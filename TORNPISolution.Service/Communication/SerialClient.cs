@@ -1,0 +1,233 @@
+using System.IO.Ports;
+using TORNPISolution.Interface;
+
+namespace TORNPISolution.Service.Communication
+{
+    /// <summary>
+    /// 通用串口客户端：支持文本（AT 指令）和二进制（固定帧）两种通讯模式。
+    /// 所有请求经 SemaphoreSlim 串行化，避免并发读写串口。
+    /// 适用于产品（AT 指令）、康伟达模拟仪（16字节帧）等非 Modbus 协议设备。
+    /// </summary>
+    public class SerialClient : IDisposable
+    {
+        private readonly SerialPort _port;
+        private readonly SemaphoreSlim _lock = new(1, 1);
+        private readonly ILogService _log;
+        private readonly int _defaultTimeoutMs;
+
+        public SerialClient(
+            string portName,
+            int baudRate = 9600,
+            Parity parity = Parity.None,
+            int dataBits = 8,
+            StopBits stopBits = StopBits.One,
+            int responseTimeoutMs = 2000,
+            ILogService? log = null)
+        {
+            _defaultTimeoutMs = responseTimeoutMs;
+            _log = log ?? new LogService(nameof(SerialClient));
+            _port = new SerialPort(portName, baudRate, parity, dataBits, stopBits)
+            {
+                ReadTimeout = responseTimeoutMs,
+                WriteTimeout = responseTimeoutMs,
+                NewLine = "\r\n"
+            };
+        }
+
+        /// <summary>串口是否已打开</summary>
+        public bool IsOpen => _port.IsOpen;
+
+        /// <summary>串口号</summary>
+        public string PortName => _port.PortName;
+
+        /// <summary>打开串口</summary>
+        public Task OpenAsync(CancellationToken ct = default) => Task.Run(() =>
+        {
+            if (!_port.IsOpen)
+            {
+                _port.Open();
+                _log.Info($"串口 {_port.PortName} 已打开（{_port.BaudRate},{_port.Parity},{_port.DataBits},{_port.StopBits}）");
+            }
+        }, ct);
+
+        /// <summary>关闭串口</summary>
+        public Task CloseAsync() => Task.Run(() =>
+        {
+            if (_port.IsOpen)
+            {
+                _port.Close();
+                _log.Info($"串口 {_port.PortName} 已关闭");
+            }
+        });
+
+        // ==================== 文本协议（AT 指令等） ====================
+
+        /// <summary>
+        /// 发送文本指令（自动追加 \r\n），等待多行响应直到超时。
+        /// 适用于产品 AT#AI 等文本指令。
+        /// </summary>
+        /// <param name="command">指令文本（不含 \r\n）</param>
+        /// <param name="timeoutMs">等待响应超时（毫秒）</param>
+        /// <returns>响应文本（可能包含多行）</returns>
+        public async Task<string> SendTextAsync(string command, int timeoutMs = 0, CancellationToken ct = default)
+        {
+            var timeout = timeoutMs > 0 ? timeoutMs : _defaultTimeoutMs;
+            await _lock.WaitAsync(ct).ConfigureAwait(false);
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    if (!_port.IsOpen)
+                        throw new InvalidOperationException($"串口 {_port.PortName} 未打开");
+
+                    _port.DiscardInBuffer();
+                    _port.WriteLine(command);
+                    _log.Debug($"TX: {command}");
+
+                    var sb = new System.Text.StringBuilder();
+                    var deadline = Environment.TickCount64 + timeout;
+
+                    while (Environment.TickCount64 < deadline)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        if (_port.BytesToRead > 0)
+                        {
+                            var line = _port.ReadLine();
+                            sb.AppendLine(line);
+                            _log.Debug($"RX: {line}");
+                            // 收到空行或超短行视为响应结束
+                            if (string.IsNullOrWhiteSpace(line) && sb.Length > 0)
+                                break;
+                        }
+                        else
+                        {
+                            Thread.Sleep(5);
+                        }
+                    }
+
+                    return sb.ToString().TrimEnd();
+                }, ct).ConfigureAwait(false);
+            }
+            catch (TimeoutException)
+            {
+                _log.Warn($"串口 {_port.PortName} 文本响应超时（{timeout}ms）：{command}");
+                throw;
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
+        // ==================== 二进制协议（固定帧） ====================
+
+        /// <summary>
+        /// 发送固定长度字节帧并接收指定长度的响应帧。
+        /// 适用于康伟达 16 字节帧协议。
+        /// </summary>
+        /// <param name="frame">发送的字节帧</param>
+        /// <param name="expectedLength">期望响应字节数（0 表示不等待响应）</param>
+        /// <param name="timeoutMs">超时（毫秒）</param>
+        /// <returns>响应字节数组</returns>
+        public async Task<byte[]> SendFrameAsync(byte[] frame, int expectedLength = 0, int timeoutMs = 0, CancellationToken ct = default)
+        {
+            var timeout = timeoutMs > 0 ? timeoutMs : _defaultTimeoutMs;
+            await _lock.WaitAsync(ct).ConfigureAwait(false);
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    if (!_port.IsOpen)
+                        throw new InvalidOperationException($"串口 {_port.PortName} 未打开");
+
+                    _port.DiscardInBuffer();
+                    _port.Write(frame, 0, frame.Length);
+                    _log.Debug($"TX Frame [{frame.Length}]: {BitConverter.ToString(frame)}");
+
+                    if (expectedLength <= 0)
+                        return Array.Empty<byte>();
+
+                    var buffer = new byte[expectedLength];
+                    var received = 0;
+                    var deadline = Environment.TickCount64 + timeout;
+
+                    while (received < expectedLength)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        if (Environment.TickCount64 > deadline)
+                            throw new TimeoutException($"二进制帧响应超时（已收 {received}/{expectedLength} 字节）");
+
+                        if (_port.BytesToRead > 0)
+                        {
+                            received += _port.Read(buffer, received, expectedLength - received);
+                        }
+                        else
+                        {
+                            Thread.Sleep(2);
+                        }
+                    }
+
+                    _log.Debug($"RX Frame [{received}]: {BitConverter.ToString(buffer)}");
+                    return buffer;
+                }, ct).ConfigureAwait(false);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
+        /// <summary>
+        /// 持续监听串口，等待设备主动发送的数据（如心跳询问帧）。
+        /// 返回收到的字节数组；超时返回 null。
+        /// </summary>
+        /// <param name="timeoutMs">监听超时（毫秒）</param>
+        /// <returns>收到的字节，超时返回 null</returns>
+        public async Task<byte[]?> ListenAsync(int timeoutMs = 5000, CancellationToken ct = default)
+        {
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    if (!_port.IsOpen)
+                        return null;
+
+                    var deadline = Environment.TickCount64 + timeoutMs;
+                    var buffer = new List<byte>();
+
+                    while (Environment.TickCount64 < deadline)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        if (_port.BytesToRead > 0)
+                        {
+                            var chunk = new byte[_port.BytesToRead];
+                            var count = _port.Read(chunk, 0, chunk.Length);
+                            buffer.AddRange(chunk.Take(count));
+                            // 收到至少 1 字节后稍等让帧完整到达
+                            Thread.Sleep(50);
+                            break;
+                        }
+                        Thread.Sleep(10);
+                    }
+
+                    return buffer.Count > 0 ? buffer.ToArray() : null;
+                }, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+        }
+
+        public void Dispose()
+        {
+            _lock.Dispose();
+            if (_port.IsOpen)
+            {
+                _port.Close();
+            }
+            _port.Dispose();
+            GC.SuppressFinalize(this);
+        }
+    }
+}

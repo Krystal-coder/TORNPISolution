@@ -1,0 +1,62 @@
+using Serilog;
+using Serilog.Core;
+using TORNPISolution.Interface;
+
+namespace TORNPISolution.Service
+{
+    /// <summary>
+    /// 基于 Serilog 的日志实现：
+    /// - 日志文件按天滚动（Logs\log-yyyyMMdd.txt）
+    /// - 单文件超过 10MB 自动生成新文件（log-yyyyMMdd_001.txt ...）
+    /// - 全局统一输出格式：[时间] [级别] [来源] 消息
+    /// 各层通过 ILogService 使用，不直接依赖 Serilog。
+    /// </summary>
+    public class LogService : ILogService
+    {
+        private const long MaxFileSizeBytes = 10 * 1024 * 1024;
+
+        private const string OutputTemplate =
+            "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{Source}] {Message:lj}{NewLine}{Exception}";
+
+        /// <summary>全局唯一的根 Logger（进程内共享，线程安全）</summary>
+        private static readonly Lazy<Logger> Root = new(() =>
+            new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(
+                    path: Path.Combine(AppContext.BaseDirectory, "Logs", "log-.txt"),
+                    rollingInterval: RollingInterval.Day,          // 按天更新
+                    fileSizeLimitBytes: MaxFileSizeBytes,          // 单文件上限 10MB
+                    rollOnFileSizeLimit: true,                     // 超限自动生成新文件
+                    outputTemplate: OutputTemplate,                // 统一格式
+                    shared: true)
+                .CreateLogger());
+
+        private readonly Serilog.ILogger _logger;
+
+        /// <summary>
+        /// 创建带来源标识的日志实例，source 一般传调用方类名，
+        /// 便于在统一格式中区分日志出自哪一层哪个类。
+        /// </summary>
+        public LogService(string source)
+        {
+            _logger = Root.Value.ForContext("Source", source);
+        }
+
+        public void Debug(string message) => _logger.Debug("{Message}", message);
+
+        public void Info(string message) => _logger.Information("{Message}", message);
+
+        public void Warn(string message) => _logger.Warning("{Message}", message);
+
+        public void Error(string message, Exception? ex = null) => _logger.Error(ex, "{Message}", message);
+
+        /// <summary>程序退出前调用，确保缓冲日志全部落盘</summary>
+        public static void CloseAndFlush()
+        {
+            if (Root.IsValueCreated)
+            {
+                Root.Value.Dispose();
+            }
+        }
+    }
+}

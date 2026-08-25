@@ -1,0 +1,159 @@
+[2026-08-20 10:18:29.931] [INF] [App] ========== 应用启动 ==========
+[2026-08-20 10:18:29.997] [INF] [Spec] 2026/8/20 10:18:29 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-20 10:18:29.997] [INF] [Spec] 2026/8/20 10:18:29 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-20 10:18:29.998] [INF] [MainViewModel] 2026/8/20 10:18:29 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-20 10:18:29.999] [INF] [TestPlanService] 2026/8/20 10:18:29 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 10:18:29.999] [INF] [TestPlanService] 2026/8/20 10:18:29 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 10:18:29.999] [INF] [MainViewModel] 2026/8/20 10:18:29 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-20 10:18:46.825] [INF] [TestPlanService] 2026/8/20 10:18:46 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 10:18:46.828] [INF] [TestPlanService] 2026/8/20 10:18:46 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 10:18:50.888] [INF] [MainViewModel] 2026/8/20 10:18:50 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-20 10:18:50.896] [INF] [TestPlanService] 2026/8/20 10:18:50 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-20 10:18:50.937] [INF] [TestPlanService] 2026/8/20 10:18:50 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-20 10:18:50.940] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-20 10:18:50.941] [INF] [MainViewModel] 2026/8/20 10:18:50 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-20 11:23:22.957] [INF] [InstrumentConfigService] 2026/8/20 11:23:22 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 11:23:22.975] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 11:23:22.975] [INF] [InstrumentConfigService] 2026/8/20 11:23:22 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 11:23:22.988] [INF] [InstrumentConfigViewModel] 2026/8/20 11:23:22 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 11:23:22.989] [INF] [InstrumentConfigViewModel] 2026/8/20 11:23:22 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:36:27.433] [INF] [InstrumentConfigService] 2026/8/20 13:36:27 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:36:27.434] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 13:36:27.434] [INF] [InstrumentConfigService] 2026/8/20 13:36:27 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:36:27.435] [INF] [InstrumentConfigViewModel] 2026/8/20 13:36:27 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:36:27.435] [INF] [InstrumentConfigViewModel] 2026/8/20 13:36:27 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:06.617] [INF] [InstrumentConfigService] 2026/8/20 13:37:06 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:37:06.617] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 13:37:06.617] [INF] [InstrumentConfigService] 2026/8/20 13:37:06 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:37:06.617] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:06 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:06.617] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:06 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:22.666] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:22 Start calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-20 13:37:22.667] [INF] [InstrumentConfigService] 2026/8/20 13:37:22 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-20 13:37:22.683] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 13:37:22.683] [INF] [InstrumentConfigService] 2026/8/20 13:37:22 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-20 13:37:22.691] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:22 Ended calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-20 13:37:24.416] [INF] [InstrumentConfigService] 2026/8/20 13:37:24 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:37:24.422] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 13:37:24.422] [INF] [InstrumentConfigService] 2026/8/20 13:37:24 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 13:37:24.422] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:24 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:24.422] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:24 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:35.192] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:35 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 13:37:35.193] [INF] [InstrumentConfigViewModel] 2026/8/20 13:37:35 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 16:08:23.739] [INF] [InstrumentConfigService] 2026/8/20 16:08:23 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 16:08:23.740] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 16:08:23.740] [INF] [InstrumentConfigService] 2026/8/20 16:08:23 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 16:08:23.740] [INF] [InstrumentConfigViewModel] 2026/8/20 16:08:23 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 16:08:23.741] [INF] [InstrumentConfigViewModel] 2026/8/20 16:08:23 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 17:57:06.918] [INF] [App] ========== 应用启动 ==========
+[2026-08-20 17:57:06.982] [INF] [Spec] 2026/8/20 17:57:06 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-20 17:57:06.983] [INF] [Spec] 2026/8/20 17:57:06 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-20 17:57:06.984] [INF] [MainViewModel] 2026/8/20 17:57:06 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-20 17:57:06.984] [INF] [TestPlanService] 2026/8/20 17:57:06 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 17:57:06.985] [INF] [TestPlanService] 2026/8/20 17:57:06 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 17:57:06.985] [INF] [MainViewModel] 2026/8/20 17:57:06 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-20 17:57:11.031] [INF] [InstrumentConfigService] 2026/8/20 17:57:11 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 17:57:11.083] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 17:57:11.083] [INF] [InstrumentConfigService] 2026/8/20 17:57:11 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 17:57:19.329] [INF] [InstrumentConfigService] 2026/8/20 17:57:19 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 17:57:19.331] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 17:57:19.331] [INF] [InstrumentConfigService] 2026/8/20 17:57:19 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 17:57:32.912] [INF] [MainViewModel] 2026/8/20 17:57:32 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:32.917] [INF] [MainViewModel] 2026/8/20 17:57:32 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:33.999] [INF] [MainViewModel] 2026/8/20 17:57:33 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:34.008] [INF] [MainViewModel] 2026/8/20 17:57:34 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:34.883] [INF] [MainViewModel] 2026/8/20 17:57:34 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:34.888] [INF] [MainViewModel] 2026/8/20 17:57:34 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:35.755] [INF] [MainViewModel] 2026/8/20 17:57:35 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:57:35.759] [INF] [MainViewModel] 2026/8/20 17:57:35 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-20 17:59:40.307] [INF] [MainViewModel] 2026/8/20 17:59:40 Start calling the MainViewModel.SavePlanWithName() method . 
+
+[2026-08-20 17:59:40.308] [INF] [TestPlanService] 2026/8/20 17:59:40 Start calling the TestPlanService.SavePlan() method . 
+
+[2026-08-20 17:59:40.316] [INF] [TestPlanService] 2026/8/20 17:59:40 Ended calling the TestPlanService.SavePlan() method . 
+
+[2026-08-20 17:59:40.317] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已保存，共 4 个模块
+[2026-08-20 17:59:40.317] [INF] [MainViewModel] 2026/8/20 17:59:40 Ended calling the MainViewModel.SavePlanWithName() method . 
+
+[2026-08-20 18:00:13.517] [INF] [TestPlanService] 2026/8/20 18:00:13 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 18:00:13.518] [INF] [TestPlanService] 2026/8/20 18:00:13 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-20 18:00:17.566] [INF] [MainViewModel] 2026/8/20 18:00:17 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-20 18:00:17.566] [INF] [TestPlanService] 2026/8/20 18:00:17 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-20 18:00:17.569] [INF] [TestPlanService] 2026/8/20 18:00:17 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-20 18:00:17.573] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-20 18:00:17.573] [INF] [MainViewModel] 2026/8/20 18:00:17 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-20 18:00:45.184] [INF] [InstrumentConfigService] 2026/8/20 18:00:45 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 18:00:45.185] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 18:00:45.185] [INF] [InstrumentConfigService] 2026/8/20 18:00:45 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 18:00:45.196] [INF] [InstrumentConfigViewModel] 2026/8/20 18:00:45 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 18:00:45.197] [INF] [InstrumentConfigViewModel] 2026/8/20 18:00:45 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-20 18:00:50.646] [INF] [InstrumentConfigService] 2026/8/20 18:00:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-20 18:00:50.647] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-20 18:00:50.647] [INF] [InstrumentConfigService] 2026/8/20 18:00:50 Ended calling the InstrumentConfigService.Load() method . 
+

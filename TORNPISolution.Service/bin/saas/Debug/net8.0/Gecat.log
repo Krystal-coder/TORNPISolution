@@ -1,0 +1,31 @@
+Config INFO: Googol Technology ECAT Master driver 2025-05-29-44-MultiTask
+Config INFO: INIT NORMAL
+2026-01-05-09:18:40 EtherCAT: 1 master waiting for devices.
+2026-01-05-09:18:40 EtherCAT 0: expect 0 slave(s),actual  1 slave(s)
+2026-01-05-09:18:40 EtherCAT 0: 1 slave(s) responding
+2026-01-05-09:18:40 EtherCAT 0: Slave states: SAFEOP  + ERROR.
+2026-01-05-09:18:40 EtherCAT 0: Clear slaves node addresses.
+2026-01-05-09:18:40 EtherCAT 0: Scanning bus.
+2026-01-05-09:18:40 EtherCAT 0-0: Slave alias is 0
+2026-01-05-09:18:40 EtherCAT 0-0: Start Fetch sii data 153 bytes
+2026-01-05-09:18:41 EtherCAT ERROR 0-0: SDO upload 0x1C12:00 aborted.
+2026-01-05-09:18:41 EtherCAT ERROR 0-0: SDO abort message 0x06020000: "This object does not exist in the object directory".
+2026-01-05-09:18:41 EtherCAT ERROR 0-0: SDO upload 0x1C13:00 aborted.
+2026-01-05-09:18:41 EtherCAT ERROR 0-0: SDO abort message 0x06020000: "This object does not exist in the object directory".
+2026-01-05-09:18:41 EtherCAT 0: Bus scanning completed in 75 ms.
+Config INFO: EtherCAT Configuration file Path is F:\ÉÕÂ¼\Synapsor.App\Synapsor.App\bin\Debug\net8.0-windows\Gecat.xml.
+Config INFO: EtherCAT Configuration file type is Gecat.xml.
+Config INFO: Slave Config by mode 0x10.
+Config INFO: EtherCAT Master Cyctime is 1000 us.
+Config INFO: Start Config 1 ECAT slave.
+2026-01-05-09:18:41 EtherCAT 0: Config each slave SDO config info ...
+2026-01-05-09:18:41 EtherCAT 0: Config each slave PDO sync info ...
+2026-01-05-09:18:41 EtherCAT 0: Registering PDO entries...
+2026-01-05-09:18:41 EtherCAT 0: pdo mapping in normal mode
+2026-01-05-09:18:41 EtherCAT 0: First pdo channel size is 24 (bytes)
+2026-01-05-09:18:41 EtherCAT 0: Need pdo channel num 1
+2026-01-05-09:18:41 EtherCAT 0: Activating master...
+2026-01-05-09:18:41 EtherCAT 0: Slave states: PREOP .
+2026-01-05-09:18:41 EtherCAT 0: Link is up.
+2026-01-05-09:18:42 EtherCAT 0-0: Now in OP. Finished configuration.
+2026-01-05-09:18:42 EtherCAT 0: All slaves are in OP mode

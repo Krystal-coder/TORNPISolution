@@ -1,0 +1,94 @@
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\ecat_config.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\ecat_master.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\Ecfg_parser.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\Gecat.log
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\Gecat.xml
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\gts.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\gts.h
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\gts.lib
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.deps.json
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.pdb
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.AssemblyReference.cache
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfoInputs.cache
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfo.cs
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.CoreCompileInputs.cache
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISo.5220B606.Up2Date
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\refint\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\S9644\Desktop\Synapsor.GoogolEtherCAT\obj\Debug\net8.0\ref\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_config.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_master.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Ecfg_parser.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.log
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.xml
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.h
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.lib
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.deps.json
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.pdb
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.AssemblyReference.cache
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfoInputs.cache
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfo.cs
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.CoreCompileInputs.cache
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISo.5220B606.Up2Date
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\refint\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\Synapsor\Downloads\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\ref\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_config.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_master.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Ecfg_parser.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.log
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.xml
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.h
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.lib
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.deps.json
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.pdb
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.AssemblyReference.cache
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfoInputs.cache
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfo.cs
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.CoreCompileInputs.cache
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISo.5220B606.Up2Date
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\refint\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\ref\CGMNPISolution.GoogolEtherCAT.dll
+C:\Users\S9644\Downloads\CGMNIPSolution 3.17\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.sourcelink.json
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_config.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\ecat_master.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Ecfg_parser.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.log
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\Gecat.xml
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.h
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\gts.lib
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.deps.json
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\bin\Debug\net8.0\CGMNPISolution.Share.pdb
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.AssemblyReference.cache
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.GeneratedMSBuildEditorConfig.editorconfig
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfoInputs.cache
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.AssemblyInfo.cs
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.csproj.CoreCompileInputs.cache
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.sourcelink.json
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISo.5220B606.Up2Date
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\refint\CGMNPISolution.GoogolEtherCAT.dll
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\CGMNPISolution.GoogolEtherCAT.pdb
+D:\projcet\CGMNIPSolution\CGMNIPSolution\CGMNPISolution.GoogolEtherCAT\obj\Debug\net8.0\ref\CGMNPISolution.GoogolEtherCAT.dll

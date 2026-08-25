@@ -1,0 +1,15 @@
+D:\projcet\TORNPISolution\TORNPISolution.Interface\bin\Release\net8.0\TORNPISolution.Interface.deps.json
+D:\projcet\TORNPISolution\TORNPISolution.Interface\bin\Release\net8.0\TORNPISolution.Interface.dll
+D:\projcet\TORNPISolution\TORNPISolution.Interface\bin\Release\net8.0\TORNPISolution.Interface.pdb
+D:\projcet\TORNPISolution\TORNPISolution.Interface\bin\Release\net8.0\TORNPISolution.Share.dll
+D:\projcet\TORNPISolution\TORNPISolution.Interface\bin\Release\net8.0\TORNPISolution.Share.pdb
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.csproj.AssemblyReference.cache
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.GeneratedMSBuildEditorConfig.editorconfig
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.AssemblyInfoInputs.cache
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.AssemblyInfo.cs
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.csproj.CoreCompileInputs.cache
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISo.FDE94808.Up2Date
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.dll
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\refint\TORNPISolution.Interface.dll
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\TORNPISolution.Interface.pdb
+D:\projcet\TORNPISolution\TORNPISolution.Interface\obj\Release\net8.0\ref\TORNPISolution.Interface.dll

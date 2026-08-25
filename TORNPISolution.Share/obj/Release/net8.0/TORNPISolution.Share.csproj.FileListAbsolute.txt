@@ -1,0 +1,11 @@
+D:\projcet\TORNPISolution\TORNPISolution.Share\bin\Release\net8.0\TORNPISolution.Share.deps.json
+D:\projcet\TORNPISolution\TORNPISolution.Share\bin\Release\net8.0\TORNPISolution.Share.dll
+D:\projcet\TORNPISolution\TORNPISolution.Share\bin\Release\net8.0\TORNPISolution.Share.pdb
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.GeneratedMSBuildEditorConfig.editorconfig
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.AssemblyInfoInputs.cache
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.AssemblyInfo.cs
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.csproj.CoreCompileInputs.cache
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.dll
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\refint\TORNPISolution.Share.dll
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\TORNPISolution.Share.pdb
+D:\projcet\TORNPISolution\TORNPISolution.Share\obj\Release\net8.0\ref\TORNPISolution.Share.dll

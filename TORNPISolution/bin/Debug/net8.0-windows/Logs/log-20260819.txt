@@ -1,0 +1,1196 @@
+[2026-08-19 09:59:48.195] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 09:59:48.340] [INF] [Spec] 2026/8/19 9:59:48 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 09:59:48.341] [INF] [Spec] 2026/8/19 9:59:48 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 09:59:48.344] [INF] [MainViewModel] 2026/8/19 9:59:48 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 09:59:48.345] [INF] [TestPlanService] 2026/8/19 9:59:48 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 09:59:48.347] [INF] [TestPlanService] 2026/8/19 9:59:48 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 09:59:48.347] [INF] [MainViewModel] 2026/8/19 9:59:48 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 10:00:10.501] [INF] [TestPlanService] 2026/8/19 10:00:10 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 10:00:10.501] [INF] [TestPlanService] 2026/8/19 10:00:10 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 10:00:14.868] [INF] [MainViewModel] 2026/8/19 10:00:14 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 10:00:14.875] [INF] [TestPlanService] 2026/8/19 10:00:14 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 10:00:14.904] [INF] [TestPlanService] 2026/8/19 10:00:14 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 10:00:14.906] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-19 10:00:14.906] [INF] [MainViewModel] 2026/8/19 10:00:14 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 10:20:07.289] [INF] [MainViewModel] 2026/8/19 10:20:07 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:07.294] [INF] [MainViewModel] 2026/8/19 10:20:07 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:08.745] [INF] [MainViewModel] 2026/8/19 10:20:08 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:08.748] [INF] [MainViewModel] 2026/8/19 10:20:08 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:09.744] [INF] [MainViewModel] 2026/8/19 10:20:09 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:09.754] [INF] [MainViewModel] 2026/8/19 10:20:09 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-19 10:20:10.860] [INF] [MainViewModel] 2026/8/19 10:20:10 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-19 10:20:10.862] [INF] [MainViewModel] 2026/8/19 10:20:10 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-19 10:20:10.863] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-19 10:20:10.869] [INF] [TestItem] 2026/8/19 10:20:10 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 10:20:10.869] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-19 10:20:10.872] [INF] [TestItem] 2026/8/19 10:20:10 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-19 10:20:10.873] [INF] [InstrumentConfigService] 2026/8/19 10:20:10 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 10:20:10.893] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 10:20:10.893] [INF] [InstrumentConfigService] 2026/8/19 10:20:10 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 10:20:10.901] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 10:20:10.902] [INF] [MainViewModel] 2026/8/19 10:20:10 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-19 10:20:10.908] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 10:20:10.955] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-19 10:20:12.502] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-19 10:20:12.550] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-19 10:20:12.550] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-19 10:20:12.551] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-19 10:20:12.554] [INF] [TestItem] 2026/8/19 10:20:12 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-19 10:20:12.555] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-19 10:20:12.555] [INF] [TestItem] 2026/8/19 10:20:12 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 10:20:12.560] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-19 10:20:12.564] [INF] [TestItem] 2026/8/19 10:20:12 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 10:20:12.564] [INF] [TestItem] TestItem2：压力控制功能测试 开始执行
+[2026-08-19 10:20:12.568] [INF] [TestItem] 2026/8/19 10:20:12 Start calling the TestItem.PressureControlModule() method . 
+
+[2026-08-19 10:20:12.568] [INF] [InstrumentConfigService] 2026/8/19 10:20:12 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 10:20:12.568] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 10:20:12.568] [INF] [InstrumentConfigService] 2026/8/19 10:20:12 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 10:20:12.580] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 10:20:12.583] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 10:20:12.678] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-19 10:20:12.680] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-19 10:20:12.799] [INF] [TestItem] BPA700：设置静态压力 350mmHg，时长 5s，等待到位...
+[2026-08-19 10:20:12.805] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 10:20:19.372] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-19 10:20:19.375] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 10:20:21.603] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-19 10:20:22.413] [INF] [TestItem] BPA700：静态压力 350mmHg 已到位（采样读回 350.0mmHg）
+[2026-08-19 10:20:22.413] [INF] [TestItem] BP-006：充气至 350 完成，采样读回稳压值 350.0（规格 340~355）
+[2026-08-19 10:20:28.202] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-19 10:21:22.424] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-19 10:21:22.435] [INF] [TestItem] BPA700：压力已归零
+[2026-08-19 10:21:22.555] [INF] [TestItem] BPA700：设置静态压力 150mmHg，时长 1s，等待到位...
+[2026-08-19 10:21:22.562] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 10:21:30.758] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-19 10:21:31.558] [INF] [TestItem] BPA700：静态压力 150mmHg 已到位（采样读回 150.4mmHg）
+[2026-08-19 10:21:33.158] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-19 10:22:31.572] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-19 10:22:31.701] [INF] [TestItem] BPA700：放气模式运行静态压力 150mmHg，时长 60s，等待到位...
+[2026-08-19 10:22:31.711] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 10:22:36.905] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-19 10:22:37.705] [INF] [TestItem] BPA700：静态压力 150mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-19 10:22:37.706] [INF] [TestItem] BP-007：平均放气速率 0.00mmHg/s（规格 2~6，采样点 1220 个）
+[2026-08-19 10:23:37.715] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-19 10:23:37.764] [ERR] [TestItem] BPA700：BPARunStaticPressure(250, inflation=True) 调用失败（如上一轮未 Finish，请先 WaitStaticPressureFinishAsync）
+[2026-08-19 10:23:37.843] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-19 10:23:37.907] [ERR] [TestItem] An error occured in TestItem.class PressureControlModule method, message: System.IO.IOException: BPA700 静态压力设置失败（250）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 556
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 674
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+System.IO.IOException: BPA700 静态压力设置失败（250）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 556
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 674
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+[2026-08-19 10:23:37.908] [INF] [TestItem] 2026/8/19 10:23:37 Ended calling the TestItem.PressureControlModule() method . 
+
+[2026-08-19 10:23:37.908] [INF] [TestItem] TestItem2：压力控制功能测试 执行完成，共 6 项结果
+[2026-08-19 10:23:37.908] [INF] [TestItem] 2026/8/19 10:23:37 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 10:23:37.908] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 10:23:37.908] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 10:23:37.908] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-007匀速放气控制 = 0 mmHg/s 超规格 2 ~ 6 mmHg/s -> FAIL
+[2026-08-19 10:23:37.908] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-009过压保护 = 0 mmHg 超规格 300 ~ 320 mmHg -> FAIL
+[2026-08-19 10:23:37.908] [INF] [MainViewModel] [TestItem2 压力控制功能测试] 模块结果：FAIL
+[2026-08-19 10:23:37.908] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-19 10:23:37.908] [INF] [MainViewModel] 2026/8/19 10:23:37 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-19 10:27:45.006] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=False
+[2026-08-19 10:27:45.006] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-19 10:27:46.082] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-19 10:27:46.082] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 14:06:49.701] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 14:06:49.816] [INF] [Spec] 2026/8/19 14:06:49 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 14:06:49.817] [INF] [Spec] 2026/8/19 14:06:49 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 14:06:49.818] [INF] [MainViewModel] 2026/8/19 14:06:49 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 14:06:49.819] [INF] [TestPlanService] 2026/8/19 14:06:49 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 14:06:49.819] [INF] [TestPlanService] 2026/8/19 14:06:49 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 14:06:49.819] [INF] [MainViewModel] 2026/8/19 14:06:49 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 14:06:54.444] [INF] [TestPlanService] 2026/8/19 14:06:54 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 14:06:54.445] [INF] [TestPlanService] 2026/8/19 14:06:54 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 14:06:59.058] [INF] [MainViewModel] 2026/8/19 14:06:59 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 14:06:59.065] [INF] [TestPlanService] 2026/8/19 14:06:59 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 14:06:59.098] [INF] [TestPlanService] 2026/8/19 14:06:59 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 14:06:59.099] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-19 14:06:59.100] [INF] [MainViewModel] 2026/8/19 14:06:59 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 14:07:26.200] [INF] [MainViewModel] 2026/8/19 14:07:26 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-19 14:07:26.203] [INF] [MainViewModel] 2026/8/19 14:07:26 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-19 14:07:26.204] [INF] [MainViewModel] ===== 开始执行测试方案，共 5 个模块 =====
+[2026-08-19 14:07:26.218] [INF] [TestItem] 2026/8/19 14:07:26 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:07:26.218] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-19 14:07:26.220] [INF] [TestItem] 2026/8/19 14:07:26 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-19 14:07:26.220] [INF] [InstrumentConfigService] 2026/8/19 14:07:26 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:07:26.238] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:07:26.238] [INF] [InstrumentConfigService] 2026/8/19 14:07:26 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:07:26.246] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 14:07:26.247] [INF] [MainViewModel] 2026/8/19 14:07:26 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-19 14:07:26.253] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 14:07:26.300] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-19 14:07:27.846] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-19 14:07:27.895] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-19 14:07:27.895] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-19 14:07:27.895] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-19 14:07:27.899] [INF] [TestItem] 2026/8/19 14:07:27 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-19 14:07:27.901] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-19 14:07:27.901] [INF] [TestItem] 2026/8/19 14:07:27 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:07:27.905] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-19 14:07:27.908] [INF] [TestItem] 2026/8/19 14:07:27 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:07:27.908] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-19 14:07:27.910] [INF] [TestItem] 2026/8/19 14:07:27 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-19 14:07:27.910] [INF] [InstrumentConfigService] 2026/8/19 14:07:27 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:07:27.910] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:07:27.910] [INF] [InstrumentConfigService] 2026/8/19 14:07:27 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:07:31.639] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 14:07:31.642] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 14:07:31.693] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-19 14:07:31.693] [WRN] [TestItem] 产品不可用：BP-001/002 仍将等待产品物理按键（最长 30 秒），BPA700 会停留在 Wait，两项判 FAIL，可随时点“停止”结束
+[2026-08-19 14:07:31.694] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-19 14:07:31.695] [INF] [TestItem] BP-001：请按下产品物理[开始]键启动测量（最长等待 30 秒）...
+[2026-08-19 14:07:31.779] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-19 14:07:31.791] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-19 14:07:44.438] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-19 14:07:44.442] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 14:08:31.805] [WRN] [TestItem] BPA700：血压测试整轮超时（60s），强制停止
+[2026-08-19 14:08:31.857] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-19 14:08:31.861] [WRN] [TestItem] BP-001 FAIL：status 序列 [2] 未经历 Busy→Stable→Finish（最终 status=2，产品未启动或气路未连通）
+[2026-08-19 14:08:31.861] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-19 14:08:31.862] [INF] [TestItem] BP-002：请先按产品[开始]键，充气过程中再按[停止]键（启动最长等待 30 秒）...
+[2026-08-19 14:08:31.947] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-19 14:08:31.959] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-19 14:08:35.848] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=True
+[2026-08-19 14:08:35.848] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 14:09:31.970] [WRN] [TestItem] BPA700：血压测试整轮超时（60s），强制停止
+[2026-08-19 14:09:32.018] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-19 14:09:32.020] [WRN] [TestItem] BP-002 FAIL：未收到 status=Idle（最终 status=2），产品未按[停止]键手动停止
+[2026-08-19 14:09:32.023] [INF] [TestItem] 2026/8/19 14:09:32 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-19 14:09:32.023] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-19 14:09:32.023] [INF] [TestItem] 2026/8/19 14:09:32 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:09:32.023] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:09:32.023] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:09:32.023] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:09:32.024] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-19 14:09:32.031] [INF] [TestItem] 2026/8/19 14:09:32 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:09:32.032] [INF] [TestItem] TestItem3：血压静态压力精度测试 开始执行
+[2026-08-19 14:09:32.033] [INF] [TestItem] 2026/8/19 14:09:32 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-19 14:09:32.033] [INF] [InstrumentConfigService] 2026/8/19 14:09:32 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:09:32.033] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:09:32.033] [INF] [InstrumentConfigService] 2026/8/19 14:09:32 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:09:32.035] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 14:09:32.039] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 14:09:32.077] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-19 14:09:32.077] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-19 14:09:32.201] [INF] [TestItem] BPA700：设置静态压力 30mmHg，保持 10s，等待到位...
+[2026-08-19 14:09:32.209] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 14:09:38.972] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-19 14:09:38.973] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-19 14:09:40.024] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=False
+[2026-08-19 14:09:40.025] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-19 14:09:49.937] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-003静态压力精度测试 → IsWaveformExpanded=True
+[2026-08-19 14:09:49.937] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 14:09:51.404] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-19 14:09:52.215] [INF] [TestItem] BPA700：静态压力 30mmHg 已到位（采样读回 37.8mmHg）
+[2026-08-19 14:09:52.215] [INF] [TestItem] 2026/8/19 14:09:52 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:09:52.215] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:09:52.215] [INF] [TestItem] 2026/8/19 14:09:52 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:10:02.804] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-19 14:10:02.929] [INF] [TestItem] BPA700：设置静态压力 60mmHg，保持 10s，等待到位...
+[2026-08-19 14:10:02.935] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:10:03.130] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:10:03.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:03.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:03.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:03.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:10:04.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:10:04.332] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:04.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:04.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:04.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:10:05.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:10:05.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:05.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:05.730] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:05.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:10:06.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:10:06.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:06.530] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:06.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:06.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:10:07.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:10:07.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:07.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:07.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:07.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:10:08.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:10:08.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:08.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:08.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:08.930] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:10:09.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:10:09.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:09.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:09.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:09.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:10:10.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:10:10.331] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:10.531] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:10.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:10.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:10:11.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:10:11.330] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:11.530] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:11.731] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:11.931] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:10:12.131] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:10:12.331] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:10:17.931] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:10:18.731] [INF] [TestItem] BPA700：静态压力 60mmHg 已到位（采样读回 63.6mmHg）
+[2026-08-19 14:10:18.739] [INF] [TestItem] 2026/8/19 14:10:18 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:10:18.739] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:10:18.739] [INF] [TestItem] 2026/8/19 14:10:18 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:10:29.131] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:10:29.261] [INF] [TestItem] BPA700：设置静态压力 90mmHg，保持 10s，等待到位...
+[2026-08-19 14:10:29.269] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:10:29.462] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:10:29.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:10:29.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:30.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:30.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:10:30.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:10:30.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:10:30.864] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:31.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:31.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:10:31.464] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:10:31.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:10:31.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:32.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:32.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:10:32.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:10:32.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:10:32.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:33.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:33.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:10:33.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:10:33.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:10:33.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:34.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:34.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:10:34.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:10:34.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:10:34.864] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:35.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:35.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:10:35.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:10:35.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:10:35.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:36.064] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:36.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:10:36.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:10:36.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:10:36.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:37.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:37.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:10:37.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:10:37.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:10:37.863] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:38.063] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:38.263] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:10:38.463] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:10:38.663] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:10:38.862] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:10:53.463] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:10:54.264] [INF] [TestItem] BPA700：静态压力 90mmHg 已到位（采样读回 91.6mmHg）
+[2026-08-19 14:10:54.265] [INF] [TestItem] 2026/8/19 14:10:54 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:10:54.265] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:10:54.265] [INF] [TestItem] 2026/8/19 14:10:54 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:11:04.862] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:11:04.990] [INF] [TestItem] BPA700：设置静态压力 120mmHg，保持 10s，等待到位...
+[2026-08-19 14:11:04.997] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:11:05.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:11:05.391] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:11:05.591] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:11:05.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:11:05.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:11:06.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:11:06.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:11:06.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:11:06.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:11:06.991] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:11:07.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:11:07.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:11:07.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:11:07.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:11:07.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:11:08.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:11:08.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:11:08.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:11:08.791] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:11:08.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:11:09.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:11:09.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:11:09.591] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:11:09.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:11:09.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:11:10.193] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:11:10.391] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:11:10.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:11:10.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:11:10.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:11:11.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:11:11.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:11:11.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:11:11.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:11:11.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:11:12.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:11:12.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:11:12.591] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:11:12.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:11:12.992] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:11:13.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:11:13.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:11:13.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:11:13.791] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:11:13.993] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:11:14.192] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:11:14.392] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:11:14.592] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:11:14.792] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:11:14.992] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:11:22.792] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:11:23.593] [INF] [TestItem] BPA700：静态压力 120mmHg 已到位（采样读回 119.9mmHg）
+[2026-08-19 14:11:23.593] [INF] [TestItem] 2026/8/19 14:11:23 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:11:23.593] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:11:23.593] [INF] [TestItem] 2026/8/19 14:11:23 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:11:34.191] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:11:34.317] [INF] [TestItem] BPA700：设置静态压力 150mmHg，保持 10s，等待到位...
+[2026-08-19 14:11:34.323] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:11:34.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:11:34.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:11:34.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:11:35.119] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:11:35.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:11:35.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:11:35.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:11:35.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:11:36.119] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:11:36.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:11:36.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:11:36.718] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:11:36.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:11:37.120] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:11:37.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:11:37.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:11:37.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:11:37.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:11:38.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:11:38.318] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:11:38.520] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:11:38.726] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:11:38.920] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:11:39.119] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:11:39.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:11:39.518] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:11:39.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:11:39.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:11:40.119] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:11:40.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:11:40.518] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:11:40.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:11:40.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:11:41.119] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:11:41.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:11:41.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:11:41.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:11:41.919] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:11:42.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:11:42.318] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:11:42.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:11:42.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:11:42.920] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:11:43.120] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:11:43.319] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:11:43.519] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:11:43.719] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:11:43.918] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:11:52.518] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:11:53.320] [INF] [TestItem] BPA700：静态压力 150mmHg 已到位（采样读回 150.2mmHg）
+[2026-08-19 14:11:53.321] [INF] [TestItem] 2026/8/19 14:11:53 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:11:53.321] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:11:53.321] [INF] [TestItem] 2026/8/19 14:11:53 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:12:03.919] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:12:04.045] [INF] [TestItem] BPA700：设置静态压力 171mmHg，保持 10s，等待到位...
+[2026-08-19 14:12:04.049] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:12:04.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:12:04.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:04.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:04.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:05.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:05.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:05.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:12:05.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:12:05.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:12:06.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:12:06.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:12:06.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:12:06.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:12:06.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:12:07.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:12:07.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:12:07.449] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:12:07.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:12:07.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:12:08.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:12:08.248] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:12:08.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:12:08.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:12:08.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:12:09.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:12:09.246] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:12:09.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:12:09.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:12:09.846] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:12:10.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:12:10.246] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:12:10.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:12:10.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:12:10.846] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:12:11.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:12:11.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:12:11.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:12:11.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:12:11.847] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:12:12.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:12:12.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:12:12.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:12:12.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:12:12.848] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:12:13.047] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:12:13.247] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:12:13.447] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:12:13.647] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:12:13.846] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:12:19.646] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:12:20.447] [INF] [TestItem] BPA700：静态压力 171mmHg 已到位（采样读回 171.3mmHg）
+[2026-08-19 14:12:20.447] [INF] [TestItem] 2026/8/19 14:12:20 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:12:20.447] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:12:20.447] [INF] [TestItem] 2026/8/19 14:12:20 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:12:31.246] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:12:31.377] [INF] [TestItem] BPA700：设置静态压力 210mmHg，保持 10s，等待到位...
+[2026-08-19 14:12:31.383] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:31.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:31.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:31.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:32.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:32.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:12:32.579] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:12:32.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:12:32.977] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:12:33.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:12:33.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:12:33.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:12:33.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:12:33.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:12:34.179] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:12:34.379] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:12:34.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:12:34.777] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:12:34.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:12:35.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:12:35.379] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:12:35.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:12:35.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:12:35.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:12:36.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:12:36.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:12:36.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:12:36.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:12:36.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:12:37.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:12:37.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:12:37.579] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:12:37.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:12:37.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:12:38.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:12:38.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:12:38.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:12:38.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:12:38.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:12:39.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:12:39.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:12:39.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:12:39.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:12:39.978] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:12:40.178] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:12:40.378] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:12:40.578] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:12:40.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:12:40.978] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:12:46.978] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:12:47.780] [INF] [TestItem] BPA700：静态压力 210mmHg 已到位（采样读回 210.6mmHg）
+[2026-08-19 14:12:47.780] [INF] [TestItem] 2026/8/19 14:12:47 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:12:47.780] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:12:47.780] [INF] [TestItem] 2026/8/19 14:12:47 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:12:58.378] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:12:58.510] [INF] [TestItem] BPA700：设置静态压力 240mmHg，保持 10s，等待到位...
+[2026-08-19 14:12:58.516] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:12:58.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:12:58.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:59.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:59.311] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:12:59.512] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:59.712] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:12:59.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:00.112] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:00.312] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:00.511] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:00.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:00.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:01.112] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:01.312] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:01.511] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:01.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:01.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:02.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:02.311] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:02.511] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:02.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:02.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:03.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:03.312] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:03.512] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:03.715] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:03.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:04.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:04.311] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:04.511] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:13:04.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:13:04.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:13:05.112] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:13:05.312] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:13:05.512] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:13:05.711] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:13:05.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:13:06.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:13:06.311] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:13:06.512] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:13:06.712] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:13:06.912] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:13:07.111] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:13:07.311] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:13:07.512] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:13:07.712] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:13:07.911] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:13:08.112] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:13:08.312] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:13:08.511] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:13:14.512] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:13:15.312] [INF] [TestItem] BPA700：静态压力 240mmHg 已到位（采样读回 240.4mmHg）
+[2026-08-19 14:13:15.313] [INF] [TestItem] 2026/8/19 14:13:15 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:13:15.313] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:13:15.313] [INF] [TestItem] 2026/8/19 14:13:15 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:13:25.912] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:13:26.035] [INF] [TestItem] BPA700：设置静态压力 270mmHg，保持 10s，等待到位...
+[2026-08-19 14:13:26.043] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:13:26.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:13:26.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:13:26.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:13:26.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:13:27.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:13:27.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:13:27.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:27.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:27.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:28.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:28.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:28.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:28.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:28.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:29.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:29.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:29.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:29.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:29.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:30.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:30.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:30.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:30.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:30.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:31.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:31.236] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:31.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:31.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:31.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:13:32.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:13:32.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:13:32.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:13:32.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:13:32.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:13:33.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:13:33.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:13:33.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:13:33.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:13:33.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:13:34.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:13:34.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:13:34.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:13:34.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:13:34.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:13:35.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:13:35.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:13:35.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:13:35.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:13:35.836] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:13:42.637] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:13:43.438] [INF] [TestItem] BPA700：静态压力 270mmHg 已到位（采样读回 270.1mmHg）
+[2026-08-19 14:13:43.439] [INF] [TestItem] 2026/8/19 14:13:43 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:13:43.439] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:13:43.439] [INF] [TestItem] 2026/8/19 14:13:43 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:13:54.237] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:13:54.360] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 10s，等待到位...
+[2026-08-19 14:13:54.363] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:13:54.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:13:54.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:13:54.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:13:55.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:13:55.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:55.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:55.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:13:55.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:56.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:13:56.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:56.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:56.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:13:56.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:57.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:13:57.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:57.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:57.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:13:57.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:58.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:13:58.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:58.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:58.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:13:58.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:59.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:13:59.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:59.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:59.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:13:59.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:00.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:00.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:00.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:00.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:00.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:01.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:01.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:01.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:01.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:01.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:02.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:02.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:02.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:02.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:02.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:03.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:03.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:03.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:03.765] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:03.961] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:14:11.761] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:14:12.562] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 300.6mmHg）
+[2026-08-19 14:14:12.562] [INF] [TestItem] 2026/8/19 14:14:12 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:14:12.562] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-19 14:14:12.562] [INF] [TestItem] 2026/8/19 14:14:12 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-19 14:14:23.161] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:14:23.171] [INF] [TestItem] BPA700：已停止模拟
+[2026-08-19 14:14:23.173] [INF] [TestItem] BPA700：压力已归零
+[2026-08-19 14:14:23.186] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-19 14:14:23.188] [WRN] [TestItem] BP-003 FAIL：产品压力上报协议预留，未取到产品上报值（协议定稿后补 ProductController.ReadProductPressureAsync）
+[2026-08-19 14:14:23.192] [INF] [TestItem] 2026/8/19 14:14:23 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-19 14:14:23.192] [INF] [TestItem] TestItem3：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-19 14:14:23.192] [INF] [TestItem] 2026/8/19 14:14:23 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:14:23.192] [WRN] [MainViewModel] [TestItem3 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:14:23.192] [WRN] [MainViewModel] [TestItem3 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:14:23.192] [INF] [MainViewModel] [TestItem3 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-19 14:14:23.203] [INF] [TestItem] 2026/8/19 14:14:23 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:14:23.203] [INF] [TestItem] TestItem4：血压动态压力精度测试 开始执行
+[2026-08-19 14:14:23.206] [INF] [TestItem] 2026/8/19 14:14:23 Start calling the TestItem.BpDynamicAccuracyModule() method . 
+
+[2026-08-19 14:14:23.206] [INF] [InstrumentConfigService] 2026/8/19 14:14:23 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:14:23.206] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:14:23.206] [INF] [InstrumentConfigService] 2026/8/19 14:14:23 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:14:23.206] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 14:14:23.209] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 14:14:23.268] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-19 14:14:23.269] [WRN] [TestItem] BP-004/005 跳过测量轮次：产品不可用，且全部结果项依赖产品上报值（协议预留），空跑无意义
+[2026-08-19 14:14:23.271] [INF] [TestItem] 2026/8/19 14:14:23 Ended calling the TestItem.BpDynamicAccuracyModule() method . 
+
+[2026-08-19 14:14:23.271] [INF] [TestItem] TestItem4：血压动态压力精度测试 执行完成，共 8 项结果
+[2026-08-19 14:14:23.271] [INF] [TestItem] 2026/8/19 14:14:23 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:14:23.271] [WRN] [MainViewModel] [TestItem4 血压动态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:14:23.271] [WRN] [MainViewModel] [TestItem4 血压动态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:14:23.271] [INF] [MainViewModel] [TestItem4 血压动态压力精度测试] 模块结果：FAIL
+[2026-08-19 14:14:23.280] [INF] [TestItem] 2026/8/19 14:14:23 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:14:23.280] [INF] [TestItem] TestItem5：压力控制功能测试 开始执行
+[2026-08-19 14:14:23.282] [INF] [TestItem] 2026/8/19 14:14:23 Start calling the TestItem.PressureControlModule() method . 
+
+[2026-08-19 14:14:23.282] [INF] [InstrumentConfigService] 2026/8/19 14:14:23 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:14:23.283] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:14:23.283] [INF] [InstrumentConfigService] 2026/8/19 14:14:23 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:14:23.283] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-19 14:14:23.285] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-19 14:14:23.342] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-19 14:14:23.342] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-19 14:14:23.463] [INF] [TestItem] BPA700：设置静态压力 350mmHg，保持 5s，等待到位...
+[2026-08-19 14:14:23.468] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:14:23.666] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:14:23.866] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:24.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:24.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:24.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:14:24.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:14:24.866] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:25.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:25.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:25.464] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:14:25.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:14:25.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:26.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:26.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:26.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:14:26.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:14:26.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:27.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:27.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:27.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:14:27.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:14:27.866] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:28.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:28.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:28.464] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:14:28.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:14:28.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:29.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:29.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:29.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:29.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:29.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:30.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:30.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:30.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:30.666] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:30.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:31.064] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:31.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:31.464] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:31.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:31.865] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:32.065] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:32.265] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:32.465] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:32.665] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:32.865] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:14:40.258] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-19 14:14:40.259] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-19 14:14:42.064] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:14:42.865] [INF] [TestItem] BPA700：静态压力 350mmHg 已到位（采样读回 350.9mmHg）
+[2026-08-19 14:14:42.865] [INF] [TestItem] BP-006：充气至 350 完成，采样读回稳压值 350.9（规格 340~355）
+[2026-08-19 14:14:48.465] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:14:48.471] [INF] [TestItem] BPA700：压力已归零
+[2026-08-19 14:14:48.596] [INF] [TestItem] BPA700：设置静态压力 150mmHg，保持 2s，等待到位...
+[2026-08-19 14:14:48.603] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:14:48.800] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:14:48.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:14:49.198] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:14:49.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:49.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:49.800] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:14:49.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:14:50.198] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:14:50.398] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:50.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:50.799] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:14:50.999] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:14:51.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:14:51.398] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:51.598] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:51.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:14:51.999] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:14:52.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:14:52.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:52.598] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:52.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:14:52.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:14:53.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:14:53.398] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:53.598] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:53.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:14:53.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:14:54.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:14:54.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:54.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:54.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:14:54.999] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:55.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:14:55.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:55.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:55.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:14:55.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:56.199] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:14:56.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:56.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:56.798] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:14:56.998] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:57.198] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:14:57.399] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:57.599] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:57.799] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:14:57.999] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:58.198] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:14:58.398] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:15:04.198] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:15:05.000] [INF] [TestItem] BPA700：静态压力 150mmHg 已到位（采样读回 2.2mmHg）
+[2026-08-19 14:15:07.599] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:15:07.605] [INF] [TestItem] BPA700：慢速放气阀已打开（下一次测试调用时生效）
+[2026-08-19 14:15:07.734] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 14:15:07.927] [INF] [TestItem] BP-007：平均放气速率 -0.62mmHg/s（规格 2~6，采样点 60 个）
+[2026-08-19 14:15:07.929] [INF] [TestItem] BPA700：已停止模拟
+[2026-08-19 14:15:07.932] [INF] [TestItem] BPA700：慢速放气阀已关闭（下一次测试调用时生效）
+[2026-08-19 14:15:08.098] [INF] [TestItem] BPA700：设置静态压力 250mmHg，保持 2s，等待到位...
+[2026-08-19 14:15:08.106] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:15:08.301] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-19 14:15:08.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:15:08.700] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-19 14:15:08.900] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:15:09.100] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:15:09.301] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-19 14:15:09.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:15:09.700] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-19 14:15:09.901] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:15:10.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:15:10.301] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-19 14:15:10.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:15:10.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-19 14:15:10.900] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:15:11.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:15:11.300] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-19 14:15:11.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:15:11.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-19 14:15:11.901] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:15:12.100] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:15:12.301] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-19 14:15:12.502] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:15:12.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-19 14:15:12.900] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:15:13.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:15:13.300] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-19 14:15:13.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:15:13.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-19 14:15:13.901] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:15:14.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:15:14.300] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-19 14:15:14.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:15:14.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-19 14:15:14.902] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:15:15.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:15:15.300] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-19 14:15:15.500] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:15:15.700] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-19 14:15:15.901] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:15:16.101] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:15:16.301] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-19 14:15:16.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:15:16.700] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-19 14:15:16.901] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:15:17.100] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:15:17.300] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-19 14:15:17.501] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:15:17.701] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-19 14:15:17.900] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-19 14:15:24.901] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-19 14:15:25.702] [INF] [TestItem] BPA700：静态压力 250mmHg 已到位（采样读回 26.9mmHg）
+[2026-08-19 14:15:28.301] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-19 14:15:28.305] [INF] [TestItem] BPA700：快速放气阀已打开（下一次测试调用时生效）
+[2026-08-19 14:15:28.457] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-19 14:15:28.552] [INF] [TestItem] BP-008：快释放气归零耗时 0.1s（规格 ≤10s）
+[2026-08-19 14:15:28.555] [INF] [TestItem] BPA700：已停止模拟
+[2026-08-19 14:15:28.558] [INF] [TestItem] BPA700：快速放气阀已关闭（下一次测试调用时生效）
+[2026-08-19 14:15:28.559] [INF] [TestItem] BPA700：压力已归零
+[2026-08-19 14:15:28.559] [INF] [TestItem] BP-009：过压保护测试（目标 350，阈值 300/320），产品需全程实时上报压力（协议预留）...
+[2026-08-19 14:15:28.602] [ERR] [TestItem] BPA700：BPARunOverpressureTest(inflation=True, 350/300/320) 调用失败
+[2026-08-19 14:15:28.653] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-19 14:15:28.698] [ERR] [TestItem] An error occured in TestItem.class PressureControlModule method, message: System.IO.IOException: BPA700 过压保护测试启动失败
+   at TORNPISolution.Service.Devices.BPA700Simulator.RunOverpressureTestAsync(Double pressure, Double threshold1, Double threshold2, Boolean inflation, Int32 timeoutMs, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 721
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 731
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 740
+System.IO.IOException: BPA700 过压保护测试启动失败
+   at TORNPISolution.Service.Devices.BPA700Simulator.RunOverpressureTestAsync(Double pressure, Double threshold1, Double threshold2, Boolean inflation, Int32 timeoutMs, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 721
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 731
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 740
+[2026-08-19 14:15:28.698] [INF] [TestItem] 2026/8/19 14:15:28 Ended calling the TestItem.PressureControlModule() method . 
+
+[2026-08-19 14:15:28.698] [INF] [TestItem] TestItem5：压力控制功能测试 执行完成，共 6 项结果
+[2026-08-19 14:15:28.698] [INF] [TestItem] 2026/8/19 14:15:28 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-19 14:15:28.698] [WRN] [MainViewModel] [TestItem5 压力控制功能测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:15:28.699] [WRN] [MainViewModel] [TestItem5 压力控制功能测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-19 14:15:28.699] [WRN] [MainViewModel] [TestItem5 压力控制功能测试] BP-007匀速放气控制 = -0.62 mmHg/s 超规格 2 ~ 6 mmHg/s -> FAIL
+[2026-08-19 14:15:28.699] [WRN] [MainViewModel] [TestItem5 压力控制功能测试] BP-009过压保护 = 0 mmHg 超规格 300 ~ 320 mmHg -> FAIL
+[2026-08-19 14:15:28.699] [INF] [MainViewModel] [TestItem5 压力控制功能测试] 模块结果：FAIL
+[2026-08-19 14:15:28.699] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-19 14:15:28.699] [INF] [MainViewModel] 2026/8/19 14:15:28 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-19 14:26:38.199] [INF] [MainViewModel] 2026/8/19 14:26:38 Start calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-19 14:26:38.200] [INF] [MainViewModel] 2026/8/19 14:26:38 Ended calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-19 14:26:38.761] [INF] [MainViewModel] 2026/8/19 14:26:38 Start calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-19 14:26:38.761] [INF] [MainViewModel] 2026/8/19 14:26:38 Ended calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-19 14:31:00.870] [INF] [InstrumentConfigService] 2026/8/19 14:31:00 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:31:00.870] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 14:31:00.870] [INF] [InstrumentConfigService] 2026/8/19 14:31:00 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 14:48:07.965] [INF] [App] ========== 应用退出 ==========
+[2026-08-19 15:38:06.999] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 15:38:07.065] [INF] [Spec] 2026/8/19 15:38:07 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 15:38:07.066] [INF] [Spec] 2026/8/19 15:38:07 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 15:38:07.067] [INF] [MainViewModel] 2026/8/19 15:38:07 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 15:38:07.067] [INF] [TestPlanService] 2026/8/19 15:38:07 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 15:38:07.068] [INF] [TestPlanService] 2026/8/19 15:38:07 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 15:38:07.068] [INF] [MainViewModel] 2026/8/19 15:38:07 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 15:43:00.699] [INF] [TestPlanService] 2026/8/19 15:43:00 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 15:43:00.702] [INF] [TestPlanService] 2026/8/19 15:43:00 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 15:43:03.947] [INF] [MainViewModel] 2026/8/19 15:43:03 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 15:43:03.957] [INF] [TestPlanService] 2026/8/19 15:43:03 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 15:43:03.988] [INF] [TestPlanService] 2026/8/19 15:43:03 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-19 15:43:03.990] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-19 15:43:03.990] [INF] [MainViewModel] 2026/8/19 15:43:03 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-19 15:56:17.561] [INF] [InstrumentConfigService] 2026/8/19 15:56:17 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 15:56:17.584] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 15:56:17.585] [INF] [InstrumentConfigService] 2026/8/19 15:56:17 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:05:46.482] [INF] [InstrumentConfigService] 2026/8/19 16:05:46 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:05:46.484] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:05:46.484] [INF] [InstrumentConfigService] 2026/8/19 16:05:46 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:14:29.185] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 16:14:29.254] [INF] [Spec] 2026/8/19 16:14:29 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 16:14:29.256] [INF] [Spec] 2026/8/19 16:14:29 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 16:14:29.257] [INF] [MainViewModel] 2026/8/19 16:14:29 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 16:14:29.258] [INF] [TestPlanService] 2026/8/19 16:14:29 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 16:14:29.259] [INF] [TestPlanService] 2026/8/19 16:14:29 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 16:14:29.259] [INF] [MainViewModel] 2026/8/19 16:14:29 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 16:14:32.236] [INF] [InstrumentConfigService] 2026/8/19 16:14:32 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:14:32.284] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:14:32.284] [INF] [InstrumentConfigService] 2026/8/19 16:14:32 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:14:32.291] [INF] [InstrumentConfigViewModel] 2026/8/19 16:14:32 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 16:14:32.292] [INF] [InstrumentConfigViewModel] 2026/8/19 16:14:32 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 16:14:35.762] [INF] [InstrumentConfigService] 2026/8/19 16:14:35 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:14:35.762] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:14:35.762] [INF] [InstrumentConfigService] 2026/8/19 16:14:35 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:15:27.140] [INF] [InstrumentConfigService] 2026/8/19 16:15:27 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:15:27.140] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:15:27.140] [INF] [InstrumentConfigService] 2026/8/19 16:15:27 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:47:08.637] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 16:47:08.700] [INF] [Spec] 2026/8/19 16:47:08 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 16:47:08.701] [INF] [Spec] 2026/8/19 16:47:08 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 16:47:08.702] [INF] [MainViewModel] 2026/8/19 16:47:08 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 16:47:08.702] [INF] [TestPlanService] 2026/8/19 16:47:08 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 16:47:08.703] [INF] [TestPlanService] 2026/8/19 16:47:08 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 16:47:08.703] [INF] [MainViewModel] 2026/8/19 16:47:08 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 16:47:58.274] [INF] [InstrumentConfigService] 2026/8/19 16:47:58 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:47:58.318] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:47:58.318] [INF] [InstrumentConfigService] 2026/8/19 16:47:58 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:47:58.322] [INF] [InstrumentConfigViewModel] 2026/8/19 16:47:58 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 16:47:58.324] [INF] [InstrumentConfigViewModel] 2026/8/19 16:47:58 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 16:48:01.580] [INF] [InstrumentConfigService] 2026/8/19 16:48:01 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:48:01.580] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:48:01.580] [INF] [InstrumentConfigService] 2026/8/19 16:48:01 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:52:11.304] [INF] [InstrumentConfigService] 2026/8/19 16:52:11 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:52:11.307] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 16:52:11.307] [INF] [InstrumentConfigService] 2026/8/19 16:52:11 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 16:52:11.307] [INF] [InstrumentConfigViewModel] 2026/8/19 16:52:11 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 16:52:11.307] [INF] [InstrumentConfigViewModel] 2026/8/19 16:52:11 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 18:03:18.574] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 18:03:18.650] [INF] [Spec] 2026/8/19 18:03:18 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 18:03:18.651] [INF] [Spec] 2026/8/19 18:03:18 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 18:03:18.652] [INF] [MainViewModel] 2026/8/19 18:03:18 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 18:03:18.652] [INF] [TestPlanService] 2026/8/19 18:03:18 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 18:03:18.653] [INF] [TestPlanService] 2026/8/19 18:03:18 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 18:03:18.653] [INF] [MainViewModel] 2026/8/19 18:03:18 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 18:03:23.393] [INF] [InstrumentConfigService] 2026/8/19 18:03:23 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 18:03:23.432] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 18:03:23.432] [INF] [InstrumentConfigService] 2026/8/19 18:03:23 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 18:03:23.442] [INF] [InstrumentConfigViewModel] 2026/8/19 18:03:23 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 18:03:23.443] [INF] [InstrumentConfigViewModel] 2026/8/19 18:03:23 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 18:06:47.150] [INF] [App] ========== 应用退出 ==========
+[2026-08-19 18:10:13.028] [INF] [App] ========== 应用启动 ==========
+[2026-08-19 18:10:13.097] [INF] [Spec] 2026/8/19 18:10:13 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-19 18:10:13.097] [INF] [Spec] 2026/8/19 18:10:13 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-19 18:10:13.099] [INF] [MainViewModel] 2026/8/19 18:10:13 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 18:10:13.099] [INF] [TestPlanService] 2026/8/19 18:10:13 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 18:10:13.099] [INF] [TestPlanService] 2026/8/19 18:10:13 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-19 18:10:13.100] [INF] [MainViewModel] 2026/8/19 18:10:13 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-19 18:10:15.292] [INF] [InstrumentConfigService] 2026/8/19 18:10:15 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 18:10:15.350] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-19 18:10:15.350] [INF] [InstrumentConfigService] 2026/8/19 18:10:15 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-19 18:10:15.357] [INF] [InstrumentConfigViewModel] 2026/8/19 18:10:15 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 18:10:15.358] [INF] [InstrumentConfigViewModel] 2026/8/19 18:10:15 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-19 18:10:21.771] [INF] [App] ========== 应用退出 ==========

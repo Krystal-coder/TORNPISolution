@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TORNPISolution.GoogolEtherCAT\TORNPISolution.GoogolEtherCAT.csproj" />
+    <ProjectReference Include="..\TORNPISolution.Interface\TORNPISolution.Interface.csproj" />
+    <ProjectReference Include="..\TORNPISolution.Share\TORNPISolution.Share.csproj" />
+  </ItemGroup>
+
+  <!-- 仪器原生/第三方库：用 Content 项可随项目引用传递复制到主程序输出目录 -->
+  <ItemGroup>
+    <!-- BPA700 鲸扬模拟仪原生 SDK DLL -->
+    <Content Include="Libs\BPA700x64.dll">
+      <Link>BPA700x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- AECG100 鲸扬多功能综合性能测试仪原生 SDK DLL -->
+    <Content Include="Libs\AECG100x64.dll">
+      <Link>AECG100x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- THS_HF NFC 读卡器托管库（已修补为 AnyCPU，可在 x64 进程加载） -->
+    <Content Include="Libs\Reader_DLLV1.dll">
+      <Link>Reader_DLLV1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1863 @@
+[2026-08-18 09:07:28.328] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 09:07:28.451] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 09:07:35.781] [INF] [MainWindow] [诊断] 方案列表选中 → 血压测量精度检测
+[2026-08-18 09:07:35.822] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压测量精度检测
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:07:36.515] [INF] [MainWindow] [诊断] 明细表点击：命中 DataGridCell，行数据=产品问询
+[2026-08-18 09:07:36.888] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=BP-001袖带充放气测量
+[2026-08-18 09:07:37.347] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:07:37.665] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品问询
+[2026-08-18 09:07:38.075] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:07:38.536] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品当前状态查询
+[2026-08-18 09:07:38.900] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:07:39.352] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品当前状态查询
+[2026-08-18 09:07:40.135] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品问询
+[2026-08-18 09:07:40.642] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:07:40.959] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:07:41.426] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:07:41.822] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品问询
+[2026-08-18 09:07:42.131] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=产品问询
+[2026-08-18 09:07:42.423] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:07:42.702] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=BP-001袖带充放气测量
+[2026-08-18 09:07:42.868] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=BP-001袖带充放气测量
+[2026-08-18 09:13:02.774] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:13:03.703] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:13:04.345] [INF] [MainWindow] [诊断] 明细表点击：命中 DataGridCell，行数据=BP-001袖带充放气测量
+[2026-08-18 09:23:16.540] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:35:25.513] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 09:35:25.649] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 09:35:32.630] [INF] [MainWindow] [诊断] 方案列表选中 → 血压仪初始化连接
+[2026-08-18 09:35:32.664] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压仪初始化连接
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:35:33.238] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:35:33.880] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:35:34.458] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:35:35.126] [INF] [MainWindow] [诊断] 方案列表选中 → 血压测量精度检测
+[2026-08-18 09:35:35.127] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压测量精度检测
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:35:35.654] [INF] [MainWindow] [诊断] 明细表点击：命中 DataGridCell，行数据=产品问询
+[2026-08-18 09:35:36.066] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:35:36.486] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:35:36.708] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:35:37.128] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:35:37.397] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:35:37.642] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:35:37.998] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:35:38.221] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:35:47.526] [INF] [App] ========== 应用退出 ==========
+[2026-08-18 09:44:55.618] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 09:44:55.710] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 09:45:25.329] [INF] [MainWindow] [诊断] 方案列表选中 → 血压仪初始化连接
+[2026-08-18 09:45:25.369] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压仪初始化连接
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:45:25.946] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:25.954] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='血压模拟仪初始化连接', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='配置页面选择康伟达/鲸扬，未选择模拟仪则 FAIL', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:45:26.642] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:26.967] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:27.204] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:27.917] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:28.257] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:45:28.743] [INF] [MainWindow] [诊断] 方案列表选中 → 血压测量精度检测
+[2026-08-18 09:45:28.744] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压测量精度检测
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:45:29.445] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:29.450] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:45:30.032] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:45:30.036] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品问询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品问询]，产品返回 MAC 地址和嵌软版本', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:45:30.468] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:30.472] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:45:30.848] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:31.190] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:31.194] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:31.522] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:45:31.526] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品问询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品问询]，产品返回 MAC 地址和嵌软版本', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:31.760] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:45:32.043] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:32.047] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:32.431] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:32.435] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:32.790] [INF] [MainWindow] [诊断] 明细表点击：命中 DataGridCell，行数据=产品当前状态查询
+[2026-08-18 09:45:32.794] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:33.041] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:33.644] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:33.652] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:34.173] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:35.926] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:36.257] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:45:36.260] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品问询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品问询]，产品返回 MAC 地址和嵌软版本', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:36.978] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:36.982] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:37.159] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:37.328] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:37.603] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:37.606] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:37.772] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:45:38.293] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:45:38.297] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:45:38.499] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:46:12.370] [INF] [App] ========== 应用退出 ==========
+[2026-08-18 09:56:20.179] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 09:56:20.276] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 09:56:37.097] [INF] [MainWindow] [诊断] 方案列表选中 → 血压仪初始化连接
+[2026-08-18 09:56:37.117] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压仪初始化连接
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:56:37.643] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:37.649] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='血压模拟仪初始化连接', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='配置页面选择康伟达/鲸扬，未选择模拟仪则 FAIL', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:56:38.141] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:38.348] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:38.650] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:38.877] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:39.067] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:39.599] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:40.090] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:56:40.454] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=血压模拟仪初始化连接
+[2026-08-18 09:57:05.675] [INF] [MainWindow] [诊断] 方案列表选中 → 血压测量精度检测
+[2026-08-18 09:57:05.676] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压测量精度检测
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-18 09:57:06.605] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:06.613] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:57:07.360] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:07.794] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:08.040] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:08.238] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:08.427] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:08.610] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:08.990] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:09.235] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:09.425] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:09.600] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:09.789] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:10.202] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:10.558] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品当前状态查询
+[2026-08-18 09:57:10.562] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品当前状态查询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品当前状态]，返回内容预留待定（有返回即通过）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:57:10.842] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=产品问询
+[2026-08-18 09:57:10.845] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='产品问询', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='发送[产品问询]，产品返回 MAC 地址和嵌软版本', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+
+[2026-08-18 09:57:11.167] [INF] [MainWindow] [诊断] 明细表点击：命中 TextBlock，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:11.171] [INF] [MainWindow] [诊断] 选中行视觉状态转储（IsSelected=True，行高=36）：
+  TextBlock: Text='BP-001袖带充放气测量', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=182x35, IsVisible=True
+  TextBlock: Text='模拟仪加压至目标压力 -> 发[袖带开始充气] -> 状态判断 -> 放气回到 0', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=212.6x35, IsVisible=True
+  TextBlock: Text='1 ~ 1 ', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=155.4x35, IsVisible=True
+  TextBlock: Text='--', Visibility=Visible, Opacity=1, Foreground=#FFFFFFFF, 尺寸=128.9x35, IsVisible=True
+  TextBlock: Text='未测试', Visibility=Visible, Opacity=1, Foreground=#FF9AA4B2, 尺寸=93x15.2, IsVisible=True
+  TextBlock: Text='压力波形', Visibility=Visible, Opacity=1, Foreground=#FF2D3748, 尺寸=0x0, IsVisible=False
+  TextBlock: Text='单位跟随仪器设置（mmHg/kPa）', Visibility=Visible, Opacity=1, Foreground=#FF8A94A6, 尺寸=0x0, IsVisible=False
+
+[2026-08-18 09:57:11.605] [INF] [MainWindow] [诊断] 明细表点击：命中 Path，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:11.794] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:12.000] [INF] [MainWindow] [诊断] 明细表点击：命中 Path，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:12.174] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:12.361] [INF] [MainWindow] [诊断] 明细表点击：命中 Path，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:12.530] [INF] [MainWindow] [诊断] 明细表点击：命中 Grid，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:12.751] [INF] [MainWindow] [诊断] 明细表点击：命中 Path，行数据=BP-001袖带充放气测量
+[2026-08-18 09:57:58.895] [INF] [App] ========== 应用退出 ==========
+[2026-08-18 10:04:21.144] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 10:04:21.265] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 10:05:22.106] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-18 10:05:22.109] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 10:05:22.137] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 10:05:22.166] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 10:05:22.177] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 10:05:22.222] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 10:05:23.768] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 10:05:23.817] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 10:05:23.818] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 10:05:23.819] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 10:05:23.825] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 10:05:23.829] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 10:05:23.830] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-18 10:16:11.418] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 10:16:11.510] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 10:16:20.933] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=True
+[2026-08-18 10:16:20.936] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 10:16:22.531] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=False
+[2026-08-18 10:16:22.531] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 10:16:22.925] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=True
+[2026-08-18 10:16:22.926] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 10:16:25.144] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=False
+[2026-08-18 10:16:25.144] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 10:16:26.323] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=True
+[2026-08-18 10:16:26.323] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 10:16:27.457] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=False
+[2026-08-18 10:16:27.457] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 11:46:24.887] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 11:46:24.947] [INF] [Spec] 2026/8/18 11:46:24 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 11:46:24.948] [INF] [Spec] 2026/8/18 11:46:24 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 11:46:24.950] [INF] [MainViewModel] 2026/8/18 11:46:24 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 11:46:24.950] [INF] [TestPlanService] 2026/8/18 11:46:24 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 11:46:24.951] [INF] [TestPlanService] 2026/8/18 11:46:24 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 11:46:24.951] [INF] [MainViewModel] 2026/8/18 11:46:24 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 11:46:24.956] [INF] [TestPlanService] 2026/8/18 11:46:24 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 11:46:24.980] [INF] [TestPlanService] 2026/8/18 11:46:24 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 11:46:24.981] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 11:46:24.981] [INF] [MainViewModel] 2026/8/18 11:46:24 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 11:46:24.981] [INF] [MainViewModel] 2026/8/18 11:46:24 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 11:46:29.843] [INF] [MainViewModel] 2026/8/18 11:46:29 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 11:46:29.850] [INF] [MainViewModel] 2026/8/18 11:46:29 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 11:46:32.187] [INF] [MainViewModel] 2026/8/18 11:46:32 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 11:46:32.189] [INF] [MainViewModel] 2026/8/18 11:46:32 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 11:46:32.190] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-18 11:46:32.194] [INF] [TestItem] 2026/8/18 11:46:32 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 11:46:32.194] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 11:46:32.198] [INF] [TestItem] 2026/8/18 11:46:32 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 11:46:32.199] [INF] [InstrumentConfigService] 2026/8/18 11:46:32 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 11:46:32.218] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 11:46:32.218] [INF] [InstrumentConfigService] 2026/8/18 11:46:32 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 11:46:32.219] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 11:46:32.220] [INF] [MainViewModel] 2026/8/18 11:46:32 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 11:46:32.226] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 11:46:32.268] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 11:46:33.831] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 11:46:33.879] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 11:46:33.879] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 11:46:33.880] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 11:46:33.885] [INF] [TestItem] 2026/8/18 11:46:33 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 11:46:33.886] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 11:46:33.886] [INF] [TestItem] 2026/8/18 11:46:33 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 11:46:33.890] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 11:46:33.891] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-18 11:46:33.891] [INF] [MainViewModel] 2026/8/18 11:46:33 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 11:46:59.508] [INF] [App] ========== 应用退出 ==========
+[2026-08-18 13:04:46.254] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 13:04:46.317] [INF] [Spec] 2026/8/18 13:04:46 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 13:04:46.318] [INF] [Spec] 2026/8/18 13:04:46 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 13:04:46.319] [INF] [MainViewModel] 2026/8/18 13:04:46 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 13:04:46.319] [INF] [TestPlanService] 2026/8/18 13:04:46 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:04:46.320] [INF] [TestPlanService] 2026/8/18 13:04:46 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:04:46.320] [INF] [MainViewModel] 2026/8/18 13:04:46 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 13:04:46.325] [INF] [TestPlanService] 2026/8/18 13:04:46 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 13:04:46.350] [INF] [TestPlanService] 2026/8/18 13:04:46 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 13:04:46.350] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 13:04:46.350] [INF] [MainViewModel] 2026/8/18 13:04:46 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 13:04:46.350] [INF] [MainViewModel] 2026/8/18 13:04:46 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 13:06:13.933] [INF] [InstrumentConfigService] 2026/8/18 13:06:13 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:13.952] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 13:06:13.952] [INF] [InstrumentConfigService] 2026/8/18 13:06:13 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:34.843] [INF] [BpaParamConfigViewModel] 2026/8/18 13:06:34 Start calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-18 13:06:34.844] [INF] [InstrumentConfigService] 2026/8/18 13:06:34 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-18 13:06:34.857] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 13:06:34.857] [INF] [InstrumentConfigService] 2026/8/18 13:06:34 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-18 13:06:34.857] [INF] [BpaParamConfigViewModel] 血压仪参数配置已保存（instruments.json → BPA700Simulator.TestParams）
+[2026-08-18 13:06:34.866] [INF] [BpaParamConfigViewModel] 2026/8/18 13:06:34 Ended calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-18 13:06:36.658] [INF] [MainViewModel] 2026/8/18 13:06:36 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 13:06:36.660] [INF] [MainViewModel] 2026/8/18 13:06:36 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 13:06:36.661] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 13:06:36.671] [INF] [TestItem] 2026/8/18 13:06:36 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 13:06:36.671] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 13:06:36.673] [INF] [TestItem] 2026/8/18 13:06:36 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 13:06:36.673] [INF] [InstrumentConfigService] 2026/8/18 13:06:36 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:36.676] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 13:06:36.676] [INF] [InstrumentConfigService] 2026/8/18 13:06:36 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:36.686] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 13:06:36.687] [INF] [MainViewModel] 2026/8/18 13:06:36 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 13:06:36.692] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 13:06:36.738] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 13:06:38.289] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 13:06:38.334] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 13:06:38.334] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 13:06:38.335] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 13:06:38.338] [INF] [TestItem] 2026/8/18 13:06:38 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 13:06:38.339] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 13:06:38.339] [INF] [TestItem] 2026/8/18 13:06:38 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 13:06:38.343] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 13:06:38.346] [INF] [TestItem] 2026/8/18 13:06:38 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 13:06:38.346] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-18 13:06:38.347] [INF] [TestItem] 2026/8/18 13:06:38 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 13:06:40.169] [INF] [InstrumentConfigService] 2026/8/18 13:06:40 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:40.169] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 13:06:40.169] [INF] [InstrumentConfigService] 2026/8/18 13:06:40 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 13:06:40.176] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 13:06:40.180] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 13:06:40.269] [ERR] [TestItem] An error occured in TestItem.class BpAccuracyTestModule method, message: System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 273
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 273
+[2026-08-18 13:06:40.269] [INF] [TestItem] 2026/8/18 13:06:40 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 13:06:40.269] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-18 13:06:40.269] [INF] [TestItem] 2026/8/18 13:06:40 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 13:06:40.269] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 13:06:40.269] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 13:06:40.269] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 13:06:40.269] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-18 13:06:40.269] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 13:06:40.270] [INF] [MainViewModel] 2026/8/18 13:06:40 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 13:07:02.977] [INF] [MainViewModel] 2026/8/18 13:07:02 Start calling the MainViewModel.ClearPlan() method . 
+
+[2026-08-18 13:07:02.987] [INF] [MainViewModel] 2026/8/18 13:07:02 Ended calling the MainViewModel.ClearPlan() method . 
+
+[2026-08-18 13:09:59.224] [INF] [TestPlanService] 2026/8/18 13:09:59 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:09:59.225] [INF] [TestPlanService] 2026/8/18 13:09:59 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:10:16.294] [INF] [TestPlanService] 2026/8/18 13:10:16 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:10:16.294] [INF] [TestPlanService] 2026/8/18 13:10:16 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 13:10:19.749] [INF] [MainViewModel] 2026/8/18 13:10:19 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 13:10:19.749] [INF] [TestPlanService] 2026/8/18 13:10:19 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 13:10:19.750] [INF] [TestPlanService] 2026/8/18 13:10:19 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 13:10:19.750] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 13:10:19.750] [INF] [MainViewModel] 2026/8/18 13:10:19 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 14:33:52.678] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 14:33:52.746] [INF] [Spec] 2026/8/18 14:33:52 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 14:33:52.747] [INF] [Spec] 2026/8/18 14:33:52 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 14:33:52.748] [INF] [MainViewModel] 2026/8/18 14:33:52 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 14:33:52.748] [INF] [TestPlanService] 2026/8/18 14:33:52 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 14:33:52.749] [INF] [TestPlanService] 2026/8/18 14:33:52 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 14:33:52.749] [INF] [MainViewModel] 2026/8/18 14:33:52 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 14:33:52.755] [INF] [TestPlanService] 2026/8/18 14:33:52 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 14:33:52.784] [INF] [TestPlanService] 2026/8/18 14:33:52 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 14:33:52.785] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 14:33:52.785] [INF] [MainViewModel] 2026/8/18 14:33:52 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 14:33:52.785] [INF] [MainViewModel] 2026/8/18 14:33:52 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 14:38:31.018] [INF] [MainViewModel] 2026/8/18 14:38:31 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 14:38:31.023] [INF] [MainViewModel] 2026/8/18 14:38:31 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 14:54:01.613] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=True
+[2026-08-18 14:54:01.617] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 14:54:04.914] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001袖带充放气测量 → IsWaveformExpanded=False
+[2026-08-18 14:54:04.915] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 16:22:18.263] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 16:22:18.325] [INF] [Spec] 2026/8/18 16:22:18 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 16:22:18.325] [INF] [Spec] 2026/8/18 16:22:18 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 16:22:18.326] [INF] [MainViewModel] 2026/8/18 16:22:18 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 16:22:18.327] [INF] [TestPlanService] 2026/8/18 16:22:18 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 16:22:18.327] [INF] [TestPlanService] 2026/8/18 16:22:18 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 16:22:18.328] [INF] [MainViewModel] 2026/8/18 16:22:18 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 16:22:18.332] [INF] [TestPlanService] 2026/8/18 16:22:18 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 16:22:18.357] [INF] [TestPlanService] 2026/8/18 16:22:18 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 16:22:18.358] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-18 16:22:18.358] [INF] [MainViewModel] 2026/8/18 16:22:18 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 16:22:18.358] [INF] [MainViewModel] 2026/8/18 16:22:18 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 16:22:30.008] [INF] [MainViewModel] 2026/8/18 16:22:30 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:30.012] [INF] [MainViewModel] 2026/8/18 16:22:30 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:30.996] [INF] [MainViewModel] 2026/8/18 16:22:30 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:31.009] [INF] [MainViewModel] 2026/8/18 16:22:31 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:33.363] [INF] [MainViewModel] 2026/8/18 16:22:33 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:33.378] [INF] [MainViewModel] 2026/8/18 16:22:33 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 16:22:39.074] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 16:22:39.077] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 16:22:41.204] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 16:22:41.204] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 16:37:16.278] [INF] [MainViewModel] 2026/8/18 16:37:16 Start calling the MainViewModel.SavePlanWithName() method . 
+
+[2026-08-18 16:37:16.279] [INF] [TestPlanService] 2026/8/18 16:37:16 Start calling the TestPlanService.SavePlan() method . 
+
+[2026-08-18 16:37:16.284] [INF] [TestPlanService] 2026/8/18 16:37:16 Ended calling the TestPlanService.SavePlan() method . 
+
+[2026-08-18 16:37:16.284] [INF] [MainViewModel] 方案 [血压功能测试] 已保存，共 5 个模块
+[2026-08-18 16:37:16.284] [INF] [MainViewModel] 2026/8/18 16:37:16 Ended calling the MainViewModel.SavePlanWithName() method . 
+
+[2026-08-18 16:42:50.015] [INF] [MainViewModel] 2026/8/18 16:42:50 Start calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-18 16:42:50.015] [INF] [MainViewModel] 2026/8/18 16:42:50 Ended calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-18 16:43:12.284] [INF] [MainViewModel] 2026/8/18 16:43:12 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:12.288] [INF] [MainViewModel] 2026/8/18 16:43:12 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:13.331] [INF] [MainViewModel] 2026/8/18 16:43:13 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:13.334] [INF] [MainViewModel] 2026/8/18 16:43:13 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:14.439] [INF] [MainViewModel] 2026/8/18 16:43:14 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:14.456] [INF] [MainViewModel] 2026/8/18 16:43:14 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 16:43:18.938] [INF] [MainViewModel] 2026/8/18 16:43:18 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:43:18.941] [INF] [MainViewModel] 2026/8/18 16:43:18 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:43:18.942] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 16:43:18.953] [INF] [TestItem] 2026/8/18 16:43:18 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:43:18.953] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 16:43:18.957] [INF] [TestItem] 2026/8/18 16:43:18 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:43:18.957] [INF] [InstrumentConfigService] 2026/8/18 16:43:18 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:43:18.979] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:43:18.979] [INF] [InstrumentConfigService] 2026/8/18 16:43:18 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:43:18.991] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:43:18.992] [INF] [MainViewModel] 2026/8/18 16:43:18 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:43:18.998] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:43:19.048] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 16:43:20.596] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 16:43:20.654] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 16:43:20.655] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 16:43:20.656] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 16:43:20.660] [INF] [TestItem] 2026/8/18 16:43:20 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:43:20.662] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 16:43:20.662] [INF] [TestItem] 2026/8/18 16:43:20 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:43:20.665] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 16:43:20.669] [INF] [TestItem] 2026/8/18 16:43:20 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:43:20.669] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 16:43:20.672] [INF] [TestItem] 2026/8/18 16:43:20 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:43:39.396] [INF] [InstrumentConfigService] 2026/8/18 16:43:39 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:43:39.397] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:43:39.397] [INF] [InstrumentConfigService] 2026/8/18 16:43:39 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:44:07.827] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:44:07.831] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:44:12.438] [ERR] [TestItem] An error occured in TestItem.class BpAccuracyTestModule method, message: System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+[2026-08-18 16:44:13.679] [INF] [TestItem] 2026/8/18 16:44:13 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:44:14.641] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-18 16:44:14.641] [INF] [TestItem] 2026/8/18 16:44:14 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:44:14.641] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:44:14.641] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:44:14.641] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:44:14.641] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-18 16:44:14.641] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 16:44:14.641] [INF] [MainViewModel] 2026/8/18 16:44:14 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:44:23.582] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 16:44:23.582] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 16:44:25.359] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=True
+[2026-08-18 16:44:25.359] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 16:44:29.161] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 16:44:29.161] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 16:44:30.024] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=False
+[2026-08-18 16:44:30.024] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 16:44:41.673] [INF] [MainViewModel] 2026/8/18 16:44:41 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:44:41.673] [INF] [MainViewModel] 2026/8/18 16:44:41 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:44:41.673] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 16:44:41.685] [INF] [TestItem] 2026/8/18 16:44:41 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:44:41.685] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 16:44:41.685] [INF] [TestItem] 2026/8/18 16:44:41 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:44:41.685] [INF] [InstrumentConfigService] 2026/8/18 16:44:41 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:44:41.685] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:44:41.685] [INF] [InstrumentConfigService] 2026/8/18 16:44:41 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:44:41.686] [INF] [MainViewModel] 2026/8/18 16:44:41 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:44:41.690] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:44:41.695] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:44:41.751] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 16:44:43.299] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 16:44:43.342] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 16:44:43.342] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 16:44:43.343] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 16:44:43.346] [INF] [TestItem] 2026/8/18 16:44:43 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:44:43.346] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 16:44:43.346] [INF] [TestItem] 2026/8/18 16:44:43 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:44:43.347] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 16:44:43.351] [INF] [TestItem] 2026/8/18 16:44:43 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:44:43.351] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 16:44:43.351] [INF] [TestItem] 2026/8/18 16:44:43 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:45:06.442] [INF] [InstrumentConfigService] 2026/8/18 16:45:06 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:45:06.445] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:45:06.445] [INF] [InstrumentConfigService] 2026/8/18 16:45:06 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:45:18.084] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:45:18.087] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:45:18.163] [ERR] [TestItem] An error occured in TestItem.class BpAccuracyTestModule method, message: System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+[2026-08-18 16:45:18.163] [INF] [TestItem] 2026/8/18 16:45:18 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:45:18.163] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-18 16:45:18.163] [INF] [TestItem] 2026/8/18 16:45:18 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:45:18.163] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:45:18.163] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:45:18.163] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:45:18.163] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-18 16:45:18.163] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 16:45:18.163] [INF] [MainViewModel] 2026/8/18 16:45:18 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:45:45.736] [INF] [MainViewModel] 2026/8/18 16:45:45 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:45:45.736] [INF] [MainViewModel] 2026/8/18 16:45:45 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:45:45.737] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 16:45:45.746] [INF] [TestItem] 2026/8/18 16:45:45 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:45:45.746] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 16:45:45.746] [INF] [TestItem] 2026/8/18 16:45:45 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:45:45.746] [INF] [InstrumentConfigService] 2026/8/18 16:45:45 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:45:45.747] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:45:45.747] [INF] [InstrumentConfigService] 2026/8/18 16:45:45 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:45:45.747] [INF] [MainViewModel] 2026/8/18 16:45:45 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:45:45.752] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:45:45.756] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:45:45.809] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 16:45:47.353] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 16:45:47.398] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 16:45:47.398] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 16:45:47.399] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 16:45:47.403] [INF] [TestItem] 2026/8/18 16:45:47 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:45:47.403] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 16:45:47.403] [INF] [TestItem] 2026/8/18 16:45:47 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:45:47.403] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 16:45:47.407] [INF] [TestItem] 2026/8/18 16:45:47 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:45:47.407] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 16:45:47.407] [INF] [TestItem] 2026/8/18 16:45:47 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:45:47.407] [INF] [InstrumentConfigService] 2026/8/18 16:45:47 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:45:47.408] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:45:47.408] [INF] [InstrumentConfigService] 2026/8/18 16:45:47 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:49:04.341] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:49:04.349] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:49:04.380] [ERR] [TestItem] An error occured in TestItem.class BpAccuracyTestModule method, message: System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 291
+[2026-08-18 16:49:04.380] [INF] [TestItem] 2026/8/18 16:49:04 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:49:04.380] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-18 16:49:04.380] [INF] [TestItem] 2026/8/18 16:49:04 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:49:04.380] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:49:04.380] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:49:04.380] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:49:04.380] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-18 16:49:04.380] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 16:49:04.380] [INF] [MainViewModel] 2026/8/18 16:49:04 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:49:07.782] [INF] [MainViewModel] 2026/8/18 16:49:07 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:49:07.782] [INF] [MainViewModel] 2026/8/18 16:49:07 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 16:49:07.782] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 16:49:07.792] [INF] [TestItem] 2026/8/18 16:49:07 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:49:07.792] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 16:49:07.792] [INF] [TestItem] 2026/8/18 16:49:07 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:49:07.792] [INF] [InstrumentConfigService] 2026/8/18 16:49:07 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:49:07.793] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:49:07.793] [INF] [InstrumentConfigService] 2026/8/18 16:49:07 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:49:07.793] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 16:49:07.793] [INF] [MainViewModel] 2026/8/18 16:49:07 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 16:49:07.796] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 16:49:07.843] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 16:49:09.389] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 16:49:09.432] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 16:49:09.432] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 16:49:09.432] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 16:49:09.435] [INF] [TestItem] 2026/8/18 16:49:09 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 16:49:09.436] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 16:49:09.436] [INF] [TestItem] 2026/8/18 16:49:09 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:49:09.436] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 16:49:09.440] [INF] [TestItem] 2026/8/18 16:49:09 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:49:09.440] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 16:49:09.440] [INF] [TestItem] 2026/8/18 16:49:09 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:49:09.440] [INF] [InstrumentConfigService] 2026/8/18 16:49:09 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:49:09.440] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 16:49:09.440] [INF] [InstrumentConfigService] 2026/8/18 16:49:09 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 16:50:22.691] [ERR] [TestItem] An error occured in TestItem.class BpAccuracyTestModule method, message: System.InvalidOperationException: BPA700 未连接
+   at TORNPISolution.Service.Devices.BPA700Simulator.StartSamplingAsync(CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 620
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 321
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 329
+System.InvalidOperationException: BPA700 未连接
+   at TORNPISolution.Service.Devices.BPA700Simulator.StartSamplingAsync(CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 620
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 321
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 329
+[2026-08-18 16:50:22.691] [INF] [TestItem] 2026/8/18 16:50:22 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 16:50:22.691] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-18 16:50:22.691] [INF] [TestItem] 2026/8/18 16:50:22 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 16:50:22.691] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:50:22.691] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:50:22.691] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 16:50:22.691] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-18 16:50:22.691] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 16:50:22.691] [INF] [MainViewModel] 2026/8/18 16:50:22 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:09:43.102] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 17:09:43.191] [INF] [Spec] 2026/8/18 17:09:43 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 17:09:43.192] [INF] [Spec] 2026/8/18 17:09:43 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 17:09:43.193] [INF] [MainViewModel] 2026/8/18 17:09:43 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 17:09:43.194] [INF] [TestPlanService] 2026/8/18 17:09:43 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:09:43.194] [INF] [TestPlanService] 2026/8/18 17:09:43 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:09:43.194] [INF] [MainViewModel] 2026/8/18 17:09:43 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 17:09:48.441] [INF] [TestPlanService] 2026/8/18 17:09:48 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:09:48.442] [INF] [TestPlanService] 2026/8/18 17:09:48 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:09:51.953] [INF] [MainViewModel] 2026/8/18 17:09:51 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:09:51.963] [INF] [TestPlanService] 2026/8/18 17:09:51 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:09:51.997] [INF] [TestPlanService] 2026/8/18 17:09:51 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:09:52.000] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-18 17:09:52.000] [INF] [MainViewModel] 2026/8/18 17:09:52 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:10:42.881] [INF] [MainViewModel] 2026/8/18 17:10:42 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:10:42.883] [INF] [MainViewModel] 2026/8/18 17:10:42 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:10:42.884] [INF] [MainViewModel] ===== 开始执行测试方案，共 5 个模块 =====
+[2026-08-18 17:10:42.897] [INF] [TestItem] 2026/8/18 17:10:42 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:10:42.897] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 17:10:42.899] [INF] [TestItem] 2026/8/18 17:10:42 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:10:42.900] [INF] [InstrumentConfigService] 2026/8/18 17:10:42 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:10:42.918] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:10:42.918] [INF] [InstrumentConfigService] 2026/8/18 17:10:42 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:10:42.927] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:10:42.927] [INF] [MainViewModel] 2026/8/18 17:10:42 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:10:42.933] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:10:42.977] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 17:10:44.527] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 17:10:44.572] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 17:10:44.573] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 17:10:44.575] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 17:10:44.580] [INF] [TestItem] 2026/8/18 17:10:44 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:10:44.582] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 17:10:44.582] [INF] [TestItem] 2026/8/18 17:10:44 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:10:44.588] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 17:10:44.591] [INF] [TestItem] 2026/8/18 17:10:44 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:10:44.591] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 17:10:44.594] [INF] [TestItem] 2026/8/18 17:10:44 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 17:10:44.594] [INF] [InstrumentConfigService] 2026/8/18 17:10:44 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:10:44.594] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:10:44.594] [INF] [InstrumentConfigService] 2026/8/18 17:10:44 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:10:46.409] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:10:46.412] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:10:46.488] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 17:10:46.488] [WRN] [TestItem] 产品不可用：BP-001/002 仍将等待产品物理按键（最长 120 秒），BPA700 会停留在 Wait，两项判 FAIL，可随时点“停止”结束
+[2026-08-18 17:10:46.489] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 17:10:46.490] [INF] [TestItem] BP-001：请按下产品物理[开始]键启动测量（最长等待 120 秒）...
+[2026-08-18 17:10:46.571] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-18 17:10:46.581] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-18 17:11:11.205] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:11:11.208] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:11:18.260] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=True
+[2026-08-18 17:11:18.261] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:12:04.967] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 17:12:04.967] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:12:07.532] [INF] [MainViewModel] 2026/8/18 17:12:07 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:12:07.532] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-18 17:12:07.533] [INF] [MainViewModel] 2026/8/18 17:12:07 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:12:07.540] [WRN] [TestItem] BPA700：血压测试整轮超时（300s），强制停止
+[2026-08-18 17:12:07.575] [DBG] [TestItem] BPA700 BP测试回调：status=4 peak=0.0 inflate=50.1s deflate=6503.5s total=0.0s
+[2026-08-18 17:12:07.600] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 17:12:07.608] [WRN] [TestItem] BP-001 FAIL：status 序列 [2] 未经历 Busy→Stable→Finish（最终 status=2，产品未启动或气路未连通）
+[2026-08-18 17:12:07.650] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 17:12:07.677] [INF] [TestItem] 2026/8/18 17:12:07 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 17:12:07.701] [INF] [TestItem] 2026/8/18 17:12:07 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:12:07.713] [WRN] [MainViewModel] ===== 测试方案已停止 =====
+[2026-08-18 17:12:07.713] [INF] [MainViewModel] 2026/8/18 17:12:07 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:12:09.229] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:12:09.229] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:20:43.966] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 17:20:43.966] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:20:44.422] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:20:44.422] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:20:44.804] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 17:20:44.804] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:20:45.088] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:20:45.088] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:20:45.808] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 17:20:45.808] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:20:46.158] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:20:46.158] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:48:49.769] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 17:48:49.832] [INF] [Spec] 2026/8/18 17:48:49 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 17:48:49.832] [INF] [Spec] 2026/8/18 17:48:49 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 17:48:49.834] [INF] [MainViewModel] 2026/8/18 17:48:49 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 17:48:49.834] [INF] [TestPlanService] 2026/8/18 17:48:49 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:48:49.834] [INF] [TestPlanService] 2026/8/18 17:48:49 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:48:49.834] [INF] [MainViewModel] 2026/8/18 17:48:49 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 17:48:51.981] [INF] [TestPlanService] 2026/8/18 17:48:51 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:48:51.982] [INF] [TestPlanService] 2026/8/18 17:48:51 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:48:56.229] [INF] [MainViewModel] 2026/8/18 17:48:56 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:48:56.236] [INF] [TestPlanService] 2026/8/18 17:48:56 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:48:56.273] [INF] [TestPlanService] 2026/8/18 17:48:56 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:48:56.275] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-18 17:48:56.275] [INF] [MainViewModel] 2026/8/18 17:48:56 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:49:03.613] [INF] [MainViewModel] 2026/8/18 17:49:03 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:03.634] [INF] [MainViewModel] 2026/8/18 17:49:03 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:04.143] [INF] [MainViewModel] 2026/8/18 17:49:04 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:04.145] [INF] [MainViewModel] 2026/8/18 17:49:04 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:04.531] [INF] [MainViewModel] 2026/8/18 17:49:04 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:04.534] [INF] [MainViewModel] 2026/8/18 17:49:04 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:49:05.348] [INF] [MainViewModel] 2026/8/18 17:49:05 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:49:05.350] [INF] [MainViewModel] 2026/8/18 17:49:05 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:49:05.351] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 17:49:05.356] [INF] [TestItem] 2026/8/18 17:49:05 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:49:05.356] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 17:49:05.358] [INF] [TestItem] 2026/8/18 17:49:05 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:49:05.359] [INF] [InstrumentConfigService] 2026/8/18 17:49:05 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:49:05.378] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:49:05.378] [INF] [InstrumentConfigService] 2026/8/18 17:49:05 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:49:05.379] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:49:05.380] [INF] [MainViewModel] 2026/8/18 17:49:05 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:49:05.386] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:49:05.432] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 17:49:06.979] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 17:49:07.028] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 17:49:07.029] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 17:49:07.031] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 17:49:07.036] [INF] [TestItem] 2026/8/18 17:49:07 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:49:07.038] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 17:49:07.038] [INF] [TestItem] 2026/8/18 17:49:07 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:49:07.042] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 17:49:07.046] [INF] [TestItem] 2026/8/18 17:49:07 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:49:07.046] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-18 17:49:07.049] [INF] [TestItem] 2026/8/18 17:49:07 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 17:49:07.049] [INF] [InstrumentConfigService] 2026/8/18 17:49:07 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:49:07.049] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:49:07.049] [INF] [InstrumentConfigService] 2026/8/18 17:49:07 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:49:12.273] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:49:12.276] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:49:12.329] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 17:49:12.329] [WRN] [TestItem] 产品不可用：BP-001/002 仍将等待产品物理按键（最长 30 秒），BPA700 会停留在 Wait，两项判 FAIL，可随时点“停止”结束
+[2026-08-18 17:49:12.330] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 17:49:12.331] [INF] [TestItem] BP-001：请按下产品物理[开始]键启动测量（最长等待 30 秒）...
+[2026-08-18 17:49:12.414] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-18 17:49:12.426] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-18 17:49:23.632] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=True
+[2026-08-18 17:49:23.636] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:50:12.435] [WRN] [TestItem] BPA700：血压测试整轮超时（60s），强制停止
+[2026-08-18 17:50:12.487] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 17:50:12.491] [WRN] [TestItem] BP-001 FAIL：status 序列 [2] 未经历 Busy→Stable→Finish（最终 status=2，产品未启动或气路未连通）
+[2026-08-18 17:50:12.492] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 17:50:12.493] [INF] [TestItem] BP-002：请先按产品[开始]键，充气过程中再按[停止]键（启动最长等待 30 秒）...
+[2026-08-18 17:50:12.581] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-18 17:50:12.592] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-18 17:50:17.554] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=True
+[2026-08-18 17:50:17.554] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:51:12.604] [WRN] [TestItem] BPA700：血压测试整轮超时（60s），强制停止
+[2026-08-18 17:51:12.650] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 17:51:12.661] [WRN] [TestItem] BP-002 FAIL：未收到 status=Idle（最终 status=2），产品未按[停止]键手动停止
+[2026-08-18 17:51:12.665] [INF] [TestItem] 2026/8/18 17:51:12 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-18 17:51:12.665] [INF] [TestItem] TestItem2：产品充放气测试 执行完成，共 4 项结果
+[2026-08-18 17:51:12.665] [INF] [TestItem] 2026/8/18 17:51:12 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:51:12.665] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:51:12.666] [WRN] [MainViewModel] [TestItem2 产品充放气测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:51:12.666] [WRN] [MainViewModel] [TestItem2 产品充放气测试] BP-001物理按键启动测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:51:12.666] [INF] [MainViewModel] [TestItem2 产品充放气测试] 模块结果：FAIL
+[2026-08-18 17:51:12.666] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 17:51:12.666] [INF] [MainViewModel] 2026/8/18 17:51:12 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:51:20.359] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-001物理按键启动测量 → IsWaveformExpanded=False
+[2026-08-18 17:51:20.360] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:51:21.605] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-002测量中手动停止 → IsWaveformExpanded=False
+[2026-08-18 17:51:21.606] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:51:27.105] [INF] [TestPlanService] 2026/8/18 17:51:27 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:51:27.106] [INF] [TestPlanService] 2026/8/18 17:51:27 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 17:51:31.167] [INF] [MainViewModel] 2026/8/18 17:51:31 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:51:31.168] [INF] [TestPlanService] 2026/8/18 17:51:31 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:51:31.168] [INF] [TestPlanService] 2026/8/18 17:51:31 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 17:51:31.181] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-18 17:51:31.181] [INF] [MainViewModel] 2026/8/18 17:51:31 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 17:51:35.872] [INF] [MainViewModel] 2026/8/18 17:51:35 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:35.876] [INF] [MainViewModel] 2026/8/18 17:51:35 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:37.258] [INF] [MainViewModel] 2026/8/18 17:51:37 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:37.260] [INF] [MainViewModel] 2026/8/18 17:51:37 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:37.727] [INF] [MainViewModel] 2026/8/18 17:51:37 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:37.729] [INF] [MainViewModel] 2026/8/18 17:51:37 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:51:38.914] [INF] [MainViewModel] 2026/8/18 17:51:38 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:51:38.914] [INF] [MainViewModel] 2026/8/18 17:51:38 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:51:38.914] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 17:51:38.923] [INF] [TestItem] 2026/8/18 17:51:38 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:51:38.923] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 17:51:38.923] [INF] [TestItem] 2026/8/18 17:51:38 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:51:38.923] [INF] [InstrumentConfigService] 2026/8/18 17:51:38 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:51:38.923] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:51:38.923] [INF] [InstrumentConfigService] 2026/8/18 17:51:38 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:51:38.924] [INF] [MainViewModel] 2026/8/18 17:51:38 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:51:38.932] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:51:38.938] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:51:38.993] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 17:51:40.539] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 17:51:40.582] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 17:51:40.582] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 17:51:40.582] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 17:51:40.586] [INF] [TestItem] 2026/8/18 17:51:40 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:51:40.587] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 17:51:40.587] [INF] [TestItem] 2026/8/18 17:51:40 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:51:40.587] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 17:51:40.591] [INF] [TestItem] 2026/8/18 17:51:40 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:51:40.591] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-18 17:51:40.595] [INF] [TestItem] 2026/8/18 17:51:40 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-18 17:51:40.595] [INF] [InstrumentConfigService] 2026/8/18 17:51:40 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:51:40.595] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:51:40.595] [INF] [InstrumentConfigService] 2026/8/18 17:51:40 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:51:40.598] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:51:40.602] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:51:40.649] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 17:51:40.649] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 17:51:40.771] [INF] [TestItem] BPA700：设置静态压力 30mmHg，时长 10s，等待到位...
+[2026-08-18 17:51:40.782] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0s
+[2026-08-18 17:51:43.681] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-003静态压力精度测试 → IsWaveformExpanded=True
+[2026-08-18 17:51:43.682] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:51:51.175] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0s
+[2026-08-18 17:51:51.175] [INF] [TestItem] BPA700：静态压力 30mmHg 已到位（实际 10.0mmHg）
+[2026-08-18 17:51:51.176] [INF] [TestItem] 2026/8/18 17:51:51 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-18 17:51:51.177] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-18 17:51:51.177] [INF] [TestItem] 2026/8/18 17:51:51 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-18 17:51:51.217] [ERR] [TestItem] BPA700：BPARunStaticPressure(60, inflation=True) 调用失败
+[2026-08-18 17:51:51.307] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 17:51:51.386] [ERR] [TestItem] An error occured in TestItem.class BpStaticAccuracyModule method, message: System.IO.IOException: BPA700 静态压力设置失败（60）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 547
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 436
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 454
+System.IO.IOException: BPA700 静态压力设置失败（60）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 547
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 436
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 454
+[2026-08-18 17:51:51.386] [INF] [TestItem] 2026/8/18 17:51:51 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-18 17:51:51.386] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-18 17:51:51.386] [INF] [TestItem] 2026/8/18 17:51:51 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:51:51.386] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:51:51.386] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:51:51.387] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-18 17:51:51.387] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 17:51:51.387] [INF] [MainViewModel] 2026/8/18 17:51:51 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:52:10.308] [INF] [MainViewModel] 2026/8/18 17:52:10 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:52:10.320] [INF] [MainViewModel] 2026/8/18 17:52:10 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:52:12.685] [INF] [MainViewModel] 2026/8/18 17:52:12 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 17:52:12.686] [INF] [MainViewModel] 2026/8/18 17:52:12 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 17:52:22.575] [INF] [MainViewModel] 2026/8/18 17:52:22 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:52:22.575] [INF] [MainViewModel] 2026/8/18 17:52:22 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:52:22.576] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 17:52:22.594] [INF] [TestItem] 2026/8/18 17:52:22 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:52:22.594] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 17:52:22.594] [INF] [TestItem] 2026/8/18 17:52:22 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:52:22.594] [INF] [InstrumentConfigService] 2026/8/18 17:52:22 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:52:22.594] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:52:22.594] [INF] [InstrumentConfigService] 2026/8/18 17:52:22 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:52:22.594] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:52:22.594] [INF] [MainViewModel] 2026/8/18 17:52:22 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:52:22.597] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:52:22.653] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 17:52:24.196] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 17:52:24.242] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 17:52:24.242] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 17:52:24.243] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 17:52:24.246] [INF] [TestItem] 2026/8/18 17:52:24 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:52:24.247] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 17:52:24.247] [INF] [TestItem] 2026/8/18 17:52:24 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:52:24.247] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 17:52:24.252] [INF] [TestItem] 2026/8/18 17:52:24 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:52:24.252] [INF] [TestItem] TestItem2：血压动态压力精度测试 开始执行
+[2026-08-18 17:52:24.256] [INF] [TestItem] 2026/8/18 17:52:24 Start calling the TestItem.BpDynamicAccuracyModule() method . 
+
+[2026-08-18 17:52:24.256] [INF] [InstrumentConfigService] 2026/8/18 17:52:24 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:52:24.256] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:52:24.256] [INF] [InstrumentConfigService] 2026/8/18 17:52:24 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:52:24.257] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:52:24.260] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:52:24.346] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 17:52:24.347] [WRN] [TestItem] BP-004/005 跳过测量轮次：产品不可用，且全部结果项依赖产品上报值（协议预留），空跑无意义
+[2026-08-18 17:52:24.349] [INF] [TestItem] 2026/8/18 17:52:24 Ended calling the TestItem.BpDynamicAccuracyModule() method . 
+
+[2026-08-18 17:52:24.349] [INF] [TestItem] TestItem2：血压动态压力精度测试 执行完成，共 8 项结果
+[2026-08-18 17:52:24.349] [INF] [TestItem] 2026/8/18 17:52:24 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:52:24.349] [WRN] [MainViewModel] [TestItem2 血压动态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:52:24.349] [WRN] [MainViewModel] [TestItem2 血压动态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:52:24.349] [INF] [MainViewModel] [TestItem2 血压动态压力精度测试] 模块结果：FAIL
+[2026-08-18 17:52:24.349] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 17:52:24.349] [INF] [MainViewModel] 2026/8/18 17:52:24 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:53:10.631] [INF] [MainViewModel] 2026/8/18 17:53:10 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 17:53:10.645] [INF] [MainViewModel] 2026/8/18 17:53:10 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 17:53:11.277] [INF] [MainViewModel] 2026/8/18 17:53:11 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:53:11.279] [INF] [MainViewModel] 2026/8/18 17:53:11 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 17:53:14.076] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-18 17:53:14.076] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 17:53:15.951] [INF] [MainViewModel] 2026/8/18 17:53:15 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:53:15.951] [INF] [MainViewModel] 2026/8/18 17:53:15 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:53:15.951] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 17:53:15.965] [INF] [TestItem] 2026/8/18 17:53:15 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:53:15.965] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 17:53:15.965] [INF] [TestItem] 2026/8/18 17:53:15 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:53:15.965] [INF] [InstrumentConfigService] 2026/8/18 17:53:15 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:53:15.966] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:53:15.966] [INF] [InstrumentConfigService] 2026/8/18 17:53:15 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:53:15.966] [INF] [MainViewModel] 2026/8/18 17:53:15 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 17:53:15.966] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:53:15.969] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:53:16.017] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 17:53:17.563] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 17:53:17.607] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 17:53:17.607] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 17:53:17.607] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 17:53:17.611] [INF] [TestItem] 2026/8/18 17:53:17 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 17:53:17.611] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 17:53:17.611] [INF] [TestItem] 2026/8/18 17:53:17 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:53:17.611] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 17:53:17.616] [INF] [TestItem] 2026/8/18 17:53:17 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:53:17.616] [INF] [TestItem] TestItem2：压力控制功能测试 开始执行
+[2026-08-18 17:53:17.619] [INF] [TestItem] 2026/8/18 17:53:17 Start calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 17:53:17.619] [INF] [InstrumentConfigService] 2026/8/18 17:53:17 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:53:17.619] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 17:53:17.619] [INF] [InstrumentConfigService] 2026/8/18 17:53:17 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 17:53:17.619] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 17:53:17.622] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 17:53:17.700] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 17:53:17.820] [INF] [TestItem] BPA700：设置静态压力 350mmHg，时长 5s，等待到位...
+[2026-08-18 17:53:17.827] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0s
+[2026-08-18 17:53:25.223] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0s
+[2026-08-18 17:53:25.223] [INF] [TestItem] BPA700：静态压力 350mmHg 已到位（实际 10.0mmHg）
+[2026-08-18 17:53:25.224] [INF] [TestItem] BP-006：充气至 350 完成，读回稳压值 10.0（规格 340~355）
+[2026-08-18 17:53:25.226] [INF] [TestItem] BPA700：压力已归零
+[2026-08-18 17:53:25.264] [ERR] [TestItem] BPA700：BPARunStaticPressure(150, inflation=True) 调用失败
+[2026-08-18 17:53:25.310] [ERR] [TestItem] An error occured in TestItem.class PressureControlModule method, message: System.IO.IOException: BPA700 静态压力设置失败（150）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 547
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 626
+System.IO.IOException: BPA700 静态压力设置失败（150）
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 547
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 626
+[2026-08-18 17:53:25.311] [INF] [TestItem] 2026/8/18 17:53:25 Ended calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 17:53:25.311] [INF] [TestItem] TestItem2：压力控制功能测试 执行完成，共 6 项结果
+[2026-08-18 17:53:25.311] [INF] [TestItem] 2026/8/18 17:53:25 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 17:53:25.311] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:53:25.311] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 17:53:25.311] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-006最高充气压力 = 10 mmHg 超规格 340 ~ 355 mmHg -> FAIL
+[2026-08-18 17:53:25.311] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-007匀速放气控制 = 0 mmHg/s 超规格 2 ~ 6 mmHg/s -> FAIL
+[2026-08-18 17:53:25.311] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-009过压保护 = 0 mmHg 超规格 300 ~ 320 mmHg -> FAIL
+[2026-08-18 17:53:25.311] [INF] [MainViewModel] [TestItem2 压力控制功能测试] 模块结果：FAIL
+[2026-08-18 17:53:25.311] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 17:53:25.311] [INF] [MainViewModel] 2026/8/18 17:53:25 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 17:53:50.385] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=False
+[2026-08-18 17:53:50.385] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 17:53:52.455] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-18 17:53:52.455] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 18:09:32.692] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 18:09:32.763] [INF] [Spec] 2026/8/18 18:09:32 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 18:09:32.763] [INF] [Spec] 2026/8/18 18:09:32 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 18:09:32.764] [INF] [MainViewModel] 2026/8/18 18:09:32 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 18:09:32.764] [INF] [TestPlanService] 2026/8/18 18:09:32 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:09:32.765] [INF] [TestPlanService] 2026/8/18 18:09:32 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:09:32.765] [INF] [MainViewModel] 2026/8/18 18:09:32 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 18:09:35.013] [INF] [TestPlanService] 2026/8/18 18:09:35 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:09:35.013] [INF] [TestPlanService] 2026/8/18 18:09:35 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:09:38.681] [INF] [MainViewModel] 2026/8/18 18:09:38 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 18:09:38.688] [INF] [TestPlanService] 2026/8/18 18:09:38 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 18:09:38.722] [INF] [TestPlanService] 2026/8/18 18:09:38 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-18 18:09:38.724] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-18 18:09:38.724] [INF] [MainViewModel] 2026/8/18 18:09:38 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-18 18:09:41.984] [INF] [MainViewModel] 2026/8/18 18:09:41 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:41.989] [INF] [MainViewModel] 2026/8/18 18:09:41 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:42.409] [INF] [MainViewModel] 2026/8/18 18:09:42 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:42.412] [INF] [MainViewModel] 2026/8/18 18:09:42 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:42.885] [INF] [MainViewModel] 2026/8/18 18:09:42 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:42.888] [INF] [MainViewModel] 2026/8/18 18:09:42 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:09:43.831] [INF] [MainViewModel] 2026/8/18 18:09:43 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:09:43.832] [INF] [MainViewModel] 2026/8/18 18:09:43 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 18:09:43.834] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 18:09:43.840] [INF] [TestItem] 2026/8/18 18:09:43 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:09:43.841] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-18 18:09:43.843] [INF] [TestItem] 2026/8/18 18:09:43 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 18:09:43.843] [INF] [InstrumentConfigService] 2026/8/18 18:09:43 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:09:43.861] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 18:09:43.861] [INF] [InstrumentConfigService] 2026/8/18 18:09:43 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:09:43.863] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 18:09:43.863] [INF] [MainViewModel] 2026/8/18 18:09:43 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:09:43.869] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 18:09:43.939] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-18 18:09:45.486] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-18 18:09:45.536] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-18 18:09:45.537] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-18 18:09:45.537] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-18 18:09:45.541] [INF] [TestItem] 2026/8/18 18:09:45 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-18 18:09:45.542] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-18 18:09:45.543] [INF] [TestItem] 2026/8/18 18:09:45 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:09:45.547] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-18 18:09:45.552] [INF] [TestItem] 2026/8/18 18:09:45 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:09:45.552] [INF] [TestItem] TestItem2：压力控制功能测试 开始执行
+[2026-08-18 18:09:45.555] [INF] [TestItem] 2026/8/18 18:09:45 Start calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 18:09:45.555] [INF] [InstrumentConfigService] 2026/8/18 18:09:45 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:09:45.555] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 18:09:45.555] [INF] [InstrumentConfigService] 2026/8/18 18:09:45 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:09:45.563] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 18:09:45.566] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 18:09:45.698] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 18:09:45.699] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 18:09:45.819] [INF] [TestItem] BPA700：设置静态压力 350mmHg，时长 5s，等待到位...
+[2026-08-18 18:09:45.831] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-18 18:09:51.797] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-18 18:09:51.801] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 18:09:54.221] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-18 18:09:55.032] [INF] [TestItem] BPA700：静态压力 350mmHg 已到位（采样读回 351.0mmHg）
+[2026-08-18 18:09:55.032] [INF] [TestItem] BP-006：充气至 350 完成，采样读回稳压值 351.0（规格 340~355）
+[2026-08-18 18:10:01.020] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-18 18:10:55.045] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-18 18:10:55.055] [INF] [TestItem] BPA700：压力已归零
+[2026-08-18 18:10:55.176] [INF] [TestItem] BPA700：设置静态压力 150mmHg，时长 1s，等待到位...
+[2026-08-18 18:10:55.184] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-18 18:12:29.097] [INF] [MainViewModel] 2026/8/18 18:12:29 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:12:29.097] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-18 18:12:29.098] [INF] [MainViewModel] 2026/8/18 18:12:29 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:12:29.157] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 18:12:29.208] [ERR] [TestItem] An error occured in TestItem.class PressureControlModule method, message: System.TimeoutException: BPA700 静态压力 150mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 564
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 641
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+System.TimeoutException: BPA700 静态压力 150mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 564
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 641
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+[2026-08-18 18:12:29.208] [INF] [TestItem] 2026/8/18 18:12:29 Ended calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 18:12:29.208] [INF] [TestItem] TestItem2：压力控制功能测试 执行完成，共 6 项结果
+[2026-08-18 18:12:29.208] [INF] [TestItem] 2026/8/18 18:12:29 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:12:29.208] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 18:12:29.208] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 18:12:29.209] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-007匀速放气控制 = 0 mmHg/s 超规格 2 ~ 6 mmHg/s -> FAIL
+[2026-08-18 18:12:29.209] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-009过压保护 = 0 mmHg 超规格 300 ~ 320 mmHg -> FAIL
+[2026-08-18 18:12:29.209] [INF] [MainViewModel] [TestItem2 压力控制功能测试] 模块结果：FAIL
+[2026-08-18 18:12:29.209] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 18:12:29.209] [INF] [MainViewModel] 2026/8/18 18:12:29 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 18:22:35.661] [INF] [App] ========== 应用退出 ==========
+[2026-08-18 18:23:41.767] [INF] [App] ========== 应用启动 ==========
+[2026-08-18 18:23:41.837] [INF] [Spec] 2026/8/18 18:23:41 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-18 18:23:41.838] [INF] [Spec] 2026/8/18 18:23:41 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-18 18:23:41.839] [INF] [MainViewModel] 2026/8/18 18:23:41 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 18:23:41.839] [INF] [TestPlanService] 2026/8/18 18:23:41 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:23:41.840] [INF] [TestPlanService] 2026/8/18 18:23:41 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-18 18:23:41.840] [INF] [MainViewModel] 2026/8/18 18:23:41 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-18 18:23:45.700] [INF] [MainViewModel] 2026/8/18 18:23:45 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:45.703] [INF] [MainViewModel] 2026/8/18 18:23:45 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:47.550] [INF] [MainViewModel] 2026/8/18 18:23:47 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:47.553] [INF] [MainViewModel] 2026/8/18 18:23:47 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:48.770] [INF] [MainViewModel] 2026/8/18 18:23:48 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:23:48.787] [INF] [MainViewModel] 2026/8/18 18:23:48 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-18 18:23:49.927] [INF] [MainViewModel] 2026/8/18 18:23:49 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:49.928] [INF] [MainViewModel] 2026/8/18 18:23:49 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-18 18:23:50.925] [INF] [MainViewModel] 2026/8/18 18:23:50 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:23:50.928] [INF] [MainViewModel] 2026/8/18 18:23:50 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 18:23:50.929] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-18 18:23:50.940] [INF] [TestItem] 2026/8/18 18:23:50 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:23:50.940] [INF] [TestItem] TestItem1：初始化仪器 开始执行
+[2026-08-18 18:23:50.941] [INF] [TestItem] 2026/8/18 18:23:50 Start calling the TestItem.InitInstrumentsModule() method . 
+
+[2026-08-18 18:23:50.943] [INF] [MainViewModel] 2026/8/18 18:23:50 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:23:50.950] [ERR] [TestItem] 固高IO模块初始化失败，错误码：-6
+[2026-08-18 18:23:50.951] [INF] [TestItem] 2026/8/18 18:23:50 Ended calling the TestItem.InitInstrumentsModule() method . 
+
+[2026-08-18 18:23:50.951] [INF] [TestItem] TestItem1：初始化仪器 执行完成，共 1 项结果
+[2026-08-18 18:23:50.951] [INF] [TestItem] 2026/8/18 18:23:50 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:23:50.953] [WRN] [MainViewModel] [TestItem1 初始化仪器] 固高IO模块初始化 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 18:23:50.953] [INF] [MainViewModel] [TestItem1 初始化仪器] 模块结果：FAIL
+[2026-08-18 18:23:50.955] [INF] [TestItem] 2026/8/18 18:23:50 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:23:50.955] [INF] [TestItem] TestItem2：压力控制功能测试 开始执行
+[2026-08-18 18:23:50.957] [INF] [TestItem] 2026/8/18 18:23:50 Start calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 18:23:50.962] [INF] [InstrumentConfigService] 2026/8/18 18:23:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:23:50.998] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-18 18:23:50.998] [INF] [InstrumentConfigService] 2026/8/18 18:23:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-18 18:23:51.005] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-18 18:23:51.012] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-18 18:23:51.111] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-18 18:23:51.113] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-18 18:23:51.236] [INF] [TestItem] BPA700：设置静态压力 350mmHg，时长 5s，等待到位...
+[2026-08-18 18:23:51.244] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-18 18:23:58.113] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-18 18:23:58.117] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 18:23:59.639] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-18 18:24:00.443] [INF] [TestItem] BPA700：静态压力 350mmHg 已到位（采样读回 229.8mmHg）
+[2026-08-18 18:24:00.443] [INF] [TestItem] BP-006：充气至 350 完成，采样读回稳压值 229.8（规格 340~355）
+[2026-08-18 18:24:06.039] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-18 18:24:46.808] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=False
+[2026-08-18 18:24:46.808] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=257, 行高=293
+[2026-08-18 18:24:48.109] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-009过压保护 → IsWaveformExpanded=True
+[2026-08-18 18:24:48.109] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-18 18:25:00.457] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-18 18:25:00.480] [INF] [TestItem] BPA700：压力已归零
+[2026-08-18 18:25:00.600] [INF] [TestItem] BPA700：设置静态压力 150mmHg，时长 1s，等待到位...
+[2026-08-18 18:25:00.606] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-18 18:26:41.575] [INF] [MainViewModel] 2026/8/18 18:26:41 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:26:41.575] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-18 18:26:41.576] [INF] [MainViewModel] 2026/8/18 18:26:41 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-18 18:26:41.671] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-18 18:26:41.726] [ERR] [TestItem] An error occured in TestItem.class PressureControlModule method, message: System.TimeoutException: BPA700 静态压力 150mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 564
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 641
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+System.TimeoutException: BPA700 静态压力 150mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 564
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 641
+   at TORNPISolution.Service.TestItem.PressureControlModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 725
+[2026-08-18 18:26:41.726] [INF] [TestItem] 2026/8/18 18:26:41 Ended calling the TestItem.PressureControlModule() method . 
+
+[2026-08-18 18:26:41.727] [INF] [TestItem] TestItem2：压力控制功能测试 执行完成，共 6 项结果
+[2026-08-18 18:26:41.727] [INF] [TestItem] 2026/8/18 18:26:41 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-18 18:26:41.727] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 18:26:41.727] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-18 18:26:41.727] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-006最高充气压力 = 229.8 mmHg 超规格 340 ~ 355 mmHg -> FAIL
+[2026-08-18 18:26:41.727] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-007匀速放气控制 = 0 mmHg/s 超规格 2 ~ 6 mmHg/s -> FAIL
+[2026-08-18 18:26:41.727] [WRN] [MainViewModel] [TestItem2 压力控制功能测试] BP-009过压保护 = 0 mmHg 超规格 300 ~ 320 mmHg -> FAIL
+[2026-08-18 18:26:41.727] [INF] [MainViewModel] [TestItem2 压力控制功能测试] 模块结果：FAIL
+[2026-08-18 18:26:41.727] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-18 18:26:41.727] [INF] [MainViewModel] 2026/8/18 18:26:41 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-18 18:26:43.536] [INF] [App] ========== 应用退出 ==========

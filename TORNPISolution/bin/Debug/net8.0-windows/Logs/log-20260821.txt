@@ -1,0 +1,2168 @@
+[2026-08-21 09:54:34.913] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 09:54:34.997] [INF] [Spec] 2026/8/21 9:54:34 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 09:54:34.998] [INF] [Spec] 2026/8/21 9:54:34 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 09:54:35.000] [INF] [MainViewModel] 2026/8/21 9:54:34 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 09:54:35.000] [INF] [TestPlanService] 2026/8/21 9:54:35 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:54:35.001] [INF] [TestPlanService] 2026/8/21 9:54:35 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:54:35.001] [INF] [MainViewModel] 2026/8/21 9:54:35 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 09:54:39.854] [INF] [TestPlanService] 2026/8/21 9:54:39 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:54:39.854] [INF] [TestPlanService] 2026/8/21 9:54:39 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:54:44.069] [INF] [MainViewModel] 2026/8/21 9:54:44 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 09:54:44.076] [INF] [TestPlanService] 2026/8/21 9:54:44 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 09:54:44.108] [INF] [TestPlanService] 2026/8/21 9:54:44 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 09:54:44.110] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-21 09:54:44.110] [INF] [MainViewModel] 2026/8/21 9:54:44 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 09:54:52.841] [INF] [MainViewModel] 2026/8/21 9:54:52 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:54:52.849] [INF] [MainViewModel] 2026/8/21 9:54:52 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:54:53.582] [INF] [MainViewModel] 2026/8/21 9:54:53 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:54:53.587] [INF] [MainViewModel] 2026/8/21 9:54:53 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:54:54.343] [INF] [MainViewModel] 2026/8/21 9:54:54 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:54:54.348] [INF] [MainViewModel] 2026/8/21 9:54:54 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 09:55:01.620] [INF] [MainViewModel] 2026/8/21 9:55:01 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 09:55:01.621] [INF] [MainViewModel] 2026/8/21 9:55:01 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 09:55:01.621] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-21 09:55:01.624] [INF] [TestItem] 2026/8/21 9:55:01 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 09:55:01.624] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 09:55:01.625] [INF] [TestItem] 2026/8/21 9:55:01 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 09:55:01.626] [INF] [InstrumentConfigService] 2026/8/21 9:55:01 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:01.646] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 09:55:01.646] [INF] [InstrumentConfigService] 2026/8/21 9:55:01 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:01.648] [INF] [Aecg100Tester] 2026/8/21 9:55:01 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 09:55:01.663] [INF] [MainViewModel] 2026/8/21 9:55:01 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 09:55:06.672] [INF] [Aecg100Tester] AECG100 连接超时（Port=COM9, Timeout=5000ms）
+[2026-08-21 09:55:06.673] [INF] [Aecg100Tester] 2026/8/21 9:55:06 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 09:55:06.675] [ERR] [TestItem] AECG100 初始化连接失败（WTQInit/WTQConnect 返回失败）
+[2026-08-21 09:55:06.675] [INF] [TestItem] 2026/8/21 9:55:06 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 09:55:06.676] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 09:55:06.676] [INF] [TestItem] 2026/8/21 9:55:06 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 09:55:06.681] [WRN] [MainViewModel] [TestItem1 AECG100初始化连接] AECG100初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 09:55:06.681] [WRN] [MainViewModel] [TestItem1 AECG100初始化连接] AECG100设备信息读取 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 09:55:06.681] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：FAIL
+[2026-08-21 09:55:06.681] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 09:55:06.681] [INF] [MainViewModel] 2026/8/21 9:55:06 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 09:55:09.562] [INF] [InstrumentConfigService] 2026/8/21 9:55:09 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:09.563] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 09:55:09.563] [INF] [InstrumentConfigService] 2026/8/21 9:55:09 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:09.569] [INF] [InstrumentConfigViewModel] 2026/8/21 9:55:09 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 09:55:09.570] [INF] [InstrumentConfigViewModel] 2026/8/21 9:55:09 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 09:55:43.989] [INF] [InstrumentConfigViewModel] 2026/8/21 9:55:43 Start calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-21 09:55:43.989] [INF] [InstrumentConfigService] 2026/8/21 9:55:43 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 09:55:44.000] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 09:55:44.000] [INF] [InstrumentConfigService] 2026/8/21 9:55:44 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 09:55:44.008] [INF] [InstrumentConfigViewModel] 2026/8/21 9:55:44 Ended calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-21 09:55:44.903] [INF] [MainViewModel] 2026/8/21 9:55:44 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 09:55:44.903] [INF] [MainViewModel] 2026/8/21 9:55:44 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 09:55:44.903] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-21 09:55:44.903] [INF] [TestItem] 2026/8/21 9:55:44 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 09:55:44.903] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 09:55:44.903] [INF] [TestItem] 2026/8/21 9:55:44 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 09:55:44.903] [INF] [InstrumentConfigService] 2026/8/21 9:55:44 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:44.907] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 09:55:44.907] [INF] [InstrumentConfigService] 2026/8/21 9:55:44 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 09:55:44.910] [INF] [Aecg100Tester] 2026/8/21 9:55:44 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 09:55:44.918] [INF] [MainViewModel] 2026/8/21 9:55:44 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 09:55:49.929] [INF] [Aecg100Tester] AECG100 连接超时（Port=COM9, Timeout=5000ms）
+[2026-08-21 09:55:49.930] [INF] [Aecg100Tester] 2026/8/21 9:55:49 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 09:55:49.931] [ERR] [TestItem] AECG100 初始化连接失败（WTQInit/WTQConnect 返回失败）
+[2026-08-21 09:55:49.931] [INF] [TestItem] 2026/8/21 9:55:49 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 09:55:49.931] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 09:55:49.931] [INF] [TestItem] 2026/8/21 9:55:49 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 09:55:49.931] [WRN] [MainViewModel] [TestItem1 AECG100初始化连接] AECG100初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 09:55:49.931] [WRN] [MainViewModel] [TestItem1 AECG100初始化连接] AECG100设备信息读取 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 09:55:49.931] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：FAIL
+[2026-08-21 09:55:49.931] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 09:55:49.932] [INF] [MainViewModel] 2026/8/21 9:55:49 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 09:58:50.620] [INF] [TestPlanService] 2026/8/21 9:58:50 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:58:50.621] [INF] [TestPlanService] 2026/8/21 9:58:50 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 09:58:56.314] [INF] [MainViewModel] 2026/8/21 9:58:56 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 09:58:56.314] [INF] [TestPlanService] 2026/8/21 9:58:56 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 09:58:56.314] [INF] [TestPlanService] 2026/8/21 9:58:56 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 09:58:56.325] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-21 09:58:56.325] [INF] [MainViewModel] 2026/8/21 9:58:56 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 10:04:24.718] [INF] [MainViewModel] 2026/8/21 10:04:24 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:24.722] [INF] [MainViewModel] 2026/8/21 10:04:24 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:25.969] [INF] [MainViewModel] 2026/8/21 10:04:25 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:25.973] [INF] [MainViewModel] 2026/8/21 10:04:25 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:26.649] [INF] [MainViewModel] 2026/8/21 10:04:26 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:26.656] [INF] [MainViewModel] 2026/8/21 10:04:26 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 10:04:28.535] [INF] [MainViewModel] 2026/8/21 10:04:28 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 10:04:28.535] [INF] [MainViewModel] 2026/8/21 10:04:28 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 10:04:28.535] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-21 10:04:28.535] [INF] [TestItem] 2026/8/21 10:04:28 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 10:04:28.535] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 10:04:28.535] [INF] [TestItem] 2026/8/21 10:04:28 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 10:04:28.535] [INF] [InstrumentConfigService] 2026/8/21 10:04:28 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:04:28.536] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 10:04:28.536] [INF] [InstrumentConfigService] 2026/8/21 10:04:28 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:04:28.536] [INF] [Aecg100Tester] 2026/8/21 10:04:28 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 10:04:28.537] [INF] [MainViewModel] 2026/8/21 10:04:28 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 10:04:29.154] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-21 10:04:29.155] [INF] [Aecg100Tester] 2026/8/21 10:04:29 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 10:04:29.155] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-21 10:04:31.219] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-21 10:04:31.219] [INF] [TestItem] 2026/8/21 10:04:31 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 10:04:31.219] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 10:04:31.219] [INF] [TestItem] 2026/8/21 10:04:31 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 10:04:31.219] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-21 10:04:31.219] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-21 10:04:31.219] [INF] [MainViewModel] 2026/8/21 10:04:31 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 10:12:42.729] [INF] [App] ========== 应用退出 ==========
+[2026-08-21 10:12:46.820] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 10:12:46.903] [INF] [Spec] 2026/8/21 10:12:46 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 10:12:46.903] [INF] [Spec] 2026/8/21 10:12:46 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 10:12:46.905] [INF] [MainViewModel] 2026/8/21 10:12:46 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 10:12:46.906] [INF] [TestPlanService] 2026/8/21 10:12:46 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 10:12:46.907] [INF] [TestPlanService] 2026/8/21 10:12:46 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 10:12:46.907] [INF] [MainViewModel] 2026/8/21 10:12:46 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 10:12:52.540] [INF] [InstrumentConfigService] 2026/8/21 10:12:52 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:12:52.594] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 10:12:52.594] [INF] [InstrumentConfigService] 2026/8/21 10:12:52 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:12:56.744] [INF] [InstrumentConfigService] 2026/8/21 10:12:56 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:12:56.744] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 10:12:56.744] [INF] [InstrumentConfigService] 2026/8/21 10:12:56 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 10:12:56.754] [INF] [InstrumentConfigViewModel] 2026/8/21 10:12:56 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 10:12:56.756] [INF] [InstrumentConfigViewModel] 2026/8/21 10:12:56 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 10:13:01.702] [INF] [App] ========== 应用退出 ==========
+[2026-08-21 11:23:02.385] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 11:23:02.474] [INF] [Spec] 2026/8/21 11:23:02 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:23:02.475] [INF] [Spec] 2026/8/21 11:23:02 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:23:02.477] [INF] [MainViewModel] 2026/8/21 11:23:02 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:23:02.477] [INF] [TestPlanService] 2026/8/21 11:23:02 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:23:02.478] [INF] [TestPlanService] 2026/8/21 11:23:02 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:23:02.478] [INF] [MainViewModel] 2026/8/21 11:23:02 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:45:01.491] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 11:45:01.555] [INF] [Spec] 2026/8/21 11:45:01 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:45:01.555] [INF] [Spec] 2026/8/21 11:45:01 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:45:01.557] [INF] [MainViewModel] 2026/8/21 11:45:01 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:45:01.557] [INF] [TestPlanService] 2026/8/21 11:45:01 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:45:01.558] [INF] [TestPlanService] 2026/8/21 11:45:01 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:45:01.558] [INF] [MainViewModel] 2026/8/21 11:45:01 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:45:08.468] [INF] [InstrumentConfigService] 2026/8/21 11:45:08 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:08.527] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:45:08.527] [INF] [InstrumentConfigService] 2026/8/21 11:45:08 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:08.533] [INF] [InstrumentConfigViewModel] 2026/8/21 11:45:08 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 11:45:08.534] [INF] [InstrumentConfigViewModel] 2026/8/21 11:45:08 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 11:45:50.503] [INF] [InstrumentConfigService] 2026/8/21 11:45:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:50.503] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:45:50.503] [INF] [InstrumentConfigService] 2026/8/21 11:45:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:52.967] [INF] [InstrumentConfigService] 2026/8/21 11:45:52 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:52.967] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:45:52.967] [INF] [InstrumentConfigService] 2026/8/21 11:45:52 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:45:52.967] [INF] [InstrumentConfigViewModel] 2026/8/21 11:45:52 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 11:45:52.968] [INF] [InstrumentConfigViewModel] 2026/8/21 11:45:52 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 11:51:17.511] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 11:51:17.587] [INF] [Spec] 2026/8/21 11:51:17 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:51:17.587] [INF] [Spec] 2026/8/21 11:51:17 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:51:17.589] [INF] [MainViewModel] 2026/8/21 11:51:17 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:51:17.589] [INF] [TestPlanService] 2026/8/21 11:51:17 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:51:17.590] [INF] [TestPlanService] 2026/8/21 11:51:17 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:51:17.590] [INF] [MainViewModel] 2026/8/21 11:51:17 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:51:23.862] [INF] [InstrumentConfigService] 2026/8/21 11:51:23 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:51:23.909] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:51:23.909] [INF] [InstrumentConfigService] 2026/8/21 11:51:23 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:51:35.566] [INF] [TestPlanService] 2026/8/21 11:51:35 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:51:35.566] [INF] [TestPlanService] 2026/8/21 11:51:35 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:51:42.600] [INF] [MainViewModel] 2026/8/21 11:51:42 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 11:51:42.602] [INF] [TestPlanService] 2026/8/21 11:51:42 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 11:51:42.607] [INF] [TestPlanService] 2026/8/21 11:51:42 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 11:51:42.609] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-21 11:51:42.609] [INF] [MainViewModel] 2026/8/21 11:51:42 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 11:52:50.051] [INF] [MainViewModel] 2026/8/21 11:52:50 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 11:52:50.053] [INF] [MainViewModel] 2026/8/21 11:52:50 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 11:52:50.053] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-21 11:52:50.060] [INF] [TestItem] 2026/8/21 11:52:50 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:52:50.060] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 11:52:50.063] [INF] [TestItem] 2026/8/21 11:52:50 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 11:52:50.063] [INF] [InstrumentConfigService] 2026/8/21 11:52:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:50.063] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:52:50.064] [INF] [InstrumentConfigService] 2026/8/21 11:52:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:50.065] [INF] [Aecg100Tester] 2026/8/21 11:52:50 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 11:52:50.078] [INF] [MainViewModel] 2026/8/21 11:52:50 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 11:52:50.692] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-21 11:52:50.693] [INF] [Aecg100Tester] 2026/8/21 11:52:50 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 11:52:50.693] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-21 11:52:52.753] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-21 11:52:52.753] [INF] [TestItem] 2026/8/21 11:52:52 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 11:52:52.756] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 11:52:52.756] [INF] [TestItem] 2026/8/21 11:52:52 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:52:52.760] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-21 11:52:52.764] [INF] [TestItem] 2026/8/21 11:52:52 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:52:52.765] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-21 11:52:52.765] [INF] [TestItem] 2026/8/21 11:52:52 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 11:52:52.766] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 11:52:52.766] [INF] [InstrumentConfigService] 2026/8/21 11:52:52 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:52.766] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:52:52.766] [INF] [InstrumentConfigService] 2026/8/21 11:52:52 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:52.839] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-21 11:52:52.839] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-21 11:52:53.254] [INF] [TestItem] 2026/8/21 11:52:53 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 11:52:53.255] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-21 11:52:53.255] [INF] [TestItem] 2026/8/21 11:52:53 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:52:53.255] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：PASS
+[2026-08-21 11:52:53.267] [INF] [TestItem] 2026/8/21 11:52:53 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:52:53.267] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-21 11:52:53.268] [INF] [TestItem] 2026/8/21 11:52:53 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 11:52:53.268] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 11:52:53.268] [INF] [InstrumentConfigService] 2026/8/21 11:52:53 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:53.269] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:52:53.269] [INF] [InstrumentConfigService] 2026/8/21 11:52:53 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:52:53.326] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:54.194] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:55.066] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:55.960] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:56.837] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:57.716] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:58.596] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:52:59.463] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:00.331] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:01.207] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:02.063] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:02.923] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:03.816] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:04.695] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:05.577] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:06.467] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:07.351] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:08.226] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 11:53:09.048] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-21 11:53:09.048] [INF] [TestItem] 2026/8/21 11:53:09 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 11:53:09.048] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-21 11:53:09.048] [INF] [TestItem] 2026/8/21 11:53:09 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:53:09.049] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：PASS
+[2026-08-21 11:53:09.059] [INF] [TestItem] 2026/8/21 11:53:09 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:53:09.059] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-21 11:53:09.060] [INF] [TestItem] 2026/8/21 11:53:09 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 11:53:09.061] [INF] [InstrumentConfigService] 2026/8/21 11:53:09 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:53:09.061] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 11:53:09.061] [INF] [InstrumentConfigService] 2026/8/21 11:53:09 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 11:53:09.061] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-21 11:53:09.130] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-21 11:53:10.117] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 11:53:11.108] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 11:53:12.028] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-21 11:53:12.105] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-21 11:53:13.020] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-21 11:53:13.097] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-21 11:53:14.014] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-21 11:53:14.035] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-21 11:53:14.155] [INF] [TestItem] 2026/8/21 11:53:14 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 11:53:14.155] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-21 11:53:14.155] [INF] [TestItem] 2026/8/21 11:53:14 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 11:53:14.157] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-21 11:53:14.157] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-21 11:53:14.158] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 11:53:14.158] [INF] [MainViewModel] 2026/8/21 11:53:14 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 11:53:26.207] [INF] [App] ========== 应用退出 ==========
+[2026-08-21 11:57:55.332] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 11:57:55.413] [INF] [Spec] 2026/8/21 11:57:55 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:57:55.414] [INF] [Spec] 2026/8/21 11:57:55 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 11:57:55.416] [INF] [MainViewModel] 2026/8/21 11:57:55 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 11:57:55.417] [INF] [TestPlanService] 2026/8/21 11:57:55 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:57:55.417] [INF] [TestPlanService] 2026/8/21 11:57:55 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 11:57:55.417] [INF] [MainViewModel] 2026/8/21 11:57:55 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 13:42:24.712] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 13:42:24.781] [INF] [Spec] 2026/8/21 13:42:24 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 13:42:24.781] [INF] [Spec] 2026/8/21 13:42:24 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 13:42:24.783] [INF] [MainViewModel] 2026/8/21 13:42:24 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 13:42:24.783] [INF] [TestPlanService] 2026/8/21 13:42:24 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 13:42:24.784] [INF] [TestPlanService] 2026/8/21 13:42:24 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 13:42:24.784] [INF] [MainViewModel] 2026/8/21 13:42:24 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 13:42:29.218] [INF] [TestPlanService] 2026/8/21 13:42:29 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 13:42:29.218] [INF] [TestPlanService] 2026/8/21 13:42:29 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 13:42:33.276] [INF] [MainViewModel] 2026/8/21 13:42:33 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 13:42:33.285] [INF] [TestPlanService] 2026/8/21 13:42:33 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 13:42:33.316] [INF] [TestPlanService] 2026/8/21 13:42:33 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 13:42:33.317] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-21 13:42:33.317] [INF] [MainViewModel] 2026/8/21 13:42:33 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 13:42:45.847] [INF] [InstrumentConfigService] 2026/8/21 13:42:45 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 13:42:45.873] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 13:42:45.873] [INF] [InstrumentConfigService] 2026/8/21 13:42:45 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 13:42:48.919] [INF] [InstrumentConfigService] 2026/8/21 13:42:48 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 13:42:48.920] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 13:42:48.920] [INF] [InstrumentConfigService] 2026/8/21 13:42:48 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:31:21.855] [INF] [MainViewModel] 2026/8/21 14:31:21 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:21.863] [INF] [MainViewModel] 2026/8/21 14:31:21 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:22.878] [INF] [MainViewModel] 2026/8/21 14:31:22 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:22.882] [INF] [MainViewModel] 2026/8/21 14:31:22 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:23.610] [INF] [MainViewModel] 2026/8/21 14:31:23 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:23.632] [INF] [MainViewModel] 2026/8/21 14:31:23 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:31:24.706] [INF] [MainViewModel] 2026/8/21 14:31:24 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:31:24.708] [INF] [MainViewModel] 2026/8/21 14:31:24 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:31:24.709] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-21 14:31:24.716] [INF] [TestItem] 2026/8/21 14:31:24 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:31:24.716] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 14:31:24.719] [INF] [TestItem] 2026/8/21 14:31:24 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 14:31:24.719] [INF] [InstrumentConfigService] 2026/8/21 14:31:24 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:31:24.719] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:31:24.720] [INF] [InstrumentConfigService] 2026/8/21 14:31:24 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:31:24.722] [INF] [Aecg100Tester] 2026/8/21 14:31:24 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 14:31:24.736] [INF] [MainViewModel] 2026/8/21 14:31:24 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:31:25.343] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-21 14:31:25.344] [INF] [Aecg100Tester] 2026/8/21 14:31:25 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 14:31:25.345] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-21 14:31:27.405] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-21 14:31:27.405] [INF] [TestItem] 2026/8/21 14:31:27 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 14:31:27.407] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 14:31:27.407] [INF] [TestItem] 2026/8/21 14:31:27 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:31:27.409] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-21 14:31:27.409] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-21 14:31:27.409] [INF] [MainViewModel] 2026/8/21 14:31:27 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:31:33.881] [INF] [TestPlanService] 2026/8/21 14:31:33 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:31:33.881] [INF] [TestPlanService] 2026/8/21 14:31:33 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:31:37.960] [INF] [MainViewModel] 2026/8/21 14:31:37 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 14:31:37.960] [INF] [TestPlanService] 2026/8/21 14:31:37 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 14:31:37.960] [INF] [TestPlanService] 2026/8/21 14:31:37 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 14:31:37.965] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-21 14:31:37.965] [INF] [MainViewModel] 2026/8/21 14:31:37 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 14:39:33.326] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 14:39:33.404] [INF] [Spec] 2026/8/21 14:39:33 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 14:39:33.405] [INF] [Spec] 2026/8/21 14:39:33 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 14:39:33.407] [INF] [MainViewModel] 2026/8/21 14:39:33 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 14:39:33.408] [INF] [TestPlanService] 2026/8/21 14:39:33 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:39:33.408] [INF] [TestPlanService] 2026/8/21 14:39:33 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:39:33.409] [INF] [MainViewModel] 2026/8/21 14:39:33 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 14:49:47.431] [INF] [TestPlanService] 2026/8/21 14:49:47 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:49:47.431] [INF] [TestPlanService] 2026/8/21 14:49:47 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 14:49:52.499] [INF] [MainViewModel] 2026/8/21 14:49:52 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 14:49:52.508] [INF] [TestPlanService] 2026/8/21 14:49:52 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 14:49:52.539] [INF] [TestPlanService] 2026/8/21 14:49:52 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 14:49:52.541] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-21 14:49:52.541] [INF] [MainViewModel] 2026/8/21 14:49:52 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 14:49:57.121] [INF] [MainViewModel] 2026/8/21 14:49:57 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:49:57.123] [INF] [MainViewModel] 2026/8/21 14:49:57 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:49:57.125] [INF] [MainViewModel] ===== 开始执行测试方案，共 5 个模块 =====
+[2026-08-21 14:49:57.133] [INF] [TestItem] 2026/8/21 14:49:57 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:49:57.133] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 14:49:57.135] [INF] [TestItem] 2026/8/21 14:49:57 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:49:57.135] [INF] [InstrumentConfigService] 2026/8/21 14:49:57 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:49:57.163] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:49:57.163] [INF] [InstrumentConfigService] 2026/8/21 14:49:57 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:49:57.171] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:49:57.171] [INF] [MainViewModel] 2026/8/21 14:49:57 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:49:57.179] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:49:57.261] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 14:49:58.811] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 14:49:58.858] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 14:49:58.859] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 14:49:58.860] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 14:49:58.864] [INF] [TestItem] 2026/8/21 14:49:58 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:49:58.865] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 14:49:58.866] [INF] [TestItem] 2026/8/21 14:49:58 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:49:58.870] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 14:49:58.875] [INF] [TestItem] 2026/8/21 14:49:58 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:49:58.875] [INF] [TestItem] TestItem2：产品充放气测试 开始执行
+[2026-08-21 14:49:58.877] [INF] [TestItem] 2026/8/21 14:49:58 Start calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-21 14:49:58.877] [INF] [InstrumentConfigService] 2026/8/21 14:49:58 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:49:58.877] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:49:58.877] [INF] [InstrumentConfigService] 2026/8/21 14:49:58 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:49:58.884] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:49:58.886] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:49:59.250] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 14:49:59.250] [WRN] [TestItem] 产品不可用：BP-001/002 仍将等待产品物理按键（最长 30 秒），BPA700 会停留在 Wait，两项判 FAIL，可随时点“停止”结束
+[2026-08-21 14:49:59.252] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 14:49:59.252] [INF] [TestItem] BP-001：请按下产品物理[开始]键启动测量（最长等待 30 秒）...
+[2026-08-21 14:49:59.335] [INF] [TestItem] BPA700：血压测试待测中 SYS=120 DIA=80 HR=60，等待产品启动测量...
+[2026-08-21 14:49:59.347] [DBG] [TestItem] BPA700 BP测试回调：status=2 peak=0.0 inflate=0.0s deflate=0.0s total=0.0s
+[2026-08-21 14:50:39.917] [INF] [MainViewModel] 2026/8/21 14:50:39 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:50:39.918] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-21 14:50:39.918] [INF] [MainViewModel] 2026/8/21 14:50:39 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:50:39.918] [WRN] [TestItem] BPA700：血压测试整轮超时（60s），强制停止
+[2026-08-21 14:50:39.963] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 14:50:39.969] [WRN] [TestItem] BP-001 FAIL：status 序列 [2] 未经历 Busy→Stable→Finish（最终 status=2，产品未启动或气路未连通）
+[2026-08-21 14:50:40.006] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 14:50:40.034] [INF] [TestItem] 2026/8/21 14:50:40 Ended calling the TestItem.BpAccuracyTestModule() method . 
+
+[2026-08-21 14:50:40.060] [INF] [TestItem] 2026/8/21 14:50:40 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:50:40.074] [WRN] [MainViewModel] ===== 测试方案已停止 =====
+[2026-08-21 14:50:40.074] [INF] [MainViewModel] 2026/8/21 14:50:40 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:50:42.030] [INF] [MainViewModel] 2026/8/21 14:50:42 Start calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-21 14:50:42.030] [INF] [MainViewModel] 2026/8/21 14:50:42 Ended calling the MainViewModel.MovePlanModule() method . 
+
+[2026-08-21 14:50:42.303] [INF] [MainViewModel] 2026/8/21 14:50:42 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:42.333] [INF] [MainViewModel] 2026/8/21 14:50:42 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:43.175] [INF] [MainViewModel] 2026/8/21 14:50:43 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:43.182] [INF] [MainViewModel] 2026/8/21 14:50:43 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:44.086] [INF] [MainViewModel] 2026/8/21 14:50:44 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:44.093] [INF] [MainViewModel] 2026/8/21 14:50:44 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 14:50:59.458] [INF] [MainViewModel] 2026/8/21 14:50:59 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:50:59.458] [INF] [MainViewModel] 2026/8/21 14:50:59 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:50:59.458] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 14:50:59.459] [INF] [TestItem] 2026/8/21 14:50:59 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:50:59.459] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 14:50:59.459] [INF] [TestItem] 2026/8/21 14:50:59 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:50:59.459] [INF] [InstrumentConfigService] 2026/8/21 14:50:59 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:50:59.460] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:50:59.460] [INF] [InstrumentConfigService] 2026/8/21 14:50:59 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:50:59.460] [INF] [MainViewModel] 2026/8/21 14:50:59 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:50:59.460] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:50:59.464] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:50:59.528] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 14:51:01.072] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 14:51:01.118] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 14:51:01.119] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 14:51:01.120] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 14:51:01.123] [INF] [TestItem] 2026/8/21 14:51:01 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:51:01.123] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 14:51:01.123] [INF] [TestItem] 2026/8/21 14:51:01 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:51:01.124] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 14:51:01.124] [INF] [TestItem] 2026/8/21 14:51:01 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:51:01.124] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 14:51:01.127] [INF] [TestItem] 2026/8/21 14:51:01 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:51:01.127] [INF] [InstrumentConfigService] 2026/8/21 14:51:01 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:01.128] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:51:01.128] [INF] [InstrumentConfigService] 2026/8/21 14:51:01 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:01.131] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:51:01.134] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:51:01.165] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 14:51:01.165] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 14:51:01.287] [INF] [TestItem] BPA700：设置静态压力 30mmHg，保持 10s，等待到位...
+[2026-08-21 14:51:01.299] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 14:51:05.593] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-003静态压力精度测试 → IsWaveformExpanded=True
+[2026-08-21 14:51:05.599] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-21 14:51:08.092] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-21 14:51:08.896] [INF] [TestItem] BPA700：静态压力 30mmHg 已到位（采样读回 0.8mmHg）
+[2026-08-21 14:51:08.897] [INF] [TestItem] 2026/8/21 14:51:08 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:51:08.897] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:51:08.897] [INF] [TestItem] 2026/8/21 14:51:08 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:51:19.291] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 14:51:19.419] [INF] [TestItem] BPA700：设置静态压力 60mmHg，保持 10s，等待到位...
+[2026-08-21 14:51:19.422] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:51:19.621] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:51:19.820] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:20.021] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:20.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:20.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:51:20.620] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:51:20.820] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:21.020] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:21.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:21.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:51:21.620] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:51:21.820] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:22.020] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:22.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:22.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:51:22.621] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:51:22.821] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:23.020] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:23.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:23.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:51:23.620] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:51:23.821] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:24.020] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:24.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:24.421] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:51:24.621] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:51:24.820] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:25.021] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:25.220] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:25.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:51:25.621] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:51:25.820] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:26.021] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:26.220] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:26.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:51:26.621] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:51:26.821] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:27.021] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:27.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:27.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:51:27.620] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:51:27.821] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:28.021] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:28.221] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:28.420] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:51:28.620] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:51:28.820] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:51:34.420] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:51:35.220] [INF] [TestItem] BPA700：静态压力 60mmHg 已到位（采样读回 63.4mmHg）
+[2026-08-21 14:51:35.225] [INF] [TestItem] 2026/8/21 14:51:35 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:51:35.226] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:51:35.226] [INF] [TestItem] 2026/8/21 14:51:35 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:51:42.144] [INF] [InstrumentConfigService] 2026/8/21 14:51:42 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:42.144] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:51:42.144] [INF] [InstrumentConfigService] 2026/8/21 14:51:42 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:45.620] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 14:51:45.755] [INF] [TestItem] BPA700：设置静态压力 90mmHg，保持 10s，等待到位...
+[2026-08-21 14:51:45.763] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-21 14:51:45.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:51:46.158] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:51:46.358] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:46.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:46.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:51:46.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:51:47.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:51:47.358] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:47.558] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:47.758] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:51:47.958] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:51:48.160] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:51:48.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:48.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:48.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:51:48.958] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:51:49.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:51:49.358] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:49.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:49.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:51:49.958] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:51:50.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:51:50.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:50.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:50.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:51:50.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:51:51.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:51:51.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:51.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:51.758] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:51:51.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:51:52.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:51:52.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:52.558] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:52.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:51:52.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:51:53.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:51:53.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:53.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:53.757] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:51:53.958] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:51:54.157] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:51:54.357] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:54.557] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:54.758] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:51:54.957] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:51:55.158] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:51:55.357] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:51:56.027] [INF] [InstrumentConfigService] 2026/8/21 14:51:56 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:56.028] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:51:56.028] [INF] [InstrumentConfigService] 2026/8/21 14:51:56 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:56.028] [INF] [InstrumentConfigViewModel] 2026/8/21 14:51:56 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 14:51:56.031] [INF] [InstrumentConfigViewModel] 2026/8/21 14:51:56 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-21 14:51:59.913] [INF] [InstrumentConfigService] 2026/8/21 14:51:59 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:51:59.913] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:51:59.913] [INF] [InstrumentConfigService] 2026/8/21 14:51:59 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:00.957] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:52:01.757] [INF] [TestItem] BPA700：静态压力 90mmHg 已到位（采样读回 90.2mmHg）
+[2026-08-21 14:52:01.757] [INF] [TestItem] 2026/8/21 14:52:01 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:52:01.758] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:52:01.758] [INF] [TestItem] 2026/8/21 14:52:01 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:52:12.357] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 14:52:12.478] [INF] [TestItem] BPA700：设置静态压力 120mmHg，保持 10s，等待到位...
+[2026-08-21 14:52:12.482] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:52:12.679] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:52:12.880] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:52:13.080] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:52:13.279] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:52:13.480] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:52:13.680] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:52:13.879] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:52:14.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:52:14.280] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:52:14.480] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:52:14.679] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:52:14.879] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:52:15.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:52:15.280] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:52:15.479] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:52:15.680] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:52:15.880] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:52:16.080] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:52:16.280] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:52:16.479] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:52:16.680] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:52:16.880] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:52:17.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:52:17.279] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:52:17.479] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:52:17.679] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:52:17.879] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:52:18.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:52:18.279] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:52:18.479] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:52:18.679] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:52:18.880] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:52:19.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:52:19.280] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:52:19.479] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:52:19.679] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:52:19.880] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:52:20.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:52:20.279] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:52:20.480] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:52:20.680] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:52:20.879] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:52:21.079] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:52:21.280] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:52:21.325] [INF] [MainViewModel] 2026/8/21 14:52:21 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:52:21.325] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-21 14:52:21.326] [INF] [MainViewModel] 2026/8/21 14:52:21 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:52:21.376] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 14:52:21.423] [ERR] [TestItem] An error occured in TestItem.class BpStaticAccuracyModule method, message: System.TimeoutException: BPA700 静态压力 120mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 551
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 448
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 469
+System.TimeoutException: BPA700 静态压力 120mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 551
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 448
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 469
+[2026-08-21 14:52:21.423] [INF] [TestItem] 2026/8/21 14:52:21 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:52:21.423] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 14:52:21.423] [INF] [TestItem] 2026/8/21 14:52:21 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:52:21.424] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 14:52:21.424] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 14:52:21.424] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 14:52:21.424] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 14:52:21.424] [INF] [MainViewModel] 2026/8/21 14:52:21 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:52:25.136] [INF] [InstrumentConfigService] 2026/8/21 14:52:25 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:25.136] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:52:25.136] [INF] [InstrumentConfigService] 2026/8/21 14:52:25 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:52.698] [INF] [BpaParamConfigViewModel] 2026/8/21 14:52:52 Start calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 14:52:52.699] [INF] [InstrumentConfigService] 2026/8/21 14:52:52 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 14:52:52.714] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:52:52.714] [INF] [InstrumentConfigService] 2026/8/21 14:52:52 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 14:52:52.714] [INF] [BpaParamConfigViewModel] 血压仪参数配置已保存（instruments.json → BPA700Simulator.TestParams）
+[2026-08-21 14:52:52.732] [INF] [BpaParamConfigViewModel] 2026/8/21 14:52:52 Ended calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 14:52:54.567] [INF] [MainViewModel] 2026/8/21 14:52:54 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:52:54.567] [INF] [MainViewModel] 2026/8/21 14:52:54 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:52:54.568] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 14:52:54.578] [INF] [TestItem] 2026/8/21 14:52:54 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:52:54.578] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 14:52:54.578] [INF] [TestItem] 2026/8/21 14:52:54 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:52:54.578] [INF] [InstrumentConfigService] 2026/8/21 14:52:54 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:54.581] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:52:54.581] [INF] [InstrumentConfigService] 2026/8/21 14:52:54 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:54.582] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:52:54.582] [INF] [MainViewModel] 2026/8/21 14:52:54 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:52:54.585] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:52:54.641] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 14:52:56.185] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 14:52:56.232] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 14:52:56.232] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 14:52:56.233] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 14:52:56.238] [INF] [TestItem] 2026/8/21 14:52:56 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:52:56.238] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 14:52:56.238] [INF] [TestItem] 2026/8/21 14:52:56 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:52:56.239] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 14:52:56.243] [INF] [TestItem] 2026/8/21 14:52:56 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:52:56.243] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 14:52:56.243] [INF] [TestItem] 2026/8/21 14:52:56 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:52:56.243] [INF] [InstrumentConfigService] 2026/8/21 14:52:56 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:56.244] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:52:56.244] [INF] [InstrumentConfigService] 2026/8/21 14:52:56 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:52:56.244] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:52:56.248] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:52:56.314] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 14:52:56.314] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 14:52:56.434] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 5s，等待到位...
+[2026-08-21 14:52:56.447] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 14:53:02.838] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-21 14:53:03.639] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 300.2mmHg）
+[2026-08-21 14:53:03.639] [INF] [TestItem] 2026/8/21 14:53:03 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:03.639] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:53:03.639] [INF] [TestItem] 2026/8/21 14:53:03 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:09.438] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 14:53:09.560] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 5s，等待到位...
+[2026-08-21 14:53:09.566] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-21 14:53:09.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-21 14:53:09.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:53:10.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:53:10.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:10.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:10.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:10.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:53:11.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:53:11.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:11.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:11.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:11.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:53:12.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:53:12.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:12.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:12.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:12.963] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:53:13.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:53:13.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:13.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:13.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:13.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:53:14.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:53:14.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:14.563] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:14.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:14.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:53:15.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:53:15.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:15.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:15.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:15.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:53:16.161] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:53:16.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:16.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:16.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:16.962] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:53:17.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:53:17.361] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:17.561] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:17.762] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:17.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:53:18.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:53:18.362] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:18.562] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:18.761] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:18.961] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:53:19.162] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:53:19.362] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:53:25.363] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:53:26.163] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 200.0mmHg）
+[2026-08-21 14:53:26.164] [INF] [TestItem] 2026/8/21 14:53:26 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:26.164] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:53:26.164] [INF] [TestItem] 2026/8/21 14:53:26 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:31.762] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 14:53:31.886] [INF] [TestItem] BPA700：设置静态压力 100mmHg，保持 5s，等待到位...
+[2026-08-21 14:53:31.892] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:53:32.087] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:53:32.287] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:32.488] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:32.687] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:53:32.887] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:53:33.088] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:53:33.287] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:33.487] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:33.688] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:53:33.888] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:53:34.088] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:53:34.288] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:34.488] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:34.688] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:53:34.888] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:53:35.088] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:53:35.287] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:35.488] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:35.688] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:53:35.887] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:53:36.088] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:53:36.288] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:36.487] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:36.688] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:53:36.887] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:53:37.089] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:53:37.287] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:37.487] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:37.687] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:53:37.887] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:53:38.088] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:53:38.288] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:38.487] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:38.687] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:53:38.888] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:53:39.087] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:53:39.288] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:39.488] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:39.687] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:53:39.887] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:53:40.087] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:53:40.287] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:40.488] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:40.687] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:53:40.888] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:53:41.087] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:53:41.287] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:53:46.888] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:53:47.688] [INF] [TestItem] BPA700：静态压力 100mmHg 已到位（采样读回 100.2mmHg）
+[2026-08-21 14:53:47.688] [INF] [TestItem] 2026/8/21 14:53:47 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:47.688] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:53:47.688] [INF] [TestItem] 2026/8/21 14:53:47 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:53:47.888] [INF] [InstrumentConfigService] 2026/8/21 14:53:47 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:53:47.889] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:53:47.889] [INF] [InstrumentConfigService] 2026/8/21 14:53:47 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:53:52.925] [INF] [MainViewModel] 2026/8/21 14:53:52 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:53:52.925] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-21 14:53:52.925] [INF] [MainViewModel] 2026/8/21 14:53:52 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:53:52.925] [WRN] [TestItem] BPA700：静态压力测试 60s 未收到 Finish，主动 BPAStopTest 结束本轮
+[2026-08-21 14:53:52.977] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 14:53:53.004] [INF] [TestItem] 2026/8/21 14:53:53 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:53:53.030] [INF] [TestItem] 2026/8/21 14:53:53 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:53:53.042] [WRN] [MainViewModel] ===== 测试方案已停止 =====
+[2026-08-21 14:53:53.042] [INF] [MainViewModel] 2026/8/21 14:53:53 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:53:54.025] [INF] [InstrumentConfigService] 2026/8/21 14:53:54 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:53:54.025] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:53:54.025] [INF] [InstrumentConfigService] 2026/8/21 14:53:54 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:53:56.715] [INF] [InstrumentConfigService] 2026/8/21 14:53:56 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:53:56.715] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:53:56.715] [INF] [InstrumentConfigService] 2026/8/21 14:53:56 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:54:01.672] [INF] [BpaParamConfigViewModel] 2026/8/21 14:54:01 Start calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 14:54:01.672] [INF] [InstrumentConfigService] 2026/8/21 14:54:01 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 14:54:01.673] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:54:01.673] [INF] [InstrumentConfigService] 2026/8/21 14:54:01 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 14:54:01.673] [INF] [BpaParamConfigViewModel] 血压仪参数配置已保存（instruments.json → BPA700Simulator.TestParams）
+[2026-08-21 14:54:01.690] [INF] [BpaParamConfigViewModel] 2026/8/21 14:54:01 Ended calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 14:54:02.503] [INF] [MainViewModel] 2026/8/21 14:54:02 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:54:02.503] [INF] [MainViewModel] 2026/8/21 14:54:02 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 14:54:02.504] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 14:54:02.512] [INF] [TestItem] 2026/8/21 14:54:02 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:54:02.512] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 14:54:02.512] [INF] [TestItem] 2026/8/21 14:54:02 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:54:02.512] [INF] [InstrumentConfigService] 2026/8/21 14:54:02 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:54:02.513] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:54:02.513] [INF] [InstrumentConfigService] 2026/8/21 14:54:02 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:54:02.513] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:54:02.513] [INF] [MainViewModel] 2026/8/21 14:54:02 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 14:54:02.517] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:54:02.576] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 14:54:04.122] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 14:54:04.165] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 14:54:04.165] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 14:54:04.166] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 14:54:04.170] [INF] [TestItem] 2026/8/21 14:54:04 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 14:54:04.170] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 14:54:04.170] [INF] [TestItem] 2026/8/21 14:54:04 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:54:04.170] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 14:54:04.175] [INF] [TestItem] 2026/8/21 14:54:04 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:54:04.175] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 14:54:04.175] [INF] [TestItem] 2026/8/21 14:54:04 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:54:04.175] [INF] [InstrumentConfigService] 2026/8/21 14:54:04 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:54:04.175] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 14:54:04.175] [INF] [InstrumentConfigService] 2026/8/21 14:54:04 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 14:54:04.175] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 14:54:04.179] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 14:54:04.264] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 14:54:04.264] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 14:54:04.387] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 0s，等待到位...
+[2026-08-21 14:54:04.397] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 14:54:12.390] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 14:54:13.191] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 0.7mmHg）
+[2026-08-21 14:54:13.191] [INF] [TestItem] 2026/8/21 14:54:13 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:13.191] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:54:13.191] [INF] [TestItem] 2026/8/21 14:54:13 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:13.315] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 0s，等待到位...
+[2026-08-21 14:54:13.321] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:54:13.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:54:13.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:54:13.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:54:14.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:54:14.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:54:14.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:54:14.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:54:14.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:54:15.117] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:54:15.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:54:15.518] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:54:15.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:54:15.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:54:16.117] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:54:16.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:54:16.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:54:16.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:54:16.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:54:17.117] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:54:17.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:54:17.518] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:54:17.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:54:17.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:54:18.117] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:54:18.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:54:18.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:54:18.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:54:18.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:54:19.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:54:19.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:54:19.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:54:19.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:54:19.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:54:20.117] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:54:20.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:54:20.517] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:54:20.718] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:54:20.918] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:54:21.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:54:21.317] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:54:21.518] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:54:21.717] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:54:21.917] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:54:22.118] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:54:22.317] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:54:28.317] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:54:29.118] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 0.8mmHg）
+[2026-08-21 14:54:29.121] [INF] [TestItem] 2026/8/21 14:54:29 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:29.121] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:54:29.121] [INF] [TestItem] 2026/8/21 14:54:29 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:29.717] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 14:54:29.837] [INF] [TestItem] BPA700：设置静态压力 100mmHg，保持 0s，等待到位...
+[2026-08-21 14:54:29.840] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:54:30.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:54:30.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 14:54:30.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:54:30.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 14:54:30.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:54:31.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:54:31.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 14:54:31.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:54:31.639] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 14:54:31.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:54:32.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:54:32.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 14:54:32.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:54:32.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 14:54:32.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:54:33.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:54:33.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 14:54:33.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:54:33.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 14:54:33.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:54:34.037] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:54:34.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 14:54:34.438] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:54:34.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 14:54:34.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:54:35.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:54:35.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 14:54:35.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:54:35.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 14:54:35.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:54:36.039] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:54:36.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 14:54:36.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:54:36.637] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 14:54:36.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:54:37.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:54:37.238] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 14:54:37.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:54:37.638] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 14:54:37.838] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:54:38.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:54:38.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 14:54:38.437] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:54:38.639] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 14:54:38.837] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:54:39.038] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:54:39.237] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 14:54:39.438] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 14:54:44.837] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 14:54:45.637] [INF] [TestItem] BPA700：静态压力 100mmHg 已到位（采样读回 0.8mmHg）
+[2026-08-21 14:54:45.638] [INF] [TestItem] 2026/8/21 14:54:45 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:45.638] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 14:54:45.638] [INF] [TestItem] 2026/8/21 14:54:45 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 14:54:46.437] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 14:54:46.441] [INF] [TestItem] BPA700：已停止模拟
+[2026-08-21 14:54:46.443] [INF] [TestItem] BPA700：压力已归零
+[2026-08-21 14:54:46.473] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 14:54:46.473] [WRN] [TestItem] BP-003 FAIL：产品压力上报协议预留，未取到产品上报值（协议定稿后补 ProductController.ReadProductPressureAsync）
+[2026-08-21 14:54:46.476] [INF] [TestItem] 2026/8/21 14:54:46 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 14:54:46.476] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 14:54:46.476] [INF] [TestItem] 2026/8/21 14:54:46 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 14:54:46.476] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 14:54:46.476] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 14:54:46.476] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 14:54:46.476] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 14:54:46.476] [INF] [MainViewModel] 2026/8/21 14:54:46 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 15:15:06.847] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 15:15:06.912] [INF] [Spec] 2026/8/21 15:15:06 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 15:15:06.912] [INF] [Spec] 2026/8/21 15:15:06 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 15:15:06.914] [INF] [MainViewModel] 2026/8/21 15:15:06 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 15:15:06.914] [INF] [TestPlanService] 2026/8/21 15:15:06 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 15:15:06.915] [INF] [TestPlanService] 2026/8/21 15:15:06 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 15:15:06.915] [INF] [MainViewModel] 2026/8/21 15:15:06 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 15:15:11.243] [INF] [TestPlanService] 2026/8/21 15:15:11 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 15:15:11.244] [INF] [TestPlanService] 2026/8/21 15:15:11 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 15:15:18.652] [INF] [MainViewModel] 2026/8/21 15:15:18 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 15:15:18.659] [INF] [TestPlanService] 2026/8/21 15:15:18 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 15:15:18.690] [INF] [TestPlanService] 2026/8/21 15:15:18 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 15:15:18.692] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-21 15:15:18.692] [INF] [MainViewModel] 2026/8/21 15:15:18 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 15:15:20.409] [INF] [MainViewModel] 2026/8/21 15:15:20 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:20.414] [INF] [MainViewModel] 2026/8/21 15:15:20 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:21.526] [INF] [MainViewModel] 2026/8/21 15:15:21 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:21.548] [INF] [MainViewModel] 2026/8/21 15:15:21 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:21.990] [INF] [MainViewModel] 2026/8/21 15:15:21 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:21.993] [INF] [MainViewModel] 2026/8/21 15:15:21 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 15:15:22.625] [INF] [MainViewModel] 2026/8/21 15:15:22 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:15:22.627] [INF] [MainViewModel] 2026/8/21 15:15:22 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 15:15:22.630] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 15:15:22.635] [INF] [TestItem] 2026/8/21 15:15:22 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:15:22.635] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 15:15:22.639] [INF] [TestItem] 2026/8/21 15:15:22 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 15:15:22.639] [INF] [InstrumentConfigService] 2026/8/21 15:15:22 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:15:22.668] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:15:22.668] [INF] [InstrumentConfigService] 2026/8/21 15:15:22 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:15:22.669] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 15:15:22.669] [INF] [MainViewModel] 2026/8/21 15:15:22 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:15:22.676] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 15:15:22.723] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 15:15:24.274] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 15:15:24.320] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 15:15:24.321] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 15:15:24.323] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 15:15:24.328] [INF] [TestItem] 2026/8/21 15:15:24 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 15:15:24.329] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 15:15:24.329] [INF] [TestItem] 2026/8/21 15:15:24 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:15:24.334] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 15:15:24.338] [INF] [TestItem] 2026/8/21 15:15:24 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:15:24.338] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 15:15:24.341] [INF] [TestItem] 2026/8/21 15:15:24 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 15:15:24.341] [INF] [InstrumentConfigService] 2026/8/21 15:15:24 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:15:24.341] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:15:24.341] [INF] [InstrumentConfigService] 2026/8/21 15:15:24 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:15:24.350] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 15:15:24.353] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 15:15:24.528] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 15:15:24.530] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 15:15:31.534] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 0s，等待到位...
+[2026-08-21 15:15:31.544] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 15:15:38.894] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-003静态压力精度测试 → IsWaveformExpanded=True
+[2026-08-21 15:15:38.896] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-21 15:15:39.336] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-21 15:15:40.142] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 1.3mmHg）
+[2026-08-21 15:15:40.143] [INF] [TestItem] 2026/8/21 15:15:40 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:15:40.143] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 15:15:40.143] [INF] [TestItem] 2026/8/21 15:15:40 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:15:40.181] [WRN] [TestItem] BPA700：BPARunStaticPressure(200, inflation=True) 首次调用失败，BPAStopTest 后重试
+[2026-08-21 15:15:41.307] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 0s，等待到位...
+[2026-08-21 15:15:41.313] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-21 15:15:41.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 15:15:41.708] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 15:15:41.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:42.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:42.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:42.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:15:42.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:15:42.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:15:43.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:15:43.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:15:43.508] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:15:43.708] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:15:43.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:15:44.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:15:44.308] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:15:44.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:15:44.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:15:44.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:15:45.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:15:45.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:15:45.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:15:45.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:15:45.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:15:46.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:15:46.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:15:46.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:15:46.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:15:46.908] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:15:47.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:15:47.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:15:47.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:15:47.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:15:47.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:15:48.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:15:48.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:15:48.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:15:48.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:15:48.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:15:49.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:15:49.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:15:49.510] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:15:49.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:15:49.909] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:15:50.109] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:15:50.309] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:15:50.509] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:15:50.709] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:15:50.909] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 15:15:56.909] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 15:15:57.709] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 15:15:57.710] [INF] [TestItem] 2026/8/21 15:15:57 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:15:57.710] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 15:15:57.710] [INF] [TestItem] 2026/8/21 15:15:57 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:15:57.752] [WRN] [TestItem] BPA700：BPARunStaticPressure(100, inflation=True) 首次调用失败，BPAStopTest 后重试
+[2026-08-21 15:15:58.875] [INF] [TestItem] BPA700：设置静态压力 100mmHg，保持 0s，等待到位...
+[2026-08-21 15:15:58.882] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:59.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:59.278] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:15:59.478] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:15:59.678] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:15:59.878] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:00.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:00.277] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:00.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:16:00.678] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:16:00.878] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:01.078] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:01.277] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:01.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:16:01.677] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:16:01.877] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:02.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:02.278] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:02.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:16:02.677] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:16:02.877] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:03.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:03.277] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:03.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:16:03.677] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:16:03.877] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:04.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:04.278] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:04.478] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:16:04.678] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:16:04.878] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:05.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:05.277] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:05.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:16:05.677] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:16:05.877] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:06.077] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:06.277] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:06.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:16:06.677] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:16:06.878] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:07.078] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:07.278] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:07.477] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:16:07.678] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:16:07.878] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 15:16:10.273] [INF] [MainViewModel] 2026/8/21 15:16:10 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:16:10.273] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-21 15:16:10.273] [INF] [MainViewModel] 2026/8/21 15:16:10 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:16:10.341] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 15:16:10.394] [ERR] [TestItem] An error occured in TestItem.class BpStaticAccuracyModule method, message: System.TimeoutException: BPA700 静态压力 100mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 551
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 448
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 469
+System.TimeoutException: BPA700 静态压力 100mmHg 等待到位超时
+   at TORNPISolution.Service.Devices.BPA700Simulator.SetStaticPressureAsync(Double pressure, Int32 stableSeconds, Boolean inflation, CancellationToken ct) in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 551
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 448
+   at TORNPISolution.Service.TestItem.BpStaticAccuracyModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 469
+[2026-08-21 15:16:10.394] [INF] [TestItem] 2026/8/21 15:16:10 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 15:16:10.394] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 15:16:10.394] [INF] [TestItem] 2026/8/21 15:16:10 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:16:10.394] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 15:16:10.394] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 15:16:10.394] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 15:16:10.394] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 15:16:10.394] [INF] [MainViewModel] 2026/8/21 15:16:10 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 15:16:14.428] [INF] [InstrumentConfigService] 2026/8/21 15:16:14 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:14.429] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:16:14.429] [INF] [InstrumentConfigService] 2026/8/21 15:16:14 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:21.544] [INF] [BpaParamConfigViewModel] 2026/8/21 15:16:21 Start calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 15:16:21.544] [INF] [InstrumentConfigService] 2026/8/21 15:16:21 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 15:16:21.562] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:16:21.562] [INF] [InstrumentConfigService] 2026/8/21 15:16:21 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-21 15:16:21.562] [INF] [BpaParamConfigViewModel] 血压仪参数配置已保存（instruments.json → BPA700Simulator.TestParams）
+[2026-08-21 15:16:21.577] [INF] [BpaParamConfigViewModel] 2026/8/21 15:16:21 Ended calling the BpaParamConfigViewModel.Save() method . 
+
+[2026-08-21 15:16:22.394] [INF] [MainViewModel] 2026/8/21 15:16:22 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:16:22.394] [INF] [MainViewModel] 2026/8/21 15:16:22 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 15:16:22.395] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 15:16:22.400] [INF] [TestItem] 2026/8/21 15:16:22 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:16:22.400] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 15:16:22.400] [INF] [TestItem] 2026/8/21 15:16:22 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 15:16:22.400] [INF] [InstrumentConfigService] 2026/8/21 15:16:22 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:22.401] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:16:22.401] [INF] [InstrumentConfigService] 2026/8/21 15:16:22 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:22.401] [INF] [MainViewModel] 2026/8/21 15:16:22 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 15:16:22.401] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 15:16:22.404] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 15:16:22.465] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 15:16:24.008] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 15:16:24.055] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 15:16:24.055] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 15:16:24.055] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 15:16:24.058] [INF] [TestItem] 2026/8/21 15:16:24 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 15:16:24.058] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 15:16:24.058] [INF] [TestItem] 2026/8/21 15:16:24 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:16:24.059] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 15:16:24.062] [INF] [TestItem] 2026/8/21 15:16:24 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:16:24.062] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 15:16:24.062] [INF] [TestItem] 2026/8/21 15:16:24 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 15:16:24.062] [INF] [InstrumentConfigService] 2026/8/21 15:16:24 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:24.062] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 15:16:24.062] [INF] [InstrumentConfigService] 2026/8/21 15:16:24 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 15:16:24.062] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 15:16:24.066] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 15:16:24.122] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 15:16:24.122] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 15:16:24.241] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 0s，等待到位...
+[2026-08-21 15:16:24.249] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 15:16:32.844] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 15:16:33.645] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 15:16:33.646] [INF] [TestItem] 2026/8/21 15:16:33 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:16:33.646] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 15:16:33.646] [INF] [TestItem] 2026/8/21 15:16:33 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:16:33.767] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 0s，等待到位...
+[2026-08-21 15:16:33.778] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 15:16:33.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:16:34.169] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 15:16:34.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:34.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:34.769] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 15:16:34.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:16:35.169] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 15:16:35.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:35.570] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:35.769] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 15:16:35.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:16:36.170] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 15:16:36.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:36.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:36.770] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 15:16:36.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:16:37.170] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 15:16:37.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:37.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:37.770] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 15:16:37.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:16:38.169] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 15:16:38.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:38.570] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:38.769] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 15:16:38.970] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:16:39.170] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 15:16:39.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:39.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:39.770] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 15:16:39.970] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:16:40.169] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 15:16:40.370] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:40.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:40.769] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 15:16:40.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:16:41.170] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 15:16:41.369] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:41.569] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:41.770] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 15:16:41.969] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:16:42.169] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 15:16:42.369] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 15:16:51.970] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 15:16:52.773] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 15:16:52.774] [INF] [TestItem] 2026/8/21 15:16:52 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:16:52.774] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 15:16:52.774] [INF] [TestItem] 2026/8/21 15:16:52 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 15:16:52.776] [INF] [TestItem] BPA700：已停止模拟
+[2026-08-21 15:16:52.777] [INF] [TestItem] BPA700：压力已归零
+[2026-08-21 15:16:52.782] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 15:16:52.784] [WRN] [TestItem] BP-003 FAIL：产品压力上报协议预留，未取到产品上报值（协议定稿后补 ProductController.ReadProductPressureAsync）
+[2026-08-21 15:16:52.787] [INF] [TestItem] 2026/8/21 15:16:52 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 15:16:52.787] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 15:16:52.787] [INF] [TestItem] 2026/8/21 15:16:52 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 15:16:52.788] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 15:16:52.788] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 15:16:52.788] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 15:16:52.788] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 15:16:52.788] [INF] [MainViewModel] 2026/8/21 15:16:52 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 16:59:55.330] [INF] [App] ========== 应用启动 ==========
+[2026-08-21 16:59:55.420] [INF] [Spec] 2026/8/21 16:59:55 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-21 16:59:55.421] [INF] [Spec] 2026/8/21 16:59:55 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-21 16:59:55.422] [INF] [MainViewModel] 2026/8/21 16:59:55 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 16:59:55.422] [INF] [TestPlanService] 2026/8/21 16:59:55 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 16:59:55.423] [INF] [TestPlanService] 2026/8/21 16:59:55 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 16:59:55.423] [INF] [MainViewModel] 2026/8/21 16:59:55 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-21 16:59:58.617] [INF] [TestPlanService] 2026/8/21 16:59:58 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 16:59:58.617] [INF] [TestPlanService] 2026/8/21 16:59:58 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 17:00:02.226] [INF] [MainViewModel] 2026/8/21 17:00:02 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 17:00:02.236] [INF] [TestPlanService] 2026/8/21 17:00:02 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 17:00:02.279] [INF] [TestPlanService] 2026/8/21 17:00:02 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 17:00:02.281] [INF] [MainViewModel] 方案 [血压功能测试] 已加载，共 5 个模块
+[2026-08-21 17:00:02.281] [INF] [MainViewModel] 2026/8/21 17:00:02 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 17:00:05.624] [INF] [MainViewModel] 2026/8/21 17:00:05 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:05.631] [INF] [MainViewModel] 2026/8/21 17:00:05 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:06.352] [INF] [MainViewModel] 2026/8/21 17:00:06 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:06.375] [INF] [MainViewModel] 2026/8/21 17:00:06 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:07.150] [INF] [MainViewModel] 2026/8/21 17:00:07 Start calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:07.153] [INF] [MainViewModel] 2026/8/21 17:00:07 Ended calling the MainViewModel.RemoveModuleFromPlan() method . 
+
+[2026-08-21 17:00:07.834] [INF] [MainViewModel] 2026/8/21 17:00:07 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:00:07.837] [INF] [MainViewModel] 2026/8/21 17:00:07 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:00:07.838] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 17:00:07.843] [INF] [TestItem] 2026/8/21 17:00:07 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:00:07.843] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 17:00:07.847] [INF] [TestItem] 2026/8/21 17:00:07 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 17:00:07.848] [INF] [InstrumentConfigService] 2026/8/21 17:00:07 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:00:07.892] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:00:07.892] [INF] [InstrumentConfigService] 2026/8/21 17:00:07 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:00:07.894] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 17:00:07.894] [INF] [MainViewModel] 2026/8/21 17:00:07 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:00:07.901] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 17:00:07.953] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 17:00:09.504] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 17:00:09.553] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 17:00:09.553] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 17:00:09.554] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 17:00:09.559] [INF] [TestItem] 2026/8/21 17:00:09 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 17:00:09.560] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 17:00:09.560] [INF] [TestItem] 2026/8/21 17:00:09 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:00:09.565] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 17:00:09.569] [INF] [TestItem] 2026/8/21 17:00:09 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:00:09.569] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 17:00:09.571] [INF] [TestItem] 2026/8/21 17:00:09 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 17:00:09.571] [INF] [InstrumentConfigService] 2026/8/21 17:00:09 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:00:09.572] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:00:09.572] [INF] [InstrumentConfigService] 2026/8/21 17:00:09 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:00:09.581] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 17:00:09.584] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 17:00:09.824] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 17:00:09.826] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 17:00:09.951] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 0s，等待到位...
+[2026-08-21 17:00:09.964] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 17:00:14.053] [INF] [MainWindow] [波形诊断] Preview 直接翻转：行=BP-003静态压力精度测试 → IsWaveformExpanded=True
+[2026-08-21 17:00:14.057] [INF] [MainWindow] [波形诊断] 翻转后状态：DetailsVisibility=Visible, 详情区=Visibility=Visible, 高度=1, 行高=37
+[2026-08-21 17:00:23.154] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 17:00:23.967] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 17:00:23.968] [INF] [TestItem] 2026/8/21 17:00:23 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:00:23.968] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 17:00:23.968] [INF] [TestItem] 2026/8/21 17:00:23 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:00:24.092] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 0s，等待到位...
+[2026-08-21 17:00:24.096] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 17:00:24.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:00:24.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:00:24.692] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:00:24.893] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 17:00:25.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 17:00:25.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:00:25.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:00:25.692] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:00:25.892] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 17:00:26.092] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 17:00:26.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:00:26.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:00:26.692] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:00:26.892] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 17:00:27.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 17:00:27.292] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:00:27.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:00:27.693] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:00:27.892] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 17:00:28.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 17:00:28.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:00:28.492] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:00:28.692] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:00:28.893] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 17:00:29.092] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 17:00:29.292] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:00:29.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:00:29.692] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:00:29.893] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 17:00:30.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 17:00:30.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:00:30.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:00:30.693] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:00:30.893] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 17:00:31.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 17:00:31.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:00:31.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:00:31.693] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:00:31.893] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 17:00:32.093] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 17:00:32.293] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:00:32.493] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:00:32.693] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:00:32.893] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 17:00:38.693] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=0.5 index=0
+[2026-08-21 17:00:39.493] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 17:00:39.494] [INF] [TestItem] 2026/8/21 17:00:39 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:00:39.494] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 17:00:39.494] [INF] [TestItem] 2026/8/21 17:00:39 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:00:40.093] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 17:00:40.137] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 17:00:40.140] [WRN] [TestItem] BP-003 FAIL：产品压力上报协议预留，未取到产品上报值（协议定稿后补 ProductController.ReadProductPressureAsync）
+[2026-08-21 17:00:40.143] [INF] [TestItem] 2026/8/21 17:00:40 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 17:00:40.144] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 17:00:40.144] [INF] [TestItem] 2026/8/21 17:00:40 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:00:40.144] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 17:00:40.144] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 17:00:40.144] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 17:00:40.144] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 17:00:40.144] [INF] [MainViewModel] 2026/8/21 17:00:40 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:17:02.061] [INF] [MainViewModel] 2026/8/21 17:17:02 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:17:02.061] [INF] [MainViewModel] 2026/8/21 17:17:02 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:17:02.062] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-21 17:17:02.069] [INF] [TestItem] 2026/8/21 17:17:02 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:17:02.069] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-21 17:17:02.069] [INF] [TestItem] 2026/8/21 17:17:02 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 17:17:02.069] [INF] [InstrumentConfigService] 2026/8/21 17:17:02 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:17:02.071] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:17:02.071] [INF] [InstrumentConfigService] 2026/8/21 17:17:02 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:17:02.072] [INF] [MainViewModel] 2026/8/21 17:17:02 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:17:02.076] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 17:17:02.080] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 17:17:02.134] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-21 17:17:03.681] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-21 17:17:03.724] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-21 17:17:03.724] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-21 17:17:03.724] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-21 17:17:03.727] [INF] [TestItem] 2026/8/21 17:17:03 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-21 17:17:03.727] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-21 17:17:03.727] [INF] [TestItem] 2026/8/21 17:17:03 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:17:03.727] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-21 17:17:03.732] [INF] [TestItem] 2026/8/21 17:17:03 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:17:03.733] [INF] [TestItem] TestItem2：血压静态压力精度测试 开始执行
+[2026-08-21 17:17:03.733] [INF] [TestItem] 2026/8/21 17:17:03 Start calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 17:17:03.733] [INF] [InstrumentConfigService] 2026/8/21 17:17:03 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:17:03.733] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:17:03.733] [INF] [InstrumentConfigService] 2026/8/21 17:17:03 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:17:03.733] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-21 17:17:03.737] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-21 17:17:03.795] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-21 17:17:03.796] [INF] [TestItem] BPA700：开始压力采样（采样率 200Hz）
+[2026-08-21 17:17:03.918] [INF] [TestItem] BPA700：设置静态压力 300mmHg，保持 0s，等待到位...
+[2026-08-21 17:17:03.926] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=10.0 index=0
+[2026-08-21 17:17:13.320] [DBG] [TestItem] BPA700 静态压力回调：status=3 wait=10.0 index=0
+[2026-08-21 17:17:14.121] [INF] [TestItem] BPA700：静态压力 300mmHg 已到位（采样读回 0.4mmHg）
+[2026-08-21 17:17:14.121] [INF] [TestItem] 2026/8/21 17:17:14 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:17:14.121] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 17:17:14.121] [INF] [TestItem] 2026/8/21 17:17:14 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:17:14.920] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=10.0 index=0
+[2026-08-21 17:17:15.043] [INF] [TestItem] BPA700：设置静态压力 200mmHg，保持 0s，等待到位...
+[2026-08-21 17:17:15.049] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=10.0 index=0
+[2026-08-21 17:17:15.246] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 17:17:15.445] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 17:17:15.646] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.5 index=0
+[2026-08-21 17:17:15.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 17:17:16.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=9.0 index=0
+[2026-08-21 17:17:16.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:17:16.445] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:17:16.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.5 index=0
+[2026-08-21 17:17:16.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 17:17:17.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=8.0 index=0
+[2026-08-21 17:17:17.246] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:17:17.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:17:17.646] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.5 index=0
+[2026-08-21 17:17:17.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 17:17:18.045] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=7.0 index=0
+[2026-08-21 17:17:18.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:17:18.445] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:17:18.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.5 index=0
+[2026-08-21 17:17:18.846] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 17:17:19.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=6.0 index=0
+[2026-08-21 17:17:19.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:17:19.445] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:17:19.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.5 index=0
+[2026-08-21 17:17:19.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 17:17:20.045] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=5.0 index=0
+[2026-08-21 17:17:20.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:17:20.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:17:20.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.5 index=0
+[2026-08-21 17:17:20.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 17:17:21.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=4.0 index=0
+[2026-08-21 17:17:21.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:17:21.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:17:21.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.5 index=0
+[2026-08-21 17:17:21.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 17:17:22.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=3.0 index=0
+[2026-08-21 17:17:22.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:17:22.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:17:22.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.5 index=0
+[2026-08-21 17:17:22.846] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 17:17:23.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=2.0 index=0
+[2026-08-21 17:17:23.246] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:17:23.445] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:17:23.645] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.5 index=0
+[2026-08-21 17:17:23.845] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 17:17:24.046] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=1.0 index=0
+[2026-08-21 17:17:24.245] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:17:24.446] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:17:24.646] [DBG] [TestItem] BPA700 静态压力回调：status=1 wait=0.5 index=0
+[2026-08-21 17:17:24.845] [DBG] [TestItem] BPA700 静态压力回调：status=2 wait=0.5 index=0
+[2026-08-21 17:17:32.245] [DBG] [TestItem] BPA700 静态压力回调：status=4 wait=0.5 index=0
+[2026-08-21 17:17:33.046] [INF] [TestItem] BPA700：静态压力 200mmHg 已到位（采样读回 0.0mmHg）
+[2026-08-21 17:17:33.046] [INF] [TestItem] 2026/8/21 17:17:33 Start calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:17:33.046] [WRN] [TestItem] 产品压力上报协议预留：未发送串口指令，直接返回 NaN（协议定稿后在 ReadProductPressureAsync 补查询指令与解析）
+[2026-08-21 17:17:33.046] [INF] [TestItem] 2026/8/21 17:17:33 Ended calling the ProductController.ReadProductPressureAsync() method . 
+
+[2026-08-21 17:17:33.055] [INF] [TestItem] BPA700：已停止压力采样
+[2026-08-21 17:17:33.055] [WRN] [TestItem] BP-003 FAIL：产品压力上报协议预留，未取到产品上报值（协议定稿后补 ProductController.ReadProductPressureAsync）
+[2026-08-21 17:17:33.058] [INF] [TestItem] 2026/8/21 17:17:33 Ended calling the TestItem.BpStaticAccuracyModule() method . 
+
+[2026-08-21 17:17:33.058] [INF] [TestItem] TestItem2：血压静态压力精度测试 执行完成，共 3 项结果
+[2026-08-21 17:17:33.058] [INF] [TestItem] 2026/8/21 17:17:33 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:17:33.059] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 17:17:33.059] [WRN] [MainViewModel] [TestItem2 血压静态压力精度测试] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-21 17:17:33.059] [INF] [MainViewModel] [TestItem2 血压静态压力精度测试] 模块结果：FAIL
+[2026-08-21 17:17:33.059] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 17:17:33.059] [INF] [MainViewModel] 2026/8/21 17:17:33 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:19:55.300] [INF] [TestPlanService] 2026/8/21 17:19:55 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 17:19:55.301] [INF] [TestPlanService] 2026/8/21 17:19:55 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-21 17:19:59.771] [INF] [MainViewModel] 2026/8/21 17:19:59 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 17:19:59.771] [INF] [TestPlanService] 2026/8/21 17:19:59 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 17:19:59.772] [INF] [TestPlanService] 2026/8/21 17:19:59 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-21 17:19:59.778] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-21 17:19:59.778] [INF] [MainViewModel] 2026/8/21 17:19:59 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-21 17:20:02.643] [INF] [MainViewModel] 2026/8/21 17:20:02 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:20:02.643] [INF] [MainViewModel] 2026/8/21 17:20:02 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:20:02.643] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-21 17:20:02.643] [INF] [TestItem] 2026/8/21 17:20:02 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:02.643] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 17:20:02.646] [INF] [TestItem] 2026/8/21 17:20:02 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 17:20:02.646] [INF] [InstrumentConfigService] 2026/8/21 17:20:02 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:02.647] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:20:02.647] [INF] [InstrumentConfigService] 2026/8/21 17:20:02 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:02.650] [INF] [Aecg100Tester] 2026/8/21 17:20:02 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 17:20:02.688] [INF] [MainViewModel] 2026/8/21 17:20:02 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:20:03.269] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-21 17:20:03.269] [INF] [Aecg100Tester] 2026/8/21 17:20:03 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-21 17:20:03.270] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-21 17:20:05.335] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-21 17:20:05.336] [INF] [TestItem] 2026/8/21 17:20:05 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 17:20:05.336] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 17:20:05.336] [INF] [TestItem] 2026/8/21 17:20:05 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:05.336] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-21 17:20:05.345] [INF] [TestItem] 2026/8/21 17:20:05 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:05.345] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-21 17:20:05.346] [INF] [TestItem] 2026/8/21 17:20:05 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 17:20:05.346] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 17:20:05.347] [INF] [InstrumentConfigService] 2026/8/21 17:20:05 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:05.347] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:20:05.347] [INF] [InstrumentConfigService] 2026/8/21 17:20:05 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:05.424] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-21 17:20:05.424] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-21 17:20:05.838] [INF] [TestItem] 2026/8/21 17:20:05 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 17:20:05.838] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-21 17:20:05.838] [INF] [TestItem] 2026/8/21 17:20:05 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:05.838] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：PASS
+[2026-08-21 17:20:05.846] [INF] [TestItem] 2026/8/21 17:20:05 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:05.846] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-21 17:20:05.849] [INF] [TestItem] 2026/8/21 17:20:05 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 17:20:05.849] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 17:20:05.849] [INF] [InstrumentConfigService] 2026/8/21 17:20:05 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:05.849] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:20:05.849] [INF] [InstrumentConfigService] 2026/8/21 17:20:05 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:05.908] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:06.777] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:07.646] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:08.544] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:09.426] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:10.310] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:11.190] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:12.058] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:12.927] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:13.809] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:14.676] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:15.536] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:16.427] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:17.303] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:18.182] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:19.068] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:19.953] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:20.828] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:20:21.650] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-21 17:20:21.650] [INF] [TestItem] 2026/8/21 17:20:21 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 17:20:21.650] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-21 17:20:21.650] [INF] [TestItem] 2026/8/21 17:20:21 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:21.650] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：PASS
+[2026-08-21 17:20:21.650] [INF] [TestItem] 2026/8/21 17:20:21 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:21.650] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-21 17:20:21.653] [INF] [TestItem] 2026/8/21 17:20:21 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 17:20:21.653] [INF] [InstrumentConfigService] 2026/8/21 17:20:21 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:21.654] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:20:21.654] [INF] [InstrumentConfigService] 2026/8/21 17:20:21 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:20:21.654] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-21 17:20:21.725] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-21 17:20:22.708] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 17:20:23.697] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 17:20:24.610] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-21 17:20:24.683] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-21 17:20:25.605] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-21 17:20:25.678] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-21 17:20:26.590] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-21 17:20:26.611] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-21 17:20:26.731] [INF] [TestItem] 2026/8/21 17:20:26 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 17:20:26.732] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-21 17:20:26.732] [INF] [TestItem] 2026/8/21 17:20:26 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:20:26.732] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-21 17:20:26.732] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-21 17:20:26.732] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 17:20:26.732] [INF] [MainViewModel] 2026/8/21 17:20:26 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:24:18.941] [INF] [MainViewModel] 2026/8/21 17:24:18 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:24:18.941] [INF] [MainViewModel] 2026/8/21 17:24:18 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 17:24:18.941] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-21 17:24:18.946] [INF] [TestItem] 2026/8/21 17:24:18 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:18.946] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-21 17:24:18.946] [INF] [TestItem] 2026/8/21 17:24:18 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 17:24:18.946] [INF] [InstrumentConfigService] 2026/8/21 17:24:18 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:18.946] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:24:18.946] [INF] [InstrumentConfigService] 2026/8/21 17:24:18 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:18.946] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-21 17:24:18.946] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-21 17:24:18.946] [INF] [TestItem] 2026/8/21 17:24:18 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-21 17:24:18.946] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-21 17:24:18.946] [INF] [TestItem] 2026/8/21 17:24:18 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:18.946] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-21 17:24:18.947] [INF] [TestItem] 2026/8/21 17:24:18 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:18.947] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-21 17:24:18.947] [INF] [TestItem] 2026/8/21 17:24:18 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 17:24:18.947] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 17:24:18.947] [INF] [InstrumentConfigService] 2026/8/21 17:24:18 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:18.947] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:24:18.947] [INF] [InstrumentConfigService] 2026/8/21 17:24:18 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:18.948] [INF] [MainViewModel] 2026/8/21 17:24:18 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-21 17:24:19.023] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-21 17:24:19.024] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-21 17:24:19.441] [INF] [TestItem] 2026/8/21 17:24:19 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-21 17:24:19.441] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-21 17:24:19.441] [INF] [TestItem] 2026/8/21 17:24:19 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:19.441] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：PASS
+[2026-08-21 17:24:19.450] [INF] [TestItem] 2026/8/21 17:24:19 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:19.450] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-21 17:24:19.450] [INF] [TestItem] 2026/8/21 17:24:19 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 17:24:19.450] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-21 17:24:19.450] [INF] [InstrumentConfigService] 2026/8/21 17:24:19 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:19.450] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:24:19.450] [INF] [InstrumentConfigService] 2026/8/21 17:24:19 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:19.508] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:20.373] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:21.239] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:22.139] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:23.021] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:23.899] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:24.779] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:25.649] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:26.519] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:27.395] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:28.257] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:29.116] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:30.019] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:30.904] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:31.787] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:32.679] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:33.560] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:34.444] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-21 17:24:35.264] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-21 17:24:35.264] [INF] [TestItem] 2026/8/21 17:24:35 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-21 17:24:35.264] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-21 17:24:35.264] [INF] [TestItem] 2026/8/21 17:24:35 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:35.264] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：PASS
+[2026-08-21 17:24:35.270] [INF] [TestItem] 2026/8/21 17:24:35 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:35.270] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-21 17:24:35.270] [INF] [TestItem] 2026/8/21 17:24:35 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 17:24:35.270] [INF] [InstrumentConfigService] 2026/8/21 17:24:35 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:35.271] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-21 17:24:35.271] [INF] [InstrumentConfigService] 2026/8/21 17:24:35 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-21 17:24:35.271] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-21 17:24:35.339] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-21 17:24:36.326] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 17:24:37.312] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-21 17:24:38.226] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-21 17:24:38.304] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-21 17:24:39.220] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-21 17:24:39.293] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-21 17:24:40.207] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-21 17:24:40.233] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-21 17:24:40.354] [INF] [TestItem] 2026/8/21 17:24:40 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-21 17:24:40.354] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-21 17:24:40.354] [INF] [TestItem] 2026/8/21 17:24:40 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-21 17:24:40.355] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-21 17:24:40.355] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-21 17:24:40.355] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-21 17:24:40.355] [INF] [MainViewModel] 2026/8/21 17:24:40 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-21 18:00:18.096] [INF] [App] ========== 应用退出 ==========

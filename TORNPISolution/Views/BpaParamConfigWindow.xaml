@@ -1,0 +1,351 @@
+<Window x:Class="TORNPISolution.Views.BpaParamConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TORNPISolution.ViewModels"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="血压仪参数配置（鲸杨 BPA700）" Width="760" Height="640"
+        Icon="/Images/logo.ico"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{StaticResource Brush.Window.Background}"
+        FontFamily="Microsoft YaHei UI">
+
+    <Window.DataContext>
+        <vm:BpaParamConfigViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <!-- 字段标签 -->
+        <Style x:Key="Style.CfgLabel" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <!-- 数值输入框 -->
+        <Style x:Key="Style.CfgBox" TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+
+        <!-- 分组标题 -->
+        <Style x:Key="Style.GroupTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+            <Setter Property="Margin" Value="0,14,0,8"/>
+        </Style>
+
+        <!-- 单位/范围提示小字 -->
+        <Style x:Key="Style.Hint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 动态血压参数字段：标签 + 输入框（UniformGrid 单元） -->
+        <Style x:Key="Style.FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+            <Setter Property="Margin" Value="0,0,0,3"/>
+        </Style>
+
+    </Window.Resources>
+
+    <DockPanel>
+
+        <!-- ====== 底部按钮栏 ====== -->
+        <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
+            <TextBlock Text="保存后写入 Config\instruments.json（BPA700Simulator.TestParams），测试模块按需读取"
+                       Style="{StaticResource Style.Hint}" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="取消" Style="{StaticResource Style.ToolButton}" IsCancel="True" Margin="0,0,8,0"/>
+                <Button Content="保存" Style="{StaticResource Style.PrimaryButton}"
+                        MinWidth="88" Command="{Binding SaveCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ====== 四类测试参数 TabControl（充放气规格 / 静态压力 / 动态血压 / 超压测试） ====== -->
+        <TabControl Margin="12,10,12,0" Background="Transparent">
+
+            <!-- ============ 充放气规格（产品充放气测试 BP-001/BP-002） ============ -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ClockFast" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="充放气规格" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <StackPanel Margin="8,4">
+
+                    <!-- 超时保护：避免产品异常时一直充气不停止 -->
+                    <TextBlock Text="超时保护（超时自动停止本轮并判 FAIL，避免一直充气不停止）" Style="{StaticResource Style.GroupTitle}"/>
+                    <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                            CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="0,4,16,4">
+                                <TextBlock Text="等待按键启动超时" Style="{StaticResource Style.FieldLabel}"/>
+                                <TextBox Style="{StaticResource Style.CfgBox}"
+                                         Text="{Binding Params.CuffTest.WaitStartTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="秒（BPARunBPTest 进入待测后，等待产品物理[开始]键的最长时间）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,4,0,4">
+                                <TextBlock Text="整轮测量超时" Style="{StaticResource Style.FieldLabel}"/>
+                                <TextBox Style="{StaticResource Style.CfgBox}"
+                                         Text="{Binding Params.CuffTest.TotalTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="秒（启动后充气→稳压→放气全程的兜底上限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </Border>
+
+                    <!-- 放气规格：BP-002 快速放气时间上限 -->
+                    <TextBlock Text="放气规格（BP-002 测量中手动停止）" Style="{StaticResource Style.GroupTitle}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Style="{StaticResource Style.CfgBox}" Width="90"
+                                 Text="{Binding Params.CuffTest.MaxDeflationSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="秒（快速放气时间 ≤ 上限视为放气完成 = PASS，如 20 即规格 0~20s）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
+                               Text="说明：BP-001 仍按 BPA700 status 序列 Busy→Stable→Finish 判定（拿到产品连调后改按产品状态判定）；&#10;充放气时间由 SDK 回调直接返回（inflatableTime / deflationTime），无需上位机计时。"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- ============ 静态压力 ============ -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Gauge" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="静态压力" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="8,4">
+
+                        <!-- BPA 充气 -->
+                        <TextBlock Text="充气方式" Style="{StaticResource Style.GroupTitle}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="BPA700 自行充气" Style="{StaticResource Style.CfgLabel}"/>
+                            <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                          IsChecked="{Binding Params.StaticPressure.BpaInflation, Mode=TwoWay}"
+                                          Width="50" Height="30" Margin="8,0"/>
+                            <TextBlock Text="关闭 = 外部设备充气" Style="{StaticResource Style.Hint}"/>
+                        </StackPanel>
+
+                        <!-- 量测时间 -->
+                        <TextBlock Text="量测时间" Style="{StaticResource Style.GroupTitle}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Style="{StaticResource Style.CfgBox}" Width="90"
+                                     Text="{Binding Params.StaticPressure.MeasureSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="秒（每个压力点的稳压保持时间，0~999）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
+                        </StackPanel>
+
+                        <!-- 压力点列表 -->
+                        <Grid Margin="0,14,0,8">
+                            <TextBlock Text="压力点（勾选的点参与测试，逐点循环执行）" Style="{StaticResource Style.GroupTitle}" Margin="0"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <CheckBox Content="全选" VerticalAlignment="Center"
+                                          IsChecked="{Binding SelectAllPoints, Mode=TwoWay}" Margin="0,0,12,0"/>
+                                <Button Content="添加压力点" Style="{StaticResource Style.ToolButton}"
+                                        Command="{Binding AddPointCommand}"
+                                        ToolTip="最多添加 10 个压力点（与官方上位机一致）" Margin="0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 列表区保持最小高度：删空压力点后仍保留表格框，中间显示占位提示 -->
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" MinHeight="76">
+                            <Grid>
+                                <TextBlock Text="暂无压力点，点上方“添加压力点”新增（最多 10 个）"
+                                           Style="{StaticResource Style.Hint}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Visibility="{Binding PointsEmpty, Converter={StaticResource BoolToVisibility}}"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                                <ItemsControl ItemsSource="{Binding Points}" Margin="8,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding Enabled}"
+                                                          VerticalAlignment="Center" Margin="4,0,10,0"/>
+                                                <TextBox Grid.Column="1" Style="{StaticResource Style.CfgBox}"
+                                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <TextBlock Grid.Column="2" Style="{StaticResource Style.Hint}"
+                                                           Text="单位跟随仪器压力单位（mmHg 20~400 / kPa 2.7~53.3）"
+                                                           Margin="10,0,0,0"/>
+                                                <Button Grid.Column="3" Width="24" Height="24" Padding="0"
+                                                        ToolTip="删除该压力点"
+                                                        Command="{Binding DataContext.RemovePointCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}">
+                                                    <materialDesign:PackIcon Kind="Close" Width="14" Height="14"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                        <TextBlock Style="{StaticResource Style.Hint}" Margin="0,6,0,0" TextWrapping="Wrap"
+                                   Text="说明：SDK 一次调用只支持 1 个压力点（BPARunStaticPressure），多点测试由上位机按勾选的点循环调用，最多 10 个（与官方上位机一致）。"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 动态血压 ============ -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="HeartPulse" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="动态血压" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="8,4">
+
+                        <!-- 方法 + 类型；选 Customized 时出现包络曲线图标，点击进 Oscillation Shape 配置（仿官方上位机） -->
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <TextBlock Text="方法" Style="{StaticResource Style.CfgLabel}"/>
+                            <ComboBox Width="150" ItemsSource="{Binding DynamicMethods}"
+                                      SelectedItem="{Binding DynamicMethod, Mode=TwoWay}"/>
+                            <Button ToolTip="打开 Oscillation Shape 包络曲线配置"
+                                    Click="OpenOscillationShape_Click" Padding="4" Height="30" Margin="6,0,0,0"
+                                    Visibility="{Binding IsCustomizedMethod, Converter={StaticResource BoolToVisibility}}">
+                                <materialDesign:PackIcon Kind="Pulse" Width="18" Height="18"/>
+                            </Button>
+                            <TextBlock Text="类型" Style="{StaticResource Style.CfgLabel}" Margin="28,0,8,0"/>
+                            <ComboBox Width="150" ItemsSource="{Binding DynamicCategories}"
+                                      SelectedItem="{Binding DynamicCategory, Mode=TwoWay}"/>
+                        </StackPanel>
+
+                        <!-- 血压默认值：仅 Default 方法可选，列表随类型变化（括号内为平均动脉压），选中即填充下方收缩压/舒张压 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <TextBlock Text="血压默认值" Style="{StaticResource Style.CfgLabel}"/>
+                            <ComboBox Width="150" ItemsSource="{Binding BpDefaultPresets}"
+                                      IsEnabled="{Binding IsDefaultMethod}"
+                                      SelectedItem="{Binding SelectedBpPreset, Mode=TwoWay}"/>
+                            <TextBlock Text="Default方法可选；选中即填充下方收缩压/舒张压（括号内为平均动脉压）"
+                                       Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
+                        </StackPanel>
+
+                        <!-- Default 方法参数（选 Customized 时不可选，与官方上位机一致；收缩/舒张压由血压默认值下拉填充） -->
+                        <TextBlock Text="血压默认参数（Default 方法）" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12"
+                                IsEnabled="{Binding IsDefaultMethod}">
+                            <UniformGrid Columns="2">
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="收缩压" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.Systolic, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg 25~300 / kPa 3.3~39.9" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="舒张压" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.Diastolic, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg 10~250 / kPa 1.3~33.3" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="收缩压偏移" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.EnvelopSystolic, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg -20~20 / kPa -2.6~2.6" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="舒张压偏移" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.EnvelopDiastolic, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg -20~20 / kPa -2.6~2.6" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </Border>
+
+                        <!-- 心率与脉搏量：与官方上位机一致，仅 Customized 方法可设置（不受类型影响） -->
+                        <TextBlock Text="心率与脉搏量（仅 Customized 方法可设置）" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12"
+                                IsEnabled="{Binding IsCustomizedMethod}">
+                            <UniformGrid Columns="2">
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="心率" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.HeartRate, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="30~300 BPM" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="脉搏量" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding Params.DynamicBloodPressure.PulseVolume, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="0.1~2.0 ml（心率 &gt;150 时 0.1~1.0 ml）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </Border>
+
+                        <!-- Customized 包络参数：点方法旁的图标进 Oscillation Shape 页配置（含曲线预览与滑块调参） -->
+                        <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
+                                   Text="说明：选 Customized 方法后，点“方法”右侧的包络曲线图标进入 Oscillation Shape 页配置包络参数；&#10;x 轴八点须满足 SP2 &gt; PS &gt; SYS &gt; MAP2 &gt; MAP1 &gt; DIAS &gt; PD &gt; SP1（mmHg 0~299），y 轴五点百分比 0~100。"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 超压测试 ============ -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AlertCircleOutline" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="超压测试" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <StackPanel Margin="8,4">
+
+                    <!-- BPA 充气 -->
+                    <TextBlock Text="充气方式" Style="{StaticResource Style.GroupTitle}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BPA700 自行充气" Style="{StaticResource Style.CfgLabel}"/>
+                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding Params.Overpressure.BpaInflation, Mode=TwoWay}"
+                                      Width="50" Height="30" Margin="8,0"/>
+                        <TextBlock Text="关闭 = 外部设备充气" Style="{StaticResource Style.Hint}"/>
+                    </StackPanel>
+
+                    <!-- 目标压力 / 阈值 -->
+                    <TextBlock Text="超压参数（BPARunOverpressureTest）" Style="{StaticResource Style.GroupTitle}"/>
+                    <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                            CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="0,4,16,4">
+                                <TextBlock Text="目标压力" Style="{StaticResource Style.FieldLabel}"/>
+                                <TextBox Style="{StaticResource Style.CfgBox}"
+                                         Text="{Binding Params.Overpressure.TargetPressure, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="mmHg 20~400 / kPa 2.7~53.3（单位跟随仪器设置）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,4,0,4">
+                                <TextBlock Text="阈值 1" Style="{StaticResource Style.FieldLabel}"/>
+                                <TextBox Style="{StaticResource Style.CfgBox}"
+                                         Text="{Binding Params.Overpressure.Threshold1, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,4,16,4">
+                                <TextBlock Text="阈值 2" Style="{StaticResource Style.FieldLabel}"/>
+                                <TextBox Style="{StaticResource Style.CfgBox}"
+                                         Text="{Binding Params.Overpressure.Threshold2, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

@@ -1,0 +1,894 @@
+[2026-08-17 09:09:24.562] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 09:09:24.720] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 09:10:20.462] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 09:10:20.468] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 09:10:20.483] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:10:20.491] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:10:20.498] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:10:20.531] [WRN] [TestItem] BPA700：切换 Adult 模式失败（如签名不符请联系鲸扬确认 SDK）
+[2026-08-17 09:10:20.577] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 09:10:20.586] [WRN] [TestItem] BPA700：切换 500ml 模式未生效（读回 Is500mlMode=false）——可能当前患者模式/硬件（气瓶）不支持 500ml，或函数签名不符，请与鲸扬确认
+[2026-08-17 09:10:20.586] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 09:10:20.586] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 09:10:20.591] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 09:10:20.593] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 09:10:20.601] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 09:10:23.902] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:10:40.732] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:10:40.736] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:10:40.795] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 09:10:40.828] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 09:10:40.829] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:10:40.829] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:10:40.829] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:10:40.829] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 09:10:40.829] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 09:11:00.467] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:11:11.451] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:11:12.568] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 09:11:12.569] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 09:11:12.569] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:11:12.578] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:11:12.584] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:11:12.586] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 09:11:12.632] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 09:11:12.633] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 09:11:12.633] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 09:11:12.633] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 09:11:12.637] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 09:11:12.638] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 09:11:12.642] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 09:11:14.652] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:11:14.653] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:11:14.656] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:11:14.695] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 09:11:14.696] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 09:11:14.696] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:11:14.696] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:11:14.696] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:11:14.696] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 09:11:14.696] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 09:11:18.589] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:51:02.261] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:51:05.301] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 09:51:05.305] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 09:51:05.305] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:51:05.314] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:51:05.320] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:51:05.340] [WRN] [TestItem] BPA700：切换 Adult 模式失败（如签名不符请联系鲸扬确认 SDK）
+[2026-08-17 09:51:05.386] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 09:51:05.386] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 09:51:05.387] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 09:51:05.387] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 09:51:05.391] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 09:51:05.392] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 09:51:05.394] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 09:51:10.563] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:51:10.564] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:51:10.568] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:51:10.619] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 09:51:10.619] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 09:51:10.620] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:51:10.620] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:51:10.620] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:51:10.620] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 09:51:10.620] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 09:51:13.589] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:55:07.335] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:55:08.364] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 09:55:08.368] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 09:55:08.368] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:55:08.375] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:55:08.382] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:55:08.398] [WRN] [TestItem] BPA700：切换 Adult 模式失败（如签名不符请联系鲸扬确认 SDK）
+[2026-08-17 09:55:08.444] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 09:55:08.453] [WRN] [TestItem] BPA700：切换 500ml 模式未生效（读回 Is500mlMode=false）——可能当前患者模式/硬件（气瓶）不支持 500ml，或函数签名不符，请与鲸扬确认
+[2026-08-17 09:55:08.453] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 09:55:08.453] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 09:55:08.456] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 09:55:08.456] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 09:55:08.458] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 09:55:29.276] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:55:46.701] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:55:46.709] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:55:46.783] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 09:55:46.783] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 09:55:46.783] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:55:46.783] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:55:46.783] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:55:46.783] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 09:55:46.784] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 09:55:55.240] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:56:14.006] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:56:15.164] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 09:56:15.168] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 09:56:15.168] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:56:15.176] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:56:15.182] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:56:15.201] [WRN] [TestItem] BPA700：切换 Adult 模式失败（如签名不符请联系鲸扬确认 SDK）
+[2026-08-17 09:56:15.249] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 09:56:15.258] [WRN] [TestItem] BPA700：切换 500ml 模式未生效（读回 Is500mlMode=false）——可能当前患者模式/硬件（气瓶）不支持 500ml，或函数签名不符，请与鲸扬确认
+[2026-08-17 09:56:15.258] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=kPa AirReservoir=500ml
+[2026-08-17 09:56:15.258] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 09:56:15.262] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 09:56:15.263] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 09:56:15.266] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 09:56:16.853] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 09:56:16.853] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 09:56:16.857] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 09:56:16.906] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 09:56:16.907] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 09:56:16.907] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:56:16.907] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:56:16.907] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 09:56:16.907] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 09:56:16.907] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 10:23:57.659] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 10:23:57.876] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 10:24:11.247] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:17.716] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:18.955] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 10:24:18.961] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:24:18.963] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:18.972] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:24:18.981] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:24:19.006] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:24:19.052] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 10:24:19.052] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:24:19.052] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 10:24:19.052] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:24:19.055] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:24:19.056] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:24:19.059] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 10:24:20.501] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:20.504] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:24:20.508] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:24:20.575] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 10:24:20.606] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 10:24:20.607] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:20.607] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:20.607] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:20.607] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 10:24:20.607] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 10:24:35.913] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:43.471] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:44.817] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 10:24:44.821] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:24:44.822] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:44.830] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:24:44.838] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:24:44.848] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:24:44.896] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:24:44.897] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:24:44.897] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:24:44.897] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:24:44.900] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:24:44.900] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:24:44.902] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 10:24:48.112] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:24:48.112] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:24:48.116] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:24:48.168] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 221
+[2026-08-17 10:24:48.169] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 10:24:48.169] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:48.169] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:48.169] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 10:24:48.169] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 10:24:48.169] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 10:29:27.025] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 10:29:27.141] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 10:29:30.721] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:29:30.729] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:29:30.745] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:29:30.746] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:29:30.752] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:29:30.776] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:29:30.826] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:29:30.826] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:29:30.826] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:29:30.826] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:29:30.833] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:29:30.836] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:29:30.836] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:29:41.509] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:29:50.008] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:29:51.059] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:29:51.060] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:29:51.060] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:29:51.068] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:29:51.075] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:29:51.078] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:29:51.123] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 10:29:51.124] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:29:51.124] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 10:29:51.124] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:29:51.127] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:29:51.127] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:29:51.127] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:29:55.664] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:00.177] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:01.441] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:30:01.441] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:30:01.442] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:01.442] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:30:01.445] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:30:01.452] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:30:01.501] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:30:07.556] [WRN] [TestItem] BPA700：500ml 切换读回未生效（切换函数原始值=False），等待后重试一次...
+[2026-08-17 10:30:08.345] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:11.911] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:13.122] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:14.029] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:14.266] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:14.462] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:15.000] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:15.105] [WRN] [TestItem] BPA700：切换 500ml 模式未生效（读回 Is500mlMode=false，切换函数原始值=False）——疑似函数签名不符或需先切 Adult/换气瓶，请向鲸扬确认 BPASwitchTo500mlMode 原型
+[2026-08-17 10:30:15.105] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:30:15.106] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:30:15.108] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:30:15.108] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:30:15.108] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:30:15.238] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:30:15.238] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:30:15.238] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:15.239] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:30:15.242] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:30:15.248] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:30:15.292] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:30:16.585] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:17.631] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:17.835] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:18.042] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:21.339] [WRN] [TestItem] BPA700：500ml 切换读回未生效（切换函数原始值=False），等待后重试一次...
+[2026-08-17 10:30:24.252] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:24.459] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 10:30:28.889] [WRN] [TestItem] BPA700：切换 500ml 模式未生效（读回 Is500mlMode=false，切换函数原始值=False）——疑似函数签名不符或需先切 Adult/换气瓶，请向鲸扬确认 BPASwitchTo500mlMode 原型
+[2026-08-17 10:30:28.889] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:30:28.889] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:30:28.892] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:30:28.893] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:30:28.893] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:30:54.637] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:30:59.579] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:00.378] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:31:00.378] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:31:00.378] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:00.386] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:31:00.392] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:31:00.400] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:31:00.447] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:31:00.447] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:31:00.447] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:31:00.447] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:31:00.452] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:31:00.452] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:31:00.452] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:31:08.020] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:31:08.021] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:31:08.021] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:08.021] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:31:08.024] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:31:08.030] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:31:08.073] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:31:08.073] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:31:08.073] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:31:08.073] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:31:08.077] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:31:08.077] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:31:08.078] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:31:08.932] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:31:08.932] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:31:08.932] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:08.932] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:31:08.936] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:31:08.942] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:31:08.989] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:31:08.989] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:31:08.989] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:31:08.989] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:31:08.993] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:31:08.993] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:31:08.994] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:31:10.594] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:31:10.594] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:31:10.595] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:10.595] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:31:10.598] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:31:10.604] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:31:10.647] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:31:10.647] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:31:10.647] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:31:10.647] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:31:10.651] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:31:10.651] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:31:10.651] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:31:14.427] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:31:14.427] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:31:14.428] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:31:14.428] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:31:14.431] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:31:14.437] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:31:14.483] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:31:14.484] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:31:14.484] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:31:14.484] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:31:14.487] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:31:14.487] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:31:14.487] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:31:21.636] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:34:52.385] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:34:53.826] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:34:53.827] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:34:53.827] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:34:53.835] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:34:53.841] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:34:53.843] [WRN] [TestItem] BPA700：Neonatal + 500ml 组合可能不受仪器支持（新生儿模式通常配 100ml 气瓶），如下发未生效请检查组合
+[2026-08-17 10:34:53.843] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:34:53.887] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:34:53.898] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 10:34:53.898] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:34:53.898] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:34:53.902] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:34:53.902] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:34:53.902] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:35:00.952] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:35:52.604] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:35:53.403] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:35:53.404] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:35:53.404] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:35:53.412] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:35:53.418] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:35:53.420] [WRN] [TestItem] BPA700：Neonatal + 500ml 组合可能不受仪器支持（新生儿模式通常配 100ml 气瓶），如下发未生效请检查组合
+[2026-08-17 10:35:53.420] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:35:53.466] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:35:53.475] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 10:35:53.475] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:35:53.475] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:35:53.479] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:35:53.480] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:35:53.480] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:36:25.627] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:41.483] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:42.248] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:36:42.248] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:36:42.249] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:42.258] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:36:42.264] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:36:42.271] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:36:42.314] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:36:42.323] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 10:36:42.323] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:36:42.323] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:36:42.327] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:36:42.327] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:36:42.327] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:36:46.609] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:50.256] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:50.985] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:36:50.985] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:36:50.985] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:36:50.986] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:36:50.989] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:36:50.995] [WRN] [TestItem] BPA700：切换 Adult 模式返回 false（原始值=False），疑似函数签名不符，请向鲸扬确认 BPASwitchToAdultMode 原型
+[2026-08-17 10:36:51.043] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:36:51.043] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:36:51.043] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:36:51.043] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:36:51.047] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:36:51.048] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:36:51.048] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:36:58.517] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:37:02.894] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:37:03.898] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:37:03.898] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:37:03.898] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:37:03.899] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:37:03.902] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:37:03.902] [INF] [TestItem] BPA700：保持 Neonatal 模式（仪器默认模式，无需下发）
+[2026-08-17 10:37:03.948] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 10:37:03.948] [INF] [TestItem] BPA700：保持 100ml 模式（仪器默认模式，无需下发）
+[2026-08-17 10:37:03.948] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 10:37:03.948] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:37:03.952] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:37:03.953] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:37:03.953] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:37:30.539] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:56:39.675] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 10:56:39.792] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 10:56:45.225] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:56:45.232] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:56:45.250] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:56:45.251] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:56:45.257] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:56:45.323] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 10:56:46.871] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 10:56:46.920] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 10:56:46.921] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 10:56:46.921] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:56:46.926] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:56:46.929] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:56:46.929] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:56:50.896] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:56:55.971] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:56:57.331] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:56:57.331] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:56:57.332] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:56:57.333] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:56:57.337] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:56:57.377] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 10:56:58.924] [INF] [TestItem] BPA700：压力单位已设为 kPa
+[2026-08-17 10:56:58.967] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 10:56:58.967] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=kPa AirReservoir=100ml
+[2026-08-17 10:56:58.968] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:56:58.972] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:56:58.973] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:56:58.973] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:57:02.789] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:07.240] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:08.237] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:57:08.238] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:57:08.238] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:08.238] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:57:08.242] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:57:08.285] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 10:57:09.831] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:57:09.877] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 10:57:09.877] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:57:09.877] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:57:09.880] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:57:09.880] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:57:09.880] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:57:13.131] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:16.365] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:17.251] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:57:17.251] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:57:17.251] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:17.252] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:57:17.255] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:57:17.295] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 10:57:18.841] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:57:18.884] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 10:57:18.884] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 10:57:18.885] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:57:18.888] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:57:18.889] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:57:18.889] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:57:22.329] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:27.437] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:28.133] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:57:28.134] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:57:28.134] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:28.134] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:57:28.137] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:57:28.181] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 10:57:29.725] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:57:29.771] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 10:57:29.771] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:57:29.771] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:57:29.775] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:57:29.775] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:57:29.775] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 10:57:33.788] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:38.732] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:39.515] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 10:57:39.515] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 10:57:39.515] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 10:57:39.515] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 10:57:39.520] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 10:57:39.560] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 10:57:41.107] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 10:57:41.150] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 10:57:41.150] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 10:57:41.151] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 10:57:41.155] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 10:57:41.155] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 10:57:41.155] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 11:03:56.888] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 11:03:57.008] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 11:26:25.987] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 11:26:26.129] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 11:33:24.289] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 11:33:24.297] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 11:33:24.322] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 11:33:24.329] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 11:33:24.337] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 11:33:24.403] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 11:33:25.951] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 11:33:26.000] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 11:33:26.001] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 11:33:26.003] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 11:33:26.008] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 11:33:26.010] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 11:33:26.010] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 14:19:36.715] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 14:19:36.841] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 14:20:16.349] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 14:20:16.358] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 14:20:16.381] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 14:20:16.389] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 14:20:21.462] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 14:20:21.587] [ERR] [TestItem] 血压仪初始化连接异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 180
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 156
+[2026-08-17 14:20:21.615] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 14:20:21.617] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 14:20:21.617] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-17 14:20:21.618] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 14:20:29.333] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 14:20:29.344] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 14:20:34.403] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 14:20:34.460] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 180
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 239
+[2026-08-17 14:20:34.460] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 14:20:34.461] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 14:20:34.461] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 14:20:34.461] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 14:20:34.461] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 14:20:34.461] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 14:20:42.852] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 14:20:45.598] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 14:20:45.704] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 14:20:49.095] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 14:20:49.102] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 14:20:49.122] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 14:20:49.123] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 14:20:52.562] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 14:20:54.205] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 14:20:54.289] [ERR] [TestItem] 血压仪初始化连接异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 180
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 156
+[2026-08-17 14:20:54.309] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 14:20:54.310] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 14:20:54.310] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-17 14:20:54.314] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 14:20:58.309] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 14:20:58.411] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 14:21:02.901] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:46:50.156] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 15:46:50.266] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 15:46:53.856] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:46:56.314] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:55:17.035] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 15:55:17.152] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 15:55:24.228] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:55:33.911] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:55:45.383] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 15:55:45.387] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 15:55:45.389] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:55:45.403] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 15:55:50.470] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 15:55:50.572] [ERR] [TestItem] 血压仪初始化连接异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 181
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 156
+[2026-08-17 15:55:50.599] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 15:55:50.601] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 15:55:50.601] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-17 15:55:50.601] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 15:55:57.074] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 15:55:57.075] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 15:55:57.075] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:55:57.075] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 15:56:00.510] [INF] [MainViewModel] ===== 收到停止请求，正在中断测试方案 =====
+[2026-08-17 15:56:02.140] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 15:56:02.185] [ERR] [TestItem] 血压仪初始化连接异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 181
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 156
+[2026-08-17 15:56:02.185] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 15:56:02.185] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 15:56:02.185] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-17 15:56:02.185] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 15:56:06.186] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:56:11.812] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:56:12.677] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 15:56:12.677] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 15:56:12.686] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 15:56:12.686] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 15:56:17.748] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-17 15:56:17.782] [ERR] [TestItem] 血压仪初始化连接异常
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__35_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 181
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 156
+[2026-08-17 15:56:17.782] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 15:56:17.783] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 15:56:17.783] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-17 15:56:17.783] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 16:00:22.532] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 16:00:22.647] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 16:00:25.969] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:00:29.640] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:00:33.906] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:00:41.632] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:00:43.880] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 16:00:43.887] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 16:00:43.896] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:00:43.904] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 16:00:43.911] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 16:00:43.979] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 16:00:45.528] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 16:00:45.573] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 16:00:45.574] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 16:00:45.576] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 16:00:45.582] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 16:00:45.587] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 16:00:45.587] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 16:05:09.426] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 16:05:09.427] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 16:05:09.429] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:05:09.436] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 16:05:09.443] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 16:05:09.486] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-17 16:05:11.030] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 16:05:11.075] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-17 16:05:11.075] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-17 16:05:11.076] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 16:05:11.079] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 16:05:11.079] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 16:05:11.079] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 16:12:58.432] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 16:13:20.076] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 16:13:20.204] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 16:13:25.763] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-17 16:13:25.769] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 16:13:25.786] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:13:25.787] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 16:13:25.794] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 16:13:25.863] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 16:13:27.411] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 16:13:27.455] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 16:13:27.455] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 16:13:27.455] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 16:13:27.458] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 16:13:27.462] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 16:13:27.468] [INF] [TestItem] TestItem2：血压测量精度检测 开始执行
+[2026-08-17 16:13:29.617] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 16:13:29.625] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 16:13:29.628] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 16:13:29.700] [ERR] [TestItem] 血压测量精度检测异常
+System.IO.FileNotFoundException: Could not find file 'COM1'.
+File name: 'COM1'
+   at System.IO.Ports.SerialStream..ctor(String portName, Int32 baudRate, Parity parity, Int32 dataBits, StopBits stopBits, Int32 readTimeout, Int32 writeTimeout, Handshake handshake, Boolean dtrEnable, Boolean rtsEnable, Boolean discardNull, Byte parityReplace)
+   at System.IO.Ports.SerialPort.Open()
+   at TORNPISolution.Service.Communication.SerialClient.<OpenAsync>b__9_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Communication\SerialClient.cs:line 48
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpAccuracyTestModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 240
+[2026-08-17 16:13:29.750] [INF] [TestItem] TestItem2：血压测量精度检测 执行完成，共 3 项结果
+[2026-08-17 16:13:29.751] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 16:13:29.751] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 16:13:29.751] [WRN] [MainViewModel] [TestItem2 血压测量精度检测] BP-001袖带充放气测量 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-17 16:13:29.751] [INF] [MainViewModel] [TestItem2 血压测量精度检测] 模块结果：FAIL
+[2026-08-17 16:13:29.751] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-17 17:00:48.133] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:00:48.253] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:00:51.702] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 17:00:51.708] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 17:00:51.728] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 17:00:51.729] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 17:00:51.736] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 17:00:51.809] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 17:00:53.356] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 17:00:53.405] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 17:00:53.406] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 17:00:53.406] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 17:00:53.412] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 17:00:53.416] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 17:00:53.416] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 17:09:32.000] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:09:32.203] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:09:42.096] [INF] [MainViewModel] ===== 开始执行测试方案，共 1 个模块 =====
+[2026-08-17 17:09:42.103] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-17 17:09:42.122] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-17 17:09:42.123] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-17 17:09:42.131] [INF] [TestItem] BPA700：已连接 COM7
+[2026-08-17 17:09:42.203] [INF] [TestItem] BPA700：患者类型已设为 Neonatal
+[2026-08-17 17:09:43.752] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-17 17:09:43.797] [INF] [TestItem] BPA700：袖带容量已设为 100ml（读回确认）
+[2026-08-17 17:09:43.798] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Neonatal PressureUnit=mmHg AirReservoir=100ml
+[2026-08-17 17:09:43.799] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-17 17:09:43.803] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-17 17:09:43.807] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-17 17:09:43.807] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-17 17:22:01.716] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:22:01.819] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:22:09.897] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:22:22.968] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:22:23.069] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:28:31.625] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:28:31.689] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:34:39.712] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:38:36.863] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:38:36.968] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:43:00.617] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:43:00.733] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:43:04.308] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:43:38.324] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:43:40.724] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:46:55.395] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:46:57.414] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:47:06.634] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:49:25.092] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:49:26.987] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:49:41.553] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:49:53.891] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:49:54.018] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:49:57.655] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:50:08.326] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:50:08.425] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:50:11.529] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:50:26.724] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:50:26.837] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:50:55.732] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:52:54.163] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:52:54.282] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:53:05.065] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:53:05.198] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:53:08.754] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 17:57:05.861] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 17:57:05.952] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 17:58:42.396] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 18:24:43.337] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 18:24:43.459] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 18:24:46.320] [INF] [MainWindow] [诊断] 方案列表选中 → 血压仪初始化连接
+[2026-08-17 18:24:46.358] [INF] [MainViewModel] [诊断] SelectedPlanModule → 血压仪初始化连接
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBox.OnSelectionChanged(SelectionChangedEventArgs e)
+   at System.Windows.Controls.Primitives.Selector.SetSelectedHelper(Object item, FrameworkElement UI, Boolean selected)
+   at System.Windows.Controls.Primitives.Selector.NotifyIsSelectedChanged(FrameworkElement container, Boolean selected, RoutedEventArgs e)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.ListBoxItem.OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)
+   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)
+   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)
+   at System.Windows.DependencyObject.SetCurrentValueInternal(DependencyProperty dp, Object value)
+   at System.Windows.Controls.ListBox.NotifyListItemClicked(ListBoxItem item, MouseButton mouseButton)
+   at System.Windows.Controls.ListBoxItem.OnMouseLeftButtonDown(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndSubclass.DispatcherCallbackOperation(Object o)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at TORNPISolution.App.Main()
+
+[2026-08-17 18:24:46.929] [INF] [MainWindow] [诊断] 明细表点击：命中 Border，行数据=血压模拟仪初始化连接
+[2026-08-17 18:24:48.596] [INF] [App] ========== 应用退出 ==========
+[2026-08-17 18:24:57.813] [INF] [App] ========== 应用启动 ==========
+[2026-08-17 18:24:57.926] [INF] [MainViewModel] 方案 [A] 已加载，共 2 个模块
+[2026-08-17 18:25:00.015] [INF] [App] ========== 应用退出 ==========

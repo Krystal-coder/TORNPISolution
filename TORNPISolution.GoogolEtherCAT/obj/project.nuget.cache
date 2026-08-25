@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "raRa4hoBNZY=",
+  "success": true,
+  "projectFilePath": "D:\\projcet\\TORNPISolution\\TORNPISolution.GoogolEtherCAT\\TORNPISolution.GoogolEtherCAT.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\S9644\\.nuget\\packages\\serilog\\4.3.1\\serilog.4.3.1.nupkg.sha512"
+  ],
+  "logs": []
+}

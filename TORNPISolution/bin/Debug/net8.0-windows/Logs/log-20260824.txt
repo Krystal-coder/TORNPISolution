@@ -1,0 +1,735 @@
+[2026-08-24 09:15:30.107] [INF] [App] ========== 应用启动 ==========
+[2026-08-24 09:15:30.225] [INF] [Spec] 2026/8/24 9:15:30 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-24 09:15:30.226] [INF] [Spec] 2026/8/24 9:15:30 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-24 09:15:30.227] [INF] [MainViewModel] 2026/8/24 9:15:30 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 09:15:30.227] [INF] [TestPlanService] 2026/8/24 9:15:30 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 09:15:30.229] [INF] [TestPlanService] 2026/8/24 9:15:30 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 09:15:30.229] [INF] [MainViewModel] 2026/8/24 9:15:30 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 09:15:42.353] [INF] [MainViewModel] 2026/8/24 9:15:42 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-24 09:15:42.357] [INF] [MainViewModel] 2026/8/24 9:15:42 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-24 09:15:49.258] [INF] [MainViewModel] 2026/8/24 9:15:49 Start calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-24 09:15:49.264] [INF] [MainViewModel] 2026/8/24 9:15:49 Ended calling the MainViewModel.AddModuleToPlan() method . 
+
+[2026-08-24 09:15:51.341] [INF] [MainViewModel] 2026/8/24 9:15:51 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:15:51.343] [INF] [MainViewModel] 2026/8/24 9:15:51 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:15:51.344] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-24 09:15:51.354] [INF] [TestItem] 2026/8/24 9:15:51 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:15:51.354] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-24 09:15:51.356] [INF] [TestItem] 2026/8/24 9:15:51 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:15:51.363] [INF] [InstrumentConfigService] 2026/8/24 9:15:51 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:15:51.411] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:15:51.411] [INF] [InstrumentConfigService] 2026/8/24 9:15:51 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:15:51.412] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-24 09:15:51.412] [INF] [MainViewModel] 2026/8/24 9:15:51 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:15:56.480] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-24 09:15:56.647] [ERR] [TestItem] An error occured in TestItem.class BpDeviceInitModule method, message: System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+[2026-08-24 09:15:56.648] [INF] [TestItem] 2026/8/24 9:15:56 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:15:56.648] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-24 09:15:56.648] [INF] [TestItem] 2026/8/24 9:15:56 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:15:56.650] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 09:15:56.650] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-24 09:15:56.652] [INF] [TestItem] 2026/8/24 9:15:56 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:15:56.652] [INF] [TestItem] TestItem2：AECG100初始化连接 开始执行
+[2026-08-24 09:15:56.653] [INF] [TestItem] 2026/8/24 9:15:56 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:15:56.653] [INF] [InstrumentConfigService] 2026/8/24 9:15:56 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:15:56.653] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:15:56.653] [INF] [InstrumentConfigService] 2026/8/24 9:15:56 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:15:56.655] [INF] [Aecg100Tester] 2026/8/24 9:15:56 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 09:15:57.269] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-24 09:15:57.270] [INF] [Aecg100Tester] 2026/8/24 9:15:57 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 09:15:57.270] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 09:15:59.342] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 09:15:59.342] [INF] [TestItem] 2026/8/24 9:15:59 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:15:59.343] [INF] [TestItem] TestItem2：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 09:15:59.343] [INF] [TestItem] 2026/8/24 9:15:59 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:15:59.343] [INF] [MainViewModel] [TestItem2 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 09:15:59.343] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 09:15:59.343] [INF] [MainViewModel] 2026/8/24 9:15:59 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:17:38.000] [INF] [MainViewModel] 2026/8/24 9:17:38 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:17:38.000] [INF] [MainViewModel] 2026/8/24 9:17:38 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:17:38.001] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-24 09:17:38.005] [INF] [TestItem] 2026/8/24 9:17:38 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:17:38.005] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-24 09:17:38.005] [INF] [TestItem] 2026/8/24 9:17:38 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:17:38.005] [INF] [InstrumentConfigService] 2026/8/24 9:17:38 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:17:38.006] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:17:38.006] [INF] [InstrumentConfigService] 2026/8/24 9:17:38 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:17:38.012] [INF] [MainViewModel] 2026/8/24 9:17:38 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:17:38.012] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-24 09:17:43.076] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-24 09:17:43.127] [ERR] [TestItem] An error occured in TestItem.class BpDeviceInitModule method, message: System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+[2026-08-24 09:17:43.127] [INF] [TestItem] 2026/8/24 9:17:43 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:17:43.127] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-24 09:17:43.127] [INF] [TestItem] 2026/8/24 9:17:43 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:17:43.127] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 09:17:43.127] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-24 09:17:43.129] [INF] [TestItem] 2026/8/24 9:17:43 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:17:43.130] [INF] [TestItem] TestItem2：AECG100初始化连接 开始执行
+[2026-08-24 09:17:43.130] [INF] [TestItem] 2026/8/24 9:17:43 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:17:43.130] [INF] [InstrumentConfigService] 2026/8/24 9:17:43 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:17:43.130] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:17:43.130] [INF] [InstrumentConfigService] 2026/8/24 9:17:43 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:17:43.130] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 09:17:43.130] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 09:17:43.130] [INF] [TestItem] 2026/8/24 9:17:43 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:17:43.130] [INF] [TestItem] TestItem2：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 09:17:43.130] [INF] [TestItem] 2026/8/24 9:17:43 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:17:43.132] [INF] [MainViewModel] [TestItem2 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 09:17:43.132] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 09:17:43.132] [INF] [MainViewModel] 2026/8/24 9:17:43 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:17:58.535] [INF] [InstrumentConfigService] 2026/8/24 9:17:58 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:17:58.535] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:17:58.535] [INF] [InstrumentConfigService] 2026/8/24 9:17:58 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:10.295] [INF] [InstrumentConfigService] 2026/8/24 9:18:10 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:10.295] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:18:10.295] [INF] [InstrumentConfigService] 2026/8/24 9:18:10 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:10.300] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:10 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-24 09:18:10.302] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:10 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-24 09:18:30.476] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:30 Start calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-24 09:18:30.476] [INF] [InstrumentConfigService] 2026/8/24 9:18:30 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-24 09:18:30.495] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:18:30.495] [INF] [InstrumentConfigService] 2026/8/24 9:18:30 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-24 09:18:30.501] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:30 Ended calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-24 09:18:31.243] [INF] [MainViewModel] 2026/8/24 9:18:31 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:18:31.243] [INF] [MainViewModel] 2026/8/24 9:18:31 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:18:31.243] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-24 09:18:31.243] [INF] [TestItem] 2026/8/24 9:18:31 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:18:31.243] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-24 09:18:31.243] [INF] [TestItem] 2026/8/24 9:18:31 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:18:31.243] [INF] [InstrumentConfigService] 2026/8/24 9:18:31 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:31.244] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:18:31.244] [INF] [InstrumentConfigService] 2026/8/24 9:18:31 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:31.250] [INF] [MainViewModel] 2026/8/24 9:18:31 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:18:31.252] [INF] [TestItem] BPA700：正在连接 COM7...
+[2026-08-24 09:18:36.314] [ERR] [TestItem] BPA700：连接 COM7 超时或失败
+[2026-08-24 09:18:36.350] [ERR] [TestItem] An error occured in TestItem.class BpDeviceInitModule method, message: System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+System.IO.IOException: BPA700 连接失败（COM7）
+   at TORNPISolution.Service.Devices.BPA700Simulator.<OpenAsync>b__44_0() in D:\projcet\TORNPISolution\TORNPISolution.Service\Devices\BPA700Simulator.cs:line 237
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at TORNPISolution.Service.TestItem.BpDeviceInitModule(Dictionary`2 results, CancellationToken token) in D:\projcet\TORNPISolution\TORNPISolution.Service\TestItem.cs:line 203
+[2026-08-24 09:18:36.350] [INF] [TestItem] 2026/8/24 9:18:36 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:18:36.350] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-24 09:18:36.350] [INF] [TestItem] 2026/8/24 9:18:36 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:18:36.350] [WRN] [MainViewModel] [TestItem1 血压仪初始化连接] 血压模拟仪初始化连接 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 09:18:36.350] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：FAIL
+[2026-08-24 09:18:36.352] [INF] [TestItem] 2026/8/24 9:18:36 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:18:36.353] [INF] [TestItem] TestItem2：AECG100初始化连接 开始执行
+[2026-08-24 09:18:36.353] [INF] [TestItem] 2026/8/24 9:18:36 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:18:36.353] [INF] [InstrumentConfigService] 2026/8/24 9:18:36 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:36.353] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:18:36.353] [INF] [InstrumentConfigService] 2026/8/24 9:18:36 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:36.353] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 09:18:36.353] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 09:18:36.353] [INF] [TestItem] 2026/8/24 9:18:36 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:18:36.353] [INF] [TestItem] TestItem2：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 09:18:36.353] [INF] [TestItem] 2026/8/24 9:18:36 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:18:36.353] [INF] [MainViewModel] [TestItem2 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 09:18:36.353] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 09:18:36.353] [INF] [MainViewModel] 2026/8/24 9:18:36 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:18:50.954] [INF] [InstrumentConfigService] 2026/8/24 9:18:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:50.955] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:18:50.955] [INF] [InstrumentConfigService] 2026/8/24 9:18:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:18:50.955] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:50 Start calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-24 09:18:50.955] [INF] [InstrumentConfigViewModel] 2026/8/24 9:18:50 Ended calling the InstrumentConfigViewModel.RefreshPorts() method . 
+
+[2026-08-24 09:19:00.802] [INF] [InstrumentConfigViewModel] 2026/8/24 9:19:00 Start calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-24 09:19:00.802] [INF] [InstrumentConfigService] 2026/8/24 9:19:00 Start calling the InstrumentConfigService.Save() method . 
+
+[2026-08-24 09:19:00.803] [INF] [InstrumentConfigService] 仪器链接配置已保存：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:19:00.803] [INF] [InstrumentConfigService] 2026/8/24 9:19:00 Ended calling the InstrumentConfigService.Save() method . 
+
+[2026-08-24 09:19:00.814] [INF] [InstrumentConfigViewModel] 2026/8/24 9:19:00 Ended calling the InstrumentConfigViewModel.Save() method . 
+
+[2026-08-24 09:19:01.659] [INF] [MainViewModel] 2026/8/24 9:19:01 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:19:01.659] [INF] [MainViewModel] 2026/8/24 9:19:01 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:19:01.659] [INF] [MainViewModel] ===== 开始执行测试方案，共 2 个模块 =====
+[2026-08-24 09:19:01.665] [INF] [TestItem] 2026/8/24 9:19:01 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:19:01.665] [INF] [TestItem] TestItem1：血压仪初始化连接 开始执行
+[2026-08-24 09:19:01.665] [INF] [TestItem] 2026/8/24 9:19:01 Start calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:19:01.665] [INF] [InstrumentConfigService] 2026/8/24 9:19:01 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:19:01.665] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:19:01.665] [INF] [InstrumentConfigService] 2026/8/24 9:19:01 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:19:01.666] [INF] [MainViewModel] 2026/8/24 9:19:01 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:19:01.673] [INF] [TestItem] BPA700：正在连接 COM10...
+[2026-08-24 09:19:01.679] [INF] [TestItem] BPA700：已连接 COM10
+[2026-08-24 09:19:01.736] [INF] [TestItem] BPA700：患者类型已设为 Adult
+[2026-08-24 09:19:03.286] [INF] [TestItem] BPA700：压力单位已设为 mmHg
+[2026-08-24 09:19:03.331] [INF] [TestItem] BPA700：袖带容量已设为 500ml（读回确认）
+[2026-08-24 09:19:03.332] [INF] [TestItem] BPA700：初始化设置应用完成 Category=Adult PressureUnit=mmHg AirReservoir=500ml
+[2026-08-24 09:19:03.332] [INF] [TestItem] 鲸扬 BPA700 模拟仪初始化成功
+[2026-08-24 09:19:03.340] [INF] [TestItem] 2026/8/24 9:19:03 Ended calling the TestItem.BpDeviceInitModule() method . 
+
+[2026-08-24 09:19:03.340] [INF] [TestItem] TestItem1：血压仪初始化连接 执行完成，共 1 项结果
+[2026-08-24 09:19:03.340] [INF] [TestItem] 2026/8/24 9:19:03 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:19:03.341] [INF] [MainViewModel] [TestItem1 血压仪初始化连接] 模块结果：PASS
+[2026-08-24 09:19:03.346] [INF] [TestItem] 2026/8/24 9:19:03 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:19:03.346] [INF] [TestItem] TestItem2：AECG100初始化连接 开始执行
+[2026-08-24 09:19:03.346] [INF] [TestItem] 2026/8/24 9:19:03 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:19:03.346] [INF] [InstrumentConfigService] 2026/8/24 9:19:03 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:19:03.346] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:19:03.346] [INF] [InstrumentConfigService] 2026/8/24 9:19:03 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:19:03.346] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 09:19:03.346] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 09:19:03.346] [INF] [TestItem] 2026/8/24 9:19:03 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:19:03.346] [INF] [TestItem] TestItem2：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 09:19:03.346] [INF] [TestItem] 2026/8/24 9:19:03 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:19:03.347] [INF] [MainViewModel] [TestItem2 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 09:19:03.347] [INF] [MainViewModel] ===== 方案执行完成，整体判定：PASS =====
+[2026-08-24 09:19:03.347] [INF] [MainViewModel] 2026/8/24 9:19:03 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:29:33.492] [INF] [TestPlanService] 2026/8/24 9:29:33 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 09:29:33.494] [INF] [TestPlanService] 2026/8/24 9:29:33 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 09:29:36.838] [INF] [MainViewModel] 2026/8/24 9:29:36 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 09:29:36.839] [INF] [TestPlanService] 2026/8/24 9:29:36 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 09:29:36.842] [INF] [TestPlanService] 2026/8/24 9:29:36 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 09:29:36.847] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-24 09:29:36.847] [INF] [MainViewModel] 2026/8/24 9:29:36 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 09:29:38.725] [INF] [MainViewModel] 2026/8/24 9:29:38 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:29:38.725] [INF] [MainViewModel] 2026/8/24 9:29:38 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 09:29:38.725] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-24 09:29:38.726] [INF] [TestItem] 2026/8/24 9:29:38 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:38.726] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-24 09:29:38.726] [INF] [TestItem] 2026/8/24 9:29:38 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:29:38.726] [INF] [InstrumentConfigService] 2026/8/24 9:29:38 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:38.727] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:29:38.727] [INF] [InstrumentConfigService] 2026/8/24 9:29:38 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:38.727] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 09:29:38.727] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 09:29:38.727] [INF] [TestItem] 2026/8/24 9:29:38 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 09:29:38.727] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 09:29:38.727] [INF] [TestItem] 2026/8/24 9:29:38 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:38.727] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 09:29:38.728] [INF] [TestItem] 2026/8/24 9:29:38 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:38.728] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-24 09:29:38.729] [INF] [TestItem] 2026/8/24 9:29:38 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 09:29:38.729] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-24 09:29:38.729] [INF] [InstrumentConfigService] 2026/8/24 9:29:38 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:38.729] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:29:38.729] [INF] [InstrumentConfigService] 2026/8/24 9:29:38 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:38.735] [INF] [MainViewModel] 2026/8/24 9:29:38 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 09:29:38.813] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-24 09:29:38.813] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-24 09:29:39.219] [INF] [TestItem] 2026/8/24 9:29:39 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 09:29:39.219] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-24 09:29:39.219] [INF] [TestItem] 2026/8/24 9:29:39 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:39.219] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：PASS
+[2026-08-24 09:29:39.224] [INF] [TestItem] 2026/8/24 9:29:39 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:39.224] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-24 09:29:39.226] [INF] [TestItem] 2026/8/24 9:29:39 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 09:29:39.226] [INF] [TestItem] 产品问询/状态查询：TBD，默认 PASS（产品串口协议预留）
+[2026-08-24 09:29:39.226] [INF] [InstrumentConfigService] 2026/8/24 9:29:39 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:39.227] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:29:39.227] [INF] [InstrumentConfigService] 2026/8/24 9:29:39 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:39.284] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:40.139] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:40.994] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:41.869] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:42.735] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:43.601] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:44.466] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:45.319] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:46.174] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:47.033] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:47.880] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:48.728] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:49.607] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:50.471] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:51.335] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:52.209] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:53.072] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:53.935] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 09:29:54.741] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-24 09:29:54.741] [INF] [TestItem] 2026/8/24 9:29:54 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 09:29:54.741] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-24 09:29:54.741] [INF] [TestItem] 2026/8/24 9:29:54 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:54.741] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：PASS
+[2026-08-24 09:29:54.746] [INF] [TestItem] 2026/8/24 9:29:54 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:54.746] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-24 09:29:54.747] [INF] [TestItem] 2026/8/24 9:29:54 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 09:29:54.747] [INF] [InstrumentConfigService] 2026/8/24 9:29:54 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:54.747] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 09:29:54.747] [INF] [InstrumentConfigService] 2026/8/24 9:29:54 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 09:29:54.747] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-24 09:29:54.814] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-24 09:29:55.782] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 09:29:56.748] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 09:29:57.645] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-24 09:29:57.718] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-24 09:29:58.619] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-24 09:29:58.689] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-24 09:29:59.588] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-24 09:29:59.605] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-24 09:29:59.723] [INF] [TestItem] 2026/8/24 9:29:59 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 09:29:59.723] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-24 09:29:59.723] [INF] [TestItem] 2026/8/24 9:29:59 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 09:29:59.723] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-24 09:29:59.723] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-24 09:29:59.723] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 09:29:59.723] [INF] [MainViewModel] 2026/8/24 9:29:59 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 16:59:07.592] [INF] [App] ========== 应用启动 ==========
+[2026-08-24 16:59:07.667] [INF] [Spec] 2026/8/24 16:59:07 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-24 16:59:07.667] [INF] [Spec] 2026/8/24 16:59:07 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-24 16:59:07.669] [INF] [MainViewModel] 2026/8/24 16:59:07 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 16:59:07.669] [INF] [TestPlanService] 2026/8/24 16:59:07 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 16:59:07.670] [INF] [TestPlanService] 2026/8/24 16:59:07 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 16:59:07.670] [INF] [MainViewModel] 2026/8/24 16:59:07 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 16:59:43.302] [INF] [TestPlanService] 2026/8/24 16:59:43 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 16:59:43.302] [INF] [TestPlanService] 2026/8/24 16:59:43 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 16:59:46.278] [INF] [MainViewModel] 2026/8/24 16:59:46 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 16:59:46.287] [INF] [TestPlanService] 2026/8/24 16:59:46 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 16:59:46.317] [INF] [TestPlanService] 2026/8/24 16:59:46 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 16:59:46.318] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-24 16:59:46.318] [INF] [MainViewModel] 2026/8/24 16:59:46 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 16:59:48.014] [INF] [MainViewModel] 2026/8/24 16:59:48 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 16:59:48.016] [INF] [MainViewModel] 2026/8/24 16:59:48 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 16:59:48.017] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-24 16:59:48.023] [INF] [TestItem] 2026/8/24 16:59:48 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 16:59:48.023] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-24 16:59:48.025] [INF] [TestItem] 2026/8/24 16:59:48 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 16:59:48.025] [INF] [InstrumentConfigService] 2026/8/24 16:59:48 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:48.054] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 16:59:48.054] [INF] [InstrumentConfigService] 2026/8/24 16:59:48 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:48.055] [INF] [Aecg100Tester] 2026/8/24 16:59:48 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 16:59:48.062] [INF] [MainViewModel] 2026/8/24 16:59:48 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 16:59:48.673] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-24 16:59:48.674] [INF] [Aecg100Tester] 2026/8/24 16:59:48 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 16:59:48.675] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 16:59:50.740] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 16:59:50.741] [INF] [TestItem] 2026/8/24 16:59:50 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 16:59:50.742] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 16:59:50.742] [INF] [TestItem] 2026/8/24 16:59:50 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 16:59:50.746] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 16:59:50.753] [INF] [TestItem] 2026/8/24 16:59:50 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 16:59:50.753] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-24 16:59:50.754] [INF] [TestItem] 2026/8/24 16:59:50 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 16:59:50.754] [INF] [InstrumentConfigService] 2026/8/24 16:59:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:50.754] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 16:59:50.754] [INF] [InstrumentConfigService] 2026/8/24 16:59:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:51.120] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-24 16:59:51.121] [WRN] [TestItem] 产品不可用：ECG-001/002 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL
+[2026-08-24 16:59:51.121] [INF] [InstrumentConfigService] 2026/8/24 16:59:51 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:51.121] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 16:59:51.121] [INF] [InstrumentConfigService] 2026/8/24 16:59:51 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:51.196] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-24 16:59:51.196] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-24 16:59:51.614] [INF] [TestItem] 2026/8/24 16:59:51 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 16:59:51.614] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-24 16:59:51.614] [INF] [TestItem] 2026/8/24 16:59:51 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 16:59:51.615] [WRN] [MainViewModel] [TestItem2 ECG采集与启动] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 16:59:51.615] [WRN] [MainViewModel] [TestItem2 ECG采集与启动] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 16:59:51.615] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：FAIL
+[2026-08-24 16:59:51.625] [INF] [TestItem] 2026/8/24 16:59:51 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 16:59:51.625] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-24 16:59:51.627] [INF] [TestItem] 2026/8/24 16:59:51 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 16:59:51.627] [INF] [InstrumentConfigService] 2026/8/24 16:59:51 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:51.627] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 16:59:51.627] [INF] [InstrumentConfigService] 2026/8/24 16:59:51 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 16:59:51.681] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-24 16:59:51.681] [WRN] [TestItem] 产品不可用：ECG-004 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL
+[2026-08-24 16:59:51.767] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:52.642] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:53.512] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:54.406] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:55.291] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:56.171] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:57.053] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:57.919] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:58.789] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 16:59:59.662] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:00.523] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:01.386] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:02.284] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:03.165] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:04.045] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:04.935] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:05.812] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:06.691] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:00:07.512] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-24 17:00:07.513] [INF] [TestItem] 2026/8/24 17:00:07 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 17:00:07.513] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-24 17:00:07.513] [INF] [TestItem] 2026/8/24 17:00:07 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:00:07.513] [WRN] [MainViewModel] [TestItem3 ECG心率监测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:00:07.513] [WRN] [MainViewModel] [TestItem3 ECG心率监测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:00:07.513] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：FAIL
+[2026-08-24 17:00:07.522] [INF] [TestItem] 2026/8/24 17:00:07 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:00:07.522] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-24 17:00:07.524] [INF] [TestItem] 2026/8/24 17:00:07 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 17:00:07.524] [INF] [InstrumentConfigService] 2026/8/24 17:00:07 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:00:07.525] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:00:07.525] [INF] [InstrumentConfigService] 2026/8/24 17:00:07 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:00:07.525] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-24 17:00:07.593] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-24 17:00:08.585] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 17:00:09.576] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 17:00:10.487] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-24 17:00:10.565] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-24 17:00:11.483] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-24 17:00:11.554] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-24 17:00:12.471] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-24 17:00:12.502] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-24 17:00:12.623] [INF] [TestItem] 2026/8/24 17:00:12 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 17:00:12.623] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-24 17:00:12.623] [INF] [TestItem] 2026/8/24 17:00:12 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:00:12.624] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-24 17:00:12.624] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-24 17:00:12.624] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 17:00:12.624] [INF] [MainViewModel] 2026/8/24 17:00:12 Ended calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 17:00:23.052] [INF] [App] ========== 应用退出 ==========
+[2026-08-24 17:01:57.038] [INF] [App] ========== 应用启动 ==========
+[2026-08-24 17:01:57.102] [INF] [Spec] 2026/8/24 17:01:57 Start calling the Spec.GetAllModules() method . 
+
+[2026-08-24 17:01:57.102] [INF] [Spec] 2026/8/24 17:01:57 Ended calling the Spec.GetAllModules() method . 
+
+[2026-08-24 17:01:57.103] [INF] [MainViewModel] 2026/8/24 17:01:57 Start calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 17:01:57.104] [INF] [TestPlanService] 2026/8/24 17:01:57 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 17:01:57.104] [INF] [TestPlanService] 2026/8/24 17:01:57 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 17:01:57.104] [INF] [MainViewModel] 2026/8/24 17:01:57 Ended calling the MainViewModel.AutoLoadLastPlan() method . 
+
+[2026-08-24 17:01:59.788] [INF] [TestPlanService] 2026/8/24 17:01:59 Start calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 17:01:59.789] [INF] [TestPlanService] 2026/8/24 17:01:59 Ended calling the TestPlanService.GetPlanNames() method . 
+
+[2026-08-24 17:02:02.655] [INF] [MainViewModel] 2026/8/24 17:02:02 Start calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 17:02:02.660] [INF] [TestPlanService] 2026/8/24 17:02:02 Start calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 17:02:02.689] [INF] [TestPlanService] 2026/8/24 17:02:02 Ended calling the TestPlanService.LoadPlan() method . 
+
+[2026-08-24 17:02:02.690] [INF] [MainViewModel] 方案 [血氧和ECG功能测试] 已加载，共 4 个模块
+[2026-08-24 17:02:02.690] [INF] [MainViewModel] 2026/8/24 17:02:02 Ended calling the MainViewModel.LoadPlanWithName() method . 
+
+[2026-08-24 17:05:30.930] [INF] [MainViewModel] 2026/8/24 17:05:30 Start calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 17:05:30.933] [INF] [MainViewModel] 2026/8/24 17:05:30 Start calling the MainViewModel.RunPlan() method . 
+
+[2026-08-24 17:05:30.934] [INF] [MainViewModel] ===== 开始执行测试方案，共 4 个模块 =====
+[2026-08-24 17:05:30.946] [INF] [TestItem] 2026/8/24 17:05:30 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:30.946] [INF] [TestItem] TestItem1：AECG100初始化连接 开始执行
+[2026-08-24 17:05:30.947] [INF] [TestItem] 2026/8/24 17:05:30 Start calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 17:05:30.948] [INF] [InstrumentConfigService] 2026/8/24 17:05:30 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:30.970] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:05:30.970] [INF] [InstrumentConfigService] 2026/8/24 17:05:30 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:30.971] [INF] [Aecg100Tester] 2026/8/24 17:05:30 Start calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 17:05:30.982] [INF] [MainViewModel] 2026/8/24 17:05:30 Ended calling the MainViewModel.RunOrStop() method . 
+
+[2026-08-24 17:05:31.589] [INF] [Aecg100Tester] AECG100 连接成功（Port=COM9）
+[2026-08-24 17:05:31.590] [INF] [Aecg100Tester] 2026/8/24 17:05:31 Ended calling the Aecg100Tester.ConnectAsync() method . 
+
+[2026-08-24 17:05:31.591] [INF] [TestItem] AECG100 初始化连接成功
+[2026-08-24 17:05:33.653] [INF] [TestItem] AECG100 设备信息：型号=AE 序列号=WAE1001-210031 固件=1.47.6 硬件版本=1
+[2026-08-24 17:05:33.653] [INF] [TestItem] 2026/8/24 17:05:33 Ended calling the TestItem.Aecg100InitModule() method . 
+
+[2026-08-24 17:05:33.654] [INF] [TestItem] TestItem1：AECG100初始化连接 执行完成，共 2 项结果
+[2026-08-24 17:05:33.654] [INF] [TestItem] 2026/8/24 17:05:33 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:33.658] [INF] [MainViewModel] [TestItem1 AECG100初始化连接] 模块结果：PASS
+[2026-08-24 17:05:33.664] [INF] [TestItem] 2026/8/24 17:05:33 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:33.664] [INF] [TestItem] TestItem2：ECG采集与启动 开始执行
+[2026-08-24 17:05:33.665] [INF] [TestItem] 2026/8/24 17:05:33 Start calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 17:05:33.665] [INF] [InstrumentConfigService] 2026/8/24 17:05:33 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:33.666] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:05:33.666] [INF] [InstrumentConfigService] 2026/8/24 17:05:33 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:33.749] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-24 17:05:33.749] [WRN] [TestItem] 产品不可用：ECG-001/002 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL
+[2026-08-24 17:05:33.749] [INF] [InstrumentConfigService] 2026/8/24 17:05:33 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:33.750] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:05:33.750] [INF] [InstrumentConfigService] 2026/8/24 17:05:33 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:33.823] [INF] [TestItem] ECG-001 PASS：AECG100 ECG 波形输出成功（WTQOutputECG 返回 true）
+[2026-08-24 17:05:33.823] [INF] [TestItem] ECG-002：导联脱落检测预留，默认 PASS（待导联脱落判断逻辑确定后补充）
+[2026-08-24 17:05:34.238] [INF] [TestItem] 2026/8/24 17:05:34 Ended calling the TestItem.EcgAcquisitionTestModule() method . 
+
+[2026-08-24 17:05:34.238] [INF] [TestItem] TestItem2：ECG采集与启动 执行完成，共 4 项结果
+[2026-08-24 17:05:34.238] [INF] [TestItem] 2026/8/24 17:05:34 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:34.239] [WRN] [MainViewModel] [TestItem2 ECG采集与启动] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:05:34.239] [WRN] [MainViewModel] [TestItem2 ECG采集与启动] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:05:34.239] [INF] [MainViewModel] [TestItem2 ECG采集与启动] 模块结果：FAIL
+[2026-08-24 17:05:34.248] [INF] [TestItem] 2026/8/24 17:05:34 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:34.248] [INF] [TestItem] TestItem3：ECG心率监测 开始执行
+[2026-08-24 17:05:34.249] [INF] [TestItem] 2026/8/24 17:05:34 Start calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 17:05:34.249] [INF] [InstrumentConfigService] 2026/8/24 17:05:34 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:34.250] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:05:34.250] [INF] [InstrumentConfigService] 2026/8/24 17:05:34 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:34.281] [WRN] [TestItem] 产品通讯不可用（打开/问询/状态查询失败），[产品问询]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：Could not find file 'COM1'.
+[2026-08-24 17:05:34.281] [WRN] [TestItem] 产品不可用：ECG-004 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL
+[2026-08-24 17:05:34.366] [INF] [TestItem] ECG-004 心率 40BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:35.237] [INF] [TestItem] ECG-004 心率 40BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:36.105] [INF] [TestItem] ECG-004 心率 40BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:36.997] [INF] [TestItem] ECG-004 心率 60BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:37.873] [INF] [TestItem] ECG-004 心率 60BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:38.754] [INF] [TestItem] ECG-004 心率 60BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:39.657] [INF] [TestItem] ECG-004 心率 80BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:40.527] [INF] [TestItem] ECG-004 心率 80BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:41.396] [INF] [TestItem] ECG-004 心率 80BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:42.270] [INF] [TestItem] ECG-004 心率 100BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:43.128] [INF] [TestItem] ECG-004 心率 100BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:43.988] [INF] [TestItem] ECG-004 心率 100BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:44.885] [INF] [TestItem] ECG-004 心率 120BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:45.762] [INF] [TestItem] ECG-004 心率 120BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:46.642] [INF] [TestItem] ECG-004 心率 120BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:47.537] [INF] [TestItem] ECG-004 心率 160BPM 第 1/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:48.411] [INF] [TestItem] ECG-004 心率 160BPM 第 2/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:49.288] [INF] [TestItem] ECG-004 心率 160BPM 第 3/3 次：仪器设置下发成功，偏差=0.00BPM（产品回传比对预留）
+[2026-08-24 17:05:50.111] [INF] [TestItem] ECG-004 完成：最大偏差=0.00BPM（规格 ≤±2BPM，产品回传比对预留）
+[2026-08-24 17:05:50.111] [INF] [TestItem] 2026/8/24 17:05:50 Ended calling the TestItem.EcgHeartRateTestModule() method . 
+
+[2026-08-24 17:05:50.111] [INF] [TestItem] TestItem3：ECG心率监测 执行完成，共 3 项结果
+[2026-08-24 17:05:50.111] [INF] [TestItem] 2026/8/24 17:05:50 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:50.111] [WRN] [MainViewModel] [TestItem3 ECG心率监测] 产品问询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:05:50.111] [WRN] [MainViewModel] [TestItem3 ECG心率监测] 产品当前状态查询 = 0  超规格 1 ~ 1  -> FAIL
+[2026-08-24 17:05:50.111] [INF] [MainViewModel] [TestItem3 ECG心率监测] 模块结果：FAIL
+[2026-08-24 17:05:50.127] [INF] [TestItem] 2026/8/24 17:05:50 Start calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:50.127] [INF] [TestItem] TestItem4：ECG信号质量与波形 开始执行
+[2026-08-24 17:05:50.129] [INF] [TestItem] 2026/8/24 17:05:50 Start calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 17:05:50.129] [INF] [InstrumentConfigService] 2026/8/24 17:05:50 Start calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:50.129] [INF] [InstrumentConfigService] 仪器链接配置已加载：D:\projcet\TORNPISolution\TORNPISolution\bin\Debug\net8.0-windows\Config\instruments.json
+[2026-08-24 17:05:50.129] [INF] [InstrumentConfigService] 2026/8/24 17:05:50 Ended calling the InstrumentConfigService.Load() method . 
+
+[2026-08-24 17:05:50.129] [INF] [TestItem] ECG-009：发出 6mV 三角波 + ±300mV DC 偏置（标准 201.12.4.4.101）...
+[2026-08-24 17:05:50.198] [INF] [TestItem] ECG-009：6mV 三角波输出成功，产品回传比对预留（TBD，默认 PASS）
+[2026-08-24 17:05:51.184] [INF] [TestItem] ECG-009：+300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 17:05:52.174] [INF] [TestItem] ECG-009：-300mV DC 偏置三角波输出成功，产品回传比对预留
+[2026-08-24 17:05:53.089] [INF] [TestItem] ECG-010：发出 10Hz 5mV 正弦波（标准 201.12.4.4.102）...
+[2026-08-24 17:05:53.160] [INF] [TestItem] ECG-010：10Hz 5mV 正弦波输出成功，产品回传 + 外部开关控制预留（TBD，默认 PASS）
+[2026-08-24 17:05:54.076] [INF] [TestItem] ECG-011：发出 5Hz 2mV 正弦波（标准 201.12.4.4.104）...
+[2026-08-24 17:05:54.151] [INF] [TestItem] ECG-011：5Hz 2mV 正弦波输出成功，产品各增益档回传预留（TBD，默认 PASS）
+[2026-08-24 17:05:55.067] [INF] [TestItem] ECG-012：发出 0.67Hz~40Hz 频率扫描 2mV 正弦波（标准 201.12.4.4.108）...
+[2026-08-24 17:05:55.097] [INF] [TestItem] ECG-012：频率扫描输出成功，产品各频点回传预留（TBD，默认 PASS）
+[2026-08-24 17:05:55.218] [INF] [TestItem] 2026/8/24 17:05:55 Ended calling the TestItem.EcgSignalQualityTestModule() method . 
+
+[2026-08-24 17:05:55.218] [INF] [TestItem] TestItem4：ECG信号质量与波形 执行完成，共 4 项结果
+[2026-08-24 17:05:55.218] [INF] [TestItem] 2026/8/24 17:05:55 Ended calling the TestItem.TestItemxx() method . 
+
+[2026-08-24 17:05:55.219] [WRN] [MainViewModel] [TestItem4 ECG信号质量与波形] ECG-012频率响应 = 1 % 超规格 70 ~ 140 % -> FAIL
+[2026-08-24 17:05:55.219] [INF] [MainViewModel] [TestItem4 ECG信号质量与波形] 模块结果：FAIL
+[2026-08-24 17:05:55.219] [INF] [MainViewModel] ===== 方案执行完成，整体判定：NG =====
+[2026-08-24 17:05:55.219] [INF] [MainViewModel] 2026/8/24 17:05:55 Ended calling the MainViewModel.RunPlan() method . 
+

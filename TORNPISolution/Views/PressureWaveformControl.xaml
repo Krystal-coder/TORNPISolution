@@ -1,0 +1,41 @@
+<UserControl x:Class="TORNPISolution.Views.PressureWaveformControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White" ClipToBounds="True" SnapsToDevicePixels="True"
+             SizeChanged="OnSizeChanged">
+    <Grid>
+        <!-- 网格线 / 时间刻度 / 内置横向进度条 -->
+        <Canvas x:Name="AxisCanvas"/>
+
+        <!-- 波形曲线（只绘制当前可视时间窗口内的点） -->
+        <Polyline x:Name="WavePolyline" Stroke="#1565C0" StrokeThickness="1.4"/>
+
+        <!-- 悬停覆盖层：十字线 + 气泡（不拦截鼠标） -->
+        <Canvas x:Name="HoverLayer" IsHitTestVisible="False">
+            <Line x:Name="CrosshairV" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
+            <Line x:Name="CrosshairH" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
+            <Ellipse x:Name="CrosshairDot" Width="7" Height="7" Fill="#FF9800" Visibility="Collapsed"/>
+            <Border x:Name="HoverTip" Background="#E6212121" CornerRadius="3" Padding="6,3" Visibility="Collapsed">
+                <TextBlock x:Name="HoverTipText" Foreground="White" FontSize="11"/>
+            </Border>
+        </Canvas>
+
+        <!-- 量程标注 -->
+        <StackPanel Orientation="Horizontal" Margin="6,2,0,0">
+            <TextBlock x:Name="MaxLabel" Text="300" FontSize="10" Foreground="#9E9E9E"/>
+            <TextBlock Text=" mmHg" FontSize="10" Foreground="#9E9E9E"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="6,0,0,22" VerticalAlignment="Bottom">
+            <TextBlock x:Name="MinLabel" Text="0" FontSize="10" Foreground="#9E9E9E"/>
+            <TextBlock Text=" mmHg" FontSize="10" Foreground="#9E9E9E"/>
+        </StackPanel>
+
+        <!-- 右下角：总时长标注 -->
+        <TextBlock x:Name="DurationLabel" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Margin="0,0,8,22" FontSize="10" Foreground="#9E9E9E"/>
+
+        <!-- 空态提示 -->
+        <TextBlock x:Name="EmptyText" Text="暂无采样数据" Foreground="#BDBDBD" FontSize="12"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    </Grid>
+</UserControl>
