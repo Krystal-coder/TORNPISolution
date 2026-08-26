@@ -1,0 +1,52 @@
+﻿# Visual Studio 专用 .gitignore
+
+# 用户特定文件
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 编译输出（核心！）
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+*.cache
+*.nupkg
+
+# 发布输出
+publish/
+*.pubxml.user
+
+# 测试结果
+TestResults/
+*.coverage
+*.trx
+
+# IDE 缓存
+.vs/
+_ReSharper.Caches/
+*.resharper
+*.pidb
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# 系统文件
+Thumbs.db
+Desktop.ini
+
+# 日志
+*.log
+*.tmp
+
+# NuGet
+packages/
+*.nupkg
+
+# 其他临时文件
+*.tmp_proj
+*.lob
+*.vsidx
