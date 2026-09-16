@@ -3,6 +3,7 @@ using System.IO.Ports;
 using System.Windows.Data;
 using System.Windows.Input;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
 using TORNPISolution.Models;
@@ -17,11 +18,17 @@ namespace TORNPISolution.ViewModels
     /// </summary>
     public class InstrumentConfigViewModel : ViewModelBase
     {
-        private readonly IInstrumentConfigService _configService = new InstrumentConfigService();
+        private readonly IInstrumentConfigService _configService;
         private readonly ILogService _log = new LogService(nameof(InstrumentConfigViewModel));
 
-        public InstrumentConfigViewModel()
+       // 实例化
+        public InstrumentConfigViewModel() : this(App.Services.GetRequiredService<IInstrumentConfigService>())
         {
+        }
+
+        public InstrumentConfigViewModel(IInstrumentConfigService configService)
+        {
+            _configService = configService;
             Config = _configService.Load();
             RefreshPorts();
 
@@ -71,7 +78,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>本机可用串口列表</summary>
         public List<string> AvailablePorts { get; private set; } = new();
 
-        public int[] BaudRates { get; } = { 4800, 9600, 19200, 38400, 57600, 115200 };
+        public int[] BaudRates { get; } = { 4800, 9600, 19200, 38400, 57600, 115200, 921600 };
 
         public string[] Parities { get; } = { "None", "Odd", "Even" };
 

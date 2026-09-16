@@ -17,6 +17,9 @@ namespace TORNPISolution.Interface
         /// <summary>关闭串口连接</summary>
         Task CloseAsync();
 
+        /// <summary>心跳保活（0x01）：防止产品进入休眠模式（约10秒无通讯即休眠）</summary>
+        Task KeepAliveAsync(CancellationToken ct = default);
+
         /// <summary>产品问询（0x72）：读取 MAC 地址和嵌软版本</summary>
         Task<string> QueryProductInfoAsync(CancellationToken ct = default);
 
@@ -50,7 +53,7 @@ namespace TORNPISolution.Interface
         /// <summary>停止血压测量（0x7D）</summary>
         Task StopBpMeasureAsync(CancellationToken ct = default);
 
-        /// <summary>读取 ECG 导联状态（0x87）</summary>
+        /// <summary>读取 ECG 导联状态（0x88）</summary>
         Task<byte[]> ReadLeadStateAsync(CancellationToken ct = default);
 
         /// <summary>读取心率测量值（0x7C）</summary>
@@ -58,5 +61,18 @@ namespace TORNPISolution.Interface
 
         /// <summary>开始/停止血氧测量（0x80）</summary>
         Task StartSpo2MeasureAsync(bool start = true, CancellationToken ct = default);
+
+        /// <summary>读取血氧测量值（0x81，SPO2-001 用）</summary>
+        Task<double> ReadSpo2ValueAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 读取电池信息（0x6C）：返回电池电压（mV，uint32 LE）和百分比（%）。
+        /// </summary>
+        Task<BatteryReading?> ReadBatteryInfoAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 读取充电状态（0x6D）：返回是否正在充电（1=充电中，0=未充电）。
+        /// </summary>
+        Task<byte> ReadChargingStatusAsync(CancellationToken ct = default);
     }
 }

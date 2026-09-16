@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Icon="/Images/logo.ico"
         FontFamily="Microsoft YaHei UI"
-        Title="TOR NPI Solution" Height="720" Width="1280"
+        Title="TOR NPI Solution" Height="720" Width="1300"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
@@ -21,21 +21,19 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
 
-        <!-- 明细表单元格文字：垂直居中 + 左边距 8（与表头 Padding 一致，
-             保证内容与表头文字左对齐；默认单元格模板不应用 Padding/
-             VerticalContentAlignment，必须通过列的 ElementStyle 设到 TextBlock 上） -->
+        <!-- 明细表单元格文字：垂直居中 + 左边距 8 -->
         <Style x:Key="Style.CellText" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Padding" Value="8,0"/>
         </Style>
 
-        <!-- 短数值列（规格范围/测试值）：垂直 + 水平居中（表头同步居中，见 Style.GridColumnHeader.Center） -->
+        <!-- 短数值列（规格范围/测试值）：垂直 + 水平居中 -->
         <Style x:Key="Style.CellText.Center" TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Padding" Value="0"/>
         </Style>
 
-        <!-- 明细表表头：共享基础样式（列级 HeaderStyle 可 BasedOn 它追加对齐方式） -->
+        <!-- 明细表表头：共享基础样式 -->
         <Style x:Key="Style.GridColumnHeader" TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="#F0F3F7"/>
             <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
@@ -46,7 +44,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
         </Style>
 
-        <!-- 短数值列表头：水平居中（与内容列的居中对齐保持一致） -->
+        <!-- 短数值列表头：水平居中 -->
         <Style x:Key="Style.GridColumnHeader.Center" TargetType="DataGridColumnHeader"
                BasedOn="{StaticResource Style.GridColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -94,7 +92,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- 右侧明细面板的模块结果徽章（直接基于 MainViewModel.SelectedPlanModule 求值，避免切换 DataContext 产生绑定错误） -->
+        <!-- 右侧明细面板的模块结果 -->
         <Style x:Key="Style.DetailResultBadge" TargetType="Border">
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="8,2"/>
@@ -189,8 +187,22 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
                 <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="血压仪参数配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="ECG参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                <MenuItem Header="BPA700参数配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                <!--<MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>-->
+            </MenuItem>
+
+            <!-- 通讯菜单 -->
+            <MenuItem Header="通讯协议" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
+                <MenuItem.Icon>
+                    <materialDesign:PackIcon Kind="Protocol" Width="15" Height="15" Margin="0"/>
+                </MenuItem.Icon>
+                <MenuItem.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                    </DataTemplate>
+                </MenuItem.HeaderTemplate>
+                <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
             </MenuItem>
         </Menu>
 
@@ -208,7 +220,7 @@
         <Grid Grid.Column="0">
 
             <!-- 收起态：窄条，点击展开 -->
-            <Border Width="40" Cursor="Hand"
+            <Border Width="30" Cursor="Hand"
                     MouseLeftButtonUp="LibraryStrip_MouseLeftButtonUp"
                     ToolTip="展开测试模块库">
                 <Border.Style>
@@ -316,7 +328,7 @@
             </Border>
         </Grid>
 
-        <!-- ==================== 中栏：测试方案（标题直接显示方案名） ==================== -->
+        <!-- ==================== 中栏：测试方案 ==================== -->
         <Border Grid.Column="2" Style="{StaticResource Style.PanelCard}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -345,9 +357,6 @@
                 </Grid>
 
                 <!-- 方案模块列表（可拖拽排序，点击查看明细） -->
-                <!-- 选中不用两路绑定：拖拽库会意外清空选中并回写 null，
-                     改由 SelectionChanged / SelectedPlanModuleChanged 手动单向同步；
-                     空白区域点击在预览阶段直接吞掉，从源头避免选中被清空 -->
                 <ListBox x:Name="PlanList" Grid.Row="1"
                          ItemsSource="{Binding PlanModules}"
                          SelectionChanged="PlanList_SelectionChanged"
@@ -394,7 +403,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- 序号（跟随数据顺序，拖拽调序后自动刷新） -->
+                                <!-- 序号 -->
                                 <Border Grid.Column="0" Width="22" Height="22" CornerRadius="11"
                                         Background="{StaticResource Brush.Primary}" Margin="0,0,10,0"
                                         VerticalAlignment="Center">
@@ -417,7 +426,7 @@
                                                Style="{StaticResource Style.ModuleResultBadgeText}"/>
                                 </Border>
 
-                                <!-- 移除按钮（DragSourceIgnore：按住按钮拖动不误触发整条拖拽） -->
+                                <!-- 移除按钮 -->
                                 <Button Grid.Column="3" Content="✕" FontSize="11" Width="24" Height="24"
                                         Padding="0" Margin="4,0,0,0" Cursor="Hand"
                                         dd:DragDrop.DragSourceIgnore="True"
@@ -522,11 +531,8 @@
                         </Border>
                     </Grid>
 
-                    <!-- 测试项明细表：测试内容 / 规格 / 测试值 / 结果。
-                         ItemsSource 由 code-behind 手动赋值（切换模块时先置空再赋新集合，
-                         强制整表重建）；关闭行/列虚拟化，避免 ItemsSource 在不同集合间
-                         切换时容器复用导致视觉残留/命中测试错位 -->
-                    <DataGrid x:Name="DetailGrid" Grid.Row="1" Margin="10,0,10,12"
+                    <!-- 测试项明细表：测试内容 / 规格 / 测试值 / 结果 -->
+                        <DataGrid x:Name="DetailGrid" Grid.Row="1" Margin="10,0,10,12"
                               AutoGenerateColumns="False" IsReadOnly="True"
                               RowDetailsVisibilityMode="Visible"
                               EnableRowVirtualization="False" EnableColumnVirtualization="False"
@@ -537,14 +543,8 @@
                               Background="Transparent" BorderThickness="0"
                               RowHeight="36" FontSize="12"
                               SelectionMode="Single" SelectionUnit="FullRow">
-                        <!-- 注意：绝不在 RowStyle 里切换 DetailsVisibility（WPF 已知缺陷：
-                             会导致行布局/渲染失效，选中行单元格内容视觉丢失）。
-                             RowDetailsVisibilityMode 必须显式 Visible，让每行详情区常驻，
-                             折叠/展开改由 RowDetailsTemplate 内部元素的 Visibility 控制 -->
-                        <DataGrid.RowDetailsTemplate>
+                            <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
-                                <!-- 折叠逻辑在模板内部用 Visibility 控制（DetailsVisibility 恒为 Visible，
-                                     避免切换 DetailsVisibility 引发的行渲染失效） -->
                                 <StackPanel Visibility="{Binding IsWaveformExpanded, Converter={StaticResource BoolToVisibility}}">
                                 <Border Margin="8,2,8,10" CornerRadius="6" Padding="0,6,0,0"
                                         Background="{StaticResource Brush.Panel.Background}"
@@ -558,10 +558,10 @@
                                             <materialDesign:PackIcon Kind="ChartLine" Width="14" Height="14"
                                                                      VerticalAlignment="Center"
                                                                      Foreground="{StaticResource Brush.Primary}"/>
-                                            <TextBlock Text="压力波形" FontWeight="Bold" FontSize="12"
+                                            <TextBlock Text="波形" FontWeight="Bold" FontSize="12"
                                                        Foreground="{StaticResource Brush.Text.Main}"
                                                        VerticalAlignment="Center" Margin="6,0,0,0"/>
-                                            <TextBlock Text="单位跟随仪器设置（mmHg/kPa）"
+                                            <TextBlock Text="{Binding WaveformUnit, StringFormat='单位：{0}'}"
                                                        Style="{StaticResource Style.SubText}" FontSize="11"
                                                        VerticalAlignment="Center" Margin="10,0,0,0"/>
                                         </StackPanel>
@@ -570,7 +570,9 @@
                                                       IsChecked="{Binding IsWaveformExpanded, Mode=TwoWay}"/>
                                         <views:PressureWaveformControl Grid.ColumnSpan="2" Height="200"
                                                                        Margin="12,26,12,10"
-                                                                       Samples="{Binding WaveformSamples}"/>
+                                                                       Samples="{Binding WaveformSamples}"
+                                                                       Unit="{Binding WaveformUnit}"
+                                                                       PixelsPerSecond="{Binding TimeScale}"/>
                                     </Grid>
                                 </Border>
                                 </StackPanel>
@@ -579,21 +581,17 @@
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader}"/>
                         </DataGrid.ColumnHeaderStyle>
-                        <!-- 单元格样式：只设属性，绝不替换 ControlTemplate（替换单元格模板
-                             会导致行选中时单元格容器重排错乱，内容在行间漂移/消失）。
-                             注意：默认单元格模板不应用 Padding/VerticalContentAlignment，
-                             内边距与垂直居中均通过各列 ElementStyle 设到 TextBlock 上 -->
+                        <!-- 单元格样式 -->
                         <DataGrid.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                             </Style>
                         </DataGrid.CellStyle>
-                        <DataGrid.Columns>
-                            <!-- 只读计算属性统一用 OneWay：与 TwoWay 显示行为完全一致，
-                                 但从语义上杜绝任何“双向回写”的疑虑 -->
-                            <DataGridTextColumn Header="测试内容" Binding="{Binding Name, Mode=OneWay}" Width="1.4*">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="测试内容" Binding="{Binding Name, Mode=OneWay}" Width="1.4*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}"/>
                                 </DataGridTextColumn.ElementStyle>
@@ -614,7 +612,15 @@
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText.Center}"/>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="测试值" Binding="{Binding MeasuredValueText, Mode=OneWay}" Width="*">
+                            <DataGridTextColumn Header="仪器测试值" Binding="{Binding InstrumentValueText, Mode=OneWay}" Width="*">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText.Center}"/>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="产品上报值" Binding="{Binding ProductValueText, Mode=OneWay}" Width="*">
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
                                 </DataGridTextColumn.HeaderStyle>

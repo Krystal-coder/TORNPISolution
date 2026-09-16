@@ -20,9 +20,14 @@
 
   <!-- 仪器原生/第三方库：用 Content 项可随项目引用传递复制到主程序输出目录 -->
   <ItemGroup>
-    <!-- BPA700 鲸扬模拟仪原生 SDK DLL -->
-    <Content Include="Libs\BPA700x64.dll">
+    <!-- BPA700 正式版原生 SDK DLL（Formal） -->
+    <Content Include="Libs\BPA700\Formal\BPA700x64.dll">
       <Link>BPA700x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- BPA700 Beta 原生 SDK DLL（仅 BP-003 静态压力测试实验用），输出时重命名避免与正式版冲突 -->
+    <Content Include="Libs\BPA700\Beta\BPA700x64.dll">
+      <Link>BPA700x64Beta.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!-- AECG100 鲸扬多功能综合性能测试仪原生 SDK DLL -->

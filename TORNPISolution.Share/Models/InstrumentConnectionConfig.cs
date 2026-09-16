@@ -30,8 +30,8 @@ namespace TORNPISolution.Share.Models
     /// </summary>
     public class InstrumentConnectionConfig
     {
-        /// <summary>被测产品（DUT，串口 232，默认 115200bps）</summary>
-        public SerialLinkSettings Product { get; set; } = new() { BaudRate = 115200 };
+        /// <summary>被测产品（DUT，串口 232，默认 921600bps）</summary>
+        public SerialLinkSettings Product { get; set; } = new() { BaudRate = 921600 };
 
         /// <summary>美仪压力/差压变送器（默认 9600bps）</summary>
         public SerialLinkSettings PressureTransmitter { get; set; } = new();

@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common;
+using TORNPISolution.Interface;
 using TORNPISolution.Share.Models;
+using TORNPISolution.Service;
 
 namespace TORNPISolution.ViewModels
 {
@@ -13,12 +16,19 @@ namespace TORNPISolution.ViewModels
         private double? _measuredValue;
         private double? _dynamicLower;
         private double? _dynamicUpper;
+        private double? _instrumentValue;
+        private double? _productValue;
+        private string? _instrumentText;
         private TestResultStatus _result = TestResultStatus.NotTested;
 
         public TestItemViewModel(TestItemModel model)
         {
             _model = model;
+            TimeScale = ResolveTimeScale(model.Name);
         }
+
+        /// <summary>波形显示时间像素（像素/秒），按测试项从配置读取，默认 24</summary>
+        public double TimeScale { get; }
 
         /// <summary>底层测试项定义（供 TestItem 执行测量时使用）</summary>
         public TestItemModel Model => _model;
@@ -29,11 +39,9 @@ namespace TORNPISolution.ViewModels
         /// <summary>测试内容说明</summary>
         public string Description => _model.Description;
 
-        /// <summary>是否为带波形的测试项（血压压力曲线 / ECG 输出波形，行内显示波形折叠按钮）</summary>
-        public bool HasWaveform => Name is "BP-001物理按键启动测量" or "BP-002测量中手动停止"
-            or "BP-003静态压力精度测试" or "BP-009过压保护"
-            or "ECG-001测量启动" or "ECG-002导联脱落检测"
-            or "ECG-009动态范围" or "ECG-010输入阻抗" or "ECG-011增益准确性" or "ECG-012频率响应";
+        /// <summary>是否为带波形的测试项（血压压力曲线 / 仪器输出波形，行内显示波形折叠按钮）。
+        /// 标志在 Spec 定义测试项时置位（TestItemModel.ShowWaveform），新增波形项无需改这里</summary>
+        public bool HasWaveform => _model.ShowWaveform;
 
         /// <summary>该项波形是否展开（行内折叠按钮控制，默认折叠；展开时行下方显示压力曲线）</summary>
         public bool IsWaveformExpanded
@@ -87,6 +95,14 @@ namespace TORNPISolution.ViewModels
         public string MeasuredValueText =>
             _measuredValue.HasValue ? $"{_measuredValue.Value:0.###} {Unit}" : "--";
 
+        /// <summary>仪器测试值列显示文本（文本类结果如设备信息优先显示；无仪器侧值的项显示 --）</summary>
+        public string InstrumentValueText =>
+            _instrumentText ?? (_instrumentValue.HasValue ? $"{_instrumentValue.Value:0.###} {Unit}" : "--");
+
+        /// <summary>产品上报值列显示文本（无产品上报值的项显示 --）</summary>
+        public string ProductValueText =>
+            _productValue.HasValue ? $"{_productValue.Value:0.###} {Unit}" : "--";
+
         /// <summary>判定结果</summary>
         public TestResultStatus Result
         {
@@ -122,16 +138,49 @@ namespace TORNPISolution.ViewModels
                 : TestResultStatus.Fail;
         }
 
-        /// <summary>回填 TestItem 执行结果：先写动态规格再写测试值（保证按本次规格判定）</summary>
+        /// <summary>
+        /// 回填 TestItem 执行结果：先写动态规格再写测试值（保证按本次规格判定）；
+        /// 按测试项值来源（ValueSource）分发到仪器测试值/产品上报值两列
+        /// </summary>
         public void ApplyResult(TestItemResult result)
         {
             _dynamicLower = result.SpecMin;
             _dynamicUpper = result.SpecMax;
+            _instrumentText = result.InstrumentText;
             OnPropertyChanged(nameof(LowerLimit));
             OnPropertyChanged(nameof(UpperLimit));
             OnPropertyChanged(nameof(IsDynamicSpec));
             OnPropertyChanged(nameof(SpecText));
+
+            switch (_model.ValueSource)
+            {
+                case "Product":
+                    _instrumentValue = result.InstrumentValue;
+                    _productValue = result.ProductValue ?? result.Value;
+                    break;
+                case "Both":
+                    _instrumentValue = result.InstrumentValue;
+                    _productValue = result.ProductValue ?? result.Value;
+                    break;
+                default:
+                    _instrumentValue = result.InstrumentValue ?? result.Value;
+                    _productValue = result.ProductValue;
+                    break;
+            }
+            OnPropertyChanged(nameof(InstrumentValueText));
+            OnPropertyChanged(nameof(ProductValueText));
+
             MeasuredValue = result.Value;
+        }
+
+        /// <summary>波形显示单位（血压为 mmHg，ECG/PPG/SpO2 为 μV）</summary>
+        public string WaveformUnit => ResolveWaveformUnit(Name);
+
+        private static string ResolveWaveformUnit(string name)
+        {
+            if (name.StartsWith("ECG-") || name.StartsWith("PPG-") || name.StartsWith("SPO2-"))
+                return "μV";
+            return "mmHg";
         }
 
         /// <summary>清除测试值、动态规格与判定结果</summary>
@@ -139,11 +188,55 @@ namespace TORNPISolution.ViewModels
         {
             _dynamicLower = null;
             _dynamicUpper = null;
+            _instrumentValue = null;
+            _productValue = null;
+            _instrumentText = null;
             OnPropertyChanged(nameof(LowerLimit));
             OnPropertyChanged(nameof(UpperLimit));
             OnPropertyChanged(nameof(IsDynamicSpec));
             OnPropertyChanged(nameof(SpecText));
+            OnPropertyChanged(nameof(InstrumentValueText));
+            OnPropertyChanged(nameof(ProductValueText));
             MeasuredValue = null;
+        }
+
+        /// <summary>
+        /// 模块未报告结果时强制判 FAIL（测试值保持 0 用于显示，避免落入规格区间被误判为 Pass）。
+        /// </summary>
+        public void MarkNotReportedAsFail()
+        {
+            _measuredValue = 0;
+            _instrumentText = null;
+            if (_model.ValueSource == "Product" || _model.ValueSource == "Both")
+                _productValue = 0;
+            else
+                _instrumentValue = 0;
+            OnPropertyChanged(nameof(InstrumentValueText));
+            OnPropertyChanged(nameof(ProductValueText));
+            OnPropertyChanged(nameof(MeasuredValue));
+            OnPropertyChanged(nameof(MeasuredValueText));
+            Result = TestResultStatus.Fail;
+        }
+
+        /// <summary>从配置解析波形显示时间像素；未配置时返回 24</summary>
+        private static double ResolveTimeScale(string name)
+        {
+            try
+            {
+                var cfg = App.Services.GetRequiredService<IInstrumentConfigService>().Load();
+                if (name.StartsWith("ECG-"))
+                {
+                    var ecgCfg = cfg.Aecg100Tester.GetWaveformConfig(name);
+                    if (ecgCfg.TimeScale > 0) return ecgCfg.TimeScale;
+                }
+                else if (name.StartsWith("BP-"))
+                {
+                    var bpaCfg = cfg.BPA700Simulator.TestParams.WaveformDisplay.GetItemConfig(name);
+                    if (bpaCfg.TimeScale > 0) return bpaCfg.TimeScale;
+                }
+            }
+            catch { /* 配置文件缺失不影响界面加载 */ }
+            return 24;
         }
     }
 }

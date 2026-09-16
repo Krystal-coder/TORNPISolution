@@ -23,7 +23,7 @@ namespace TORNPISolution.Interface
 
     /// <summary>
     /// 质量流量控制器设备接口（Alicat，Modbus RTU / RS485）。
-    /// 485 通讯为慢速 IO，所有操作均为异步，避免阻塞 UI 线程。
+    /// 485 通讯为慢速 IO
     /// </summary>
     public interface IMassFlowController : IDisposable
     {

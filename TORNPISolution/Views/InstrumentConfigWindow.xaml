@@ -349,6 +349,7 @@
                                 </StackPanel>
                             </RadioButton.Content>
                         </RadioButton>
+                        
                         <!-- BPA700 使用原生 SDK，只需选择 COM 口，无需串口参数 -->
                         <Grid Margin="24,2,0,6">
                             <Grid.Style>
@@ -372,13 +373,14 @@
                                                     RelativeSource={RelativeSource AncestorType=Window}}"
                                       Text="{Binding Config.BPA700Simulator.PortName, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
+                        
                         <!-- BPA700 初始化设置：Category / 压力单位 / 袖带容量（默认 Adult/mmHg/500ml，初始化时随连接下发） -->
                         <Grid Margin="24,2,0,6">
                             <Grid.Style>
                                 <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-<DataTrigger Binding="{Binding IsBPA700Selected}" Value="True">
+                                        <DataTrigger Binding="{Binding IsBPA700Selected}" Value="True">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </Style.Triggers>

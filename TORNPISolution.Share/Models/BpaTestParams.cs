@@ -17,6 +17,12 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>产品充放气测试（BP-001/BP-002）规格与超时</summary>
         public BpaCuffSpec CuffTest { get; set; } = new();
+
+        /// <summary>压力控制功能测试（BP-006~008）过程参数</summary>
+        public BpaPressureControlParams PressureControl { get; set; } = new();
+
+        /// <summary>波形显示配置（按测试项自定义 X 轴模式与时间刻度，Y 轴固定 mmHg）</summary>
+        public BpaWaveformDisplayConfig WaveformDisplay { get; set; } = new();
     }
 
     /// <summary>
@@ -156,8 +162,91 @@ namespace TORNPISolution.Share.Models
         public double Threshold2 { get; set; } = 320;
     }
 
+    /// <summary>
+    /// 压力控制功能测试（M04 BP-006~008）过程参数，默认值 = 原测试步骤中的固定值（出处：测试要求文档）。
+    /// 规格上下限不在此处（BP-006 动态规格 收缩压+30~+40、BP-007 2~6mmHg/s、BP-008 ≤10s
+    /// 仍由 Spec/动态规格单一来源判定）；BP-009 参数在 Overpressure 节点。
+    /// </summary>
+    public class BpaPressureControlParams
+    {
+        // ===== 公共（BP-006/007 共用） =====
+
+        /// <summary>产品血压测量结果推送等待超时（秒）：触发产品测量后等待推送结果的最长时间</summary>
+        public int ProductBpPushTimeoutSeconds { get; set; } = 60;
+
+        /// <summary>充气目标偏移（mmHg）：BP-006 充气目标 = 产品收缩压 + 偏移（测试要求 +30~+40，默认取中间值）；BP-007 起始压力同偏移</summary>
+        public double InflationTargetOffset { get; set; } = 35;
+
+        /// <summary>充气到位后的稳压保持秒数</summary>
+        public int InflateStableSeconds { get; set; } = 2;
+
+        // ===== BP-006 最高充气压力 =====
+
+        /// <summary>产品收缩压读取失败时的兜底收缩压（mmHg）</summary>
+        public double BP006DefaultSystolic { get; set; } = 120;
+
+        // ===== BP-007 匀速放气控制 =====
+
+        /// <summary>产品测量压力读取失败时的兜底起始压力（mmHg）</summary>
+        public double BP007DefaultStartPressure { get; set; } = 150;
+
+        /// <summary>放气速率计算区间上限（mmHg）：只取区间内采样点，避开起点波动</summary>
+        public double BP007RateSegmentHigh { get; set; } = 130;
+
+        /// <summary>放气速率计算区间下限（mmHg）：避开接近 0 的噪声</summary>
+        public double BP007RateSegmentLow { get; set; } = 30;
+
+        /// <summary>放气结束判定压力（mmHg）：压力降到该值以下即停止采样</summary>
+        public double BP007DeflateEndPressure { get; set; } = 20;
+
+        /// <summary>放气最长等待（秒）：超过即停止采样（兜底）</summary>
+        public int BP007MaxDeflateSeconds { get; set; } = 40;
+
+        /// <summary>泄放保持时长（秒）：维持慢释阀开启的窗口</summary>
+        public int BP007DeflateHoldSeconds { get; set; } = 60;
+
+        // ===== BP-008 快释放气功能 =====
+
+        /// <summary>快释测试充气目标压力（mmHg）</summary>
+        public double BP008TargetPressure { get; set; } = 300;
+
+        /// <summary>归零判定压力（mmHg）：压力降到该值以下视为已归零</summary>
+        public double BP008ZeroPressure { get; set; } = 2;
+
+        /// <summary>归零最长等待（秒）：超时按当前耗时上报（规格 ≤10s 判定在 Spec）</summary>
+        public int BP008ZeroTimeoutSeconds { get; set; } = 15;
+    }
+
     /// <summary>压力采样点（波形数据：相对开始时刻的秒数 + 压力值，单位跟随仪器设置）</summary>
     /// <param name="TimeSeconds">相对采样开始的秒数</param>
     /// <param name="Pressure">压力值（单位跟随仪器压力单位设置）</param>
-    public readonly record struct PressureSamplePoint(double TimeSeconds, double Pressure);
+    /// <param name="Segment">测试点段号（多点扫描项按测试点序号区分颜色；单次输出项为 0）</param>
+    public readonly record struct PressureSamplePoint(double TimeSeconds, double Pressure, int Segment = 0);
+
+    /// <summary>
+    /// BPA700 波形显示配置（按测试项名存放），随 instruments.json 持久化。
+    /// Y 轴固定 mmHg；X 轴模式与时间刻度可按项自定义。
+    /// </summary>
+    public class BpaWaveformDisplayConfig
+    {
+        /// <summary>按测试项名索引的波形显示配置（如 "BP-001充气时间"）</summary>
+        public Dictionary<string, BpaWaveformItemConfig> ItemConfigs { get; set; } = new();
+
+        /// <summary>获取指定测试项的波形配置；未配置时返回默认值</summary>
+        public BpaWaveformItemConfig GetItemConfig(string itemName)
+        {
+            if (ItemConfigs.TryGetValue(itemName, out var cfg)) return cfg;
+            return new BpaWaveformItemConfig();
+        }
+    }
+
+    /// <summary>单个血压测试项的波形显示配置</summary>
+    public class BpaWaveformItemConfig
+    {
+        /// <summary>X 轴模式：Time = 时间（秒），SampleIndex = 采样点序号</summary>
+        public string XAxisMode { get; set; } = "Time";
+
+        /// <summary>时间刻度（像素/秒），仅 XAxisMode=Time 时生效；≤0 使用默认 24</summary>
+        public double TimeScale { get; set; } = 24;
+    }
 }

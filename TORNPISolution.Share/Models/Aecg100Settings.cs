@@ -118,5 +118,145 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>DC 偏置值 mV（固定模式：300/0/-300；可变模式：-500~500）</summary>
         public int DCOffset { get; set; }
+
+        // ==================== ECG 呼吸调制配置（官方上位机 ECG 模式的 Respiration 参数） ====================
+
+        /// <summary>呼吸模式（AecgRespirationMode 位组合：0=Off, 1=基线, 2=幅度, 4=频率, 128=阻抗式）</summary>
+        public int DefaultRespirationMode { get; set; }
+
+        /// <summary>呼吸速率 BrPM（4~200，默认 15）</summary>
+        public int DefaultRespirationRate { get; set; } = 15;
+
+        /// <summary>呼吸幅度 milli-ohm（阻抗式 1000~5000，默认 2000 = 2.0ohm）</summary>
+        public int DefaultRespirationAmplitude { get; set; } = 2000;
+
+        /// <summary>呼吸比率：阻抗式 1~5（1:1~1:5）；调制式 -16~16% 变化量</summary>
+        public int DefaultRespirationRatio { get; set; } = 1;
+
+        // ==================== PPG 心率测试配置（需 PPG-1R-525 绿光模块在位） ====================
+        // PPG-001 脉搏率精度：仪器经绿光 LED 输出 PPG 波形（频率 = BPM/60），
+        // 产品光学传感器接收后计算心率，与设定值比对。
+
+        /// <summary>PPG 心率测试点（BPM，默认 60/80/100/120）</summary>
+        public List<int> PpgHeartRateTestPoints { get; set; } = new() { 60, 80, 100, 120 };
+
+        /// <summary>PPG 心率每档重复次数（默认 3）</summary>
+        public int PpgHeartRateRepeats { get; set; } = 3;
+
+        /// <summary>PPG 心率容差（BPM，默认 ±2）</summary>
+        public double PpgHeartRateTolerance { get; set; } = 2.0;
+
+        /// <summary>PPG 波形直流分量 mV（0~3000，默认 1000）</summary>
+        public double PpgVolDC { get; set; } = 1000;
+
+        /// <summary>PPG 主波（收缩峰）幅度 mV（AC+ACOffset 之和 ≤ 30）</summary>
+        public double PpgVolSP { get; set; } = 10;
+
+        /// <summary>PPG 重搏切迹幅度 mV</summary>
+        public double PpgVolDN { get; set; } = 6;
+
+        /// <summary>PPG 重搏波幅度 mV</summary>
+        public double PpgVolDP { get; set; } = 7;
+
+        /// <summary>PPG 主波时刻 ms</summary>
+        public int PpgTimeSP { get; set; } = 150;
+
+        /// <summary>PPG 重搏切迹时刻 ms</summary>
+        public int PpgTimeDN { get; set; } = 350;
+
+        /// <summary>PPG 重搏波时刻 ms</summary>
+        public int PpgTimeDP { get; set; } = 450;
+
+        /// <summary>PPG 心率每档采集时长 ms（默认 5000）</summary>
+        public int PpgCaptureTimeMs { get; set; } = 5000;
+
+        // ==================== SpO2 血氧模拟测试配置（需 PPG-2R-940 红光+红外模块在位） ====================
+        // SpO2 原理：产品按 R=(AC红/DC红)/(AC红外/DC红外) 经自身标定曲线换算 SpO2，
+        // 模拟指定 SpO2% 即按产品标定曲线反解出 R，再换算红光通道 AC 幅度（红外 AC 固定）。
+        // 默认标定曲线 SpO2 = A - B×R（常见线性近似），系数可按产品实际标定曲线修改。
+
+        /// <summary>SPO2-004 血氧饱和度精度测试点（%，默认 75/80/90/95/100）</summary>
+        public List<int> Spo2TestPoints { get; set; } = new() { 75, 80, 90, 95, 100 };
+
+        /// <summary>SPO2-005 脉搏率精度测试点（BPM，默认 40/60/80/100/120/160）</summary>
+        public List<int> Spo2PulseRateTestPoints { get; set; } = new() { 40, 60, 80, 100, 120, 160 };
+
+        /// <summary>SPO2-005 脉搏率测试时输出的参考血氧值（%，默认 98）</summary>
+        public int Spo2PulseRateRefSpo2 { get; set; } = 98;
+
+        /// <summary>SPO2-006 低氧范围精度测试点（%，默认 50/60/70）</summary>
+        public List<int> Spo2LowRangeTestPoints { get; set; } = new() { 50, 60, 70 };
+
+        /// <summary>SPO2-006 低氧范围容差（%，默认 ±3）</summary>
+        public double Spo2LowRangeTolerance { get; set; } = 3.0;
+
+        /// <summary>SpO2 模拟脉搏率（BPM，默认 75）</summary>
+        public int Spo2PulseRate { get; set; } = 75;
+
+        /// <summary>SpO2 容差（%，默认 ±2，参照 ISO 80601-2-61 精度要求）</summary>
+        public double Spo2Tolerance { get; set; } = 2.0;
+
+        /// <summary>SpO2 模式脉搏率容差（BPM，默认 ±2）</summary>
+        public double Spo2PulseRateTolerance { get; set; } = 2.0;
+
+        /// <summary>产品标定曲线系数 A：SpO2 = A - B×R（默认 110）</summary>
+        public double Spo2CalibrationA { get; set; } = 110;
+
+        /// <summary>产品标定曲线系数 B：SpO2 = A - B×R（默认 25）</summary>
+        public double Spo2CalibrationB { get; set; } = 25;
+
+        /// <summary>红外通道 AC 幅度 mV（红光 AC 按 R 比例计算，默认 10）</summary>
+        public double Spo2IrAcAmplitude { get; set; } = 10;
+
+        /// <summary>SpO2 双通道直流分量 mV（红/红外一致，默认 1000）</summary>
+        public double Spo2VolDC { get; set; } = 1000;
+
+        /// <summary>SpO2 每点采集时长 ms（默认 8000）</summary>
+        public int Spo2CaptureTimeMs { get; set; } = 8000;
+
+        /// <summary>
+        /// 按测试项名存放的波形配置。
+        /// 例如 "ECG-009a动态范围(无偏置)"、"ECG-010输入阻抗" 等。
+        /// 未配置的项使用代码内置默认值。
+        /// </summary>
+        public Dictionary<string, EcgWaveformItemConfig> WaveformItemConfigs { get; set; } = new();
+
+        /// <summary>获取指定测试项的波形配置；未配置时返回默认值对象</summary>
+        public EcgWaveformItemConfig GetWaveformConfig(string itemName)
+        {
+            if (WaveformItemConfigs.TryGetValue(itemName, out var cfg)) return cfg;
+            return new EcgWaveformItemConfig();
+        }
+
+        /// <summary>PPG LED 校准参数（红光/红外/绿光 × LED Level + Trigger Level）</summary>
+        public PpgLedCalibrationConfig LedCalibration { get; set; } = new();
+    }
+
+    /// <summary>
+    /// 单个 ECG 测试项的波形与显示配置。
+    /// 键值放在 <see cref="Aecg100Settings.WaveformItemConfigs"/> 中，按测试项名（如 ECG-009a...）查找。
+    /// 任何字段 ≤0 时使用默认值。
+    /// </summary>
+    public class EcgWaveformItemConfig
+    {
+        /// <summary>输出频率 Hz（ECG 波形频率或频率扫描起始频率）；≤0 表示使用代码默认</summary>
+        public double Frequency { get; set; } = -1;
+
+        /// <summary>波形采集时长（毫秒）；≤0 表示使用代码默认（一般 3000ms）</summary>
+        public int CaptureTimeMs { get; set; } = -1;
+
+        /// <summary>波形显示时间像素（像素/秒）；≤0 表示使用默认 24 px/s</summary>
+        public double TimeScale { get; set; } = -1;
+    }
+
+    /// <summary>PPG LED 校准参数：三通道（红光/红外/绿光）各自的 LED Level 和 Trigger Level（0~255）</summary>
+    public class PpgLedCalibrationConfig
+    {
+        public ushort RedLedLevel { get; set; } = 128;
+        public ushort RedTriggerLevel { get; set; } = 128;
+        public ushort IrLedLevel { get; set; } = 128;
+        public ushort IrTriggerLevel { get; set; } = 128;
+        public ushort GreenLedLevel { get; set; } = 128;
+        public ushort GreenTriggerLevel { get; set; } = 128;
     }
 }

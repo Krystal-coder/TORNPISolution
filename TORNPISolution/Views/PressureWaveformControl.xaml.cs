@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,13 +12,17 @@ namespace TORNPISolution.Views
 {
     /// <summary>
     /// 轻量自绘压力波形：固定时间刻度（像素/秒），只渲染当前可视时间窗口；
-    /// 进度条内置在图表底部（折叠行时整个面板隐藏，进度条自然不显示）；
-    /// 绘图区左键拖动/滚轮平移查看历史波形，底部进度条可拖动滑块跳转。
+    /// 进度条内置在图表底部（折叠行时整个面板隐藏）；
+    /// 滚轮以光标为锚点缩放，绘图区左键拖动/底部进度条平移查看历史波形；
+    /// 多点扫描项按测试点段号分色绘制，悬停提示附测试点序号。
     /// </summary>
     public partial class PressureWaveformControl : UserControl
     {
-        /// <summary>固定时间刻度：像素/秒</summary>
-        private const double PixelsPerSecond = 24;
+        /// <summary>固定时间刻度：像素/秒（可在 XAML 中按测试项绑定）</summary>
+        public static readonly DependencyProperty PixelsPerSecondProperty = DependencyProperty.Register(
+            nameof(PixelsPerSecond), typeof(double), typeof(PressureWaveformControl),
+            new PropertyMetadata(24.0, OnPixelsPerSecondChanged));
+
         /// <summary>底部轴区高度（时间刻度 + 内置进度条）</summary>
         private const double AxisHeight = 22;
         /// <summary>绘图区内边距</summary>
@@ -41,6 +46,33 @@ namespace TORNPISolution.Views
         private bool _hasScrollbar;
         private double _sbTrackX0, _sbTrackW, _sbThumbX, _sbThumbW, _sbY;
 
+        /// <summary>滚轮缩放倍数；有效时间刻度 = PixelsPerSecond × _zoom，夹在 [2, 480] 像素/秒</summary>
+        private double _zoom = 1.0;
+        /// <summary>当前数据是否含多个测试点段（多段按段着色，悬停提示附段号）</summary>
+        private bool _multiSegment;
+
+        private const double MinEffectivePps = 2.0;
+        private const double MaxEffectivePps = 480.0;
+
+        /// <summary>多测试点波形配色（按段号循环取色；单段用第一色即原蓝色）</summary>
+        private static readonly Brush[] SegmentBrushes = CreateSegmentBrushes();
+
+        private static Brush[] CreateSegmentBrushes()
+        {
+            var colors = new[] { "#1565C0", "#E8590C", "#2F9E44", "#9C36B5", "#E03131", "#1098AD", "#F08C00", "#5C7CFA" };
+            var brushes = new Brush[colors.Length];
+            for (var i = 0; i < colors.Length; i++)
+            {
+                var b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colors[i]));
+                b.Freeze();
+                brushes[i] = b;
+            }
+            return brushes;
+        }
+
+        /// <summary>有效时间刻度（像素/秒）：基础刻度 × 滚轮缩放倍数</summary>
+        private double EffectivePps => Math.Clamp(PixelsPerSecond * _zoom, MinEffectivePps, MaxEffectivePps);
+
         private enum DragMode { None, Pan, Scrollbar }
 
         public PressureWaveformControl()
@@ -52,6 +84,10 @@ namespace TORNPISolution.Views
             nameof(Samples), typeof(IReadOnlyList<PressureSamplePoint>), typeof(PressureWaveformControl),
             new PropertyMetadata(null, OnSamplesChanged));
 
+        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(
+            nameof(Unit), typeof(string), typeof(PressureWaveformControl),
+            new PropertyMetadata("mmHg", OnUnitChanged));
+
         /// <summary>采样点集合（时间单调递增）</summary>
         public IReadOnlyList<PressureSamplePoint>? Samples
         {
@@ -59,23 +95,44 @@ namespace TORNPISolution.Views
             set => SetValue(SamplesProperty, value);
         }
 
+        /// <summary>波形幅值单位（默认 mmHg，ECG 可设为 μV/mV 等）</summary>
+        public string Unit
+        {
+            get => (string)GetValue(UnitProperty);
+            set => SetValue(UnitProperty, value);
+        }
+
+        /// <summary>时间刻度（像素/秒，默认 24）</summary>
+        public double PixelsPerSecond
+        {
+            get => (double)GetValue(PixelsPerSecondProperty);
+            set => SetValue(PixelsPerSecondProperty, value);
+        }
+
         private static void OnSamplesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((PressureWaveformControl)d).Redraw();
+
+        private static void OnUnitChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((PressureWaveformControl)d).Redraw();
+
+        private static void OnPixelsPerSecondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             => ((PressureWaveformControl)d).Redraw();
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e) => Redraw();
 
-        /// <summary>重绘：只渲染 [_viewOffset, _viewOffset + 窗口时长] 内的点，并更新刻度与进度条</summary>
+        /// <summary>渲染 [_viewOffset, _viewOffset + 窗口时长] 内的点，并更新刻度与进度条</summary>
         private void Redraw()
         {
             var pts = Samples;
             var w = ActualWidth;
             var h = ActualHeight;
             AxisCanvas.Children.Clear();
+            WaveLayer.Children.Clear();
 
             if (pts == null || pts.Count < 2 || w < DrawPadding * 2 + 20 || h < AxisHeight + 20)
             {
                 _hasData = false;
-                WavePolyline.Points.Clear();
+                _multiSegment = false;
                 EmptyText.Visibility = Visibility.Visible;
                 DurationLabel.Text = "";
                 HideHover();
@@ -103,8 +160,9 @@ namespace TORNPISolution.Views
             _pMin -= pad;
             _pRange = Math.Max(pMax + pad - _pMin, 1);
 
-            // 可视窗口与偏移（实时采样默认贴最新端）
-            var windowSpan = drawW / PixelsPerSecond;
+            // 可视窗口与偏移（实时采样默认贴最新端；缩放后按有效刻度换算窗口时长）
+            var pps = EffectivePps;
+            var windowSpan = drawW / pps;
             var maxOffset = Math.Max(0, totalSpan - windowSpan);
             if (_followLatest) _viewOffset = maxOffset;
             _viewOffset = Math.Clamp(_viewOffset, 0, maxOffset);
@@ -117,36 +175,41 @@ namespace TORNPISolution.Views
 
             DrawGridAndTicks(w, drawW, drawH, t0, t1);
 
-            // 波形：二分定位可视区间 [lo, hi]，前后各扩一点保证连续
-            var lo = LowerBound(pts, t0);
-            var hi = LowerBound(pts, t1);
-            if (lo > 0) lo--;
-            if (hi < pts.Count - 1) hi++;
-            var points = new PointCollection(hi - lo + 1);
-            for (var i = lo; i <= hi; i++)
+            // 波形：按测试点段号分组绘制（同段同色，单段保持原蓝色）；
+            // 窗口两侧各扩 2px 对应时长，保证曲线在视窗边缘连续
+            _multiSegment = false;
+            var collections = new Dictionary<int, PointCollection>();
+            var margin = 2.0 / pps;
+            for (var i = 0; i < pts.Count; i++)
             {
-                points.Add(new Point(
-                    DrawPadding + (pts[i].TimeSeconds - t0) * PixelsPerSecond,
+                var seg = pts[i].Segment;
+                if (seg > 0) _multiSegment = true;
+                var t = pts[i].TimeSeconds;
+                if (t < t0 - margin || t > t1 + margin) continue;
+                if (!collections.TryGetValue(seg, out var col))
+                {
+                    col = new PointCollection();
+                    collections[seg] = col;
+                }
+                col.Add(new Point(
+                    DrawPadding + (t - t0) * pps,
                     PressureToY(pts[i].Pressure, drawH)));
             }
-            WavePolyline.Points = points;
+            foreach (var kv in collections.OrderBy(kv => kv.Key))
+            {
+                WaveLayer.Children.Add(new Polyline
+                {
+                    Points = kv.Value,
+                    Stroke = SegmentBrushes[kv.Key % SegmentBrushes.Length],
+                    StrokeThickness = 1.4
+                });
+            }
 
             DrawScrollbar(w, drawW, totalSpan, windowSpan, maxOffset);
         }
 
         private double PressureToY(double p, double drawH)
             => DrawPadding + (1 - (p - _pMin) / _pRange) * drawH;
-
-        private static int LowerBound(IReadOnlyList<PressureSamplePoint> pts, double t)
-        {
-            int l = 0, r = pts.Count;
-            while (l < r)
-            {
-                var m = (l + r) >> 1;
-                if (pts[m].TimeSeconds < t) l = m + 1; else r = m;
-            }
-            return Math.Min(l, pts.Count - 1);
-        }
 
         /// <summary>横向网格线 + 可视窗口内时间刻度</summary>
         private void DrawGridAndTicks(double w, double drawW, double drawH, double t0, double t1)
@@ -189,14 +252,15 @@ namespace TORNPISolution.Views
         }
 
         /// <summary>选刻度间隔：固定时间刻度下取间距≥60px 的最小候选</summary>
-        private static double PickTick()
+        private double PickTick()
         {
+            var pps = EffectivePps;
             foreach (var c in TickCandidates)
-                if (c * PixelsPerSecond >= 60) return c;
+                if (c * pps >= 60) return c;
             return TickCandidates[^1];
         }
 
-        /// <summary>内置横向进度条：轨道 + 滑块（内容比窗口长时才显示）</summary>
+        /// <summary>内置横向进度条：轨道 + 滑块</summary>
         private void DrawScrollbar(double w, double drawW, double totalSpan, double windowSpanSec, double maxOffset)
         {
             _hasScrollbar = maxOffset > 0.05;
@@ -236,7 +300,7 @@ namespace TORNPISolution.Views
             var pts = Samples;
             if (pts == null || pts.Count < 2) return 0;
             var totalSpan = Math.Max(0.1, pts[pts.Count - 1].TimeSeconds - pts[0].TimeSeconds);
-            var windowSpan = (ActualWidth - DrawPadding * 2) / PixelsPerSecond;
+            var windowSpan = (ActualWidth - DrawPadding * 2) / EffectivePps;
             return Math.Max(0, totalSpan - windowSpan);
         }
 
@@ -283,7 +347,7 @@ namespace TORNPISolution.Views
             if (_dragMode == DragMode.Pan)
             {
                 var maxOffset = CurrentMaxOffset();
-                SetOffset(_dragStartOffset - (pos.X - _dragStartX) / PixelsPerSecond, maxOffset);
+                SetOffset(_dragStartOffset - (pos.X - _dragStartX) / EffectivePps, maxOffset);
                 HideHover();
                 Redraw();
                 return;
@@ -313,8 +377,18 @@ namespace TORNPISolution.Views
         {
             base.OnPreviewMouseWheel(e);
             if (!_hasData) return;
-            var maxOffset = CurrentMaxOffset();
-            SetOffset(_viewOffset + (e.Delta < 0 ? 2 : -2), maxOffset);
+
+            // 滚轮缩放（锚定光标下的时刻：缩放前后该时刻仍停留在光标处）
+            var pos = e.GetPosition(this);
+            var oldPps = EffectivePps;
+            var factor = e.Delta > 0 ? 1.25 : 0.8;
+            _zoom = Math.Clamp(_zoom * factor, MinEffectivePps / PixelsPerSecond, MaxEffectivePps / PixelsPerSecond);
+            var newPps = EffectivePps;
+            if (Math.Abs(newPps - oldPps) > 1e-9)
+            {
+                var tCursor = _viewOffset + (pos.X - DrawPadding) / oldPps;   // 相对数据起点（秒）
+                SetOffset(tCursor - (pos.X - DrawPadding) / newPps, CurrentMaxOffset());
+            }
             HideHover();
             Redraw();
             e.Handled = true;
@@ -338,10 +412,11 @@ namespace TORNPISolution.Views
             }
 
             // 视口横坐标 → 时间（含窗口偏移）→ 最近采样点
-            var t = _tMin + _viewOffset + (pos.X - DrawPadding) / PixelsPerSecond;
+            var pps = EffectivePps;
+            var t = _tMin + _viewOffset + (pos.X - DrawPadding) / pps;
             var idx = BinarySearchNearest(pts, t);
             var sp = pts[idx];
-            var contentX = DrawPadding + (sp.TimeSeconds - _tMin - _viewOffset) * PixelsPerSecond;
+            var contentX = DrawPadding + (sp.TimeSeconds - _tMin - _viewOffset) * pps;
             var y = PressureToY(sp.Pressure, drawH);
 
             if (contentX < DrawPadding || contentX > ActualWidth - DrawPadding)
@@ -359,7 +434,9 @@ namespace TORNPISolution.Views
             Canvas.SetLeft(CrosshairDot, contentX - 3.5);
             Canvas.SetTop(CrosshairDot, y - 3.5);
 
-            HoverTipText.Text = $"{sp.TimeSeconds:0.0}s，{sp.Pressure:0.0} mmHg";
+            var unitSuffix = string.IsNullOrEmpty(Unit) ? "" : $" {Unit}";
+            var segSuffix = _multiSegment ? $"（第{sp.Segment + 1}点）" : "";
+            HoverTipText.Text = $"{sp.TimeSeconds:0.0}s，{sp.Pressure:0.0}{unitSuffix}{segSuffix}";
             HoverTip.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             var tipX = contentX + 10;
             var tipY = y - HoverTip.DesiredSize.Height - 8;

@@ -1,5 +1,6 @@
 using GongSolutions.Wpf.DragDrop;
 using HandyControl.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -27,10 +28,14 @@ namespace TORNPISolution.ViewModels
         private bool _isLibraryVisible = false;
         private bool _isRunning;
         private string _currentPlanName = string.Empty;
-        // 运行期间的取消令牌：点"停止"时 Cancel，各模块方法内部据此尽快退出
+        // 运行期间的取消令牌：点"停止"时 Cancel
         private CancellationTokenSource? _runCts;
 
-        public MainViewModel() : this(new Spec(), new TestItem(), new TestPlanService())
+        // XAML <vm:MainViewModel/> 要求无参构造：依赖从 App 组合根解析（Spec/TestItem 均为单例，事件订阅同一实例）
+        public MainViewModel()
+            : this(App.Services.GetRequiredService<ITestModuleService>(),
+                   App.Services.GetRequiredService<ITestItemService>(),
+                   App.Services.GetRequiredService<ITestPlanService>())
         {
         }
 
@@ -38,7 +43,7 @@ namespace TORNPISolution.ViewModels
         {
             _testItemService = testItemService;
             _moduleService = moduleService;
-            _testPlanService = testPlanService ?? new TestPlanService();
+            _testPlanService = testPlanService ?? App.Services.GetRequiredService<ITestPlanService>();
 
             AvailableModules = new ObservableCollection<TestModuleViewModel>(
                 moduleService.GetAllModules().Select(m => new TestModuleViewModel(m)));
@@ -522,8 +527,7 @@ namespace TORNPISolution.ViewModels
                     foreach (var item in module.Items.Where(it => !it.Model.Det))
                         _log.Info($"[TestItem{module.Sequence} {module.Name}] {item.Name} = TBD，跳过");
 
-                    // 逐项完成回调：测试模块在后台线程执行，此回调也在后台线程触发，
-                    // 必须 Dispatcher.Invoke 回 UI 线程更新绑定属性，UI 线程空闲即可立即渲染
+
                     async Task OnItemCompleted(string itemName, TestItemResult result)
                     {
                         var item = module.Items.FirstOrDefault(it => it.Name == itemName);
@@ -535,22 +539,22 @@ namespace TORNPISolution.ViewModels
                         await Task.Delay(300, token);
                     }
 
-                    // 关键：在后台线程执行整个测试模块，UI 线程完全空闲处理渲染
+                    // 在后台线程执行整个测试模块，UI 线程完全空闲处理渲染
                     var results = await Task.Run(() =>
                         _testItemService.TestItemxx(module.Sequence, module.Model, OnItemCompleted, token), token);
                     FlushWaveform();   // 模块跑完立刻刷出最后一批采样点，波形显示完整
 
-                    // 补充：回调未覆盖的项（模块方法未写入结果的项）填 0 -> FAIL（需回 UI 线程）
+                    // 回调未覆盖的项（模块方法未写入结果的项）强制判 FAIL（需回 UI 线程）
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         foreach (var item in module.Items)
                         {
-                            if (!item.Model.Det) continue;   // TBD 已预跳过
+                            if (!item.Model.Det) continue;   // TBD 项保持"未测试"，不强制 FAIL
                             if (results.ContainsKey(item.Name) && item.Result != TestResultStatus.NotTested) continue;
                             if (item.Result == TestResultStatus.NotTested)
                             {
-                                item.MeasuredValue = 0;
-                                _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} 未报告结果，填 0 -> FAIL");
+                                item.MarkNotReportedAsFail();
+                                _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} 未报告结果，强制判 FAIL");
                             }
                         }
                     });
@@ -563,7 +567,6 @@ namespace TORNPISolution.ViewModels
             }
             catch (OperationCanceledException)
             {
-                // 用户点了"停止"：已回填的结果保留，未执行的模块保持未测状态
                 NotifyPlanResultChanged();
                 _log.Warn("===== 测试方案已停止 =====");
             }

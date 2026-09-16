@@ -59,7 +59,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- ====== 包络曲线预览 + 右侧图例（仿官方上位机） ====== -->
+            <!-- ====== 包络曲线预览 + 右侧图例  ====== -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

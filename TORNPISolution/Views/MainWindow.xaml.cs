@@ -244,6 +244,13 @@ namespace TORNPISolution.Views
             window.ShowDialog();
         }
 
+        /// <summary>配置 → 协议命令配置：打开产品串口协议命令码配置对话框（需密码验证）</summary>
+        private void MenuProtocolCommandConfig_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new ProtocolCommandConfigWindow { Owner = this };
+            window.ShowDialog();
+        }
+
         /// <summary>文件 → 保存方案</summary>
         private void MenuSavePlan_Click(object sender, RoutedEventArgs e)
         {

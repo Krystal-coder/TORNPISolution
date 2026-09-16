@@ -37,5 +37,20 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>ECG 信号质量与波形（ECG-009~012：动态范围/输入阻抗/增益准确性/频率响应）</summary>
         public const string EcgSignalQualityTest = "M10";
+
+        /// <summary>PPG 脉搏率模拟测试（PPG-001，需 PPG-1R-525 绿光模块在位）</summary>
+        public const string PpgHeartRateTest = "M11";
+
+        /// <summary>SpO2 测量模块（SPO2-001 测量启动与停止 / SPO2-002 手指脱落检测 / SPO2-003 低氧报警，需 PPG-2R-940 红光+红外模块在位）</summary>
+        public const string Spo2MeasurementTest = "M12";
+
+        /// <summary>SpO2 精度检测（SPO2-004 血氧饱和度精度 / SPO2-005 脉搏率精度 / SPO2-006 低氧范围精度）</summary>
+        public const string Spo2AccuracyTest = "M13";
+
+        /// <summary>SpO2 灌注与抗干扰测试（SPO2-008 弱灌注能力 / SPO2-009 弱灌注提示 / SPO2-010 环境光抗干扰）</summary>
+        public const string Spo2PerfusionTest = "M14";
+
+        /// <summary>充电测试（充电状态判断 / 当前电池电量测量 / 电池百分比获取）</summary>
+        public const string ChargingTest = "M15";
     }
 }

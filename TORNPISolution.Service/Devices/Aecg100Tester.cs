@@ -57,6 +57,22 @@ namespace TORNPISolution.Service.Devices
         Ppg = 3
     }
 
+    /// <summary>PPG 模块类型（由 WTQGetPPGDeviceInformation 的 LED 类型判定）</summary>
+    public enum AecgPpgModuleKind
+    {
+        /// <summary>未检测到 PPG 模块</summary>
+        None = 0,
+
+        /// <summary>单绿光模块（PPG-1R-525，用于 PPG 心率模拟）</summary>
+        Green = 1,
+
+        /// <summary>红光+红外双 LED 模块（PPG-2R-880/PPG-2R-940/PPG-2TF-660，用于 SpO2 模拟）</summary>
+        RedIr = 2,
+
+        /// <summary>已检测到模块但 LED 组合无法归类</summary>
+        Unknown = 3
+    }
+
     /// <summary>输出电极：RA / LA</summary>
     public enum AecgElectrode
     {
@@ -963,6 +979,62 @@ namespace TORNPISolution.Service.Devices
         /// <summary>PPG 模块序列号</summary>
         public string? GetPpgSerialNumber() => Marshal.PtrToStringAnsi(WTQGetPPGSerialNumber());
 
+        /// <summary>
+        /// 检测当前连接的 PPG 模块类型。
+        /// 返回值：null 表示未检测到 PPG 模块；否则返回模块类型描述。
+        /// 判断依据：WTQGetPPGDeviceInformation 成功且 LED 类型不为空。
+        /// </summary>
+        public string? DetectPpgModule()
+        {
+            var kind = DetectPpgModuleKind();
+            return kind switch
+            {
+                AecgPpgModuleKind.None => null,
+                AecgPpgModuleKind.Green => "PPG-1R-525 (Green)",
+                AecgPpgModuleKind.RedIr => "PPG-2R-880/PPG-2R-940/PPG-2TF-660 (Red+IR)",
+                _ => $"Unknown PPG module (LEDs: {DescribeLeds()})"
+            };
+        }
+
+        /// <summary>
+        /// 结构化检测当前在位的 PPG 模块类型（供测试模块在位校验用）。
+        /// AECG100 主机同一时刻只接一个 PPG 模块：绿光模块做 PPG 心率，红+红外模块做 SpO2，
+        /// 测试前调用本方法确认在位模块与测试需求匹配，不匹配时提示更换模块。
+        /// </summary>
+        public AecgPpgModuleKind DetectPpgModuleKind()
+        {
+            if (!IsConnected)
+                return AecgPpgModuleKind.None;
+
+            if (!WTQGetPPGDeviceInformation(out var m))
+                return AecgPpgModuleKind.None;
+
+            var info = FromNative(m);
+            var leds = new[] { info.LedType1, info.LedType2, info.LedType3 }
+                .Where(t => t != AecgLedType.None)
+                .ToList();
+
+            if (leds.Count == 0)
+                return AecgPpgModuleKind.None;
+
+            if (leds.Contains(AecgLedType.Green))
+                return AecgPpgModuleKind.Green;
+
+            if (leds.Contains(AecgLedType.Red) && leds.Contains(AecgLedType.Ir))
+                return AecgPpgModuleKind.RedIr;
+
+            return AecgPpgModuleKind.Unknown;
+        }
+
+        /// <summary>当前模块 LED 组合描述（日志用）</summary>
+        private string DescribeLeds()
+        {
+            if (!WTQGetPPGDeviceInformation(out var m)) return "N/A";
+            var info = FromNative(m);
+            return string.Join(",", new[] { info.LedType1, info.LedType2, info.LedType3 }
+                .Where(t => t != AecgLedType.None));
+        }
+
         private static AecgModelInformation FromNative(MODEL_INFORMATION m)
             => new(
                 $"{(char)m.ProductName0}{(char)m.ProductName1}",
@@ -1024,6 +1096,16 @@ namespace TORNPISolution.Service.Devices
             var w1 = ToNative(ch1);
             var w2 = ToNative(ch2);
             return WTQOutputPPGEx(ref w1, ref w2, Wrap(onData1), Wrap(onData2));
+        }
+
+        /// <summary>输出三通道 PPG（单 LED 模块须用本接口）</summary>
+        public bool OutputPpg3(AecgPpgWaveform ch1, AecgPpgWaveform ch2, AecgPpgWaveform ch3,
+            Action<double, int, int>? onData1 = null, Action<double, int, int>? onData2 = null, Action<double, int, int>? onData3 = null)
+        {
+            var w1 = ToNative(ch1);
+            var w2 = ToNative(ch2);
+            var w3 = ToNative(ch3);
+            return WTQOutputPPG3(ref w1, ref w2, ref w3, Wrap(onData1), Wrap(onData2), Wrap(onData3));
         }
 
         /// <summary>ECG 频率扫描（变频正弦波）</summary>
@@ -1122,6 +1204,18 @@ namespace TORNPISolution.Service.Devices
         {
             var data = BuildRawData(sampleRate, ac, dc, sync, onData);
             return WTQWaveformPlayerOutputPPG((int)channel, ref data);
+        }
+
+        /// <summary>回放原始数据到双通道 PPG（SpO2 红光/红外）</summary>
+        public bool PlayRawDataPpgEx(
+            double ch1SampleRate, double[] ch1Ac, double[] ch1Dc,
+            double ch2SampleRate, double[] ch2Ac, double[] ch2Dc,
+            AecgSyncPulse sync,
+            Action<double, int, int>? onCh1 = null, Action<double, int, int>? onCh2 = null)
+        {
+            var d1 = BuildRawData(ch1SampleRate, ch1Ac, ch1Dc, sync, onCh1);
+            var d2 = BuildRawData(ch2SampleRate, ch2Ac, ch2Dc, sync, onCh2);
+            return WTQWaveformPlayerOutputPPGEx(ref d1, ref d2);
         }
 
         private PLAY_RAW_DATA BuildRawData(double sampleRate, double[] ac, double[] dc, AecgSyncPulse sync, Action<double, int, int>? onData)

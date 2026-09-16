@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              FontFamily="Microsoft YaHei UI">
 
-    <!-- 包络曲线预览（仿官方上位机）：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100，
-         x 轴八点连成钟形包络，彩色标记 + 点名标签全部由代码绘制到 RootCanvas -->
+    <!-- 包络曲线预览：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100 -->
     <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
             CornerRadius="4" Background="White">
         <Grid>

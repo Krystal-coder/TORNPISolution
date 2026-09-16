@@ -1,0 +1,75 @@
+{
+  "CtrlGetVersion": {
+    "Code": 114,
+    "Description": "读版本/MAC"
+  },
+  "CtrlSetMode": {
+    "Code": 115,
+    "Description": "设置测试模式"
+  },
+  "CtrlGetState": {
+    "Code": 116,
+    "Description": "读测试状态"
+  },
+  "CtrlStartInflate": {
+    "Code": 117,
+    "Description": "开始充气"
+  },
+  "CtrlGetPressure": {
+    "Code": 118,
+    "Description": "读当前压力值"
+  },
+  "CtrlStartDeflate": {
+    "Code": 119,
+    "Description": "开始放气"
+  },
+  "CtrlInflateStop": {
+    "Code": 120,
+    "Description": "充放气停止"
+  },
+  "CtrlStartBpMeasure": {
+    "Code": 121,
+    "Description": "开始血压测量"
+  },
+  "CtrlGetBpValue": {
+    "Code": 122,
+    "Description": "读瞬时血压值"
+  },
+  "CtrlGetBpResult": {
+    "Code": 123,
+    "Description": "读血压测量最终结果/测量完成主动推送"
+  },
+  "CtrlGetHrValue": {
+    "Code": 124,
+    "Description": "读心率值"
+  },
+  "CtrlStopBpMeasure": {
+    "Code": 125,
+    "Description": "停止血压测量"
+  },
+  "CtrlGetStaticPress": {
+    "Code": 126,
+    "Description": "读静态压力值"
+  },
+  "CtrlStartSpo2": {
+    "Code": 128,
+    "Description": "开始/停止血氧测量"
+  },
+  "CtrlGetSpo2Value": {
+    "Code": 129,
+    "Description": "读血氧值"
+  },
+  "CtrlGetLeadState": {
+    "Code": 136,
+    "Description": "读导联状态"
+  },
+  "CtrlGetBatteryInfo": {
+    "Code": 108,
+    "Description": "读电池信息（电压+百分比）"
+  },
+  "CtrlGetChargingStatus": {
+    "Code": 109,
+    "FuncCode": 7,
+    "Description": "读充电状态"
+  }
+}

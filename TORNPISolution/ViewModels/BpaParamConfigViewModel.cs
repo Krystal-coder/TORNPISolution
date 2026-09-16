@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
 using TORNPISolution.Service;
@@ -16,7 +17,8 @@ namespace TORNPISolution.ViewModels
         private readonly IInstrumentConfigService _configService;
         private readonly ILogService _log = new LogService(nameof(BpaParamConfigViewModel));
 
-        public BpaParamConfigViewModel() : this(new InstrumentConfigService())
+       // 实例化
+        public BpaParamConfigViewModel() : this(App.Services.GetRequiredService<IInstrumentConfigService>())
         {
         }
 
@@ -228,6 +230,81 @@ namespace TORNPISolution.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand AddPointCommand { get; }
         public RelayCommand<BpaPressurePoint> RemovePointCommand { get; }
+
+        // ==================== 波形显示配置 ====================
+
+        /// <summary>X 轴模式下拉项</summary>
+        public List<string> XAxisModes { get; } = new() { "Time", "SampleIndex" };
+
+        /// <summary>带波形的血压测试项名称列表（与 Spec 中 showWaveform:true 的 BP- 项一致）</summary>
+        public List<string> WaveformItemNames { get; } = new()
+        {
+            "BP-001充气时间",
+            "BP-002放气时间",
+            "BP-003静态压力精度测试",
+            "BP-004收缩压精度测试",
+            "BP-006过压保护触发压力",
+            "BP-007快速放气速率",
+            "BP-008放气时间",
+            "BP-009过压保护响应"
+        };
+
+        private string? _selectedWaveformItem;
+
+        /// <summary>当前选中的波形测试项</summary>
+        public string SelectedWaveformItem
+        {
+            get => _selectedWaveformItem ?? WaveformItemNames[0];
+            set
+            {
+                if (_selectedWaveformItem == value) return;
+                _selectedWaveformItem = value;
+                OnPropertyChanged(nameof(SelectedWaveformItem));
+                OnPropertyChanged(nameof(SelectedXAxisMode));
+                OnPropertyChanged(nameof(SelectedTimeScale));
+                OnPropertyChanged(nameof(IsTimeXAxis));
+            }
+        }
+
+        /// <summary>选中项的 X 轴模式</summary>
+        public string SelectedXAxisMode
+        {
+            get => Params.WaveformDisplay.GetItemConfig(SelectedWaveformItem).XAxisMode;
+            set
+            {
+                var cfg = GetOrCreateWaveformConfig(SelectedWaveformItem);
+                if (cfg.XAxisMode == value) return;
+                cfg.XAxisMode = value;
+                OnPropertyChanged(nameof(SelectedXAxisMode));
+                OnPropertyChanged(nameof(IsTimeXAxis));
+            }
+        }
+
+        /// <summary>选中项的时间刻度（像素/秒）</summary>
+        public double SelectedTimeScale
+        {
+            get => Params.WaveformDisplay.GetItemConfig(SelectedWaveformItem).TimeScale;
+            set
+            {
+                var cfg = GetOrCreateWaveformConfig(SelectedWaveformItem);
+                if (Math.Abs(cfg.TimeScale - value) < 0.01) return;
+                cfg.TimeScale = value;
+                OnPropertyChanged(nameof(SelectedTimeScale));
+            }
+        }
+
+        /// <summary>X 轴模式是否为 Time（控制时间刻度输入框可用性）</summary>
+        public bool IsTimeXAxis => SelectedXAxisMode == "Time";
+
+        private BpaWaveformItemConfig GetOrCreateWaveformConfig(string itemName)
+        {
+            if (!Params.WaveformDisplay.ItemConfigs.TryGetValue(itemName, out var cfg))
+            {
+                cfg = new BpaWaveformItemConfig();
+                Params.WaveformDisplay.ItemConfigs[itemName] = cfg;
+            }
+            return cfg;
+        }
 
         /// <summary>保存：压力点列表写回配置后整体落盘 instruments.json</summary>
         private void Save()

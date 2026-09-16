@@ -36,12 +36,107 @@
     "Category": "Neonatal",
     "PressureUnit": "mmHg",
     "AirReservoir": "100ml",
+    "StaticPressureTimeoutSeconds": 180,
+    "TestParams": {
+      "StaticPressure": {
+        "BpaInflation": true,
+        "MeasureSeconds": 5,
+        "Points": [
+          {
+            "Enabled": true,
+            "Value": 200
+          },
+          {
+            "Enabled": true,
+            "Value": 150
+          },
+          {
+            "Enabled": true,
+            "Value": 100
+          }
+        ]
+      },
+      "DynamicBloodPressure": {
+        "Method": "Default",
+        "Category": "Adult",
+        "DefaultBpPreset": "120/80(93)",
+        "Systolic": 120,
+        "Diastolic": 80,
+        "HeartRate": 60,
+        "PulseVolume": 0.5,
+        "EnvelopSystolic": 0,
+        "EnvelopDiastolic": 0,
+        "SettingPoint2": 156,
+        "StartPressure": 136,
+        "MeanArterialPressure2": 97,
+        "MeanArterialPressure1": 93,
+        "EndPressure": 71,
+        "SettingPoint1": 51,
+        "SystolicRate": 53,
+        "MeanAriterialRate1": 97,
+        "MeanAriterialRate2": 100,
+        "DiastolicRate": 45,
+        "OffsetRate": 15
+      },
+      "Overpressure": {
+        "BpaInflation": true,
+        "TargetPressure": 350,
+        "Threshold1": 300,
+        "Threshold2": 320
+      },
+      "CuffTest": {
+        "WaitStartTimeoutSeconds": 30,
+        "TotalTimeoutSeconds": 60,
+        "MaxDeflationSeconds": 10
+      }
+    },
     "PortName": "COM7",
     "BaudRate": 115200,
     "Parity": "None",
     "DataBits": 8,
     "StopBits": 1,
     "SlaveId": 1
+  },
+  "Aecg100Tester": {
+    "Enabled": false,
+    "PortName": "",
+    "ConnectTimeoutMs": 5000,
+    "DefaultWaveformType": 6,
+    "DefaultAmplitude": 1,
+    "DefaultTWave": 0.2,
+    "DefaultPWave": 0.2,
+    "DefaultSTSegment": 0,
+    "DefaultTimePeriod": 1000,
+    "DefaultPRInterval": 160,
+    "DefaultQRSDuration": 100,
+    "DefaultTDuration": 180,
+    "DefaultQTInterval": 350,
+    "DefaultPulseWidth": 100,
+    "DefaultElectrode": 0,
+    "HeartRateTestPoints": [
+      40,
+      60,
+      80,
+      100,
+      120,
+      160
+    ],
+    "HeartRateRepeats": 3,
+    "HeartRateTolerance": 2,
+    "NoiseAmplitude": 0,
+    "NoiseFrequency": 0,
+    "ImpedanceEnabled": false,
+    "PacingEnabled": false,
+    "PacingAmplitude": 2,
+    "PacingDuration": 2,
+    "PacingRate": 60,
+    "FrequencyScanAmplitude": 1,
+    "FrequencyScanStart": 0.5,
+    "FrequencyScanFinish": 150,
+    "FrequencyScanDuration": 30,
+    "DCOffsetVariable": false,
+    "DCOffset": 0,
+    "WaveformItemConfigs": {}
   },
   "NfcReader": {
     "PortName": "COM1",

@@ -7,10 +7,10 @@
         <!-- 网格线 / 时间刻度 / 内置横向进度条 -->
         <Canvas x:Name="AxisCanvas"/>
 
-        <!-- 波形曲线（只绘制当前可视时间窗口内的点） -->
-        <Polyline x:Name="WavePolyline" Stroke="#1565C0" StrokeThickness="1.4"/>
+        <!-- 波形曲线（按测试点分段着色，只绘制当前可视时间窗口内的点） -->
+        <Canvas x:Name="WaveLayer"/>
 
-        <!-- 悬停覆盖层：十字线 + 气泡（不拦截鼠标） -->
+        <!-- 悬停覆盖层：十字线 + 气泡 -->
         <Canvas x:Name="HoverLayer" IsHitTestVisible="False">
             <Line x:Name="CrosshairV" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
             <Line x:Name="CrosshairH" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
@@ -23,11 +23,11 @@
         <!-- 量程标注 -->
         <StackPanel Orientation="Horizontal" Margin="6,2,0,0">
             <TextBlock x:Name="MaxLabel" Text="300" FontSize="10" Foreground="#9E9E9E"/>
-            <TextBlock Text=" mmHg" FontSize="10" Foreground="#9E9E9E"/>
+            <TextBlock FontSize="10" Foreground="#9E9E9E" Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat=' {0}'}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="6,0,0,22" VerticalAlignment="Bottom">
             <TextBlock x:Name="MinLabel" Text="0" FontSize="10" Foreground="#9E9E9E"/>
-            <TextBlock Text=" mmHg" FontSize="10" Foreground="#9E9E9E"/>
+            <TextBlock FontSize="10" Foreground="#9E9E9E" Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat=' {0}'}"/>
         </StackPanel>
 
         <!-- 右下角：总时长标注 -->
