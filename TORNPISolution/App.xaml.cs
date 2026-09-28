@@ -50,6 +50,8 @@ namespace TORNPISolution
             services.AddSingleton<IInstrumentConfigService, InstrumentConfigService>();
             services.AddSingleton(_ => HardwareManager.Instance);
             services.AddSingleton<ITestModuleService, Spec>();
+            // 血压模拟仪方案级共享会话：RunPlan 开始建立/结束关闭，TestItem 各模块借用同一连接
+            services.AddSingleton<BloodPressureSimulatorSession>();
             services.AddSingleton<ITestItemService, TestItem>();
             services.AddSingleton<ITestPlanService, TestPlanService>();
             services.AddSingleton<Func<IProductController>>(sp =>

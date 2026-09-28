@@ -28,14 +28,31 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>保持与源码声明一致的展示顺序</summary>
+        /// <summary>保持与源码声明一致的展示顺序（按功能码分组：心跳/0x02产品信息/0x05测量/0x06推送/0x07产测）</summary>
         private static readonly string[] OrderedKeys =
         {
+            // 心跳（Func=0x07）
+            "CtrlKeepAlive",
+            // 产品信息查询（Func=0x02）
+            "CtrlGetProductTime", "CtrlGetAllUserParams", "CtrlGetUserCount", "CtrlGetProductConfig",
+            "CtrlGetProductStatus", "CtrlGetDisconnectInfo", "CtrlGetResetInfo", "CtrlGetVersionInfo",
+            // 测量控制（Func=0x05）
             "CtrlGetVersion", "CtrlSetMode", "CtrlGetState", "CtrlStartInflate",
             "CtrlGetPressure", "CtrlStartDeflate", "CtrlInflateStop", "CtrlStartBpMeasure",
             "CtrlGetBpValue", "CtrlGetBpResult", "CtrlGetHrValue", "CtrlStopBpMeasure",
-            "CtrlGetStaticPress", "CtrlStartSpo2", "CtrlGetSpo2Value", "CtrlGetLeadState",
-            "CtrlGetBatteryInfo", "CtrlGetChargingStatus"
+            "CtrlGetStaticPress", "CtrlSetOverPressureThreshold", "CtrlGetOverPressureStatus",
+            "CtrlStartSpo2", "CtrlGetSpo2Value", "CtrlSetSpo2AlarmThreshold", "CtrlGetSpo2AlarmStatus",
+            "CtrlGetPulseRate", "CtrlGetWeakPerfusionAlarm", "CtrlGetWeakPerfusionIndex",
+            "CtrlGetLeadState", "CtrlGetChargingStatus5", "CtrlGetAccelTilt", "CtrlGetSpeakerVolume",
+            // 主动推送（Func=0x06）
+            "CtrlPushEcgWave", "CtrlPushEcgHr", "CtrlPushPpgHr", "CtrlPushPpgSpo2",
+            // 硬件控制/产测（Func=0x07）
+            "CtrlSetSampleRate", "CtrlStartPressureSensor", "CtrlCalibratePressureSensor", "CtrlClosePressureSensor",
+            "CtrlStartPumpTest", "CtrlStopPumpTest", "CtrlOpenValveTest", "CtrlCloseValveTest",
+            "CtrlGetBatteryInfo", "CtrlGetChargingStatus", "CtrlSoftPowerOff",
+            "CtrlPlay1KHzSine", "CtrlStopAudioPlay",
+            "CtrlStartEcgPpgMeasure", "CtrlStopEcgPpgMeasure", "CtrlGetEcgPpgResult",
+            "CtrlFactoryReset"
         };
 
         /// <summary>DataGrid 绑定源</summary>

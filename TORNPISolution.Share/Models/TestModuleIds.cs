@@ -17,7 +17,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>产品充放气测试（BP-001 物理按键启动测量 / BP-002 测量中手动停止）</summary>
         public const string BpAccuracyTest = "M03";
 
-        /// <summary>压力控制功能测试（BP-006~BP-009：最高充气压力/匀速放气/快释放气/过压保护）</summary>
+        /// <summary>压力控制功能测试（BP-006~008：匀速放气控制/快速放气控制/过压保护，均以产品串口回读压力判定）</summary>
         public const string PressureControlTest = "M04";
 
         /// <summary>血压静态压力精度测试（BP-003：多点静态压 vs 产品上报值，误差 ≤2mmHg）</summary>
@@ -52,5 +52,8 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>充电测试（充电状态判断 / 当前电池电量测量 / 电池百分比获取）</summary>
         public const string ChargingTest = "M15";
+
+        /// <summary>产品通讯初始化（进入产测模式 + 0x72 产品信息获取（MAC/嵌软版本）+ 0x74 状态查询，全方案唯一执行产品通讯判定的模块）</summary>
+        public const string ProductCommInit = "M16";
     }
 }

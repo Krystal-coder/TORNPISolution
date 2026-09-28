@@ -9,6 +9,9 @@
 # 编译输出（核心！）
 bin/
 obj/
+# 一次性验证构建产物（非源码，可随时删除并由构建重新生成）
+binVerifyBuild/
+VerifyBuild/
 *.dll
 *.pdb
 *.exe

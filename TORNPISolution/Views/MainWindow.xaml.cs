@@ -230,7 +230,7 @@ namespace TORNPISolution.Views
             window.ShowDialog();
         }
 
-        /// <summary>配置 → 血压仪参数配置：打开 BPA700 静态/动态/超压参数配置对话框</summary>
+        /// <summary>配置 → 血压模拟仪测试配置：打开 BPA700 / 康伟达 测试参数配置对话框（外层页签区分设备）</summary>
         private void MenuBpaParamConfig_Click(object sender, RoutedEventArgs e)
         {
             var window = new BpaParamConfigWindow { Owner = this };

@@ -187,7 +187,7 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
                 <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="BPA700参数配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                 <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                 <!--<MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>-->
             </MenuItem>
@@ -461,10 +461,25 @@
                 <!-- 方案操作区 -->
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
                             Margin="14,6,14,12">
-                    <Button Content="💾 保存方案" Style="{StaticResource Style.ToolButton}"
-                            Command="{Binding SavePlanCommand}" Margin="0,0,8,0"/>
-                    <Button Content="📂 加载方案" Style="{StaticResource Style.ToolButton}"
-                            Command="{Binding LoadPlanCommand}" Margin="0,0,8,0"/>
+                    <!-- 图标用 PackIcon 而非 emoji 字符串：emoji 补面字符在 WPF 字体回落下宽度测量异常，曾导致按钮塌成单字形 -->
+                    <Button Style="{StaticResource Style.ToolButton}"
+                            Command="{Binding SavePlanCommand}" Margin="0,0,8,0"
+                            ToolTip="将当前测试方案保存到磁盘">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ContentSave" Width="14" Height="14"
+                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="保存方案" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Style.ToolButton}"
+                            Command="{Binding LoadPlanCommand}" Margin="0,0,8,0"
+                            ToolTip="从磁盘加载已保存的测试方案">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FolderOpenOutline" Width="14" Height="14"
+                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="加载方案" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Content="复位结果" Style="{StaticResource Style.ToolButton}"
                             Command="{Binding ResetPlanCommand}"/>
                     <Button Style="{StaticResource Style.PrimaryButton}"
@@ -545,10 +560,86 @@
                               SelectionMode="Single" SelectionUnit="FullRow">
                             <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
-                                <StackPanel Visibility="{Binding IsWaveformExpanded, Converter={StaticResource BoolToVisibility}}">
+                                <StackPanel Visibility="{Binding HasRowDetails, Converter={StaticResource BoolToVisibility}}">
+                                <!-- 逐点结果子表（BP-003）：测试点1..N 依次展示目标/仪器稳压值/产品上报值/误差/判定，哪个点 PASS 哪个点 FAIL 一目了然 -->
+                                <Border Margin="8,2,8,4" CornerRadius="6" Padding="12,6"
+                                        Background="{StaticResource Brush.Panel.Background}"
+                                        BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                        Visibility="{Binding HasPointResults, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <materialDesign:PackIcon Kind="FormatListChecks" Width="14" Height="14"
+                                                                     VerticalAlignment="Center"
+                                                                     Foreground="{StaticResource Brush.Primary}"/>
+                                            <TextBlock Text="逐点结果（误差 ≤2mmHg 为 PASS）" FontWeight="Bold" FontSize="12"
+                                                       Foreground="{StaticResource Brush.Text.Main}"
+                                                       VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                            <!-- 汇总：共 X 点 Y PASS / Z FAIL + 最大误差所在点，父行精简后这里一眼拿结论 -->
+                                            <TextBlock Text="{Binding PointSummaryText}" FontSize="11"
+                                                       Foreground="{StaticResource Brush.Text.Sub}"
+                                                       VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                        <Grid Margin="0,0,0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.8*"/>
+                                                <ColumnDefinition Width="0.9*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="0.9*"/>
+                                                <ColumnDefinition Width="2.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="测试点" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="目标(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="仪器测试值(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="3" Text="产品上报值(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="误差(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Column="5" Text="判定" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                                        </Grid>
+                                        <ItemsControl ItemsSource="{Binding PointResults}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.8*"/>
+                                                            <ColumnDefinition Width="0.9*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="0.9*"/>
+                                                            <ColumnDefinition Width="2.2*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Center"
+                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding TargetText}" HorizontalAlignment="Center"
+                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding InstrumentText}" HorizontalAlignment="Center"
+                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                                        <TextBlock Grid.Column="3" Text="{Binding ProductText}" HorizontalAlignment="Center"
+                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                                        <TextBlock Grid.Column="4" Text="{Binding ErrorText}" HorizontalAlignment="Center"
+                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                                        <TextBlock Grid.Column="5" Text="{Binding ResultDisplay}" Margin="8,0,0,0" FontWeight="Bold">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Pass}" Value="True">
+                                                                            <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                                <!-- 波形：逐点共用一张压力曲线 -->
                                 <Border Margin="8,2,8,10" CornerRadius="6" Padding="0,6,0,0"
                                         Background="{StaticResource Brush.Panel.Background}"
-                                        BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1">
+                                        BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                        Visibility="{Binding IsWaveformExpanded, Converter={StaticResource BoolToVisibility}}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>

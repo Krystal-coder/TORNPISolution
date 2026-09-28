@@ -71,7 +71,7 @@ namespace TORNPISolution.Service.TestModules
                 uid = await _reader.GetUidAsync(ct).ConfigureAwait(false);
                 results.Add(new NfcTestItemResult
                 {
-                    Name = "标签识别",
+                    Name = SpecItems.NfcTagDetect,
                     Pass = uid.Length > 0,
                     Actual = ToHex(uid),
                     Message = uid.Length > 0 ? "读取到 NFC 标签" : "未读取到标签，请确认标签放置到位"
@@ -81,7 +81,7 @@ namespace TORNPISolution.Service.TestModules
             catch (Exception ex)
             {
                 _log.Error("NFC 测试：寻卡失败", ex);
-                results.Add(new NfcTestItemResult { Name = "标签识别", Pass = false, Message = ex.Message });
+                results.Add(new NfcTestItemResult { Name = SpecItems.NfcTagDetect, Pass = false, Message = ex.Message });
                 return results;
             }
 
@@ -91,7 +91,7 @@ namespace TORNPISolution.Service.TestModules
                 await _reader.WritePagesAsync(MacStartPage, macAddress, ct).ConfigureAwait(false);
                 results.Add(new NfcTestItemResult
                 {
-                    Name = "MAC 信息写入",
+                    Name = SpecItems.NfcMacWrite,
                     Pass = true,
                     Actual = ToHex(macAddress),
                     Message = $"已写入第 {MacStartPage}~{MacStartPage + MacPageCount - 1} 页"
@@ -100,7 +100,7 @@ namespace TORNPISolution.Service.TestModules
             catch (Exception ex)
             {
                 _log.Error("NFC 测试：MAC 写入失败", ex);
-                results.Add(new NfcTestItemResult { Name = "MAC 信息写入", Pass = false, Message = ex.Message });
+                results.Add(new NfcTestItemResult { Name = SpecItems.NfcMacWrite, Pass = false, Message = ex.Message });
                 return results;
             }
 
@@ -113,7 +113,7 @@ namespace TORNPISolution.Service.TestModules
 
                 results.Add(new NfcTestItemResult
                 {
-                    Name = "MAC 信息验证",
+                    Name = SpecItems.NfcMacVerify,
                     Pass = match,
                     Actual = ToHex(readback),
                     Message = match ? "回读内容与写入 MAC 一致" : "回读内容与写入 MAC 不一致"
@@ -122,7 +122,7 @@ namespace TORNPISolution.Service.TestModules
             catch (Exception ex)
             {
                 _log.Error("NFC 测试：MAC 回读验证失败", ex);
-                results.Add(new NfcTestItemResult { Name = "MAC 信息验证", Pass = false, Message = ex.Message });
+                results.Add(new NfcTestItemResult { Name = SpecItems.NfcMacVerify, Pass = false, Message = ex.Message });
             }
 
             // ---- 步骤 4：读取标签内容（测试步骤：查看标签内容） ----
@@ -131,7 +131,7 @@ namespace TORNPISolution.Service.TestModules
                     var content = await ReadTagContentAsync(MacStartPage, 8, ct).ConfigureAwait(false);
                     results.Add(new NfcTestItemResult
                     {
-                        Name = "标签内容读取",
+                        Name = SpecItems.NfcTagContentRead,
                         Pass = content.Length > 0,
                         Actual = content,
                         Message = "标签用户区内容"
@@ -139,7 +139,7 @@ namespace TORNPISolution.Service.TestModules
                 }
                 catch (Exception ex)
                 {
-                    results.Add(new NfcTestItemResult { Name = "标签内容读取", Pass = false, Message = ex.Message });
+                    results.Add(new NfcTestItemResult { Name = SpecItems.NfcTagContentRead, Pass = false, Message = ex.Message });
                 }
 
                 return results;

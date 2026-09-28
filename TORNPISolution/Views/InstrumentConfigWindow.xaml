@@ -15,6 +15,8 @@
 
     <Window.Resources>
 
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
         <!-- ====== 串口参数编辑器（串口号 + 波特率 + 数据位 + 校验位 + 停止位） ====== -->
         <DataTemplate x:Key="Template.SerialEditor">
             <Grid Margin="12,8">
@@ -156,9 +158,13 @@
                     Style="{StaticResource Style.ToolButton}" Margin="0"
                     Command="{Binding RefreshPortsCommand}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- 运行期锁定配置保存：灰显不可点，与血压模拟仪测试配置页一致 -->
+                <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
+                           VerticalAlignment="Center" Margin="0,0,12,0"
+                           Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
                 <Button Content="取消" Style="{StaticResource Style.ToolButton}" IsCancel="True" Margin="0,0,8,0"/>
                 <Button Content="保存" Style="{StaticResource Style.PrimaryButton}"
-                        MinWidth="88" Command="{Binding SaveCommand}"/>
+                        MinWidth="88" IsEnabled="{Binding CanSave}" Command="{Binding SaveCommand}"/>
             </StackPanel>
         </Grid>
 
@@ -225,6 +231,19 @@
                             </StackPanel>
                             <ContentControl Content="{Binding Config.Product}"
                                             ContentTemplate="{StaticResource Template.SerialEditor}"/>
+                            <StackPanel Margin="14,0,14,10">
+                                <CheckBox Content="无产品演示模式（产品未接时仅验证仪器侧行为，产品依赖项判 FAIL）"
+                                          IsChecked="{Binding Config.NoProductDemoMode}" FontSize="12"/>
+                                <TextBlock Margin="0,2,0,0" FontSize="10" TextWrapping="Wrap"
+                                           Foreground="{StaticResource Brush.Text.Sub}"
+                                           Text="勾选后：产品串口不可用时 M04 压力控制 / M06 动态压力精度仅驱动模拟仪完成充放气流程，依赖产品读回的结果项按读回缺失判 FAIL，通讯项按实际通讯结果判定；接上产品后务必取消勾选恢复正式判定。"/>
+                                <CheckBox Margin="0,8,0,0"
+                                          Content="无仪器演示模式（只读产品串口数据，忽略全部仪器控制）"
+                                          IsChecked="{Binding Config.NoInstrumentDemoMode}" FontSize="12"/>
+                                <TextBlock Margin="0,2,0,0" FontSize="10" TextWrapping="Wrap"
+                                           Foreground="{StaticResource Brush.Text.Sub}"
+                                           Text="勾选后：各测试模块只执行产品通讯（进入产测模式/0x72/0x74），跳过模拟仪/AECG/NFC/电源等仪器控制，其余结果项按读回缺失判 FAIL；正式测试务必取消勾选恢复。"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </ScrollViewer>
@@ -508,7 +527,7 @@
                         </Border>
                         <TextBlock Margin="4,4" FontSize="11" TextWrapping="Wrap"
                                    Foreground="{StaticResource Brush.Text.Sub}"
-                                   Text="💡 ECG 波形参数、心率测试、噪声/阻抗/起搏器、频率扫描等测试参数请在「配置 → ECG参数配置」中设置"/>
+                                   Text="提示：ECG 波形参数、心率测试、噪声/阻抗/起搏器、频率扫描等测试参数请在「配置 → ECG参数配置」中设置"/>
                     </StackPanel>
                 </ScrollViewer>
 

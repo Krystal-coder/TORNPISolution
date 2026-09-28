@@ -1,3 +1,5 @@
+using TORNPISolution.Share.Models;
+
 namespace TORNPISolution.Service.Communication
 {
     /// <summary>
@@ -8,57 +10,42 @@ namespace TORNPISolution.Service.Communication
     ///   CRC     = CRC-16/MODBUS，计算范围 = Head + Len + Payload（从帧头到载荷末尾）
     ///   总帧长  = Payload.Length + 5（Head 1 + Len 1 + CRC 2 + Tail 1）
     /// 串口参数：115200 8N1，无流控。
-    /// 功能码按命令区分：大多数读命令为 0x07，充电状态（0x6D）为 0x06。
-    /// 控制码从 Config\protocol_commands.json 加载，支持运行时修改后热重载。
+    /// 功能码按命令区分：0x02 产品信息查询 / 0x05 测量控制 / 0x06 主动推送 / 0x07 硬件控制与产测。
+    /// 控制码与功能码均从 Config\protocol_commands.json 加载，支持运行时修改后热重载。
     /// </summary>
     public static class ProductProtocol
     {
         // ==================== 命令码运行时字典 ====================
 
-        private static readonly Dictionary<string, byte> _commandCodes;
-        private static readonly Dictionary<byte, byte> _ctrlToFunc;
+        /// <summary>命令名 → (FuncCode, Code)。键为命令名，天然避免同 Code 不同 Func 的冲突。</summary>
+        private static readonly Dictionary<string, ProductCmd> _commands = new();
         private static readonly object _lock = new();
 
         static ProductProtocol()
         {
+            LoadFromConfig();
+        }
+
+        private static void LoadFromConfig()
+        {
             var service = new ProtocolCommandConfigService();
             var entries = service.Load();
-            _commandCodes = new Dictionary<string, byte>();
-            _ctrlToFunc = new Dictionary<byte, byte>();
-            foreach (var kvp in entries)
+            lock (_lock)
             {
-                _commandCodes[kvp.Key] = kvp.Value.Code;
-                _ctrlToFunc[kvp.Value.Code] = kvp.Value.FuncCode;
+                _commands.Clear();
+                foreach (var kvp in entries)
+                    _commands[kvp.Key] = new ProductCmd(kvp.Value.FuncCode, kvp.Value.Code);
             }
         }
 
         /// <summary>重新从 JSON 加载命令码（配置窗口保存后调用）</summary>
-        public static void ReloadCommands()
-        {
-            var service = new ProtocolCommandConfigService();
-            var entries = service.Load();
-            lock (_lock)
-            {
-                _commandCodes.Clear();
-                _ctrlToFunc.Clear();
-                foreach (var kvp in entries)
-                {
-                    _commandCodes[kvp.Key] = kvp.Value.Code;
-                    _ctrlToFunc[kvp.Value.Code] = kvp.Value.FuncCode;
-                }
-            }
-        }
+        public static void ReloadCommands() => LoadFromConfig();
 
-        private static byte GetCmd(string name, byte defaultValue)
+        /// <summary>按命令名取 (Func, Code)；未配置时返回 Func=0x07/Code=0x00 的无效命令并记录。</summary>
+        private static ProductCmd GetCmd(string name)
         {
             lock (_lock)
-                return _commandCodes.TryGetValue(name, out var code) ? code : defaultValue;
-        }
-
-        private static byte GetFuncForCtrl(byte ctrlCode)
-        {
-            lock (_lock)
-                return _ctrlToFunc.TryGetValue(ctrlCode, out var func) ? func : FuncRead;
+                return _commands.TryGetValue(name, out var cmd) ? cmd : new ProductCmd(FuncRead, 0x00);
         }
 
         // ==================== 帧常量 ====================
@@ -71,30 +58,85 @@ namespace TORNPISolution.Service.Communication
         /// <summary>ACK 应答（写命令返回）</summary>
         public const byte FuncAck = 0x00;
 
-        /// <summary>读命令（上位机发送读请求统一用 0x07）</summary>
+        /// <summary>产品信息查询（0x30~0x37）</summary>
+        public const byte FuncProductInfo = 0x02;
+
+        /// <summary>测量控制（0x72~0x8C）</summary>
+        public const byte FuncMeasure = 0x05;
+
+        /// <summary>产品主动推送（0x10~0x13）</summary>
+        public const byte FuncPush = 0x06;
+
+        /// <summary>硬件控制与产测（0x62~0xB0），亦为缺省功能码</summary>
         public const byte FuncRead = 0x07;
 
-        // ==================== 控制码（从 JSON 加载，缺省回退硬编码默认值） ====================
+        // ==================== 命令（从 JSON 加载，每项含 Func + Code） ====================
 
-        public static byte CtrlKeepAlive     => GetCmd("CtrlKeepAlive", 0x01);     // 心跳保活（防止产品休眠）
-        public static byte CtrlGetVersion     => GetCmd("CtrlGetVersion", 0x72);     // 读版本/MAC
-        public static byte CtrlSetMode        => GetCmd("CtrlSetMode", 0x73);        // 设置测试模式
-        public static byte CtrlGetState       => GetCmd("CtrlGetState", 0x74);       // 读测试状态
-        public static byte CtrlStartInflate   => GetCmd("CtrlStartInflate", 0x75);   // 开始充气
-        public static byte CtrlGetPressure    => GetCmd("CtrlGetPressure", 0x76);    // 读当前压力值
-        public static byte CtrlStartDeflate   => GetCmd("CtrlStartDeflate", 0x77);   // 开始放气
-        public static byte CtrlInflateStop    => GetCmd("CtrlInflateStop", 0x78);    // 充放气停止
-        public static byte CtrlStartBpMeasure => GetCmd("CtrlStartBpMeasure", 0x79); // 开始血压测量
-        public static byte CtrlGetBpValue     => GetCmd("CtrlGetBpValue", 0x7A);     // 读瞬时血压值
-        public static byte CtrlGetBpResult    => GetCmd("CtrlGetBpResult", 0x7B);    // 读血压测量最终结果 / 测量完成主动推送
-        public static byte CtrlGetHrValue     => GetCmd("CtrlGetHrValue", 0x7C);     // 读心率值
-        public static byte CtrlStopBpMeasure  => GetCmd("CtrlStopBpMeasure", 0x7D);  // 停止血压测量
-        public static byte CtrlGetStaticPress => GetCmd("CtrlGetStaticPress", 0x7E); // 读静态压力值
-        public static byte CtrlStartSpo2      => GetCmd("CtrlStartSpo2", 0x80);      // 开始/停止血氧测量
-        public static byte CtrlGetSpo2Value   => GetCmd("CtrlGetSpo2Value", 0x81);   // 读血氧值
-        public static byte CtrlGetLeadState   => GetCmd("CtrlGetLeadState", 0x88);   // 读导联状态
-        public static byte CtrlGetBatteryInfo  => GetCmd("CtrlGetBatteryInfo", 0x6C);  // 读电池信息（电压+百分比）
-        public static byte CtrlGetChargingStatus => GetCmd("CtrlGetChargingStatus", 0x6D); // 读充电状态
+        // ---- 进入产测模式（Func=0x07/Code=0x01）：打开串口后立即发送防产品休眠，须在 0x72/0x74 之前 ----
+        public static ProductCmd EnterProductionTestMode => GetCmd("CtrlKeepAlive");
+
+        // ---- 产品信息查询（Func=0x02）----
+        public static ProductCmd GetProductTime   => GetCmd("CtrlGetProductTime");
+        public static ProductCmd GetAllUserParams => GetCmd("CtrlGetAllUserParams");
+        public static ProductCmd GetUserCount     => GetCmd("CtrlGetUserCount");
+        public static ProductCmd GetProductConfig => GetCmd("CtrlGetProductConfig");
+        public static ProductCmd GetProductStatus => GetCmd("CtrlGetProductStatus");
+        public static ProductCmd GetDisconnectInfo=> GetCmd("CtrlGetDisconnectInfo");
+        public static ProductCmd GetResetInfo     => GetCmd("CtrlGetResetInfo");
+        public static ProductCmd GetVersionInfo   => GetCmd("CtrlGetVersionInfo");
+
+        // ---- 测量控制（Func=0x05）----
+        public static ProductCmd GetVersion              => GetCmd("CtrlGetVersion");
+        public static ProductCmd SetMode                 => GetCmd("CtrlSetMode");
+        public static ProductCmd GetState                => GetCmd("CtrlGetState");
+        public static ProductCmd StartInflate            => GetCmd("CtrlStartInflate");
+        public static ProductCmd GetPressure             => GetCmd("CtrlGetPressure");
+        public static ProductCmd StartDeflate            => GetCmd("CtrlStartDeflate");
+        public static ProductCmd InflateStop             => GetCmd("CtrlInflateStop");
+        public static ProductCmd StartBpMeasure          => GetCmd("CtrlStartBpMeasure");
+        public static ProductCmd GetBpValue              => GetCmd("CtrlGetBpValue");
+        public static ProductCmd GetBpResult             => GetCmd("CtrlGetBpResult");
+        public static ProductCmd GetHrValue              => GetCmd("CtrlGetHrValue");
+        public static ProductCmd StopBpMeasure           => GetCmd("CtrlStopBpMeasure");
+        public static ProductCmd GetStaticPress          => GetCmd("CtrlGetStaticPress");
+        public static ProductCmd SetOverPressureThreshold=> GetCmd("CtrlSetOverPressureThreshold");
+        public static ProductCmd GetOverPressureStatus   => GetCmd("CtrlGetOverPressureStatus");
+        public static ProductCmd StartSpo2               => GetCmd("CtrlStartSpo2");
+        public static ProductCmd GetSpo2Value            => GetCmd("CtrlGetSpo2Value");
+        public static ProductCmd SetSpo2AlarmThreshold   => GetCmd("CtrlSetSpo2AlarmThreshold");
+        public static ProductCmd GetSpo2AlarmStatus      => GetCmd("CtrlGetSpo2AlarmStatus");
+        public static ProductCmd GetPulseRate            => GetCmd("CtrlGetPulseRate");
+        public static ProductCmd GetWeakPerfusionAlarm   => GetCmd("CtrlGetWeakPerfusionAlarm");
+        public static ProductCmd GetWeakPerfusionIndex   => GetCmd("CtrlGetWeakPerfusionIndex");
+        public static ProductCmd GetLeadState            => GetCmd("CtrlGetLeadState");
+        public static ProductCmd GetChargingStatus5      => GetCmd("CtrlGetChargingStatus5");
+        public static ProductCmd GetAccelTilt            => GetCmd("CtrlGetAccelTilt");
+        public static ProductCmd GetSpeakerVolume        => GetCmd("CtrlGetSpeakerVolume");
+
+        // ---- 主动推送（Func=0x06，产品→上位机，仅用于识别收到的帧）----
+        public static ProductCmd PushEcgWave  => GetCmd("CtrlPushEcgWave");
+        public static ProductCmd PushEcgHr    => GetCmd("CtrlPushEcgHr");
+        public static ProductCmd PushPpgHr    => GetCmd("CtrlPushPpgHr");
+        public static ProductCmd PushPpgSpo2  => GetCmd("CtrlPushPpgSpo2");
+
+        // ---- 硬件控制/产测（Func=0x07）----
+        public static ProductCmd SetSampleRate          => GetCmd("CtrlSetSampleRate");
+        public static ProductCmd StartPressureSensor    => GetCmd("CtrlStartPressureSensor");
+        public static ProductCmd CalibratePressureSensor=> GetCmd("CtrlCalibratePressureSensor");
+        public static ProductCmd ClosePressureSensor    => GetCmd("CtrlClosePressureSensor");
+        public static ProductCmd StartPumpTest          => GetCmd("CtrlStartPumpTest");
+        public static ProductCmd StopPumpTest           => GetCmd("CtrlStopPumpTest");
+        public static ProductCmd OpenValveTest          => GetCmd("CtrlOpenValveTest");
+        public static ProductCmd CloseValveTest         => GetCmd("CtrlCloseValveTest");
+        public static ProductCmd GetBatteryInfo         => GetCmd("CtrlGetBatteryInfo");
+        public static ProductCmd GetChargingStatus      => GetCmd("CtrlGetChargingStatus");
+        public static ProductCmd SoftPowerOff           => GetCmd("CtrlSoftPowerOff");
+        public static ProductCmd Play1KHzSine           => GetCmd("CtrlPlay1KHzSine");
+        public static ProductCmd StopAudioPlay          => GetCmd("CtrlStopAudioPlay");
+        public static ProductCmd StartEcgPpgMeasure     => GetCmd("CtrlStartEcgPpgMeasure");
+        public static ProductCmd StopEcgPpgMeasure      => GetCmd("CtrlStopEcgPpgMeasure");
+        public static ProductCmd GetEcgPpgResult        => GetCmd("CtrlGetEcgPpgResult");
+        public static ProductCmd FactoryReset           => GetCmd("CtrlFactoryReset");
 
         // ==================== 测试模式枚举（0x73 参数） ====================
 
@@ -113,22 +155,21 @@ namespace TORNPISolution.Service.Communication
         /// Len = Payload 长度（Func + Ctrl + Data），不含 CRC。
         /// 总帧长 = Payload.Length + 5（Head 1 + Len 1 + CRC 2 + Tail 1）。
         /// </summary>
-        /// <param name="controlCode">控制码</param>
+        /// <param name="cmd">命令标识（功能码 + 控制码）</param>
         /// <param name="data">参数数据（可为 null 或空）</param>
-        public static byte[] BuildPacket(byte controlCode, byte[]? data = null)
+        public static byte[] BuildPacket(ProductCmd cmd, byte[]? data = null)
         {
-            var funcCode = GetFuncForCtrl(controlCode);
             var dataLen = data?.Length ?? 0;
             var payloadLen = 2 + dataLen;                    // Func + Ctrl + Data
             var frame = new byte[payloadLen + 5];            // Head + Len + Payload + CRC(2) + Tail
 
             frame[0] = Head;
             frame[1] = (byte)payloadLen;                     // Len = Payload 长度（不含 CRC）
-            frame[2] = funcCode;
-            frame[3] = controlCode;
+            frame[2] = cmd.Func;
+            frame[3] = cmd.Code;
 
             if (dataLen > 0)
-                Array.Copy(data, 0, frame, 4, dataLen);
+                Array.Copy(data!, 0, frame, 4, dataLen);
 
             var crc = ComputeCrc16Modbus(frame, 0, 2 + payloadLen);   // CRC 范围：Head + Len + Payload（从帧头到载荷末尾）
             var crcIdx = 4 + dataLen;                                 // CRC 起始位置 = Head + Len + Func + Ctrl + Data
@@ -158,6 +199,7 @@ namespace TORNPISolution.Service.Communication
             var funcCode = frame[2];
             var ctrlCode = frame[3];
             var dataLen = len - 2;                                    // 去掉功能码 + 控制码
+            if (dataLen < 0) return null;                             // Len 异常（<2），非法帧
             var payload = new byte[dataLen];
             if (dataLen > 0)
                 Array.Copy(frame, 4, payload, 0, dataLen);

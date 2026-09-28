@@ -50,7 +50,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>BPA 充气：true=BPA700 自行充气，false=外部设备充气</summary>
         public bool BpaInflation { get; set; } = true;
 
-        /// <summary>量测时间（每个压力点的稳压保持秒数，0~999）</summary>
+        /// <summary>量测时间（每个压力点的稳压保持秒数，0~999；仅 BPA700 序列有效，康伟达按收敛判据 2.5s 稳压窗取均值、不额外保持）</summary>
         public int MeasureSeconds { get; set; } = 10;
 
         /// <summary>压力点列表（单位跟随仪器压力单位：mmHg 20~400 / kPa 2.7~53.3），默认官方 10 点，上限 10 个</summary>
@@ -146,7 +146,7 @@ namespace TORNPISolution.Share.Models
         public int OffsetRate { get; set; } = 15;
     }
 
-    /// <summary>超压测试参数（BPARunOverpressureTest，默认值按 BP-009 测试要求：350/300/320）</summary>
+    /// <summary>超压测试参数（BPARunOverpressureTest，BP-008 过压保护用：默认 350/300/320）</summary>
     public class BpaOverpressureParams
     {
         /// <summary>BPA 充气：true=BPA700 自行充气，false=外部设备充气</summary>
@@ -163,58 +163,41 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 压力控制功能测试（M04 BP-006~008）过程参数，默认值 = 原测试步骤中的固定值（出处：测试要求文档）。
-    /// 规格上下限不在此处（BP-006 动态规格 收缩压+30~+40、BP-007 2~6mmHg/s、BP-008 ≤10s
-    /// 仍由 Spec/动态规格单一来源判定）；BP-009 参数在 Overpressure 节点。
+    /// 压力控制功能测试（M04 BP-006~008）过程参数。三项均以产品串口回读压力判定产品行为：
+    /// BP-006 匀速放气控制 = 产品测量周期匀速放气段算平均速率；
+    /// BP-007 快速放气控制 = 产品充气到触发压力发停止后回读归零耗时；
+    /// BP-008 过压保护 = 充气 300→320 期间回读骤降点（触发压力，阈值在 Overpressure 节点）。
+    /// 规格上下限不在此处（2~6mmHg/s、≤10s、300~320mmHg 由 Spec 单一来源判定）。
     /// </summary>
     public class BpaPressureControlParams
     {
-        // ===== 公共（BP-006/007 共用） =====
+        // ===== BP-006 匀速放气控制 =====
 
-        /// <summary>产品血压测量结果推送等待超时（秒）：触发产品测量后等待推送结果的最长时间</summary>
-        public int ProductBpPushTimeoutSeconds { get; set; } = 60;
+        /// <summary>速率计算区间上限（mmHg）：只取峰值后区间内回读点计算平均速率，避开起点波动</summary>
+        public double BP006RateSegmentHigh { get; set; } = 130;
 
-        /// <summary>充气目标偏移（mmHg）：BP-006 充气目标 = 产品收缩压 + 偏移（测试要求 +30~+40，默认取中间值）；BP-007 起始压力同偏移</summary>
-        public double InflationTargetOffset { get; set; } = 35;
+        /// <summary>速率计算区间下限（mmHg）：避开接近 0 的噪声</summary>
+        public double BP006RateSegmentLow { get; set; } = 30;
 
-        /// <summary>充气到位后的稳压保持秒数</summary>
-        public int InflateStableSeconds { get; set; } = 2;
+        /// <summary>匀速放气采样结束压力（mmHg）：产品回读降到该值以下不再纳入速率样本</summary>
+        public double BP006DeflateEndPressure { get; set; } = 20;
 
-        // ===== BP-006 最高充气压力 =====
+        /// <summary>匀速放气最长等待（秒）：产品回读未按时降到位即停止采样（兜底）</summary>
+        public int BP006MaxDeflateSeconds { get; set; } = 40;
 
-        /// <summary>产品收缩压读取失败时的兜底收缩压（mmHg）</summary>
-        public double BP006DefaultSystolic { get; set; } = 120;
+        // ===== BP-007 快速放气控制 =====
 
-        // ===== BP-007 匀速放气控制 =====
+        /// <summary>停止触发压力（mmHg）：产品充气回读达到该压力后发停止测量（0x7D）触发产品快速放气</summary>
+        public double BP007StopTriggerPressure { get; set; } = 150;
 
-        /// <summary>产品测量压力读取失败时的兜底起始压力（mmHg）</summary>
-        public double BP007DefaultStartPressure { get; set; } = 150;
+        /// <summary>充气等待超时（秒）：产品回读超时未达到停止触发压力判 FAIL</summary>
+        public int BP007InflateWaitSeconds { get; set; } = 45;
 
-        /// <summary>放气速率计算区间上限（mmHg）：只取区间内采样点，避开起点波动</summary>
-        public double BP007RateSegmentHigh { get; set; } = 130;
-
-        /// <summary>放气速率计算区间下限（mmHg）：避开接近 0 的噪声</summary>
-        public double BP007RateSegmentLow { get; set; } = 30;
-
-        /// <summary>放气结束判定压力（mmHg）：压力降到该值以下即停止采样</summary>
-        public double BP007DeflateEndPressure { get; set; } = 20;
-
-        /// <summary>放气最长等待（秒）：超过即停止采样（兜底）</summary>
-        public int BP007MaxDeflateSeconds { get; set; } = 40;
-
-        /// <summary>泄放保持时长（秒）：维持慢释阀开启的窗口</summary>
-        public int BP007DeflateHoldSeconds { get; set; } = 60;
-
-        // ===== BP-008 快释放气功能 =====
-
-        /// <summary>快释测试充气目标压力（mmHg）</summary>
-        public double BP008TargetPressure { get; set; } = 300;
-
-        /// <summary>归零判定压力（mmHg）：压力降到该值以下视为已归零</summary>
-        public double BP008ZeroPressure { get; set; } = 2;
+        /// <summary>归零判定压力（mmHg）：产品回读降到该值以下视为已归零</summary>
+        public double BP007ZeroPressure { get; set; } = 5;
 
         /// <summary>归零最长等待（秒）：超时按当前耗时上报（规格 ≤10s 判定在 Spec）</summary>
-        public int BP008ZeroTimeoutSeconds { get; set; } = 15;
+        public int BP007ZeroTimeoutSeconds { get; set; } = 15;
     }
 
     /// <summary>压力采样点（波形数据：相对开始时刻的秒数 + 压力值，单位跟随仪器设置）</summary>

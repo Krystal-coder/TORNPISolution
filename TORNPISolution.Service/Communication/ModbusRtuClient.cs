@@ -42,7 +42,7 @@ namespace TORNPISolution.Service.Communication
         {
             if (!_port.IsOpen)
             {
-                _port.Open();
+                SerialPortOpener.Open(_port);   // 限时打开：原生 Open() 无超时，端口异常时会无限期挂起
                 _log.Info($"串口 {_port.PortName} 已打开（{_port.BaudRate},{_port.Parity},{_port.StopBits}）");
             }
         }, ct);

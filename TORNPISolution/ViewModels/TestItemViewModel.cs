@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
@@ -19,6 +20,8 @@ namespace TORNPISolution.ViewModels
         private double? _instrumentValue;
         private double? _productValue;
         private string? _instrumentText;
+        private string? _productText;
+        private bool _reportedNotJudged;
         private TestResultStatus _result = TestResultStatus.NotTested;
 
         public TestItemViewModel(TestItemModel model)
@@ -47,9 +50,41 @@ namespace TORNPISolution.ViewModels
         public bool IsWaveformExpanded
         {
             get => _isWaveformExpanded;
-            set => SetProperty(ref _isWaveformExpanded, value);
+            set
+            {
+                if (SetProperty(ref _isWaveformExpanded, value))
+                    OnPropertyChanged(nameof(HasRowDetails));
+            }
         }
         private bool _isWaveformExpanded;
+
+        /// <summary>逐点子结果（BP-003 等逐点测试项）：行详情子表逐点展示哪个点 PASS / 哪个点 FAIL</summary>
+        public ObservableCollection<TestPointResult> PointResults { get; } = new();
+
+        /// <summary>是否有逐点子结果（控制行详情子表显示）</summary>
+        public bool HasPointResults => PointResults.Count > 0;
+
+        /// <summary>逐点结果摘要（子表标题栏显示）：共 X 点 Y PASS / Z FAIL，最大误差所在点，
+        /// 父行只看结论、子表看证据时也能一眼拿到汇总</summary>
+        public string PointSummaryText
+        {
+            get
+            {
+                if (PointResults.Count == 0) return string.Empty;
+                var passCount = PointResults.Count(p => p.Pass);
+                var text = $"共{PointResults.Count}点：{passCount} PASS / {PointResults.Count - passCount} FAIL";
+                var worstErr = PointResults
+                    .Where(p => p.Error.HasValue)
+                    .OrderByDescending(p => p.Error!.Value)
+                    .FirstOrDefault();
+                if (worstErr != null)
+                    text += $"，最大误差 {worstErr.Error!.Value:0.00} {Unit}（{worstErr.Name}）";
+                return text;
+            }
+        }
+
+        /// <summary>行详情是否有内容（逐点子表或波形任一展开即显示，避免空详情行）</summary>
+        public bool HasRowDetails => HasPointResults || IsWaveformExpanded;
 
         /// <summary>该项已采集的波形采样点快照（MainViewModel 按项名分发，波形控件绑定绘制）</summary>
         public IReadOnlyList<PressureSamplePoint> WaveformSamples
@@ -71,10 +106,15 @@ namespace TORNPISolution.ViewModels
         /// <summary>单位</summary>
         public string Unit => _model.Unit;
 
-        /// <summary>规格显示文本，如 "3.20 ~ 3.40 V"（动态规格带 * 标识）</summary>
-        public string SpecText => IsDynamicSpec
-            ? $"{LowerLimit:0.###} ~ {UpperLimit:0.###} {Unit} *"
-            : $"{LowerLimit:0.###} ~ {UpperLimit:0.###} {Unit}";
+        /// <summary>规格显示文本：定义了字符串规格（如管控嵌软版本）时直接显示该文本；
+        /// 否则通讯检查项显示判定规则，数值项显示范围（动态规格带 * 标识）</summary>
+        public string SpecText => !string.IsNullOrEmpty(_model.SpecText)
+            ? _model.SpecText
+            : (_model.HideSpecRange
+                ? "有响应即通过"
+                : IsDynamicSpec
+                    ? $"{LowerLimit:0.###} ~ {UpperLimit:0.###} {Unit} *"
+                    : $"{LowerLimit:0.###} ~ {UpperLimit:0.###} {Unit}");
 
         /// <summary>测试值（null 表示未测试）</summary>
         public double? MeasuredValue
@@ -95,13 +135,16 @@ namespace TORNPISolution.ViewModels
         public string MeasuredValueText =>
             _measuredValue.HasValue ? $"{_measuredValue.Value:0.###} {Unit}" : "--";
 
+        /// <summary>数值显示格式：压力类（mmHg）固定 2 位小数（如 59.99），其余量纲保持最多 3 位去尾零</summary>
+        private string ValueFormat => Unit == "mmHg" ? "0.00" : "0.###";
+
         /// <summary>仪器测试值列显示文本（文本类结果如设备信息优先显示；无仪器侧值的项显示 --）</summary>
         public string InstrumentValueText =>
-            _instrumentText ?? (_instrumentValue.HasValue ? $"{_instrumentValue.Value:0.###} {Unit}" : "--");
+            _instrumentText ?? (_instrumentValue.HasValue ? $"{_instrumentValue.Value.ToString(ValueFormat)} {Unit}" : "--");
 
-        /// <summary>产品上报值列显示文本（无产品上报值的项显示 --）</summary>
+        /// <summary>产品上报值列显示文本（文本类结果如读回的版本/状态优先显示；无产品上报值的项显示 --）</summary>
         public string ProductValueText =>
-            _productValue.HasValue ? $"{_productValue.Value:0.###} {Unit}" : "--";
+            _productText ?? (_productValue.HasValue ? $"{_productValue.Value.ToString(ValueFormat)} {Unit}" : "--");
 
         /// <summary>判定结果</summary>
         public TestResultStatus Result
@@ -138,6 +181,9 @@ namespace TORNPISolution.ViewModels
                 : TestResultStatus.Fail;
         }
 
+        /// <summary>本次运行是否上报了“演示不判定”结果：此类项保持未测试，模块收尾不强制 FAIL</summary>
+        public bool IsReportedNotJudged => _reportedNotJudged;
+
         /// <summary>
         /// 回填 TestItem 执行结果：先写动态规格再写测试值（保证按本次规格判定）；
         /// 按测试项值来源（ValueSource）分发到仪器测试值/产品上报值两列
@@ -147,11 +193,28 @@ namespace TORNPISolution.ViewModels
             _dynamicLower = result.SpecMin;
             _dynamicUpper = result.SpecMax;
             _instrumentText = result.InstrumentText;
+            _productText = result.ProductText;
             OnPropertyChanged(nameof(LowerLimit));
             OnPropertyChanged(nameof(UpperLimit));
             OnPropertyChanged(nameof(IsDynamicSpec));
-            OnPropertyChanged(nameof(SpecText));
 
+            // 演示不判定项：只显示演示文本，双值列清空并保持未测试，不参与合格判定
+            if (result.NotJudged)
+            {
+                _reportedNotJudged = true;
+                _instrumentValue = null;
+                _productValue = null;
+                OnPropertyChanged(nameof(InstrumentValueText));
+                OnPropertyChanged(nameof(ProductValueText));
+                PointResults.Clear();
+                OnPropertyChanged(nameof(HasPointResults));
+                OnPropertyChanged(nameof(HasRowDetails));
+                OnPropertyChanged(nameof(PointSummaryText));
+                MeasuredValue = null;
+                return;
+            }
+
+            _reportedNotJudged = false;
             switch (_model.ValueSource)
             {
                 case "Product":
@@ -162,6 +225,11 @@ namespace TORNPISolution.ViewModels
                     _instrumentValue = result.InstrumentValue;
                     _productValue = result.ProductValue ?? result.Value;
                     break;
+                case "Points":
+                    // 逐点判定项（BP-003）：父行双值列只显示显式回传值（通常为空，显示 --），逐点双值在子表
+                    _instrumentValue = result.InstrumentValue;
+                    _productValue = result.ProductValue;
+                    break;
                 default:
                     _instrumentValue = result.InstrumentValue ?? result.Value;
                     _productValue = result.ProductValue;
@@ -169,6 +237,17 @@ namespace TORNPISolution.ViewModels
             }
             OnPropertyChanged(nameof(InstrumentValueText));
             OnPropertyChanged(nameof(ProductValueText));
+
+            // 逐点子节点（BP-003）：清空后重建，子表随父项结果同步刷新
+            PointResults.Clear();
+            if (result.Points != null)
+            {
+                foreach (var p in result.Points)
+                    PointResults.Add(p);
+            }
+            OnPropertyChanged(nameof(HasPointResults));
+            OnPropertyChanged(nameof(HasRowDetails));
+            OnPropertyChanged(nameof(PointSummaryText));
 
             MeasuredValue = result.Value;
         }
@@ -191,12 +270,17 @@ namespace TORNPISolution.ViewModels
             _instrumentValue = null;
             _productValue = null;
             _instrumentText = null;
+            _productText = null;
+            _reportedNotJudged = false;
             OnPropertyChanged(nameof(LowerLimit));
             OnPropertyChanged(nameof(UpperLimit));
             OnPropertyChanged(nameof(IsDynamicSpec));
-            OnPropertyChanged(nameof(SpecText));
             OnPropertyChanged(nameof(InstrumentValueText));
             OnPropertyChanged(nameof(ProductValueText));
+            PointResults.Clear();
+            OnPropertyChanged(nameof(HasPointResults));
+            OnPropertyChanged(nameof(HasRowDetails));
+            OnPropertyChanged(nameof(PointSummaryText));
             MeasuredValue = null;
         }
 
@@ -207,9 +291,10 @@ namespace TORNPISolution.ViewModels
         {
             _measuredValue = 0;
             _instrumentText = null;
+            _productText = null;
             if (_model.ValueSource == "Product" || _model.ValueSource == "Both")
                 _productValue = 0;
-            else
+            else if (_model.ValueSource != "Points")   // Points 项（BP-003）双值列保持空显示 --
                 _instrumentValue = 0;
             OnPropertyChanged(nameof(InstrumentValueText));
             OnPropertyChanged(nameof(ProductValueText));
@@ -231,7 +316,7 @@ namespace TORNPISolution.ViewModels
                 }
                 else if (name.StartsWith("BP-"))
                 {
-                    var bpaCfg = cfg.BPA700Simulator.TestParams.WaveformDisplay.GetItemConfig(name);
+                    var bpaCfg = cfg.ActiveBpTestParams.WaveformDisplay.GetItemConfig(name);
                     if (bpaCfg.TimeScale > 0) return bpaCfg.TimeScale;
                 }
             }

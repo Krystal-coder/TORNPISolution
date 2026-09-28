@@ -32,12 +32,16 @@
     </Resource>
   </ItemGroup>
 
+  <!-- Config 下的 json 是“初始模板/种子”，不作为每次构建都覆盖输出的内容文件：
+       CopyToOutputDirectory 必须为 Never（切勿用 Always），否则每次构建都会用源码模板
+       覆盖输出目录，导致用户在配置页保存的修改重启后丢失。首次种子复制交由下面的
+       Ensure*Json target（仅当输出目录不存在时复制）负责，之后以输出目录为权威。 -->
   <ItemGroup>
     <None Update="Config\instruments.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Config\protocol_commands.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
@@ -49,10 +53,12 @@
     <Copy SourceFiles="Config\instruments.json" DestinationFiles="$(OutDir)Config\instruments.json" Condition="!Exists('$(OutDir)Config\instruments.json')" />
   </Target>
 
-  <!-- 每次构建时同步协议命令配置模板到输出目录；
-       用户在配置页修改的命令码写入输出目录，此处仅同步源码模板中新增的键 -->
+  <!-- 协议命令配置模板：只在输出目录没有 protocol_commands.json 时才复制（与 instruments.json 一致）。
+       用户在配置页修改并保存的命令码写入输出目录，重新编译不会覆盖；
+       源码模板新增的键由 ProtocolCommandConfigService.Load() 回退默认值并告警，
+       配置窗按 OrderedKeys 展示全部键，用户下次保存即完整落盘。 -->
   <Target Name="EnsureProtocolCommandsJson" BeforeTargets="PreBuildEvent">
-    <Copy SourceFiles="Config\protocol_commands.json" DestinationFiles="$(OutDir)Config\protocol_commands.json" />
+    <Copy SourceFiles="Config\protocol_commands.json" DestinationFiles="$(OutDir)Config\protocol_commands.json" Condition="!Exists('$(OutDir)Config\protocol_commands.json')" />
   </Target>
 
 </Project>

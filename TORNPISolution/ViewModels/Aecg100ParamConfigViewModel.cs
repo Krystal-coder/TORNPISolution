@@ -24,7 +24,7 @@ namespace TORNPISolution.ViewModels
         {
             _configService = configService;
             Config = _configService.Load();
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommand(Save, () => !TestRunState.IsRunning);
         }
 
         /// <summary>当前编辑中的配置（直接双向绑定其子属性）</summary>
@@ -149,6 +149,12 @@ namespace TORNPISolution.ViewModels
         // ==================== 命令 ====================
 
         public RelayCommand SaveCommand { get; }
+
+        /// <summary>测试是否运行中（运行期锁定配置保存，与血压模拟仪测试配置页一致）</summary>
+        public bool IsRunning => TestRunState.IsRunning;
+
+        /// <summary>是否允许保存（运行期灰色不可点）</summary>
+        public bool CanSave => !IsRunning;
 
         /// <summary>保存成功后请求关闭对话框（由窗口订阅）</summary>
         public event Action? CloseRequested;

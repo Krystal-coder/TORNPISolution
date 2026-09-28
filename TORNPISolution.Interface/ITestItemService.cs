@@ -32,5 +32,11 @@ namespace TORNPISolution.Interface
         /// <param name="onItemCompleted">逐项完成回调：每个测试小项得出结果后立即触发，UI 层可立即回填显示；null 则等模块全部完成后一次性返回</param>
         /// <param name="token">取消令牌</param>
         Task<Dictionary<string, TestItemResult>> TestItemxx(int index, TestModuleModel module, Func<string, TestItemResult, Task>? onItemCompleted, CancellationToken token);
+
+        /// <summary>
+        /// 方案开始执行前复位方案级状态（产品通讯可用性记录等），
+        /// 保证上一轮方案的 M16 握手记录不残留到本轮。
+        /// </summary>
+        void BeginPlanRun();
     }
 }

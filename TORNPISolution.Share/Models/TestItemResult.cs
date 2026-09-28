@@ -30,12 +30,29 @@ namespace TORNPISolution.Share.Models
         /// <summary>仪器侧文本结果（如设备型号/固件版本/序列号等读回的字符串；设置后仪器列显示文本而非数值）</summary>
         public string? InstrumentText { get; set; }
 
+        /// <summary>产品侧文本结果（产品串口读回的原始内容：嵌软版本/MAC、测试模式与状态等；设置后产品列显示文本而非数值）</summary>
+        public string? ProductText { get; set; }
+
+        /// <summary>逐点子结果（BP-003 等逐点测试项用）：UI 在测试项行下方子表逐点展示判定</summary>
+        public List<TestPointResult>? Points { get; set; }
+
+        /// <summary>演示/跳过标记：该项仅展示、不参与合格判定（结果保持“未测试”），用于无产品演示模式等场景</summary>
+        public bool NotJudged { get; set; }
+
         /// <summary>普通项便捷构造：只有测试值，按 Spec 静态规格判定</summary>
         public static TestItemResult Of(double value) => new() { Value = value };
 
         /// <summary>文本展示项便捷构造：主值参与 1/0 判定，仪器列显示读回的文本（如设备信息）</summary>
         public static TestItemResult OfText(double value, string text)
             => new() { Value = value, InstrumentText = text };
+
+        /// <summary>产品文本展示项便捷构造：主值参与 1/0 判定，产品列显示读回的文本（如产品信息获取/状态查询）</summary>
+        public static TestItemResult OfProductText(double value, string? productText)
+            => new() { Value = value, ProductText = productText };
+
+        /// <summary>演示不判定项便捷构造：仪器列显示演示文本，不参与判定（保持未测试）</summary>
+        public static TestItemResult Demo(string text = "演示（不判定）")
+            => new() { NotJudged = true, InstrumentText = text };
 
         /// <summary>动态规格项便捷构造：测试值 + 本次运行按仪器值现算的规格上下限</summary>
         public static TestItemResult WithDynamicSpec(double value, double specMin, double specMax)

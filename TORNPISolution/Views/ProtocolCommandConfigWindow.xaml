@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:TORNPISolution.ViewModels"
         xmlns:conv="clr-namespace:TORNPISolution.Converters"
-        Title="协议命令配置" Width="680" Height="520"
+        Title="协议命令配置" Width="760" Height="640"
         Icon="/Images/logo.ico"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="{StaticResource Brush.Window.Background}"
@@ -21,7 +21,7 @@
 
         <!-- 底部按钮栏 -->
         <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
-            <TextBlock Text="修改后保存到 Config\protocol_commands.json，运行时热重载"
+            <TextBlock Text="修改后保存到 Config\protocol_commands.json，运行时热重载；同一命令码在不同功能码下是不同命令"
                        Style="{StaticResource Style.SubText}" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="取消" Style="{StaticResource Style.ToolButton}" IsCancel="True" Margin="0,0,8,0"/>
@@ -45,9 +45,11 @@
                       FontSize="12">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="命令名称" Binding="{Binding Name, Mode=OneWay}"
-                                        Width="180" IsReadOnly="True" FontWeight="SemiBold"/>
+                                        Width="220" IsReadOnly="True" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="功能码" Binding="{Binding FuncCode, Converter={StaticResource HexByte}, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="80"/>
                     <DataGridTextColumn Header="命令码" Binding="{Binding Code, Converter={StaticResource HexByte}, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="100"/>
+                                        Width="80"/>
                     <DataGridTextColumn Header="描述" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                                         Width="*"/>
                 </DataGrid.Columns>

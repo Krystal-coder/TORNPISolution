@@ -8,9 +8,10 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 血压仪参数配置 ViewModel：对应鲸杨 BPA700 官方上位机的三类测试参数
-    /// （静态压力 / 动态血压 / 超压测试），保存时写入 instruments.json。
-    /// 目前仅做参数配置与持久化，测试模块挂钩在后续按需接入。
+    /// 血压模拟仪测试配置 ViewModel：外层按设备分页签（BPA700 / 康伟达），
+    /// 两台设备各自维护一套同构测试参数（充放气规格 / 静态压力 / 动态血压 / 超压 / 压力控制 / 波形显示），
+    /// 保存时写入 instruments.json 对应设备节点（BPA700Simulator / KangwendaSimulator 的 TestParams）。
+    /// 测试模块按仪器链接配置选择的模拟仪读取各自参数（InstrumentConnectionConfig.ActiveBpTestParams）。
     /// </summary>
     public class BpaParamConfigViewModel : ViewModelBase
     {
@@ -27,6 +28,9 @@ namespace TORNPISolution.ViewModels
             _configService = configService;
             Config = _configService.Load();
 
+            // 默认页签跟随仪器链接配置当前启用的模拟仪（康伟达→第 2 页，BPA700/未选择→第 1 页）
+            _selectedDeviceIndex = Config.ActiveSimulator == SimulatorType.Kangwenda ? 1 : 0;
+
             // 压力点列表包一层 ObservableCollection 以支持界面增删刷新，保存时写回配置（超出上限的旧数据截断）
             Points = new ObservableCollection<BpaPressurePoint>(Params.StaticPressure.Points.Take(MaxPointCount));
 
@@ -34,7 +38,7 @@ namespace TORNPISolution.ViewModels
             BpDefaultPresets = new ObservableCollection<string>(CurrentCategoryPresets());
             _selectedBpPreset = ResolveInitialPreset();
 
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommand(Save, () => !TestRunState.IsRunning);
             AddPointCommand = new RelayCommand(AddPoint, () => CanAddPoint);
             RemovePointCommand = new RelayCommand<BpaPressurePoint>(RemovePoint);
         }
@@ -44,8 +48,64 @@ namespace TORNPISolution.ViewModels
 
         public InstrumentConnectionConfig Config { get; }
 
-        /// <summary>BPA700 测试参数（充放气规格 / 静态压力 / 动态血压 / 超压）</summary>
-        public BpaTestParams Params => Config.BPA700Simulator.TestParams;
+        // ==================== 设备页签（BPA700 / 康伟达） ====================
+
+        private int _selectedDeviceIndex;
+
+        /// <summary>设备页签：0 = BPA700（鲸杨），1 = 康伟达；切换时压力点列表与全部参数绑定跟随路由</summary>
+        public int SelectedDeviceIndex
+        {
+            get => _selectedDeviceIndex;
+            set
+            {
+                if (_selectedDeviceIndex == value) return;
+
+                // 把当前页签的压力点编辑结果写回旧设备配置，再切到新设备重建界面状态
+                Params.StaticPressure.Points = Points.ToList();
+                _selectedDeviceIndex = value;
+
+                Points.Clear();
+                foreach (var p in Params.StaticPressure.Points.Take(MaxPointCount))
+                    Points.Add(p);
+                RebuildPresets();
+
+                OnPropertyChanged(nameof(SelectedDeviceIndex));
+                OnPropertyChanged(nameof(Params));
+                OnPropertyChanged(nameof(CurrentDeviceName));
+                OnPropertyChanged(nameof(SelfInflationLabel));
+                OnPropertyChanged(nameof(SelectAllPoints));
+                OnPropertyChanged(nameof(CanAddPoint));
+                OnPropertyChanged(nameof(PointsEmpty));
+                OnPropertyChanged(nameof(DynamicCategory));
+                OnPropertyChanged(nameof(DynamicMethod));
+                OnPropertyChanged(nameof(IsDefaultMethod));
+                OnPropertyChanged(nameof(IsCustomizedMethod));
+                OnPropertyChanged(nameof(SelectedXAxisMode));
+                OnPropertyChanged(nameof(SelectedTimeScale));
+                OnPropertyChanged(nameof(IsTimeXAxis));
+            }
+        }
+
+        /// <summary>当前页签设备名（动态文案用）</summary>
+        public string CurrentDeviceName => _selectedDeviceIndex == 1 ? "康伟达" : "BPA700";
+
+        /// <summary>充气方式开关文案（随页签设备变化）</summary>
+        public string SelfInflationLabel => $"{CurrentDeviceName} 自行充气";
+
+        /// <summary>当前页签设备的测试参数（充放气规格 / 静态压力 / 动态血压 / 超压 / 压力控制 / 波形显示，两台设备独立存放）</summary>
+        public BpaTestParams Params
+            => _selectedDeviceIndex == 1 ? Config.KangwendaSimulator.TestParams : Config.BPA700Simulator.TestParams;
+
+        // ==================== 运行期锁定 ====================
+
+        /// <summary>测试方案是否正在运行（打开窗口时读取全局运行态；对话框模态阻塞主窗口，运行态不会在窗口打开期间变化）</summary>
+        public bool IsRunning => TestRunState.IsRunning;
+
+        /// <summary>参数编辑区可用（运行中锁定，禁止修改）</summary>
+        public bool CanEdit => !IsRunning;
+
+        /// <summary>保存按钮可用（运行中灰色不可选）</summary>
+        public bool CanSave => !IsRunning;
 
         // ==================== 静态压力 ====================
 
@@ -170,10 +230,15 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(SelectedBpPreset));
         }
 
-        /// <summary>初始/回退选中项：优先按当前收缩压/舒张压匹配预设，匹配不到取第一项（Default 方法血压以预设为准，同步填充）</summary>
+        /// <summary>初始/回退选中项：优先用当前设备已保存的预设，其次按收缩压/舒张压匹配，
+        /// 都匹配不到才取第一项（Default 方法血压以预设为准，同步填充；切换设备页签时避免误改已保存参数）</summary>
         private string ResolveInitialPreset()
         {
             var presets = CurrentCategoryPresets();
+            var saved = Params.DynamicBloodPressure.DefaultBpPreset;
+            if (!string.IsNullOrEmpty(saved) && presets.Contains(saved))
+                return saved;
+
             foreach (var p in presets)
             {
                 if (TryParsePreset(p, out var sys, out var dia)
@@ -243,10 +308,9 @@ namespace TORNPISolution.ViewModels
             "BP-002放气时间",
             "BP-003静态压力精度测试",
             "BP-004收缩压精度测试",
-            "BP-006过压保护触发压力",
-            "BP-007快速放气速率",
-            "BP-008放气时间",
-            "BP-009过压保护响应"
+            "BP-006匀速放气控制",
+            "BP-007快速放气控制",
+            "BP-008过压保护"
         };
 
         private string? _selectedWaveformItem;
@@ -317,7 +381,7 @@ namespace TORNPISolution.ViewModels
                 // 至少保留一个勾选的压力点，避免静态压力测试无点可跑
                 if (Params.StaticPressure.Points.All(p => !p.Enabled))
                 {
-                    _log.Warn("血压仪参数配置：静态压力未勾选任何压力点，已自动勾选第一个");
+                    _log.Warn($"血压模拟仪测试配置：{CurrentDeviceName} 静态压力未勾选任何压力点，已自动勾选第一个");
                     if (Params.StaticPressure.Points.Count > 0)
                     {
                         Params.StaticPressure.Points[0].Enabled = true;
@@ -325,7 +389,7 @@ namespace TORNPISolution.ViewModels
                 }
 
                 _configService.Save(Config);
-                _log.Info("血压仪参数配置已保存（instruments.json → BPA700Simulator.TestParams）");
+                _log.Info($"血压模拟仪测试配置已保存（instruments.json → {(_selectedDeviceIndex == 1 ? "KangwendaSimulator" : "BPA700Simulator")}.TestParams）");
                 CloseRequested?.Invoke();
             }
             catch (Exception ex)

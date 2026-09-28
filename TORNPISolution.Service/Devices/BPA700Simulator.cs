@@ -1,37 +1,9 @@
 using System.Runtime.InteropServices;
 using TORNPISolution.Interface;
+using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service.Devices
 {
-    /// <summary>
-    /// BPARunBPTest 一轮执行结果：回调 status 序列（0=Idle 1=Wait 2=Busy 3=Stable 4=Finish）
-    /// 与时间参数，供 BP-001/002 验证（status 依次经历 Busy→Stable→Finish、快速放气时间）。
-    /// </summary>
-    public sealed record BpTestRunResult(
-        int FinalStatus,
-        IReadOnlyList<int> StatusSequence,
-        double PeakPressure,
-        double InflatableTime,
-        double DeflationTime,
-        double TotalTime)
-    {
-        /// <summary>是否依次经历 Busy(2)→Stable(3)→Finish(4)（产品确认启动并完成测量，BP-001 通过条件）</summary>
-        public bool CompletedFullSequence
-        {
-            get
-            {
-                var need = new[] { 2, 3, 4 };
-                var idx = 0;
-                foreach (var s in StatusSequence)
-                {
-                    if (s == need[idx] && ++idx == need.Length)
-                        return true;
-                }
-                return false;
-            }
-        }
-    }
-
     /// <summary>
     /// 鲸扬 BPA700 无创血压模拟仪控制类。
     /// 通过 P/Invoke 调用 BPA700x64.dll 原生 SDK，
@@ -199,6 +171,9 @@ namespace TORNPISolution.Service.Devices
         /// UI 层订阅此事件即可实时绘制压力波形
         /// </summary>
         public event Action<double>? PressureSampled;
+
+        /// <summary>序列模式下每个压力点到达 Stable 时触发：index=点序号，pressure=稳压读回值；BP-003 用于保持窗内回读产品上报值</summary>
+        public event Action<int, double>? PressurePointStable;
 
         /// <summary>
         /// 创建 BPA700 模拟仪控制器。
@@ -525,6 +500,38 @@ namespace TORNPISolution.Service.Devices
             => SetStaticPressureAsync(pressure, stableSeconds, inflation: true, ct);
 
         /// <summary>
+        /// 逐点执行静态压力序列（接口成员；Formal SDK 无一次下发序列 API，
+        /// 故单点循环：加压取稳压值 → 等 Finish → 快阀泄压衔接下一点）。
+        /// </summary>
+        public async Task<double[]> RunStaticPressureSequenceAsync(double[] points, int stableSeconds, bool inflation, CancellationToken ct = default)
+        {
+            if (points is not { Length: > 0 })
+                throw new ArgumentException("压力点不能为空", nameof(points));
+
+            var results = new double[points.Length];
+            for (var i = 0; i < points.Length; i++)
+            {
+                results[i] = double.NaN;
+                await SetStaticPressureAsync(points[i], stableSeconds, inflation, ct).ConfigureAwait(false);
+                results[i] = LastStaticPressure;
+
+                // 逐点稳定事件：上层在稳压保持窗内并发回读产品上报值（不阻塞本序列）
+                PressurePointStable?.Invoke(i, LastStaticPressure);
+
+                await WaitStaticPressureFinishAsync(ct: ct).ConfigureAwait(false);
+
+                if (i < points.Length - 1)
+                {
+                    // 点间快阀泄压，残压降到下一点附近再重新加压
+                    await SetFastValveAsync(true, ct).ConfigureAwait(false);
+                    await Task.Delay(3000, ct).ConfigureAwait(false);
+                    await SetFastValveAsync(false, ct).ConfigureAwait(false);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// 静态压力测试：设置恒定标准压力并等待稳定（BPARunStaticPressure）。
         /// inflation=true 时 BPA700 自行充气到目标压力并保持 stableSeconds 秒；
         /// inflation=false 为由外部设备充气（官方语义，无"放气模式"；放气用 SetSlowValve/SetFastValve 开气阀）。
@@ -607,6 +614,17 @@ namespace TORNPISolution.Service.Devices
 
             _log.Info($"BPA700：静态压力 {pressure}{PressureUnit} 已到位（采样读回 {LastStaticPressure:0.0}{PressureUnit}）");
         }
+
+        /// <summary>接口成员：启动静态压力测试不等待稳压完成（逻辑同 StartStaticPressureTestAsync）</summary>
+        public async Task StartStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default)
+            => await StartStaticPressureTestAsync(pressure, stableSeconds, inflation, ct).ConfigureAwait(false);
+
+        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变）</summary>
+        public Task<BpTestRunResult> RunBpMeasurementAsync(
+            int systolic, int diastolic, int heartRate,
+            int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
+            CancellationToken ct = default)
+            => RunBPTestAsync(systolic, diastolic, heartRate, waitStartTimeoutMs, totalTimeoutMs, ct);
 
         /// <summary>
         /// 只发起一轮静态压力测试并立即返回（不等 Stable），返回 Stable/Finish 到达信号。

@@ -8,6 +8,7 @@ using System.Windows.Input;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
 using TORNPISolution.Service;
+using TORNPISolution.Service.Devices;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.ViewModels
@@ -31,6 +32,9 @@ namespace TORNPISolution.ViewModels
         // 运行期间的取消令牌：点"停止"时 Cancel
         private CancellationTokenSource? _runCts;
 
+        /// <summary>血压模拟仪方案级共享会话（单例）：RunPlan 开始建立、结束关闭，模块间不复关复开串口</summary>
+        private readonly BloodPressureSimulatorSession? _simSession;
+
         // XAML <vm:MainViewModel/> 要求无参构造：依赖从 App 组合根解析（Spec/TestItem 均为单例，事件订阅同一实例）
         public MainViewModel()
             : this(App.Services.GetRequiredService<ITestModuleService>(),
@@ -44,6 +48,8 @@ namespace TORNPISolution.ViewModels
             _testItemService = testItemService;
             _moduleService = moduleService;
             _testPlanService = testPlanService ?? App.Services.GetRequiredService<ITestPlanService>();
+            try { _simSession = App.Services.GetRequiredService<BloodPressureSimulatorSession>(); }
+            catch { /* 设计期上下文等容器不可用时忽略，RunPlan 不建共享会话 */ }
 
             AvailableModules = new ObservableCollection<TestModuleViewModel>(
                 moduleService.GetAllModules().Select(m => new TestModuleViewModel(m)));
@@ -497,10 +503,15 @@ namespace TORNPISolution.ViewModels
 
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
             IsRunning = true;
+            TestRunState.SetRunning(true);   // 全局运行态：配置页运行期锁定编辑/保存
             _runCts = new CancellationTokenSource();
             var token = _runCts.Token;
+            _testItemService.BeginPlanRun();   // 复位方案级产品通讯状态：本轮产品可用性由 M16 初始化模块记录
             ClearWaveform();   // 新一轮测试清空上一轮波形
             _log.Info($"===== 开始执行测试方案，共 {PlanModules.Count} 个模块 =====");
+
+            // 血压模拟仪共享会话为懒建立：第一个真正需要它的血压模块借用时才打开，
+            // 纯 NFC/ECG 等方案不碰这台设备；此处不主动 Open，只保证结束时 Close
 
             try
             {
@@ -523,15 +534,10 @@ namespace TORNPISolution.ViewModels
                     module.Sequence = i + 1;   // 执行前再次确认序号 = 实际执行顺序（TestItemxx 的 xx）
                     SelectedPlanModule = module;
 
-                    // TBD 项（Det=false）预跳过：执行前就标记“未测试”，回调中不再处理
-                    foreach (var item in module.Items.Where(it => !it.Model.Det))
-                        _log.Info($"[TestItem{module.Sequence} {module.Name}] {item.Name} = TBD，跳过");
-
-
                     async Task OnItemCompleted(string itemName, TestItemResult result)
                     {
                         var item = module.Items.FirstOrDefault(it => it.Name == itemName);
-                        if (item == null || !item.Model.Det) return;   // TBD 项或不在 Spec 中的项忽略
+                        if (item == null) return;   // 不在 Spec 中的项忽略
                         Application.Current.Dispatcher.Invoke(() => item.ApplyResult(result));
                         if (item.Result == TestResultStatus.Fail)
                             _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} = {item.MeasuredValueText} 超规格 {item.SpecText} -> FAIL");
@@ -549,7 +555,7 @@ namespace TORNPISolution.ViewModels
                     {
                         foreach (var item in module.Items)
                         {
-                            if (!item.Model.Det) continue;   // TBD 项保持"未测试"，不强制 FAIL
+                            if (item.IsReportedNotJudged) continue;   // 不判定项（演示/预留）保持“未测试”，不强制 FAIL
                             if (results.ContainsKey(item.Name) && item.Result != TestResultStatus.NotTested) continue;
                             if (item.Result == TestResultStatus.NotTested)
                             {
@@ -576,9 +582,25 @@ namespace TORNPISolution.ViewModels
             }
             finally
             {
+                // 方案结束才关闭共享会话（本方案若从未懒建立过则是空操作；此时康伟达发 0x00 归还本地控制）；限时 5s 防读循环收尾卡死。
+                // 必须 await（不能用 .GetAwaiter().GetResult() 同步阻塞）——finally 在 UI 线程上执行，同步阻塞会冻结界面导致点不动
+                if (_simSession is { IsOpen: true })
+                {
+                    try
+                    {
+                        var closeTask = _simSession.CloseAsync();
+                        if (await Task.WhenAny(closeTask, Task.Delay(5000)).ConfigureAwait(true) != closeTask)
+                            _log.Warn("血压模拟仪共享会话关闭超时（5s），已跳过");
+                        else
+                            await closeTask.ConfigureAwait(true);
+                    }
+                    catch (Exception ex) { _log.Warn($"血压模拟仪共享会话关闭异常：{ex.Message}"); }
+                }
+
                 _runCts.Dispose();
                 _runCts = null;
                 IsRunning = false;
+                TestRunState.SetRunning(false);
                 _log.Info($"{DateTime.Now} Ended calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
             }
         }

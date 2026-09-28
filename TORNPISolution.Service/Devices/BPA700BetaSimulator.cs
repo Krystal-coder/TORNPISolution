@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using TORNPISolution.Interface;
+using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service.Devices
 {
@@ -237,6 +238,10 @@ namespace TORNPISolution.Service.Devices
         public Task SetStaticPressureAsync(double pressure, int stableSeconds, CancellationToken ct)
             => SetStaticPressureAsync(pressure, stableSeconds, inflation: true, ct);
 
+        /// <summary>接口实现：三参签名（stableSeconds 带默认值）委托到充气版</summary>
+        Task IBloodPressureSimulator.SetStaticPressureAsync(double pressure, int stableSeconds, CancellationToken ct)
+            => SetStaticPressureAsync(pressure, stableSeconds, inflation: true, ct);
+
         /// <summary>设置恒定标准压力并等待稳定（仅静态压力测试用）</summary>
         public async Task SetStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct, int timeoutSeconds = 180)
         {
@@ -314,6 +319,17 @@ namespace TORNPISolution.Service.Devices
             }, ct);
         }
 
+        /// <summary>接口成员：启动静态压力测试不等待稳压完成（BP-007/008 使气阀状态生效用，逻辑同 StartStaticPressureTestAsync）</summary>
+        public async Task StartStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default)
+            => await StartStaticPressureTestAsync(pressure, stableSeconds, inflation, ct).ConfigureAwait(false);
+
+        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变）</summary>
+        public Task<BpTestRunResult> RunBpMeasurementAsync(
+            int systolic, int diastolic, int heartRate,
+            int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
+            CancellationToken ct = default)
+            => RunBPTestAsync(systolic, diastolic, heartRate, waitStartTimeoutMs, totalTimeoutMs, ct);
+
         /// <summary>发起静态压力测试并返回 Stable/Finish 到达信号</summary>
         public async Task<TaskCompletionSource<bool>> StartStaticPressureTestAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default)
         {
@@ -358,16 +374,16 @@ namespace TORNPISolution.Service.Devices
         /// 注意：Beta SDK 回调的 index 参数为保留字段，永远返回 0，
         /// 因此改用 Stable 回调计数器来追踪当前到达的压力点序号。
         /// </summary>
-        public async Task<IReadOnlyList<double>> RunStaticPressureSequenceAsync(IReadOnlyList<double> points, int stableSeconds, bool inflation, CancellationToken ct = default)
+        public async Task<double[]> RunStaticPressureSequenceAsync(double[] points, int stableSeconds, bool inflation, CancellationToken ct = default)
         {
             if (!_connected)
                 throw new InvalidOperationException("BPA700Beta 未连接");
-            if (points.Count == 0)
+            if (points.Length == 0)
                 throw new ArgumentException("压力点不能为空", nameof(points));
 
             await ConfigureValvesForStaticPressureAsync(ct).ConfigureAwait(false);
 
-            var stablePressures = new double[points.Count];
+            var stablePressures = new double[points.Length];
             for (var i = 0; i < stablePressures.Length; i++)
                 stablePressures[i] = double.NaN;
 
@@ -404,7 +420,7 @@ namespace TORNPISolution.Service.Devices
             if (!success)
                 throw new IOException("BPA700Beta 静态压力序列启动失败");
 
-            var timeoutMs = Math.Max(30_000, (points.Count * (stableSeconds + 15) + 30) * 1000);
+            var timeoutMs = Math.Max(30_000, (points.Length * (stableSeconds + 15) + 30) * 1000);
             if (await Task.WhenAny(finishTcs.Task, Task.Delay(timeoutMs, ct)).ConfigureAwait(false) != finishTcs.Task)
             {
                 _log.Warn($"BPA700Beta：静态压力序列 {timeoutMs / 1000}s 未收到 Finish，主动 BPAStopTest 结束");

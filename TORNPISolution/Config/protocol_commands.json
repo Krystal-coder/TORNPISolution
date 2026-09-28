@@ -1,75 +1,282 @@
 {
+  "CtrlKeepAlive": {
+    "Code": 1,
+    "FuncCode": 7,
+    "Description": "进入产测模式（打开串口后立即发送防产品休眠，须在 0x72/0x74 查询前发送）"
+  },
+  "CtrlGetProductTime": {
+    "Code": 48,
+    "FuncCode": 2,
+    "Description": "读产品时间"
+  },
+  "CtrlGetAllUserParams": {
+    "Code": 49,
+    "FuncCode": 2,
+    "Description": "读用户所有参数"
+  },
+  "CtrlGetUserCount": {
+    "Code": 50,
+    "FuncCode": 2,
+    "Description": "读取用户数量"
+  },
+  "CtrlGetProductConfig": {
+    "Code": 51,
+    "FuncCode": 2,
+    "Description": "读产品配置参数"
+  },
+  "CtrlGetProductStatus": {
+    "Code": 52,
+    "FuncCode": 2,
+    "Description": "读产品状态"
+  },
+  "CtrlGetDisconnectInfo": {
+    "Code": 53,
+    "FuncCode": 2,
+    "Description": "读产品断联信息"
+  },
+  "CtrlGetResetInfo": {
+    "Code": 54,
+    "FuncCode": 2,
+    "Description": "读产品复位信息"
+  },
+  "CtrlGetVersionInfo": {
+    "Code": 55,
+    "FuncCode": 2,
+    "Description": "读产品版本信息"
+  },
   "CtrlGetVersion": {
     "Code": 114,
-    "Description": "读版本/MAC"
+    "FuncCode": 5,
+    "Description": "读产品嵌软版本+MAC地址"
   },
   "CtrlSetMode": {
     "Code": 115,
-    "Description": "设置测试模式"
+    "FuncCode": 5,
+    "Description": "设置测试模式（参数 uint8 test_mode）"
   },
   "CtrlGetState": {
     "Code": 116,
-    "Description": "读测试状态"
+    "FuncCode": 5,
+    "Description": "读取产品状态（待机/测量中）"
   },
   "CtrlStartInflate": {
     "Code": 117,
+    "FuncCode": 5,
     "Description": "开始充气"
   },
   "CtrlGetPressure": {
     "Code": 118,
-    "Description": "读当前压力值"
+    "FuncCode": 5,
+    "Description": "读取产品压力值"
   },
   "CtrlStartDeflate": {
     "Code": 119,
+    "FuncCode": 5,
     "Description": "开始放气"
   },
   "CtrlInflateStop": {
     "Code": 120,
-    "Description": "充放气停止"
+    "FuncCode": 5,
+    "Description": "写停止命令（参数 0充气/1放气）"
   },
   "CtrlStartBpMeasure": {
     "Code": 121,
-    "Description": "开始血压测量"
+    "FuncCode": 5,
+    "Description": "写开始完整血压测量"
   },
   "CtrlGetBpValue": {
     "Code": 122,
-    "Description": "读瞬时血压值"
+    "FuncCode": 5,
+    "Description": "读取当前血压测量值"
   },
   "CtrlGetBpResult": {
     "Code": 123,
-    "Description": "读血压测量最终结果/测量完成主动推送"
+    "FuncCode": 5,
+    "Description": "读取血压测量结果/测量完成主动推送"
   },
   "CtrlGetHrValue": {
     "Code": 124,
-    "Description": "读心率值"
+    "FuncCode": 5,
+    "Description": "读取当前心率值"
   },
   "CtrlStopBpMeasure": {
     "Code": 125,
-    "Description": "停止血压测量"
+    "FuncCode": 5,
+    "Description": "写停止完整血压测量"
   },
   "CtrlGetStaticPress": {
     "Code": 126,
-    "Description": "读静态压力值"
+    "FuncCode": 5,
+    "Description": "读取当前静态值"
+  },
+  "CtrlSetOverPressureThreshold": {
+    "Code": 127,
+    "FuncCode": 5,
+    "Description": "写过压门限"
+  },
+  "CtrlGetOverPressureStatus": {
+    "Code": 128,
+    "FuncCode": 5,
+    "Description": "读过压状态"
   },
   "CtrlStartSpo2": {
-    "Code": 128,
-    "Description": "开始/停止血氧测量"
+    "Code": 129,
+    "FuncCode": 5,
+    "Description": "写开始/停止血氧测量（参数 0开始/1停止）"
   },
   "CtrlGetSpo2Value": {
-    "Code": 129,
-    "Description": "读血氧值"
+    "Code": 130,
+    "FuncCode": 5,
+    "Description": "读取当前血氧值"
+  },
+  "CtrlSetSpo2AlarmThreshold": {
+    "Code": 131,
+    "FuncCode": 5,
+    "Description": "写血氧报警阈值"
+  },
+  "CtrlGetSpo2AlarmStatus": {
+    "Code": 132,
+    "FuncCode": 5,
+    "Description": "读取当前血氧浓度报警状态"
+  },
+  "CtrlGetPulseRate": {
+    "Code": 133,
+    "FuncCode": 5,
+    "Description": "读取当前脉搏频率"
+  },
+  "CtrlGetWeakPerfusionAlarm": {
+    "Code": 134,
+    "FuncCode": 5,
+    "Description": "读取弱灌注告警状态"
+  },
+  "CtrlGetWeakPerfusionIndex": {
+    "Code": 135,
+    "FuncCode": 5,
+    "Description": "读取弱灌注指数"
   },
   "CtrlGetLeadState": {
     "Code": 136,
-    "Description": "读导联状态"
+    "FuncCode": 5,
+    "Description": "读取心电导联状态"
+  },
+  "CtrlGetChargingStatus5": {
+    "Code": 137,
+    "FuncCode": 5,
+    "Description": "读取充电状态（0x05/0x89）"
+  },
+  "CtrlGetAccelTilt": {
+    "Code": 138,
+    "FuncCode": 5,
+    "Description": "读取加速度倾斜度"
+  },
+  "CtrlGetSpeakerVolume": {
+    "Code": 140,
+    "FuncCode": 5,
+    "Description": "读取喇叭音量"
+  },
+  "CtrlPushEcgWave": {
+    "Code": 16,
+    "FuncCode": 6,
+    "Description": "上报心电波形数据（产品主动推送）"
+  },
+  "CtrlPushEcgHr": {
+    "Code": 17,
+    "FuncCode": 6,
+    "Description": "上报ECG测量心率数据（产品主动推送）"
+  },
+  "CtrlPushPpgHr": {
+    "Code": 18,
+    "FuncCode": 6,
+    "Description": "上报PPG心率数据（产品主动推送）"
+  },
+  "CtrlPushPpgSpo2": {
+    "Code": 19,
+    "FuncCode": 6,
+    "Description": "上报PPG测量血氧数据（产品主动推送）"
+  },
+  "CtrlSetSampleRate": {
+    "Code": 98,
+    "FuncCode": 7,
+    "Description": "设置采样频率/上传间隔"
+  },
+  "CtrlStartPressureSensor": {
+    "Code": 101,
+    "FuncCode": 7,
+    "Description": "设置启动压力传感器，开启压力静态测试"
+  },
+  "CtrlCalibratePressureSensor": {
+    "Code": 102,
+    "FuncCode": 7,
+    "Description": "校准压力传感器"
+  },
+  "CtrlClosePressureSensor": {
+    "Code": 103,
+    "FuncCode": 7,
+    "Description": "设置关闭压力传感器"
+  },
+  "CtrlStartPumpTest": {
+    "Code": 104,
+    "FuncCode": 7,
+    "Description": "启动充气泵测试"
+  },
+  "CtrlStopPumpTest": {
+    "Code": 105,
+    "FuncCode": 7,
+    "Description": "关闭充气泵测试"
+  },
+  "CtrlOpenValveTest": {
+    "Code": 106,
+    "FuncCode": 7,
+    "Description": "设置开泄气阀测试"
+  },
+  "CtrlCloseValveTest": {
+    "Code": 107,
+    "FuncCode": 7,
+    "Description": "设置关闭泄气阀测试"
   },
   "CtrlGetBatteryInfo": {
     "Code": 108,
-    "Description": "读电池信息（电压+百分比）"
+    "FuncCode": 7,
+    "Description": "查询电池电量（电压+百分比）"
   },
   "CtrlGetChargingStatus": {
     "Code": 109,
     "FuncCode": 7,
-    "Description": "读充电状态"
+    "Description": "查询当前是否处于充电状态"
+  },
+  "CtrlSoftPowerOff": {
+    "Code": 110,
+    "FuncCode": 7,
+    "Description": "设置进入软关机"
+  },
+  "CtrlPlay1KHzSine": {
+    "Code": 112,
+    "FuncCode": 7,
+    "Description": "播放1KHz正弦波"
+  },
+  "CtrlStopAudioPlay": {
+    "Code": 113,
+    "FuncCode": 7,
+    "Description": "停止音频播放"
+  },
+  "CtrlStartEcgPpgMeasure": {
+    "Code": 128,
+    "FuncCode": 7,
+    "Description": "启动ECG+PPG测量（持续30秒）"
+  },
+  "CtrlStopEcgPpgMeasure": {
+    "Code": 129,
+    "FuncCode": 7,
+    "Description": "停止ECG+PPG测量"
+  },
+  "CtrlGetEcgPpgResult": {
+    "Code": 130,
+    "FuncCode": 7,
+    "Description": "获取ECG/PPG测量结果"
+  },
+  "CtrlFactoryReset": {
+    "Code": 176,
+    "FuncCode": 7,
+    "Description": "恢复出厂设置"
   }
 }

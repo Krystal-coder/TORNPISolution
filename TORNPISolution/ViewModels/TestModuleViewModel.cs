@@ -61,21 +61,22 @@ namespace TORNPISolution.ViewModels
         public string ItemCountText => $"{Items.Count} 项";
 
         /// <summary>
-        /// 模块级判定：仅统计 DET 项（TBD 项不参与判定），全部合格为合格，任一不合格为不合格，否则未测试
+        /// 模块级判定：不判定项（演示/预留，本轮上报过 NotJudged）不参与统计，
+        /// 其余项全部合格为合格，任一不合格为不合格，否则未测试
         /// </summary>
         public TestResultStatus ModuleResult
         {
             get
             {
-                var detItems = Items.Where(i => i.Model.Det).ToList();
-                if (detItems.Count == 0) return TestResultStatus.NotTested;
+                var judgedItems = Items.Where(i => !i.IsReportedNotJudged).ToList();
+                if (judgedItems.Count == 0) return TestResultStatus.NotTested;
 
-                if (detItems.Any(i => i.Result == TestResultStatus.Fail))
+                if (judgedItems.Any(i => i.Result == TestResultStatus.Fail))
                 {
                     return TestResultStatus.Fail;
                 }
 
-                return detItems.All(i => i.Result == TestResultStatus.Pass)
+                return judgedItems.All(i => i.Result == TestResultStatus.Pass)
                     ? TestResultStatus.Pass
                     : TestResultStatus.NotTested;
             }

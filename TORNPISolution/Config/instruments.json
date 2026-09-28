@@ -26,7 +26,7 @@
   "ActiveSimulator": 2,
   "KangwendaSimulator": {
     "PortName": "COM1",
-    "BaudRate": 9600,
+    "BaudRate": 115200,
     "Parity": "None",
     "DataBits": 8,
     "StopBits": 1,

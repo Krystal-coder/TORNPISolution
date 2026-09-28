@@ -1,0 +1,6 @@
+{
+  "files.exclude": {
+    "**/binVerifyBuild": true,
+    "**/VerifyBuild": true
+  }
+}

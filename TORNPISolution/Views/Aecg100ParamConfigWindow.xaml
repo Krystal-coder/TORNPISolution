@@ -65,9 +65,13 @@
             <TextBlock Text="保存后写入 Config\instruments.json（Aecg100Tester），测试模块按需读取"
                        Style="{StaticResource Style.Hint}" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- 运行期锁定配置保存：灰显不可点，与血压模拟仪测试配置页一致 -->
+                <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
+                           VerticalAlignment="Center" Margin="0,0,12,0"
+                           Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
                 <Button Content="取消" Style="{StaticResource Style.ToolButton}" IsCancel="True" Margin="0,0,8,0"/>
                 <Button Content="保存" Style="{StaticResource Style.PrimaryButton}"
-                        MinWidth="88" Command="{Binding SaveCommand}"/>
+                        MinWidth="88" IsEnabled="{Binding CanSave}" Command="{Binding SaveCommand}"/>
             </StackPanel>
         </Grid>
 

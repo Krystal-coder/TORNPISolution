@@ -37,7 +37,7 @@ namespace TORNPISolution.ViewModels
             DeviceNavView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(DeviceNavItem.Category)));
             SelectedDevice = DeviceNavItems[0];
 
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommand(Save, () => !TestRunState.IsRunning);
             RefreshPortsCommand = new RelayCommand(RefreshPorts);
         }
 
@@ -165,6 +165,12 @@ namespace TORNPISolution.ViewModels
         }
 
         public ICommand SaveCommand { get; }
+
+        /// <summary>测试是否运行中（运行期锁定配置保存，与血压模拟仪测试配置页一致）</summary>
+        public bool IsRunning => TestRunState.IsRunning;
+
+        /// <summary>是否允许保存（运行期灰色不可点）</summary>
+        public bool CanSave => !IsRunning;
 
         public ICommand RefreshPortsCommand { get; }
 
