@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Icon="/Images/logo.ico"
         FontFamily="Microsoft YaHei UI"
-        Title="TOR NPI Solution" Height="720" Width="1300"
+        Title="TOR NPI Solution" Height="720" Width="1400"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
@@ -687,7 +687,7 @@
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}"/>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="说明" Binding="{Binding Description, Mode=OneWay}" Width="1.6*">
+                            <DataGridTextColumn Header="说明" Binding="{Binding Description, Mode=OneWay}" Width="1.4*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
                                         <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>

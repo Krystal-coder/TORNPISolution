@@ -4,22 +4,25 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 规格类：所有测试模块定义集中在这一个类，每模块一个 Build 方法，GetAllModules 是模块目录。
+    /// 规格类：每模块一个 Build 方法，GetAllModules 是模块目录。
     /// 测试项名称统一引用 <see cref="SpecItems"/> 常量（项名唯一来源，TestItem 上报同引用）。
-    /// 动态规格怎么定义：这里写的 SpecMin/SpecMax 只是静态规格（默认/兜底）；需按仪器读回值
-    /// 现算规格的项（如血压：仪器值±容差）不改这里，由 TestItem 运行时把动态规格随
-    /// TestItemResult 带回，UI 判定优先用动态规格，未测到才用这里的静态值。
+    /// 动态规格怎么定义：这里写的 SpecMin/SpecMax 只是静态规格（默认/兜底）；需按仪器读回值现算规格的项（如血压：仪器值±容差）不改这里，由 TestItem 运行时把动态规格随 TestItemResult 带回，UI 判定优先用动态规格，未测到才用这里的静态值。
     /// </summary>
     public class Spec : ITestModuleService
     {
         private readonly ILogService _log = new LogService(nameof(Spec));
+        private readonly IInstrumentConfigService _configService;
+
+        /// <param name="configService">仪器配置服务：M05 项清单按当前勾选的静态压力点动态生成（一点一项）</param>
+        public Spec(IInstrumentConfigService configService) => _configService = configService;
 
         /// <summary>
         /// 嵌软版本管控规格（M16“产品信息获取(嵌软版本)”项的规格与判定唯一来源）：
         /// 产品读回版本与它不一致判 FAIL（防烧录老版本）；版本升级时只改这一处，规格列显示与判定同步生效。
         /// </summary>
-        public const string ExpectedFirmwareVersion = "V0.1.POR263901";
+        public const string ExpectedFirmwareVersion = "V0.1.POR264002";
 
+        public const string FirmwareStatus = "03-00";
         /// <summary>
         /// 模块目录：按书写顺序返回全部测试模块定义（顺序即新建方案时的默认顺序，可拖拽调整）。
         /// 每个模块的项定义见对应的 Build 方法。
@@ -47,7 +50,8 @@ namespace TORNPISolution.Service
                     BuildSpo2MeasurementTest(),      // M12 SpO2测量模块（SPO2-001~003）
                     BuildSpo2AccuracyTest(),         // M13 SpO2精度检测（SPO2-004~006）
                     BuildSpo2PerfusionTest(),        // M14 SpO2灌注与抗干扰测试（SPO2-008~010）
-                    BuildChargingTest(),             // M15 充电测试
+                    BuildChargingTest(),           // M15 充电测试
+                    BuildProductStaticPressureCalibration(), // M17 产品静态压力校准（60/120/180/240 逐点校准）
                 };
             }
             catch (Exception ex)
@@ -80,7 +84,7 @@ namespace TORNPISolution.Service
         private static TestModuleModel BuildProductCommInit()
         {
             var ti = AddTI(TestModuleIds.ProductCommInit, "产品通讯初始化", "\uE95E",
-                "进入产测模式（防休眠）+ 0x72 产品信息获取（MAC/嵌软版本）+ 0x74 状态查询，全方案仅执行一次");
+                "进入产测模式（防休眠）+ 0x72 产品信息获取（MAC/嵌软版本）+ 0x74 状态查询");
 
             AddHandshakeItems(ti);
             return ti;
@@ -141,19 +145,65 @@ namespace TORNPISolution.Service
             return ti;
         }
 
-        //======================================M05-----------血压静态压力精度测试（BP-003）
-        // 流程：逐点 BPARunStaticPressure（配置勾选的压力点） -> 稳压保持 ->
-        //       读产品上报压力值（0x7E） -> |产品值-标准值|≤2mmHg
-        private static TestModuleModel BuildBpStaticAccuracyTest()
+        //======================================M17-----------产品静态压力校准
+        // 流程：启动压力传感器（0x65）-> 逐点 60/120/180/240：模拟仪稳压 -> 发校准（0x66 + uint16 LE）-> 等 2s -> 下一点
+        //       -> 全部测试项结束后关闭压力传感器（0x67）。逐点判定：|稳压值-校准点| ≤3mmHg 且校准有 ACK。
+        private TestModuleModel BuildProductStaticPressureCalibration()
         {
-            var ti = AddTI(TestModuleIds.BpStaticAccuracyTest, "血压静态压力精度测试", "\uE95E",
-                "BP-003：逐点静态加压（压力点取配置），产品上报值与标准值误差 ≤2mmHg（含压力曲线）");
+            var ti = AddTI(TestModuleIds.ProductStaticPressureCalibration, "产品静态压力校准", "\uE95E",
+                "产品压力传感器校准：模拟仪逐点稳压 60/120/180/240mmHg 后发 0x66 校准（每点间隔 2s），结束关闭传感器");
 
-            AddResult(ti, name: SpecItems.Bp003StaticAccuracy,
-                description: "逐点静态加压，产品上报值与仪器稳压值误差 ≤2mmHg（逐点双值见行内子表）",
-                specMin: -2, specMax: 2, unit: "mmHg", showWaveform: true, valueSource: "Points");
+            AddResult(ti, name: SpecItems.PcalStartSensor,
+                description: "启动压力传感器（0x07 0x65），有响应即通过",
+                specMin: 1, specMax: 1, unit: "", hideSpecRange: true);
+
+            foreach (var value in SpecItems.PcalPoints)
+            {
+                AddResult(ti, name: SpecItems.PcalPoint(value),
+                    description: $"模拟仪稳压 {value:0.##}mmHg 后发校准（0x66），稳压误差 ≤3mmHg 且校准有 ACK（仪器列=稳压值）",
+                    specMin: 0, specMax: 3, unit: "mmHg", valueSource: "Error");
+            }
+
+            AddResult(ti, name: SpecItems.PcalCloseSensor,
+                description: "关闭压力传感器（0x07 0x67），有响应即通过",
+                specMin: 1, specMax: 1, unit: "", hideSpecRange: true);
 
             return ti;
+        }
+
+        //======================================M05-----------血压静态压力精度测试（BP-003）
+        // 流程：逐点 BPARunStaticPressure（配置勾选的压力点） -> 稳压保持 ->
+        //       读产品上报压力值（0x76） -> |产品值-标准值|≤3mmHg
+        // 一点一项：项清单按当前配置勾选的静态压力点动态生成（项名见 SpecItems.Bp003Point），
+        // 加载方案/打开模块库/点运行时 MainViewModel 会重建目录，改点无需重启。
+        private TestModuleModel BuildBpStaticAccuracyTest()
+        {
+            var ti = AddTI(TestModuleIds.BpStaticAccuracyTest, "血压静态压力精度测试", "\uE95E",
+                "BP-003：逐点静态加压（压力点取配置，一点一项），产品上报值与标准值误差 ≤3mmHg（含压力曲线）");
+
+            foreach (var value in GetStaticPressurePoints())
+            {
+                AddResult(ti, name: SpecItems.Bp003Point(value),
+                    description: $"静态加压 {value:0.##}mmHg，产品上报值与仪器稳压值误差 ≤3mmHg（仪器列=稳压值，产品列=上报值）",
+                    specMin: -3, specMax: 3, unit: "mmHg", showWaveform: true, valueSource: "Error");
+            }
+
+            return ti;
+        }
+
+        /// <summary>当前配置勾选的静态压力点（去重、保持配置顺序；与执行端 BpStaticAccuracyModule 同一口径）</summary>
+        private List<double> GetStaticPressurePoints()
+        {
+            try
+            {
+                return _configService.Load().ActiveBpTestParams.StaticPressure.Points
+                    .Where(p => p.Enabled).Select(p => p.Value).Distinct().ToList();
+            }
+            catch (Exception ex)
+            {
+                _log.Warn($"读取静态压力点配置失败（M05 项清单为空）：{ex.Message}");
+                return new List<double>();
+            }
         }
 
         //======================================M06-----------血压动态压力精度测试（BP-004/BP-005）
@@ -418,20 +468,20 @@ namespace TORNPISolution.Service
         private static void AddHandshakeItems(TestModuleModel ti)
         {
             AddResult(ti, name: SpecItems.ProductMacAddress,
-                description: "发送 0x72 读 MAC（回包前 6 字节），读回不为空即合格",
+                description: " 0x72 读 MAC（回包前 6 字节）",
                 specMin: 1, specMax: 1, unit: "", valueSource: "Product", hideSpecRange: true);
             AddResult(ti, name: SpecItems.ProductFirmwareVersion,
-                description: "发送 0x72 读嵌软版本，与管控规格比对（烧录老版本判 FAIL）",
+                description: " 0x72 读嵌软版本，与管控规格比对",
                 specMin: 1, specMax: 1, unit: "", valueSource: "Product", specText: ExpectedFirmwareVersion);
             AddResult(ti, name: SpecItems.ProductStatusQuery,
-                description: "发送 0x74 读测试模式和状态（有返回即通过）",
-                specMin: 1, specMax: 1, unit: "", valueSource: "Product", hideSpecRange: true);
+                description: " 0x74 读测试模式和状态",
+                specMin: 1, specMax: 1, unit: "", valueSource: "Product", specText: FirmwareStatus);
         }
 
         /// <summary>
         /// 给模块追加一条测试项。对应模板 ResultName[k]/SpecMin[k]/SpecMax[k] 三行。
         /// showWaveform=true = 该项执行时上抛实时采样点，UI 行内显示波形折叠按钮。
-        /// valueSource = 测试值来源：Instrument（默认，仪器值）/ Product（产品上报值）/ Both（双列比对）。
+        /// valueSource = 测试值来源：Instrument（默认，仪器值）/ Product（产品上报值）/ Both（双列比对）/ Error（误差口径：主值=误差按静态规格判，双列=仪器/产品值）。
         /// hideSpecRange=true = 通讯检查项：无数值规格，规格列显示“有响应即通过”。
         /// specText 非空 = 字符串规格项（如嵌软版本管控）：规格列直接显示该文本。
         /// 暂不具备自动化条件的预留项不用跳过标记：模块执行时报“预留（不判定）”结果即可。

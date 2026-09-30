@@ -99,6 +99,13 @@ namespace TORNPISolution.Interface
         Task SetFastValveAsync(bool open, CancellationToken ct = default);
 
         /// <summary>
+        /// 泄放回零（残压释放）：每点校准/稳压记录完成后与模块结束时的泄气，接大容量容器时
+        /// 避免气体长时间憋在气路、泵补载持续发热；康伟达=05 开阀泄放（补压力表帧维持回读）
+        /// &lt;5mmHg 提前返回后 06 关阀；BPA700=按序列点间泄压同款尽力泄（快阀短开后关，阀态下一次 SDK 测试调用生效）。
+        /// </summary>
+        Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default);
+
+        /// <summary>
         /// 过压保护测试（BP-009）：持续充气至产品触发保护泄压，返回触发时峰值压力。
         /// 康伟达：压力源充向目标压力，AA 监测峰值后的骤降判产品保护动作。
         /// </summary>

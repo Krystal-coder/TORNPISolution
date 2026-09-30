@@ -14,7 +14,7 @@ namespace TORNPISolution.ViewModels
 {
     /// <summary>
     /// 仪器链接配置对话框的 ViewModel：
-    /// 加载/保存均通过 IInstrumentConfigService，界面不直接碰文件。
+    /// 加载/保存均通过 IInstrumentConfigService
     /// </summary>
     public class InstrumentConfigViewModel : ViewModelBase
     {
@@ -41,7 +41,7 @@ namespace TORNPISolution.ViewModels
             RefreshPortsCommand = new RelayCommand(RefreshPorts);
         }
 
-        /// <summary>当前编辑中的配置（直接双向绑定其子属性）</summary>
+        /// <summary>当前编辑中的配置</summary>
         public InstrumentConnectionConfig Config { get; }
 
         // ==================== 左侧设备导航列表 ====================

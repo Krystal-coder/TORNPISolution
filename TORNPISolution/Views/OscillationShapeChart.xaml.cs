@@ -7,11 +7,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// Oscillation Shape 包络曲线预览 ：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100。
-    /// 由 Customized 方法的 x 轴八点（SP2/PS/SYS/MAP2/MAP1/DIAS/PD/SP1）与 y 轴五点比率生成钟形包络：
-    /// SP2/SP1 取 0%，PS/PD 取 Offset 比率，SYS/MAP2/MAP1/DIAS 各取对应比率；
-    /// 标记按官方配色（SYS Rate 蓝 / Max Pulse 2 紫 / Max Pulse 1 品红 / DIAS Rate 绿 / Offset 橙 / SP 灰圈），
-    /// 参数变化时调用 Refresh 重绘。
+    /// Oscillation Shape 包络曲线预览 ：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100
     /// </summary>
     public partial class OscillationShapeChart : UserControl
     {

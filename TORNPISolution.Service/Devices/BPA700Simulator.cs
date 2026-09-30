@@ -730,6 +730,18 @@ namespace TORNPISolution.Service.Devices
             else _log.Info($"BPA700：快速放气阀已{(open ? "打开" : "关闭")}（下一次测试调用时生效）");
         }
 
+        /// <summary>
+        /// 接口成员：泄放回零（点后/模块结束残压释放）。BPA700 阀态在下一次 SDK 测试调用才生效，
+        /// 此处按序列点间泄压同款尽力泄：快阀开 3s 后关；若仍有残压由下一次测试调用内的泄压补偿。
+        /// </summary>
+        public async Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default)
+        {
+            await SetFastValveAsync(true, ct).ConfigureAwait(false);
+            await Task.Delay(3000, ct).ConfigureAwait(false);
+            await SetFastValveAsync(false, ct).ConfigureAwait(false);
+            return true;
+        }
+
         /// <summary>静态压力到位后的实际稳压值（采样读回均值，BP-003 标准值 / BP-006 最高充气压力验证用）</summary>
         public double LastStaticPressure { get; private set; }
 

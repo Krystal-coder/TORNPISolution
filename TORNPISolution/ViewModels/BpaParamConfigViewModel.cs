@@ -8,8 +8,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 血压模拟仪测试配置 ViewModel：外层按设备分页签（BPA700 / 康伟达），
-    /// 两台设备各自维护一套同构测试参数（充放气规格 / 静态压力 / 动态血压 / 超压 / 压力控制 / 波形显示），
+    /// 血压模拟仪（BPA700 / 康伟达）测试配置 ViewModel
     /// 保存时写入 instruments.json 对应设备节点（BPA700Simulator / KangwendaSimulator 的 TestParams）。
     /// 测试模块按仪器链接配置选择的模拟仪读取各自参数（InstrumentConnectionConfig.ActiveBpTestParams）。
     /// </summary>
@@ -260,7 +259,7 @@ namespace TORNPISolution.ViewModels
             return fallback;
         }
 
-        /// <summary>解析预设字符串“120/80(93)”：取收缩压/舒张压，括号内为平均动脉压（仅展示）</summary>
+        /// <summary>解析预设字符串“120/80(93)”：取收缩压/舒张压，括号内为平均动脉压</summary>
         private static bool TryParsePreset(string preset, out double systolic, out double diastolic)
         {
             systolic = diastolic = 0;

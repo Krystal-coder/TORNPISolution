@@ -53,16 +53,11 @@ namespace TORNPISolution.Service
 
 
         /// <summary>
-        /// 产品充放气测试（BP-001 物理按键启动测量 / BP-002 测量过程中手动停止）：
-        /// 产品通讯（进入产测模式/0x72/0x74）集中在 M16 产品通讯初始化，本模块不再问询；
-        /// ① BP-001：经接口 RunBpMeasurementAsync 进入待测（血压/心率参数取血压模拟仪测试配置→当前启用设备→动态血压，
-        ///    按仪器链接配置选择的模拟仪路由），提示测试员按产品物理[开始]键，
-        ///    状态依次经历 Busy→Stable→Finish 为 PASS（BPA700=SDK 回调状态机；康伟达=AA 压力曲线判定），
-        ///    状态一直停留在 Wait 说明产品未启动或气路未连通；
-        /// ④ BP-002：同样进入待测，按[开始]键充气后于充气中按[停止]键，
-        ///    状态变 Idle 并快速放气，测试值=快速放气时间（≤配置上限为 PASS，
-        ///    上限在血压仪参数配置→充放气规格中设置）。超时/放气规格均取充放气规格配置。
-        /// 充放气全程开启压力采样，压力曲线在 UI 实时展示（需连接储气瓶）。
+        /// 产品充放气测试（BP-001 物理按键启动 / BP-002 测量中手动停止），产品通讯统一在 M16 初始化：
+        /// ① BP-001：经 RunBpMeasurementAsync 进入待测（血压/心率参数取血压模拟仪测试配置→当前启用设备→动态血压，按仪器链接配置路由模拟仪），
+        ///    提示按产品物理[开始]键，状态 Busy→Stable→Finish 为 PASS（BPA700=SDK 回调状态机；康伟达=AA 压力曲线判定）；一直停留 Wait 说明产品未启动或气路未连通；
+        /// ② BP-002：进入待测按[开始]充气，充气中按[停止]→状态转 Idle 快速放气，测试值=快速放气时间（≤充放气规格上限为 PASS，上限取血压仪参数配置→充放气规格）。
+        /// 全程开启压力采样，曲线在 UI 实时展示（需连接储气瓶）。
         /// </summary>
         //测试项目**************************---M03---**************************产品充放气测试（BP-001/BP-002）
         public async Task BpAccuracyTestModule(TestItemResultCollector collector, CancellationToken token)
@@ -163,52 +158,78 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 血压静态压力精度测试（BP-003）：
-        /// 产品通讯集中在 M16 产品通讯初始化，本模块不再问询；
-        /// ① 逐点加压（压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力，
-        ///    仅勾选的点参与），经模拟仪接口 RunStaticPressureSequenceAsync 执行：
-        ///    BPA700=SDK 序列；康伟达=逐点压力源+AA 回读收敛；
-        ///    每点到达稳压保持时（PressurePointStable 事件）并发回读产品上报压力（0x7E），
-        ///    保证产品值取自稳压保持窗内（与仪器稳定值同时刻口径）；
-        /// ③ 逐点判定 |产品上报值 − 仪器稳压值| ≤2mmHg，子节点（测试点1..N）随父项结果回传 UI 子表；
-        ///    父项显示最差点的双值（仪器列=标准值，产品列=上报值，动态规格=标准值±2mmHg）；
-        ///    产品未连接/无上报的点判 FAIL（不再假合格），任一点 FAIL 父项即 FAIL。
-        /// 全程开启压力采样，静态压力曲线在 UI 实时展示（波形共用一张）。
+        /// 血压静态压力精度测试（BP-003），产品通讯统一在 M16 初始化：
+        /// ① 逐点加压（压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力，仅勾选点参与），
+        ///    经 RunStaticPressureSequenceAsync 执行（BPA700=SDK 序列；康伟达=逐点压力源+AA 回读收敛）；
+        ///    每点到稳压保持（PressurePointStable 事件）时并发回读产品压力（0x76），保证与仪器稳定值同时刻口径；
+        /// ② 逐点判定 |产品−仪器| ≤3mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：
+        ///    测试值=误差（规格 -3~3），仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过。
+        /// 全程开启压力采样，每点项都挂完整静态压力曲线（同段采样广播到全部项名）。
+        /// 无仪器演示：不驱动模拟仪，产品侧照常回读（0x73 mode=3 + 逐点 0x76）填产品列；算不出误差，测试值落规格外判 FAIL。
         /// </summary>
         //测试项目**************************---M05---**************************血压静态压力精度测试（BP-003）
         public async Task BpStaticAccuracyModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血压静态压力精度测试")) return;
             var config = _configService.Load();
-            if (config.ActiveSimulator is not (SimulatorType.BPA700 or SimulatorType.Kangwenda))
-            {
-                _log.Error("血压静态压力精度测试跳过：未选择血压模拟仪（仪器链接配置 → 模拟仪类型）");
-                return;
-            }
 
-            // 静态压力点按仪器链接配置选择的模拟仪路由读取（康伟达读康伟达节点、BPA700 读 BPA700 节点）
+            // 静态压力点按仪器链接配置选择的模拟仪路由读取（康伟达读康伟达节点、BPA700 读 BPA700 节点）；
+            // 去重与 Spec 目录同一口径，保证一点一项名称一一对应
             var sp = config.ActiveBpTestParams.StaticPressure;
-            var points = sp.Points.Where(p => p.Enabled).Select(p => p.Value).ToList();
+            var points = sp.Points.Where(p => p.Enabled).Select(p => p.Value).Distinct().ToList();
             if (points.Count == 0)
             {
                 _log.Warn($"BP-003 跳过：未勾选任何静态压力点（血压模拟仪测试配置 → {(config.ActiveSimulator == SimulatorType.Kangwenda ? "康伟达" : "BPA700")} → 静态压力）");
                 return;
             }
 
+            // 无仪器演示：跳过模拟仪控制，但产品串口照常回读并显示上报值
+            if (NoInstrumentDemo("血压静态压力精度测试"))
+            {
+                await DemoStaticAccuracyAsync(collector, points, token);
+                return;
+            }
+
+            if (config.ActiveSimulator is not (SimulatorType.BPA700 or SimulatorType.Kangwenda))
+            {
+                _log.Error("血压静态压力精度测试跳过：未选择血压模拟仪（仪器链接配置 → 模拟仪类型）");
+                return;
+            }
+
             using (var product = _productFactory())
             {
-                // 产品可用性以本轮 M16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）
+                // 产品可用性以本轮 M16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）；
+                // 但本模块自建的 product 实例仍需打开产品串口，才能设置测试模式（0x73）并回读产品压力（0x76）
                 var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                if (productAvailable)
+                {
+                    try
+                    {
+                        await product.OpenAsync(token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        productAvailable = false;
+                        _log.Warn($"BP-003：产品串口打开失败，本模块按“无产品上报值”继续（仪器侧照常逐点稳压并上报）：{ex.Message}");
+                    }
+                }
 
                 // 经共享会话租约取模拟仪（接口调用，BPA700=Beta SDK 序列 API；康伟达=逐点压力源+AA 收敛）
                 await using var lease = await _simSession.RentAsync(token);
                 var simulator = lease.Simulator;
 
-                // ② 逐点静态加压，全程采样画曲线
+                // ② 逐点静态加压，全程采样画曲线：一点一项后每个压力点项都挂完整曲线（同一段采样广播到全部项名）
+                var pointNames = points.Select(SpecItems.Bp003Point).ToArray();
                 var waveWatch = System.Diagnostics.Stopwatch.StartNew();
-                void OnSample(double pressure) =>
-                    PressureSampled?.Invoke(SpecItems.Bp003StaticAccuracy,
-                        new PressureSamplePoint(waveWatch.Elapsed.TotalSeconds, pressure));
+                void OnSample(double pressure)
+                {
+                    var pt = new PressureSamplePoint(waveWatch.Elapsed.TotalSeconds, pressure);
+                    foreach (var name in pointNames)
+                        PressureSampled?.Invoke(name, pt);
+                }
 
                 var pointValues = points.ToArray();
                 var productValues = new double?[pointValues.Length];
@@ -235,17 +256,36 @@ namespace TORNPISolution.Service
                     }, token));
                 }
 
+                var staticModeEntered = false;
                 try
                 {
                     simulator.PressureSampled += OnSample;
                     simulator.PressurePointStable += OnPointStable;
                     await simulator.StartSamplingAsync(token);
 
-                    // 产品可用时才设置产品测试模式（0x73 mode=3）并读取产品上压力值
+                    // 产品可用时才设置产品测试模式（0x73 mode=3）并读取产品上压力值；
+                    // 设置失败不中止仪器序列：各点产品上报值按缺失处理（产品列判 FAIL），仪器稳压值照常上报
                     if (productAvailable)
-                        await product.SetTestModeAsync(3, ct: token);
+                    {
+                        try
+                        {
+                            await product.SetTestModeAsync(3, ct: token);
+                            staticModeEntered = true;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            productAvailable = false;
+                            _log.Warn($"BP-003：产品测试模式设置失败，各点按“无产品上报值”判 FAIL：{ex.Message}");
+                        }
+                    }
                     else
+                    {
                         _log.Warn("BP-003：产品未连接或握手失败，各压力点将按“无产品上报值”判 FAIL");
+                    }
 
                     // 一次性调用序列 API（接口成员，各实现自行逐点/一次下发），返回每个点的实际稳定压力值
                     var stablePressures = await simulator.RunStaticPressureSequenceAsync(
@@ -254,7 +294,7 @@ namespace TORNPISolution.Service
                     // 等保持窗内发起的产品回读收尾（正常单次串口往返远短于稳压保持时长）
                     await Task.WhenAll(readTasks);
 
-                    // ③ 逐点判定 + 子节点 + 父项最差点双值
+                    // ③ 逐点判定，一点一项上报
                     await ReportStaticAccuracyAsync(collector, pointValues, stablePressures, productValues);
                 }
                 finally
@@ -262,21 +302,135 @@ namespace TORNPISolution.Service
                     await simulator.StopSamplingAsync();
                     simulator.PressureSampled -= OnSample;
                     simulator.PressurePointStable -= OnPointStable;
+
+                    // 模块结束泄气：接大容积容器时避免残压憋到下一模块；停/异常路径也尽力泄
+                    try
+                    {
+                        await simulator.VentToZeroAsync(ct: CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"BP-003：模块结束泄气失败：{ex.Message}");
+                    }
+
+                    // 测试完退出静态压力模式（0x73 mode=3 status=1）；退出用 None 令牌保证停止/异常路径也执行，
+                    // 避免产品遗留在静态压力模式影响后续模块
+                    if (staticModeEntered)
+                    {
+                        try
+                        {
+                            await product.SetTestModeAsync(3, 1, CancellationToken.None);
+                            _log.Info("BP-003：已退出静态压力模式（0x73 mode=3 status=1）");
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Warn($"BP-003：退出静态压力模式（0x73 mode=3 status=1）失败：{ex.Message}");
+                        }
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// BP-003 逐点判定与上报：每点 |产品上报值 − 仪器稳压值| ≤2mmHg 为 PASS；
-        /// 子节点（测试点1..N）随父项结果回传，UI 在 BP-003 行下子表逐点展示；
-        /// 父项按最差点误差（FAIL 点优先，同类取误差最大）判定，双值列留空，任一点 FAIL 父项即 FAIL。
+        /// BP-003 无仪器演示分支：不驱动模拟仪（无仪器参考值），但产品侧照常回读——
+        /// 进静态压力模式（0x73 mode=3）后逐点读产品上报压力（0x76）
+        /// </summary>
+        private async Task DemoStaticAccuracyAsync(TestItemResultCollector collector, List<double> points, CancellationToken token)
+        {
+            const double Tolerance = 3;   // mmHg，与正式流程同规格
+
+            using var product = _productFactory();
+            var opened = false;
+            var staticModeEntered = false;
+            try
+            {
+                await product.OpenAsync(token);
+                opened = true;
+                await product.SetTestModeAsync(3, ct: token);   // 进静态压力模式，产品在该模式下才上报静态压力
+                staticModeEntered = true;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _log.Warn($"BP-003 演示：产品串口打开/设置模式失败，各点产品列显示 --：{ex.Message}");
+            }
+
+            try
+            {
+                // 探活：产品无响应就不逐点空等 3s 超时
+                var probe = opened ? await TryReadProductPressureAsync(product, token) : null;
+                if (probe == null)
+                {
+                    _log.Warn("BP-003 演示：产品无响应（0x76 读回缺失），各压力点按读回缺失判 FAIL");
+                    foreach (var value in points)
+                        await collector.SetAsync(SpecItems.Bp003Point(value), TestItemResult.Of(Tolerance + 1));
+                    return;
+                }
+
+                foreach (var value in points)
+                {
+                    token.ThrowIfCancellationRequested();
+                    var read = await TryReadProductPressureAsync(product, token);
+                    var itemName = SpecItems.Bp003Point(value);
+                    _log.Info($"BP-003 演示 {itemName}：产品上报={(read?.ToString("0.0") ?? "--")}（无仪器参考值，不判合格）");
+
+                    // 无仪器参考值算不出误差：测试值落规格外保证 FAIL，产品列照常显示读回值
+                    await collector.SetAsync(itemName, new TestItemResult
+                    {
+                        Value = Tolerance + 1,
+                        ProductValue = read
+                    });
+                }
+            }
+            finally
+            {
+                // 测试完退出静态压力模式（0x73 mode=3 status=1），避免产品遗留在静态压力模式
+                if (staticModeEntered)
+                {
+                    try
+                    {
+                        await product.SetTestModeAsync(3, 1, CancellationToken.None);
+                        _log.Info("BP-003 演示：已退出静态压力模式（0x73 mode=3 status=1）");
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"BP-003 演示：退出静态压力模式失败：{ex.Message}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>读一次产品静态压力（0x76）：NaN/异常统一返回 null，不向上抛（演示分支容错用）</summary>
+        private async Task<double?> TryReadProductPressureAsync(IProductController product, CancellationToken token)
+        {
+            try
+            {
+                var p = await product.ReadProductPressureAsync(token);
+                return double.IsNaN(p) ? null : p;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _log.Warn($"BP-003 演示：产品静态压力读失败：{ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// BP-003 逐点判定与上报（一点一项）：每点 |产品上报值 − 仪器稳压值| ≤3mmHg 为 PASS；
+        /// 每项测试值=误差（按静态规格 -3~3mmHg 判定），仪器列=稳压值、产品列=上报值；
+        /// 无产品上报/仪器未稳压的点：误差落到规格外保证 FAIL，缺值列显示 --。
         /// </summary>
         private async Task ReportStaticAccuracyAsync(TestItemResultCollector collector,
             double[] pointValues, double[] stablePressures, double?[] productValues)
         {
-            const double Tolerance = 2;   // mmHg，测试要求文档固定
-            var pointResults = new List<TestPointResult>();
-            TestPointResult? worst = null;
+            const double Tolerance = 3;   // mmHg，测试要求文档固定
 
             for (var i = 0; i < pointValues.Length; i++)
             {
@@ -291,51 +445,249 @@ namespace TORNPISolution.Service
                     : !hasInstrument ? "仪器未稳压到位"
                     : $"误差超过±{Tolerance:0}mmHg";
 
-                var pr = new TestPointResult
+                var itemName = SpecItems.Bp003Point(pointValues[i]);
+                _log.Info($"BP-003 {itemName}：目标={pointValues[i]:0.#} 仪器稳压={(hasInstrument ? standard.ToString("0.0") : "--")} 产品上报={(hasProduct ? productValues[i]!.Value.ToString("0.0") : "--")} 误差={(err?.ToString("0.0") ?? "--")} → {(pass ? "PASS" : "FAIL（" + remark + "）")}");
+
+                // 一点一项：测试值=误差（无误差的 FAIL 点落到规格外），双列=仪器稳压值/产品上报值
+                await collector.SetAsync(itemName, new TestItemResult
                 {
-                    Name = $"测试点{i + 1}",
-                    TargetPressure = pointValues[i],
+                    Value = err ?? Tolerance + 1,
                     InstrumentValue = hasInstrument ? standard : null,
-                    ProductValue = hasProduct ? productValues[i] : null,
-                    Error = err,
-                    Pass = pass,
-                    Remark = remark
-                };
-                pointResults.Add(pr);
-                _log.Info($"BP-003 {pr.Name}：目标={pointValues[i]:0.#} 仪器稳压={pr.InstrumentText} 产品上报={pr.ProductText} 误差={pr.ErrorText} → {(pass ? "PASS" : "FAIL（" + remark + "）")}");
-
-                // 最差点选择：FAIL 点优先，同类取误差大者（无误差的 FAIL 点取先出现的）
-                if (worst == null
-                    || (!pass && worst.Pass)
-                    || (!pass == !worst.Pass && (err ?? 0) > (worst.Error ?? 0)))
-                {
-                    worst = pr;
-                }
+                    ProductValue = hasProduct ? productValues[i] : null
+                });
             }
-
-            if (worst == null) return;
-
-            // 父项：主值=最差点误差（规格为静态误差窗 -2~2mmHg），双值列不放值（逐点双值子表已展示）；
-            // 无产品上报的 FAIL 点无误差，主值落到规格外保证判 FAIL
-            var value = worst.Error ?? Tolerance + 1;
-            await collector.SetAsync(SpecItems.Bp003StaticAccuracy, new TestItemResult
-            {
-                Value = value,
-                Points = pointResults
-            });
         }
 
         /// <summary>
-        /// 血压动态压力精度测试（BP-004 血压精度/重复性 + BP-005 心率精度/重复性）：
-        /// 产品通讯集中在 M16 产品通讯初始化，本模块不再问询；
-        /// ① 经接口 RunBpMeasurementAsync 按测试要求固定 4 组参数（90/60、120/80、160/100、200/120 mmHg，
-        ///    心率 60/80/100/120 BPM 同轮下发），每组重复 3 次完整充放气周期（需储气瓶产生脉搏波）；
-        /// ② 每轮先发开始测量（0x79）产品才会自行充放气，模拟仪输出血压模拟波形，
-        ///    产品测量结束后主动轮询 0x7B 拿收缩压/舒张压/平均压（实测当前固件不推送），心率由 0x7C 单独读回；
-        ///    每轮结束发一次关闭测量（0x79 status=1），否则产品不接受下次开始：
-        ///    精度（系统偏差）= 各组 |均值−设定值| 的最大值（血压 ≤3mmHg / 心率 ≤max(5,设定×5%)）；
-        ///    重复性误差 = 各组 |最大−最小| 极差的最大值（血压 ≤2mmHg / 心率 ≤max(5,设定×5%)）；
-        ///    每组“模拟仪设定值 vs 产品回读”随各结果项行内子表展示（分组行：设定/均值/最大/最小/偏差/极差/判定）。
+        /// 产品静态压力校准（M17）：产品压力传感器逐点校准（校准点固定 60/120/180/240mmHg），
+        /// 命令时序与手动实测流程一致（实测此时序手动校准后产品回读特别准，无需进静态压力模式）：
+        /// ① 启动压力传感器（0x65）前先泄气归零（零点在常压取），有响应即通过；
+        /// ② 逐点：切换前泄压（先终止压力源调压再放气，同手动点"停止"仪器即自行快速放气）->
+        ///    模拟仪稳压（稳压时间固定 3s，校准无需长稳压）-> |稳压值-校准点| ≤3mmHg 时发校准（0x66 + uint16 LE）
+        ///    有 ACK 判 PASS（测试值=稳压误差，仪器列=稳压值）-> 延时 2s -> 点后泄气 -> 下一点；
+        ///    稳压超限/无 ACK 判 FAIL 且跳过该点校准指令；
+        /// ③ 四个点完成后关闭压力传感器（0x67）：finally + None 令牌，停止/异常路径也发送。
+        /// 产品不可用（未连接/握手失败）：全项判 FAIL，不驱动模拟仪。
+        /// </summary>
+        //测试项目**************************---M17---**************************产品静态压力校准
+        public async Task ProductStaticPressureCalibrationModule(TestItemResultCollector collector, CancellationToken token)
+        {
+            const double Tolerance = 3;   // mmHg，稳压误差规格，与 BP-003 同口径
+            const int StableSeconds = 3;  // M17 稳压时间固定 3s（校准无需长稳压，不用配置里的 BP-003 稳压时长）
+
+            if (NoInstrumentDemo("产品静态压力校准")) return;
+            var config = _configService.Load();
+            if (config.ActiveSimulator is not (SimulatorType.BPA700 or SimulatorType.Kangwenda))
+            {
+                _log.Error("产品静态压力校准跳过：未选择血压模拟仪（仪器链接配置 → 模拟仪类型）");
+                return;
+            }
+
+            using (var product = _productFactory())
+            {
+                // 产品可用性以本轮 M16 产品通讯初始化记录为准；本模块自建实例仍需打开产品串口才能下发校准指令
+                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                if (productAvailable)
+                {
+                    try
+                    {
+                        await product.OpenAsync(token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        productAvailable = false;
+                        _log.Warn($"M17：产品串口打开失败：{ex.Message}");
+                    }
+                }
+
+                if (!productAvailable)
+                {
+                    _log.Error("M17 判 FAIL：产品不可用（串口未连接或握手失败），校准指令无法下发，本模块不驱动模拟仪");
+                    await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(0));
+                    foreach (var value in SpecItems.PcalPoints)
+                        await collector.SetAsync(SpecItems.PcalPoint(value), TestItemResult.Of(Tolerance + 1));
+                    await collector.SetAsync(SpecItems.PcalCloseSensor, TestItemResult.Of(0));
+                    return;
+                }
+
+                await using var lease = await _simSession.RentAsync(token);
+                var simulator = lease.Simulator;
+                var sp = config.ActiveBpTestParams.StaticPressure;
+
+                // ① 启动压力传感器（0x65）：校准流程前置命令，有响应即通过
+                var started = false;
+                try
+                {
+                    // ① 启动压力传感器（0x65）：前置命令，有响应即通过；启动前先泄气归零，传感器零点在常压取
+                    try
+                    {
+                        await simulator.VentToZeroAsync(ct: token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"M17：启动前泄气失败，传感器零点可能带残压：{ex.Message}");
+                    }
+
+                    try
+                    {
+                        await product.StartPressureSensorAsync(token);
+                        started = true;
+                        await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(1));
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"M17 启动压力传感器（0x65）无响应，判 FAIL：{ex.Message}");
+                        await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(0));
+                    }
+
+                    if (!started)
+                    {
+                        // 前置命令失败：产品未进入压力静态测试态，各校准点无需空等稳压
+                        foreach (var value in SpecItems.PcalPoints)
+                            await collector.SetAsync(SpecItems.PcalPoint(value), TestItemResult.Of(Tolerance + 1));
+                    }
+                    else
+                    {
+                        // ② 逐点：稳压 -> 校准 -> 延时 2s -> 下一点
+                        foreach (var value in SpecItems.PcalPoints)
+                        {
+                            token.ThrowIfCancellationRequested();
+                            var itemName = SpecItems.PcalPoint(value);
+
+                            // 切换前泄压（手动实测：先泄到 0 再切下一点更准）；保压顶阀时驱动会坚持开阀等设备放弃，
+                            // 失败再补泄一次；仍带残压也不硬断，后续稳压误差 >3mmHg 会拦住校准指令
+                            try
+                            {
+                                if (!await simulator.VentToZeroAsync(ct: token))
+                                {
+                                    _log.Warn($"M17 {itemName}：切换前泄压未归零，补泄一次");
+                                    await simulator.VentToZeroAsync(ct: token);
+                                }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                _log.Warn($"M17 {itemName}：切换前泄压失败（清场仪式会补偿）：{ex.Message}");
+                            }
+
+                            // 模拟仪单点稳压（序列 API 含清场/调零与收敛保持），返回实际稳压值
+                            double stable;
+                            try
+                            {
+                                stable = (await simulator.RunStaticPressureSequenceAsync(
+                                    new[] { value }, StableSeconds, sp.BpaInflation, token))[0];
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                _log.Warn($"M17 {itemName}：模拟仪稳压失败，判 FAIL：{ex.Message}");
+                                await collector.SetAsync(itemName, TestItemResult.Of(Tolerance + 1));
+                                continue;
+                            }
+
+                            var hasInstrument = !double.IsNaN(stable);
+                            var err = hasInstrument ? Math.Abs(stable - value) : (double?)null;
+                            var ack = false;
+                            if (err.HasValue && err.Value <= Tolerance)
+                            {
+                                try
+                                {
+                                    await product.CalibratePressureSensorAsync((ushort)value, token);
+                                    ack = true;
+                                }
+                                catch (OperationCanceledException)
+                                {
+                                    throw;
+                                }
+                                catch (Exception ex)
+                                {
+                                    _log.Warn($"M17 {itemName}：校准指令（0x66）无响应，判 FAIL：{ex.Message}");
+                                }
+                            }
+                            else
+                            {
+                                _log.Warn($"M17 {itemName}：稳压误差超限（稳压={(hasInstrument ? stable.ToString("0.0") : "--")}），跳过校准指令，判 FAIL");
+                            }
+
+                            var pass = ack && err.HasValue && err.Value <= Tolerance;
+                            _log.Info($"M17 {itemName}：稳压={(hasInstrument ? stable.ToString("0.0") : "--")} 误差={(err?.ToString("0.0") ?? "--")} 校准ACK={(ack ? "有" : "无")} → {(pass ? "PASS" : "FAIL")}");
+                            await collector.SetAsync(itemName, new TestItemResult
+                            {
+                                Value = pass ? err!.Value : Tolerance + 1,
+                                InstrumentValue = hasInstrument ? stable : null
+                            });
+
+                            // 每发一个校准指令延时 2s 再进行下一步（产品侧校准写入需间隔）
+                            await Task.Delay(2000, token);
+
+                            // 每点校准完成后立即泄放回零：接大容积容器时憋压会让泵补载持续发热，
+                            // 点后泄气让泵早歇；下一点清场仪式仍会按仪式泄残压并重新调零
+                            try
+                            {
+                                await simulator.VentToZeroAsync(ct: token);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                _log.Warn($"M17 {itemName}：点间泄气失败（下一点清场会补偿）：{ex.Message}");
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    // ③ 全部测试项结束后关闭压力传感器；None 令牌保证停止/异常路径也执行
+                    try
+                    {
+                        await product.ClosePressureSensorAsync(CancellationToken.None);
+                        await collector.SetAsync(SpecItems.PcalCloseSensor, TestItemResult.Of(1));
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"M17 关闭压力传感器（0x67）失败，判 FAIL：{ex.Message}");
+                        await collector.SetAsync(SpecItems.PcalCloseSensor, TestItemResult.Of(0));
+                    }
+
+                    // 模块结束泄气：容器残压放掉，避免气体憋到下一模块（尽力泄，停/异常路径也泄）
+                    try
+                    {
+                        await simulator.VentToZeroAsync(ct: CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"M17：模块结束泄气失败：{ex.Message}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 血压动态压力精度测试（BP-004 血压精度/重复性 + BP-005 心率精度/重复性），产品通讯统一在 M16 初始化：
+        /// ① 经 RunBpMeasurementAsync 按测试要求固定 4 组参数（90/60、120/80、160/100、200/120 mmHg，心率 60/80/100/120 BPM 同轮下发），每组重复 3 次完整充放气周期（需储气瓶产生脉搏波）；
+        /// ② 每轮先发开始测量（0x79）产品才自行充放气，模拟仪输出血压波形；测量结束后主动轮询 0x7B 拿收缩/舒张/平均压（实测当前固件不推送），心率由 0x7C 单独读回；
+        ///    每轮结束发关闭测量（0x79 status=1），否则产品不接受下次开始；精度=各组 |均值−设定值| 最大值（血压 ≤3mmHg / 心率 ≤max(5,设定×5%)）；
+        ///    重复性=各组 |最大−最小| 极差最大值（血压 ≤2mmHg / 心率同前）；每组“设定值 vs 产品回读”随行内子表展示（设定/均值/最大/最小/偏差/极差/判定）。
         /// </summary>
         //测试项目**************************---M06---**************************血压动态压力精度测试（BP-004/BP-005）
         public async Task BpDynamicAccuracyModule(TestItemResultCollector collector, CancellationToken token)
@@ -524,15 +876,10 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 压力控制功能测试（BP-006~BP-008，测试要求文档编号）：三项均以产品串口回读压力（0x7E）判定产品行为，
-        /// 未接产品/握手失败时三项直接 FAIL（0），不做模拟仪空跑。
-        /// 产品通讯集中在 M16 产品通讯初始化，本模块不再问询；
-        /// ① BP-006 匀速放气控制：产品自身血压测量周期（mode2 + 0x79 自充气，模拟仪并行提供脉搏波环境），
-        ///    轮询回读峰值后的匀速放气段，计算平均放气速率 2~6mmHg/s（测试值=平均速率）；
-        /// ② BP-007 快速放气控制：模拟仪充气，产品回读达到停止触发压力后发停止测量（0x7D），
-        ///    回读压力归零耗时 ≤10s（测试值=归零耗时）；
-        /// ④ BP-008 过压保护：mode3 静态压力充气过 300 冲至 320（参数取配置→超压），
-        ///    产品应触发过压保护直接快速放气——回读骤降点即触发压力（动态规格 threshold1~threshold2）。
+        /// 压力控制功能测试（BP-006~008）：三项均以产品回读压力（0x76）判定产品行为，未接产品/握手失败直接 FAIL（0），不做模拟仪空跑；产品通讯统一在 M16 初始化：
+        /// ① BP-006 匀速放气：产品自身测量周期（mode2 + 0x79 自充气，模拟仪并行提供脉搏波环境），轮询回读峰值后匀速放气段，平均放气速率 2~6mmHg/s（测试值=平均速率）；
+        /// ② BP-007 快速放气：模拟仪充气，产品回读达停止触发压力后发停止测量（0x7D），回读压力归零耗时 ≤10s（测试值=归零耗时）；
+        /// ③ BP-008 过压保护：mode3 静态压力充气过 300 冲至 320（参数取配置→超压），产品应触发过压保护快速放气——回读骤降点即触发压力（动态规格 threshold1~threshold2）。
         /// </summary>
         //测试项目**************************---M04---**************************压力控制功能测试（BP-006~008）
         public async Task PressureControlModule(TestItemResultCollector collector, CancellationToken token)
@@ -681,7 +1028,7 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// BP-006 匀速放气控制：产品自身血压测量周期（mode2 + 0x79 自充气+匀速放气），
-        /// 模拟仪并行跑一轮血压模拟提供脉搏波环境；200ms 轮询 0x7E 回读产品压力，
+        /// 模拟仪并行跑一轮血压模拟提供脉搏波环境；200ms 轮询 0x76 回读产品压力，
         /// 取峰值后的匀速放气段计算平均放气速率（规格 2~6 mmHg/s，测试值=平均速率）。
         /// </summary>
         private async Task<TestItemResult> Bp006UniformDeflationAsync(
@@ -696,7 +1043,7 @@ namespace TORNPISolution.Service
             var samples = new List<(double T, double P)>();
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            // 200ms 轮询产品回读压力（0x7E），采样与模拟仪测量并行
+            // 200ms 轮询产品回读压力（0x76），采样与模拟仪测量并行
             using var pollCts = CancellationTokenSource.CreateLinkedTokenSource(token);
             var pollTask = PollProductPressureAsync(product, samples, 200, watch, pollCts.Token);
 
@@ -925,7 +1272,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 后台轮询产品回读压力（0x7E）：按 intervalMs 间隔采样入列（时间=秒表秒），
+        /// 后台轮询产品回读压力（0x76）：按 intervalMs 间隔采样入列（时间=秒表秒），
         /// 单次回读失败不中断采样；取消即退出。
         /// </summary>
         private static async Task PollProductPressureAsync(

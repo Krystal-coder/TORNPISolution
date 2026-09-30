@@ -1,11 +1,9 @@
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 所有测试项名称的唯一来源：Spec 定义测试项时引用，TestItem/TestSteps/NfcFunctionTest
-    /// 上报结果与上抛波形时引用。改一处两边同步；项名写错从运行时自检警告变成编译错误
-    /// （原先写错只能靠 TestItemxx 末尾的"结果项不在 Spec 定义中"运行时自检发现）。
-    /// 常量值 = 历史项名字符串，不得修改值（UI 波形配置 WaveformDisplay.ItemConfigs 以项名为键）。
-    /// 按模块分区，一个测试项一条常量，命名与模块编号（Spec 注释的 ---Mxx---）对应。
+    /// 所有测试项名称的唯一来源：Spec 定义、TestItem/TestSteps/NfcFunctionTest 上报结果与上抛波形均引用此处，改一处两边同步。
+    /// 常量值 = 历史项名字符串，不得修改（UI 波形配置 WaveformDisplay.ItemConfigs 以项名为键）。
+    /// 按模块分区，一测试项一常量，命名与模块编号（Spec 注释的 ---Mxx---）对应。
     /// </summary>
     public static class SpecItems
     {
@@ -30,8 +28,20 @@ namespace TORNPISolution.Service
         public const string Bp001KeyStart = "BP-001物理按键启动测量";
         public const string Bp002ManualStop = "BP-002测量中手动停止";
 
-        // -------- M05 血压静态压力精度测试（BP-003） --------
-        public const string Bp003StaticAccuracy = "BP-003静态压力精度测试";
+        // -------- M05 血压静态压力精度测试（BP-003，一点一项：按勾选压力点动态生成） --------
+        /// <summary>
+        /// BP-003 压力点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数，
+        /// 保证项名一致；配置改点后项名自动跟随。
+        /// </summary>
+        public static string Bp003Point(double value) => $"BP-003静态压力-{value:0.##}mmHg";
+
+        // -------- M17 产品静态压力校准 --------
+        /// <summary>校准压力点（固定四点，Spec 目录与执行端同用）</summary>
+        public static readonly double[] PcalPoints = { 60, 120, 180, 240 };
+        public const string PcalStartSensor = "启动压力传感器";
+        public const string PcalCloseSensor = "关闭压力传感器";
+        /// <summary>校准点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数</summary>
+        public static string PcalPoint(double value) => $"设置{value:0.##}mmHg压力校准";
 
         // -------- M06 血压动态压力精度测试（BP-004/005） --------
         public const string Bp004SystolicAccuracy = "BP-004收缩压精度测试";

@@ -6,14 +6,9 @@ namespace TORNPISolution.Service.Devices
 {
     /// <summary>
     /// THS_HF NFC 读卡器控制类（岩柱 YZ806/YZ906 高频读写器）。
-    ///
-    /// 实现方式：运行时反射加载厂商提供的 Reader_DLLV1.dll（.NET Framework 托管库，
-    /// 已修补 PE 头为 AnyCPU，可在 x64/.NET 8 进程加载），
-    /// 调用其 Reader.ReaderMethod 类完成串口连接与 NTAG 标签读写，
-    /// 无需自行拼通讯协议帧。
-    ///
-    /// 依赖：DLL 需位于程序输出目录（csproj 已配置自动复制），
-    /// 运行时还需 System.IO.Ports 程序集（Service 项目已引用）。
+    /// 运行时反射加载厂商 Reader_DLLV1.dll（.NET Framework 托管库，已修补 PE 头为 AnyCPU 以在 x64/.NET 8 加载），
+    /// 调用其 Reader.ReaderMethod 完成串口连接与 NTAG 标签读写，无需自行拼协议帧。
+    /// 依赖：DLL 须在输出目录（csproj 已配自动复制）+ System.IO.Ports（Service 已引用）。
     /// </summary>
     public class NfcReaderService : INfcReader
     {

@@ -4,8 +4,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
-using TORNPISolution.Interface;
-using TORNPISolution.Service;
 using TORNPISolution.ViewModels;
 
 namespace TORNPISolution.Views
@@ -16,9 +14,6 @@ namespace TORNPISolution.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        // 临时诊断：定位“波形按钮无响应”用，确认后移除
-        private readonly ILogService _diagLog = new LogService(nameof(MainWindow));
-
         public MainWindow()
         {
             // 方案列表空白区域的左键点击在类级预览阶段直接吞掉：
@@ -34,15 +29,9 @@ namespace TORNPISolution.Views
             ViewModel.LoadPlanRequested += ViewModel_LoadPlanRequested;
             ViewModel.SelectedPlanModuleChanged += ViewModel_SelectedPlanModuleChanged;
 
-            // 波形折叠按钮点击保险：DataGrid 会接管非当前单元格的首次点击（选中行/
-            // 设为当前单元格），导致单元格内 ToggleButton 收不到 Click。
-            // 用 handledEventsToo 保证即使被 DataGrid 标记 Handled 也能执行：
-            // 在 Preview 阶段直接翻转属性并 Handled，每次点击恰好翻转一次
+            // 波形折叠按钮点击保险：展开/收起这个开关取反
             DetailGrid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
                 new MouseButtonEventHandler(DetailGrid_WaveformToggle_ForceClick), handledEventsToo: true);
-
-            // 临时诊断：观察按钮自身的 Click 事件是否能到达（定位用，确认后移除）
-            DetailGrid.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(WaveformDiag_ButtonClick));
 
             // 启动时自动加载的方案可能已选中模块，同步一次列表高亮与明细表
             Loaded += (_, _) =>
@@ -55,9 +44,7 @@ namespace TORNPISolution.Views
         private MainViewModel ViewModel => (MainViewModel)DataContext;
 
         /// <summary>
-        /// 波形折叠/展开点击保险：命中单元格内 ToggleButton 时直接翻转
-        /// IsWaveformExpanded 并 Handled（绕过 DataGrid 对单元格点击的接管，
-        /// 也避免按钮自身逻辑再翻转一次造成双重翻转）。
+        /// 波形折叠/展开点击
         /// </summary>
         private void DetailGrid_WaveformToggle_ForceClick(object sender, MouseButtonEventArgs e)
         {
@@ -69,30 +56,13 @@ namespace TORNPISolution.Views
 
             item.IsWaveformExpanded = !item.IsWaveformExpanded;
             e.Handled = true;
-            _diagLog.Info($"[波形诊断] Preview 直接翻转：行={item.Name} → IsWaveformExpanded={item.IsWaveformExpanded}");
 
-            // 延迟检查详情区实际状态（诊断）并强制行重新布局（保险）
+            // 延迟强制行重新布局（保险）
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var row = DetailGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
-                if (row == null)
-                {
-                    return;
-                }
-
-                row.InvalidateMeasure();
-                var presenter = FindVisualChild<DataGridDetailsPresenter>(row);
-                _diagLog.Info($"[波形诊断] 翻转后状态：DetailsVisibility={row.DetailsVisibility}, " +
-                    $"详情区={(presenter == null ? "未找到" : $"Visibility={presenter.Visibility}, 高度={presenter.ActualHeight:0.#}")}, " +
-                    $"行高={row.ActualHeight:0.#}");
+                row?.InvalidateMeasure();
             }));
-        }
-
-        /// <summary>临时诊断：记录按钮自身 Click 事件是否到达，确认后移除</summary>
-        private void WaveformDiag_ButtonClick(object sender, RoutedEventArgs e)
-        {
-            var item = (e.OriginalSource as FrameworkElement)?.DataContext as TestItemViewModel;
-            _diagLog.Info($"[波形诊断] Click 事件到达：{e.OriginalSource?.GetType().Name}，行数据={item?.Name ?? "未知"}");
         }
 
         // ==================== 中间方案列表：选中同步 ====================
@@ -101,9 +71,7 @@ namespace TORNPISolution.Views
         private bool _syncingPlanSelection;
 
         /// <summary>
-        /// 方案列表空白区域点击从源头吞掉（类级处理器，先于 gong-wpf-dragdrop
-        /// 等实例处理器执行）：点在模块卡片或滚动条上时放行（选中/拖拽/滚动
-        /// 不受影响），点在其他空白处直接 Handled，选中不会被清空。
+        /// 方案列表空白区域点击从源头吞掉
         /// </summary>
         private void BlankArea_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -125,10 +93,7 @@ namespace TORNPISolution.Views
         }
 
         /// <summary>
-        /// 用户点击模块卡片 → 更新 VM 选中（右侧面板随之刷新）。
-        /// 选中被清空时（gong-wpf-dragdrop 拖拽库接管鼠标事件，点空白
-        /// 或特定交互会意外清空选中）不回写 null，并把高亮恢复到
-        /// VM 当前模块，保证右侧明细面板内容不丢失。
+        /// 用户点击模块卡片 → 更新 VM 选中
         /// </summary>
         private void PlanList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -149,8 +114,6 @@ namespace TORNPISolution.Views
                 return;
             }
 
-            // 延迟到本次点击处理结束后恢复：若点击实际选中了新模块则无需
-            // 恢复，避免同步写选中与 ListBox 选中流程重入互相打断
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (_syncingPlanSelection)
@@ -173,10 +136,7 @@ namespace TORNPISolution.Views
         }
 
         /// <summary>
-        /// 切换选中模块时先置空 ItemsSource 再赋新集合，强制 DataGrid 整表重建。
-        /// 若直接把 ItemsSource 从一个集合切到另一个集合，DataGrid 会复用行容器，
-        /// 出现视觉残留/命中测试错位（点单元格实际命中旧模块的单元格，
-        /// 面板跳到别的模块甚至崩溃）。
+        /// 切换选中模块时先置空 ItemsSource 再赋新集合， DataGrid 整表重建
         /// </summary>
         private void RefreshDetailGrid()
         {
@@ -414,26 +374,6 @@ namespace TORNPISolution.Views
                 }
 
                 current = VisualTreeHelper.GetParent(current);
-            }
-
-            return null;
-        }
-
-        private static T? FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                var child = VisualTreeHelper.GetChild(obj, i);
-                if (child is T match)
-                {
-                    return match;
-                }
-
-                var found = FindVisualChild<T>(child);
-                if (found != null)
-                {
-                    return found;
-                }
             }
 
             return null;

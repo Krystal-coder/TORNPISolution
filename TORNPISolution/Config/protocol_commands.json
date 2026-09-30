@@ -67,7 +67,7 @@
   "CtrlGetPressure": {
     "Code": 118,
     "FuncCode": 5,
-    "Description": "读取产品压力值"
+    "Description": "读取产品压力值（静态压力回读命令，帧 EF 02 05 76 17 86 FE）"
   },
   "CtrlStartDeflate": {
     "Code": 119,
@@ -107,7 +107,7 @@
   "CtrlGetStaticPress": {
     "Code": 126,
     "FuncCode": 5,
-    "Description": "读取当前静态值"
+    "Description": "读取当前静态值（实测静态压力回读用 0x76，本命令未启用）"
   },
   "CtrlSetOverPressureThreshold": {
     "Code": 127,

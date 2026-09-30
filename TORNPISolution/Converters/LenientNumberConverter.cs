@@ -7,7 +7,6 @@ namespace TORNPISolution.Converters
     /// <summary>
     /// 宽容数字转换器：数值 ↔ 文本双向绑定专用。
     /// 清空输入框或输入非法字符时 ConvertBack 返回 UnsetValue，
-    /// 避免默认绑定把空字符串转 double 抛 FormatException（ConvertBack cannot convert value ''）。
     /// 支持 double/int/float/long 目标类型（按 targetType 返回对应类型）。
     /// </summary>
     [ValueConversion(typeof(object), typeof(string))]

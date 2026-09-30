@@ -14,7 +14,8 @@ namespace TORNPISolution.Service.Devices
     /// 0x05开排气阀 0x06关排气阀 0x07调零 0x09连接验证。
     /// 通讯仪式以控制台实测工程 NibpQuickTest 为唯一基准（启动序列/清场/放气回零/收敛判据/断开仪式）。
     /// 断开仪式 = 复位等回显（退出采样/模拟模式）→ 连发 3 次 0x00 归还本地控制，避免设备遗留采样态；
-    /// 启动握手单轮快速失败：设备一旦被遗留在程控采样态（AA 洪泛、复位无回显），软件无法恢复，直接失败并提示断电重启。
+    /// 规范重连：《无创血压接收发送表》约定 7 秒无心跳应答设备自动断开、"如果需要再次连接直接复位即可"，
+    /// 故检测到复位/命令无应答时自动重试复位握手恢复链路（ReconnectAsync），重连仍失败才提示断电重启。
     /// </summary>
     public sealed class KangwendaNIBPSimulator : IBloodPressureSimulator
     {
@@ -138,11 +139,12 @@ namespace TORNPISolution.Service.Devices
             _port.DiscardInBuffer();               // 清掉设备遗留采样态的洪泛残留字节，避免读循环组包错位
             WriteRaw([CmdDisconnect]);
             await Task.Delay(1500, ct).ConfigureAwait(false);
-            if (!await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false))
+            if (!await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false)
+                && !await ReconnectAsync(ct).ConfigureAwait(false))
             {
                 await CloseAsync().ConfigureAwait(false);
                 throw new InvalidOperationException(
-                    $"康伟达模拟仪对复位(0x01)无应答（{PortName} {BaudRate}bps）。设备很可能被上次测试遗留在程控采样态（软件无法恢复），请断电重启模拟仪后重试；并检查串口线路、波特率（实测 115200）与是否被其他程序占用。");
+                    $"康伟达模拟仪对复位(0x01)无应答，按规范重连（复位重试）亦失败（{PortName} {BaudRate}bps）。设备可能被上次测试遗留在程控采样态，请断电重启模拟仪后重试；并检查串口线路、波特率（实测 115200）与是否被其他程序占用。");
             }
             WriteRaw([CmdZero]);                                 // 调零（实测：回显为 00 而非 07，不作应答结算）
             await Task.Delay(1000, ct).ConfigureAwait(false);    // 实测调零后设备回 00 耗时约 1s，等它走完再进测试序列
@@ -162,6 +164,35 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
+        /// 规范重连：《无创血压接收发送表》约定设备 7 秒无心跳应答自动断开、"如果需要再次连接直接复位即可"。
+        /// 检测到复位/命令无应答时最多 3 轮重试复位握手（先清接收缓冲，防洪泛残留字节干扰回显结算），
+        /// 成功后补调零+关阀回待机；返回链路是否恢复。
+        /// </summary>
+        private async Task<bool> ReconnectAsync(CancellationToken ct)
+        {
+            for (var round = 1; round <= 3; round++)
+            {
+                ct.ThrowIfCancellationRequested();
+                if (_port is not { IsOpen: true }) return false;
+                _log.Info($"康伟达模拟仪：按规范重连 第{round}/3 轮（复位 0x01）");
+                _port.DiscardInBuffer();
+                if (await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false))
+                {
+                    WriteRaw([CmdZero]);
+                    await Task.Delay(300, ct).ConfigureAwait(false);
+                    WriteRaw([CmdCloseVent]);
+                    await Task.Delay(150, ct).ConfigureAwait(false);
+                    _lastRxUtc = DateTime.UtcNow;
+                    _log.Info("康伟达模拟仪：重连成功（复位应答正常），已调零关阀，链路恢复");
+                    return true;
+                }
+                await Task.Delay(700, ct).ConfigureAwait(false);
+            }
+            _log.Warn("康伟达模拟仪：按规范重连 3 轮均失败（复位无应答）");
+            return false;
+        }
+
+        /// <summary>
         /// 连接活性校验（共享会话下 M01 用）：重发复位并等待回显，两次无应答抛异常。
         /// 注：复位会使设备回到待命界面，对后续模块无影响（各模块首条指令自带模式切换）。
         /// </summary>
@@ -169,8 +200,10 @@ namespace TORNPISolution.Service.Devices
         {
             if (!IsOpen)
                 throw new InvalidOperationException("康伟达模拟仪串口未打开。");
-            if (!await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false))
-                throw new InvalidOperationException($"康伟达模拟仪连接活性校验失败：对复位(0x01)无应答（{PortName} {BaudRate}bps）");
+            if (!await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false)
+                && !(await ReconnectAsync(ct).ConfigureAwait(false)
+                     && await SendWithAckCheckAsync(new[] { CmdReset }, CmdReset, ct).ConfigureAwait(false)))
+                throw new InvalidOperationException($"康伟达模拟仪连接活性校验失败：对复位(0x01)无应答，按规范重连亦失败（{PortName} {BaudRate}bps）");
             _log.Info("康伟达模拟仪：连接活性校验通过（复位应答正常）");
         }
 
@@ -212,11 +245,23 @@ namespace TORNPISolution.Service.Devices
             _loopCts = null;
             _loopTask = null;
 
-            try { _port?.Close(); }
-            catch { /* 端口已失效时直接释放 */ }
-
-            _port?.Dispose();
+            // 串口 Close/Dispose 同步等驱动 IRP：设备/USB 转串口状态异常时可能永久挂起
+            // （实测设备静默后关闭链卡死、停止按钮取消令牌传不进来、方案停不下来），
+            // 故放到线程池限时等待，超时弃管该端口对象（进程退出时驱动自会释放）
+            var port = _port;
             _port = null;
+            if (port != null)
+            {
+                var closeTask = Task.Run(() =>
+                {
+                    try { port.Close(); }
+                    catch { /* 端口已失效时直接释放 */ }
+                    try { port.Dispose(); }
+                    catch { /* 端口已失效时直接释放 */ }
+                });
+                if (!closeTask.Wait(2000))
+                    _log.Warn("康伟达模拟仪：串口 Close 超 2s 无响应（USB 转串口驱动疑似挂起），已弃管端口对象；若下次打开失败请重插串口或断电重启模拟仪");
+            }
         }
 
         // ==================== 核心指令 ====================
@@ -283,19 +328,36 @@ namespace TORNPISolution.Service.Devices
             const double tolerance = 1.5;
             const int stableHoldMs = 2500;
             _stableSamples.Clear();
-            // 收敛超时映射（NibpQuickTest 基准）：目标 ≤100→20s、≤150→30s、其余→45s
-            var timeout = timeoutSeconds ?? (pressure <= 100 ? 20 : pressure <= 150 ? 30 : 45);
+            // 收敛超时映射：NibpQuickTest 基准（≤100→20s、≤150→30s、其余→45s）是小容积标定；
+            // 接 500ml 钢瓶等大容积后泵充气速率下降（约 2~4mmHg/s），原映射会在爬升中途截断
+            // （实测 240 截在 202、热泵 50 截在 43），故放宽为 ≤100→30s、≤150→45s、≤200→60s、>200→90s；
+            // 真停滞（泵极限/气路漏/热保护）由下方停滞检测提前 abort，不会空等上限
+            var timeout = timeoutSeconds ?? (pressure <= 100 ? 30 : pressure <= 150 ? 45 : pressure <= 200 ? 60 : 90);
             var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(timeout);
             DateTime stableSince = DateTime.MaxValue;
+            // 停滞检测基准：连续 10s 爬升 <1mmHg 判停滞提前 abort
+            var stallWatch = System.Diagnostics.Stopwatch.StartNew();
+            var stallBase = LastPressure;
             while (DateTime.UtcNow < deadline)
             {
                 ct.ThrowIfCancellationRequested();
 
-                // 快速失败：设备超过 8s 无任何回传（无 ACK/AA/心跳），不再干等收敛超时造成"卡死"观感
+                // 快速失败：设备超 8s 无任何回传（无 ACK/AA/心跳），疑似空闲 7 秒自动断开，先按规范复位重连，成功则补发压力源帧继续等收敛
                 if ((DateTime.UtcNow - _lastRxUtc).TotalSeconds > 8)
                 {
+                    _log.Warn("康伟达模拟仪：设备超 8s 无任何回传（无 ACK、无 AA 帧），疑似自动断开，按规范尝试重连（复位 0x01）...");
+                    if (await ReconnectAsync(ct).ConfigureAwait(false))
+                    {
+                        _lastRxUtc = DateTime.UtcNow;
+                        stableSince = DateTime.MaxValue;
+                        _stableSamples.Clear();
+                        stallBase = LastPressure;
+                        stallWatch.Restart();
+                        await SendWithRetryAsync(frame, FuncPressureTest, ct).ConfigureAwait(false);   // 复位后设备回待命，目标压力丢失需补发压力源帧
+                        continue;
+                    }
                     LastStaticPressure = LastPressure;
-                    var dead = "康伟达模拟仪：设备无任何回传（无 ACK、无 AA 帧），已中止本点。请断电重启设备并确认气路连接后重试。";
+                    var dead = "康伟达模拟仪：设备无任何回传且按规范重连失败，已中止本点。请断电重启设备并确认气路连接后重试。";
                     if (throwOnTimeout)
                         throw new TimeoutException(dead);
                     _log.Warn(dead);
@@ -318,6 +380,23 @@ namespace TORNPISolution.Service.Devices
                     }
                 }
                 else stableSince = DateTime.MaxValue;
+
+                // 停滞早退：连续 10s 爬升 <1mmHg 且未到位 → 泵极限/气路漏/热保护，
+                // 接大容积时真停滞等满超时只是浪费时间，提前 abort 并让日志直接定位
+                if (stallWatch.ElapsedMilliseconds >= 10_000)
+                {
+                    if (LastPressure - stallBase < 1.0)
+                    {
+                        LastStaticPressure = LastPressure;
+                        var stall = $"康伟达模拟仪：压力爬升停滞（10s 上升 <1mmHg），当前回读 {LastPressure:0.0} mmHg（目标 {pressure:0.#}），疑泵极限、气路漏或热保护，提前中止本点等待";
+                        if (throwOnTimeout)
+                            throw new TimeoutException(stall);
+                        _log.Warn(stall);
+                        return;
+                    }
+                    stallBase = LastPressure;
+                    stallWatch.Restart();
+                }
                 await Task.Delay(100, ct).ConfigureAwait(false);
             }
 
@@ -462,8 +541,9 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 连续放气回零（NibpQuickTest 基准仪式）：05 开阀泄放（泄放期间补发压力表帧维持 AA 回读，实测开阀会中断 AA 流），
-        /// 回读 &lt;5mmHg 提前返回后 06 关阀，返回是否成功回零。
+        /// 连续放气回零：切压力表补帧维持回读，05 开阀泄放，回读 &lt;5mmHg 提前返回后 06 关阀，返回是否成功回零。
+        /// 实测（9/30 日志）：泄放前绝不能发 01 复位——复位会使 05 放气阀失效（复位后开阀仅剩 ~0.3mmHg/s 自然泄漏，
+        /// 而不复位时开阀 2s 内可从 120 泄到 0）；压力源保压顶着阀时坚持开阀数秒，设备会放弃保压并自行快速泄放。
         /// </summary>
         public async Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default)
         {
@@ -482,17 +562,21 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 05 开阀泄放并等回读归零：实测开阀后设备中断 AA 回传，干等基线会等满上限（点间卡死真因），
-        /// 故泄放期间周期补发压力表帧维持回读；&lt;5mmHg 提前返回，等待上限按残压 3~capSeconds 秒缩放，最后 06 关阀。
+        /// 故泄放期间周期补发压力表帧维持回读；&lt;5mmHg 提前返回，最后 06 关阀。
+        /// 等待下限 20s：保压中的设备会顶阀数秒才放弃并自行塌压（实测 60 点残压 39 关阀后 1s 内塌到 0），
+        /// 旧下限 3s（残压/10）在低点必超时；每圈补发 05 防设备放弃保压时阀状态被复位。
         /// </summary>
         private async Task<bool> VentToBaselineAsync(double capSeconds, CancellationToken ct)
         {
             WriteRaw([CmdOpenVent]);
-            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(Math.Clamp(LastPressure / 10, 3, capSeconds));
+            var seconds = Math.Max(20, Math.Min(LastPressure / 10, capSeconds));
+            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(seconds);
             while (DateTime.UtcNow < deadline)
             {
                 ct.ThrowIfCancellationRequested();
                 if (LastPressure < 5)
                     break;
+                WriteRaw([CmdOpenVent]);                       // 补发开阀，防中途阀被设备关闭
                 WriteRaw(BuildPressureTestFrame(2, 0, 0, 0, 0));   // 补发压力表帧，AA 流未断时即可看到压力下降
                 await Task.Delay(600, ct).ConfigureAwait(false);
             }
@@ -510,8 +594,11 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 功能帧前的清场仪式（NibpQuickTest 实测定型序列，缺步设备不应答 0x03/0x02 功能帧）：
-        /// 06 关阀 → 压力表帧（拿 ACK 并恢复 AA 流）→ 残压 &gt;10 则连续放气归零 → 01 复位 → 07 调零 → 06 关阀。
+        /// 功能帧前的清场仪式（NibpQuickTest 实测序列，缺步设备不应答 0x03/0x02 功能帧）：
+        /// 06 关阀 → 压力表帧（拿 ACK 并恢复 AA 流）→ 残压 &gt;10 则连续放气归零 →
+        /// 01 复位 → 07 调零（必须常压下执行）→ 06 关阀。
+        /// 复位必须放在泄放之后：实测复位先行会使 05 阀失效、泄放变成 ~0.3mmHg/s 自然泄漏；
+        /// 且泄放失败（残压 ≥5）时跳过 07——带残压调零会让后续所有回读整体偏移（实测残压 45 调零后回读 -2.0）。
         /// </summary>
         private async Task CleanStateAsync(CancellationToken ct)
         {
@@ -522,15 +609,18 @@ namespace TORNPISolution.Service.Devices
             if (LastPressure > 10)
             {
                 // 残压泄放：开阀期间 AA 回传中断，不能干等基线（曾致点间卡死 30s）；
-                // VentToBaseline 内补发压力表帧维持回读、归零提前返回、上限按残压缩放
+                // VentToBaseline 内补发压力表帧维持回读、归零提前返回、保压顶阀时坚持开阀等设备放弃
                 _log.Info($"康伟达模拟仪：清场泄放残压（当前 {LastPressure:0.0} mmHg）");
-                if (!await VentToBaselineAsync(15, ct).ConfigureAwait(false))
-                    _log.Warn($"康伟达模拟仪：泄放后残压未确认归零（回读 {LastPressure:0.0} mmHg），继续后续调零流程");
+                if (!await VentToBaselineAsync(30, ct).ConfigureAwait(false))
+                    _log.Warn($"康伟达模拟仪：泄放后残压未确认归零（回读 {LastPressure:0.0} mmHg），跳过调零以免读数整体偏移");
             }
-            WriteRaw([CmdReset]);
-            await Task.Delay(300, ct).ConfigureAwait(false);
-            WriteRaw([CmdZero]);
-            await Task.Delay(300, ct).ConfigureAwait(false);
+            if (LastPressure < 5)
+            {
+                WriteRaw([CmdReset]);
+                await Task.Delay(300, ct).ConfigureAwait(false);
+                WriteRaw([CmdZero]);
+                await Task.Delay(300, ct).ConfigureAwait(false);
+            }
             WriteRaw([CmdCloseVent]);
             await Task.Delay(150, ct).ConfigureAwait(false);
         }
@@ -794,8 +884,18 @@ namespace TORNPISolution.Service.Devices
                 return;
 
             _log.Warn("康伟达模拟仪：命令无应答，重发一包。");
-            if (!await TrySendAndWaitAckAsync(data, ack, ct).ConfigureAwait(false))
-                _log.Warn("康伟达模拟仪：重发后仍无应答（设备未连接或未上电？）。");
+            if (await TrySendAndWaitAckAsync(data, ack, ct).ConfigureAwait(false))
+                return;
+
+            // 重发仍无应答：疑似设备空闲自动断开（7 秒无心跳应答），按规范复位重连后再补发本命令
+            _log.Warn("康伟达模拟仪：重发后仍无应答，按规范尝试重连（复位 0x01）...");
+            if (await ReconnectAsync(ct).ConfigureAwait(false)
+                && await TrySendAndWaitAckAsync(data, ack, ct).ConfigureAwait(false))
+            {
+                _log.Info("康伟达模拟仪：重连后命令发送成功。");
+                return;
+            }
+            _log.Warn("康伟达模拟仪：重连后命令仍无应答（设备未连接或未上电？）。");
         }
 
         private async Task<bool> TrySendAndWaitAckAsync(byte[] data, byte ack, CancellationToken ct)
@@ -854,9 +954,13 @@ namespace TORNPISolution.Service.Devices
         private void WriteRawLocked(byte[] data)
         {
             _log.Debug($"康伟达模拟仪 TX: {FormatFrame(data)}");
-            if (_port is not { IsOpen: true })
+            var port = _port;
+            if (port is not { IsOpen: true })
                 throw new InvalidOperationException("康伟达模拟仪串口未打开。");
-            _port.Write(data, 0, data.Length);
+            // 驱动挂起时 Write 会永久阻塞（实测设备静默后发送/关闭链卡死），限时 1s 放弃并抛异常走失败路径
+            var writeTask = Task.Run(() => port.Write(data, 0, data.Length));
+            if (!writeTask.Wait(1000))
+                throw new TimeoutException("康伟达模拟仪串口写入超 1s 无响应（USB 转串口驱动疑似挂起）");
         }
 
         // ==================== 接收解析（读循环） ====================
@@ -878,9 +982,18 @@ namespace TORNPISolution.Service.Devices
                     // 导致关闭/停止链卡死、界面无响应；有字节才读，ReadByte 立即返回
                     if (port.BytesToRead == 0)
                     {
-                        // 帧间空闲：AA 帧已收满 2 字节以上则按截断帧结算，避免最后一帧滞留
-                        if (_inAa && _aaBuf.Count >= 2)
-                            FinishAaFrame();
+                        // 帧间空闲：AA 帧已收满 2 字节以上则按截断帧结算，避免最后一帧滞留；
+                        // 仅 1 字节残留属截断杂字节，直接丢弃——否则 _inAa 恒真会把后续心跳 0x09 与 ACK 吞进组包致断连
+                        if (_inAa)
+                        {
+                            if (_aaBuf.Count >= 2)
+                                FinishAaFrame();
+                            else
+                            {
+                                _inAa = false;
+                                _aaBuf.Clear();
+                            }
+                        }
                         Thread.Sleep(20);
                         continue;
                     }
@@ -967,7 +1080,10 @@ namespace TORNPISolution.Service.Devices
             _disposed = true;
             try
             {
-                CloseAsync().GetAwaiter().GetResult();
+                // 限时等待兜底：CloseAsync 内部虽已分段限时，仍防任何意外永久阻塞释放链（释放路径多在同步上下文调用）
+                var closeTask = Task.Run(CloseAsync);
+                if (!closeTask.Wait(5000))
+                    _log.Warn("康伟达模拟仪：Dispose 关闭超 5s 未完成，放弃等待（端口对象已弃管）");
             }
             catch { /* 释放路径忽略 */ }
             GC.SuppressFinalize(this);

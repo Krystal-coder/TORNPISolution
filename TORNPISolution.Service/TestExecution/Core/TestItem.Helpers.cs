@@ -5,10 +5,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：跨模块共用的辅助方法——
-    /// 产品通讯握手、PPG 模块在位检测、产品心率回读、导联脱落判定、SpO2 精度扫描，
-    /// 以及波形构建（Build*）与波形输出采集（Output*WithCaptureAsync）辅助。
-    /// 业务模块方法见 TestItem.Bp.cs / TestItem.Aecg.cs / TestItem.NfcCharging.cs。
+    /// TestItem 分部：跨模块共用辅助方法（产品握手、PPG 在位检测、心率回读、导联脱落判定、SpO2 精度扫描、波形构建与采集）。
     /// </summary>
     public partial class TestItem
     {

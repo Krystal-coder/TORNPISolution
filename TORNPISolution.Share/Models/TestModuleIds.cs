@@ -20,7 +20,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>压力控制功能测试（BP-006~008：匀速放气控制/快速放气控制/过压保护，均以产品串口回读压力判定）</summary>
         public const string PressureControlTest = "M04";
 
-        /// <summary>血压静态压力精度测试（BP-003：多点静态压 vs 产品上报值，误差 ≤2mmHg）</summary>
+        /// <summary>血压静态压力精度测试（BP-003：多点静态压 vs 产品上报值，误差 ≤3mmHg）</summary>
         public const string BpStaticAccuracyTest = "M05";
 
         /// <summary>血压动态压力精度测试（BP-004 血压精度/重复性 + BP-005 心率精度/重复性）</summary>
@@ -55,5 +55,8 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>产品通讯初始化（进入产测模式 + 0x72 产品信息获取（MAC/嵌软版本）+ 0x74 状态查询，全方案唯一执行产品通讯判定的模块）</summary>
         public const string ProductCommInit = "M16";
+
+        /// <summary>产品静态压力校准（模拟仪逐点稳压 60/120/180/240mmHg 后发 0x66 校准，结束关闭压力传感器）</summary>
+        public const string ProductStaticPressureCalibration = "M17";
     }
 }

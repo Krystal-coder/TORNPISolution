@@ -16,8 +16,8 @@ namespace TORNPISolution.ViewModels
     /// <summary>
     /// 主窗口 ViewModel：
     /// 模块库（左） → 拖拽组建测试方案（中） → 查看模块测试明细（右）
-    /// 拖放由 gong-wpf-dragdrop 接管，本类实现 IDropTarget 处理落点逻辑。
-    /// 规格在 Spec 类、测量在 TestItem 类，本类只负责调度与结果展示。
+    /// 拖放由 gong-wpf-dragdrop 接管，IDropTarget 处理落点逻辑。
+    /// 规格在 Spec 类、测量在 TestItem 类。
     /// </summary>
     public class MainViewModel : ViewModelBase, IDropTarget
     {
@@ -195,7 +195,6 @@ namespace TORNPISolution.ViewModels
             var oldIndex = PlanModules.IndexOf(module);
             if (oldIndex >= 0 && oldIndex < insertIndex)
             {
-                // 先移除后插入的语义下，向后移动时目标位置需回退一位
                 insertIndex--;
             }
 
@@ -213,6 +212,32 @@ namespace TORNPISolution.ViewModels
 
         /// <summary>模块库：所有可用的测试模块（模板）</summary>
         public ObservableCollection<TestModuleViewModel> AvailableModules { get; }
+
+        /// <summary>
+        /// 重建模块库快照：M05 等目录项按当前仪器配置动态生成（如 BP-003 一点一项），
+        /// 配置改点后无需重启——加载方案、展开模块库、点运行时都会先走这里。
+        /// </summary>
+        private void RefreshModuleCatalog()
+        {
+            AvailableModules.Clear();
+            foreach (var m in _moduleService.GetAllModules())
+                AvailableModules.Add(new TestModuleViewModel(m));
+        }
+
+        /// <summary>按最新目录重建方案内模块实例，保证运行判定与界面项清单一致</summary>
+        private void RebuildPlanModulesFromCatalog()
+        {
+            var selectedId = SelectedPlanModule?.Id;
+            for (var i = 0; i < PlanModules.Count; i++)
+            {
+                var fresh = AvailableModules.FirstOrDefault(m => m.Id == PlanModules[i].Id);
+                if (fresh != null)
+                    PlanModules[i] = fresh.CreateInstance();
+            }
+            SelectedPlanModule = selectedId == null
+                ? null
+                : PlanModules.FirstOrDefault(m => m.Id == selectedId);
+        }
 
         /// <summary>整体测试方案：已选入的测试模块</summary>
         public ObservableCollection<TestModuleViewModel> PlanModules { get; } = new();
@@ -239,14 +264,18 @@ namespace TORNPISolution.ViewModels
         /// 当前选中模块的测试项集合（右侧明细表直接绑定此拍平属性，
         /// 不用 SelectedPlanModule.Items 深层路径，避免选中切换时路径绑定失效）
         /// </summary>
-        public ObservableCollection<TestItemViewModel> SelectedModuleItems =>
-            SelectedPlanModule?.Items ?? new ObservableCollection<TestItemViewModel>();
+        public ObservableCollection<TestItemViewModel> SelectedModuleItems =>SelectedPlanModule?.Items ?? new ObservableCollection<TestItemViewModel>();
 
-        /// <summary>模块库面板是否展开（仅配置方案时需要展开）</summary>
+        /// <summary>模块库面板是否展开；展开时按最新配置重建目录（M05 等动态项跟随压力点勾选）</summary>
         public bool IsLibraryVisible
         {
             get => _isLibraryVisible;
-            set => SetProperty(ref _isLibraryVisible, value);
+            set
+            {
+                if (value && !_isLibraryVisible)
+                    RefreshModuleCatalog();
+                SetProperty(ref _isLibraryVisible, value);
+            }
         }
 
         /// <summary>测试方案是否正在运行（运行中禁止再次触发/复位/清空）</summary>
@@ -320,13 +349,11 @@ namespace TORNPISolution.ViewModels
         }
 
         /// <summary>方案标题显示（直接显示方案名，未保存/加载方案时显示未命名方案）</summary>
-        public string PlanTitleText => string.IsNullOrEmpty(CurrentPlanName)
-            ? "未命名方案"
-            : CurrentPlanName;
+        public string PlanTitleText => string.IsNullOrEmpty(CurrentPlanName)? "未命名方案": CurrentPlanName;
 
         /// <summary>
         /// 将模块库中的模块加入测试方案（拖拽 / 双击共用入口）。
-        /// 同一模块只允许加入一次；insertIndex 为 -1 时追加到末尾。
+        /// 同一模块只允许加入一次
         /// </summary>
         public void AddModuleToPlan(TestModuleViewModel? libraryModule, int insertIndex = -1)
         {
@@ -372,7 +399,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>调整方案内模块顺序（方案列表内拖拽排序）</summary>
+        /// <summary>调整方案内模块顺序</summary>
         public void MovePlanModule(TestModuleViewModel module, int newIndex)
         {
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.MovePlanModule() method . {Environment.NewLine}");
@@ -503,15 +530,19 @@ namespace TORNPISolution.ViewModels
 
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
             IsRunning = true;
-            TestRunState.SetRunning(true);   // 全局运行态：配置页运行期锁定编辑/保存
+            TestRunState.SetRunning(true);  
             _runCts = new CancellationTokenSource();
             var token = _runCts.Token;
-            _testItemService.BeginPlanRun();   // 复位方案级产品通讯状态：本轮产品可用性由 M16 初始化模块记录
+
+            // 动态项跟随最新配置：重建目录与方案实例（M05 一点一项等），再开始本轮，
+            // 保证运行判定、结果回填与界面项清单用的是同一份最新目录
+            RefreshModuleCatalog();
+            RebuildPlanModulesFromCatalog();
+
+            _testItemService.BeginPlanRun();   // 复位方案级产品通讯状态
             ClearWaveform();   // 新一轮测试清空上一轮波形
             _log.Info($"===== 开始执行测试方案，共 {PlanModules.Count} 个模块 =====");
-
-            // 血压模拟仪共享会话为懒建立：第一个真正需要它的血压模块借用时才打开，
-            // 纯 NFC/ECG 等方案不碰这台设备；此处不主动 Open，只保证结束时 Close
+            
 
             try
             {
@@ -522,8 +553,6 @@ namespace TORNPISolution.ViewModels
                 }
                 NotifyPlanResultChanged();
 
-                //集合被意外修改也不会打断执行：取快照按当前位置逐模块执行，
-                // 执行序号 = 快照中的位置（与界面显示序号强绑定，不会错乱）
                 var snapshot = PlanModules.ToList();
                 for (var i = 0; i < snapshot.Count; i++)
                 {
@@ -537,11 +566,10 @@ namespace TORNPISolution.ViewModels
                     async Task OnItemCompleted(string itemName, TestItemResult result)
                     {
                         var item = module.Items.FirstOrDefault(it => it.Name == itemName);
-                        if (item == null) return;   // 不在 Spec 中的项忽略
+                        if (item == null) return;   
                         Application.Current.Dispatcher.Invoke(() => item.ApplyResult(result));
                         if (item.Result == TestResultStatus.Fail)
                             _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} = {item.MeasuredValueText} 超规格 {item.SpecText} -> FAIL");
-                        // 关键：给 UI 线程留出渲染时间，确保 DataGrid 显示完当前结果再开始下一项
                         await Task.Delay(300, token);
                     }
 
@@ -550,12 +578,13 @@ namespace TORNPISolution.ViewModels
                         _testItemService.TestItemxx(module.Sequence, module.Model, OnItemCompleted, token), token);
                     FlushWaveform();   // 模块跑完立刻刷出最后一批采样点，波形显示完整
 
-                    // 回调未覆盖的项（模块方法未写入结果的项）强制判 FAIL（需回 UI 线程）
+                    // 回调未覆盖的项 判 FAIL
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         foreach (var item in module.Items)
                         {
-                            if (item.IsReportedNotJudged) continue;   // 不判定项（演示/预留）保持“未测试”，不强制 FAIL
+                            // 不判定项（演示/预留）保持“未测试”，不强制 FAIL
+                            if (item.IsReportedNotJudged) continue;   
                             if (results.ContainsKey(item.Name) && item.Result != TestResultStatus.NotTested) continue;
                             if (item.Result == TestResultStatus.NotTested)
                             {
@@ -582,8 +611,6 @@ namespace TORNPISolution.ViewModels
             }
             finally
             {
-                // 方案结束才关闭共享会话（本方案若从未懒建立过则是空操作；此时康伟达发 0x00 归还本地控制）；限时 5s 防读循环收尾卡死。
-                // 必须 await（不能用 .GetAwaiter().GetResult() 同步阻塞）——finally 在 UI 线程上执行，同步阻塞会冻结界面导致点不动
                 if (_simSession is { IsOpen: true })
                 {
                     try
@@ -638,7 +665,7 @@ namespace TORNPISolution.ViewModels
 
         // ==================== 方案保存/加载 ====================
 
-        /// <summary>保存当前方案为 JSON（由 View 层提供方案名称输入）</summary>
+        /// <summary>保存当前方案为 JSON</summary>
         private void SavePlan()
         {
             // 实际保存逻辑由 SavePlanWithName 方法完成，View 层调用
@@ -646,7 +673,7 @@ namespace TORNPISolution.ViewModels
             SavePlanRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>方案保存请求事件（View 层监听并弹出名称输入对话框）</summary>
+        /// <summary>方案保存请求事件</summary>
         public event EventHandler? SavePlanRequested;
 
         /// <summary>按指定名称保存当前方案</summary>
@@ -683,11 +710,10 @@ namespace TORNPISolution.ViewModels
         /// <summary>加载方案（由 View 层提供方案名称选择）</summary>
         private void LoadPlan()
         {
-            // 实际加载逻辑由 LoadPlanWithName 方法完成，View 层调用
             LoadPlanRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>方案加载请求事件（View 层监听并弹出选择对话框）</summary>
+        /// <summary>方案加载请求事件</summary>
         public event EventHandler? LoadPlanRequested;
 
         /// <summary>获取所有已保存的方案名称</summary>
@@ -713,6 +739,9 @@ namespace TORNPISolution.ViewModels
                     _log.Warn($"方案 [{planName}] 加载失败：文件不存在或格式错误");
                     return;
                 }
+
+                // 按最新配置重建目录，再按 Id 取模块
+                RefreshModuleCatalog();
 
                 // 清空当前方案
                 SelectedPlanModule = null;
@@ -758,7 +787,6 @@ namespace TORNPISolution.ViewModels
                     // 只有一个方案时直接加载
                     LoadPlanWithName(plans[0]);
                 }
-                // 多个方案时由用户手动选择加载
             }
             catch (Exception ex)
             {

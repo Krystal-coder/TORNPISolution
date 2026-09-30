@@ -5,10 +5,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 测试项目类：所有测试模块的执行逻辑集中在这一个类（partial 按功能区拆文件，仍是同一个类）。
-    /// 每个模块方法 = 该模块完整测试流程（自包含），一次执行返回全部测试项实测值。
-    /// 写结果：await collector.SetAsync(SpecItems.项名, TestItemResult.Of(值))；
-    /// 需现算规格的项用 WithDynamicSpec/WithDualValues 把规格一并带回（UI 判定优先动态规格）。
+    /// 测试项目类 每个模块方法 = 该模块完整测试流程（自包含），一次执行返回全部测试项实测值。
+    /// 需现算规格的项用 WithDynamicSpec/WithDualValues 
     /// 结果字典由入口按 Spec 项名初始化，未测到默认 0 = FAIL —— 新增测试项只需改 Spec。
     /// </summary>
     public partial class TestItem : ITestItemService
@@ -26,7 +24,7 @@ namespace TORNPISolution.Service
         private readonly IInstrumentConfigService _configService;
 
         /// <summary>
-        /// 产品控制器工厂：每次测量新建（串口不可复用，IDisposable），由组合根注入，绝不能单例化
+        /// 产品控制器工厂：每次测量新建，由组合根注入，绝不能单例化
         /// </summary>
         private readonly Func<IProductController> _productFactory;
 
@@ -65,9 +63,7 @@ namespace TORNPISolution.Service
         public void BeginPlanRun() => _productCommOk = null;
 
         /// <summary>
-        /// 按方案序号执行测试模块（对应模板的 TestItemxx()，xx 为传入的 index：
-        /// 排第 2 即 TestItem2、排第 1 即 TestItem1，见日志标识）：
-        /// index 为方案拖拽排序后的执行序号（从 1 开始），
+        /// 按方案序号执行测试模块
         /// 按 module.Id 分派到对应模块方法，一次执行完整模块流程，
         /// 返回该模块全部测试项结果（测试项名称 → 测试值/动态规格）。
         /// </summary>
@@ -83,14 +79,10 @@ namespace TORNPISolution.Service
                 // 收集器：每次赋值自动触发 onItemCompleted 回调，UI 逐项回填
                 var collector = new TestItemResultCollector(results, onItemCompleted);
 
-                // 模块分派：ResolveModule 把模块 Id 映射为（模块名、方法体、异常钩子），
-                // 统一执行包装（日志/异常隔离）集中在 RunModuleAsync 一处，
-                // 模块方法本身只是 public async Task 直接方法体，不再套 lambda 包装
                 var (moduleName, body, onError) = ResolveModule(module.Id, collector, token);
                 await RunModuleAsync(moduleName, body, onError);
 
-                // 自检：模块方法写入了本模块 Spec 里不存在的项名（项名已统一用 SpecItems 常量，
-                // 此处仅兜底 NFC 等回调传入名称与常量用错模块的兼容性边界）
+                // 自检：模块方法写入了本模块 Spec 里不存在的项名
                 foreach (var key in results.Keys.Where(k => module.Items.All(i => i.Name != k)))
                     _log.Warn($"TestItem{index}：结果项 \"{key}\" 不在 Spec 定义中，请检查项名拼写");
 
@@ -114,9 +106,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 模块分派表：模块 Id →（日志用模块名、模块方法体、异常钩子）。
-        /// 执行包装（Start/Ended 日志与异常隔离）全部集中在 RunModuleAsync，
-        /// 业务模块方法保持 public async Task 直接方法体，不套 lambda 包装。
+        /// 模块分派表：模块 Id →（日志用模块名、模块方法体）。
         /// </summary>
         private (string Name, Func<Task> Body, Func<Exception, Task>? OnError) ResolveModule(
             string moduleId, TestItemResultCollector collector, CancellationToken token) => moduleId switch
@@ -126,6 +116,7 @@ namespace TORNPISolution.Service
             TestModuleIds.NfcFunctionTest => (nameof(NfcFunctionModule), () => NfcFunctionModule(collector, token), null),
             TestModuleIds.BpAccuracyTest => (nameof(BpAccuracyTestModule), () => BpAccuracyTestModule(collector, token), null),
             TestModuleIds.BpStaticAccuracyTest => (nameof(BpStaticAccuracyModule), () => BpStaticAccuracyModule(collector, token), null),
+            TestModuleIds.ProductStaticPressureCalibration => (nameof(ProductStaticPressureCalibrationModule), () => ProductStaticPressureCalibrationModule(collector, token), null),
             TestModuleIds.BpDynamicAccuracyTest => (nameof(BpDynamicAccuracyModule), () => BpDynamicAccuracyModule(collector, token), null),
             TestModuleIds.PressureControlTest => (nameof(PressureControlModule), () => PressureControlModule(collector, token), null),
             TestModuleIds.Aecg100Init => (nameof(Aecg100InitModule), () => Aecg100InitModule(collector, token), null),
@@ -150,9 +141,6 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 模块方法统一执行包装：Start/Ended 日志与异常隔离集中在此处，模块方法只写测试流程本身。
-        /// OperationCanceledException（用户点"停止"）向上层传递，不当作测试异常；
-        /// 其余异常记录 Error 后吞掉（模块失败，未写入的结果项保持默认 0 = FAIL）；
-        /// 需要在异常时做额外处理的模块（如连接失败通知 UI）通过 onError 传入。
         /// </summary>
         private async Task RunModuleAsync(string moduleName, Func<Task> body, Func<Exception, Task>? onError = null)
         {

@@ -25,6 +25,11 @@ namespace TORNPISolution.Service.Devices
         private readonly ILogService _log;
         private readonly int _commandTimeoutMs = 3000;
 
+        // 串口收发互斥门：并发调用（BP-003 多点稳压窗内并发回读、BP-006/007 后台压力轮询与启停命令重叠）时，
+        // 若两个线程同时 Read 同一串口，一帧字节可能被劈进两个接收缓冲区，导致双方都解析失败双双超时误判；
+        // 把“清缓冲→发送→收帧”整段串行化消除竞争（正常单次往返 ≈几十 ms，串行后吞吐足够）。
+        private readonly SemaphoreSlim _portGate = new(1, 1);
+
         /// <summary>
         /// 创建产品控制器。串口参数从 SerialLinkSettings 读取（波特率/数据位/校验位/停止位）。
         /// </summary>
@@ -77,6 +82,7 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 发送协议帧并等待响应帧（日志中标注命令名称便于追踪）。
+        /// 整段“清缓冲→发送→收帧”持 <see cref="_portGate"/> 互斥，并发调用方自动排队。
         /// Write 前先 DiscardInBuffer 清空接收缓冲，避免上一次超时残留的旧字节
         /// 被误当成本次命令的应答；等待期间到达的非目标帧（如 0xCA 周期推送）按控制码过滤跳过。
         /// </summary>
@@ -88,26 +94,34 @@ namespace TORNPISolution.Service.Devices
             var packet = ProductProtocol.BuildPacket(cmd, data);
             var tag = string.IsNullOrEmpty(commandName) ? cmd.ToString() : $"{commandName}({cmd})";
 
-            await Task.Run(() =>
+            await _portGate.WaitAsync(ct).ConfigureAwait(false);
+            try
             {
-                if (!_port.IsOpen)
-                    throw new InvalidOperationException($"产品串口 {_port.PortName} 未打开");
+                await Task.Run(() =>
+                {
+                    if (!_port.IsOpen)
+                        throw new InvalidOperationException($"产品串口 {_port.PortName} 未打开");
 
-                // 清空接收缓冲：丢弃上一命令超时未读的残留字节与期间到达的主动推送帧，
-                // 确保接下来 ReceiveFrameAsync 读到的是本命令的应答。
-                try { _port.DiscardInBuffer(); }
-                catch (Exception ex) { _log.Debug($"DiscardInBuffer 失败（忽略）：{ex.Message}"); }
+                    // 清空接收缓冲：丢弃上一命令超时未读的残留字节与期间到达的主动推送帧，
+                    // 确保接下来 ReceiveFrameAsync 读到的是本命令的应答。
+                    try { _port.DiscardInBuffer(); }
+                    catch (Exception ex) { _log.Debug($"DiscardInBuffer 失败（忽略）：{ex.Message}"); }
 
-                _port.Write(packet, 0, packet.Length);
-                _log.Info($"产品 TX [{tag}]: {BitConverter.ToString(packet)}");
-            }, ct).ConfigureAwait(false);
+                    _port.Write(packet, 0, packet.Length);
+                    _log.Info($"产品 TX [{tag}]: {BitConverter.ToString(packet)}");
+                }, ct).ConfigureAwait(false);
 
-            var resp = await ReceiveFrameAsync(timeout, cmd.Code, ct).ConfigureAwait(false);
-            if (resp != null)
-                _log.Info($"产品 RX [{tag}]: Func=0x{resp.FunctionCode:X2} Ctrl=0x{resp.ControlCode:X2} Data=[{BitConverter.ToString(resp.Payload)}]");
-            else
-                _log.Warn($"产品 RX [{tag}]: 超时无响应");
-            return resp;
+                var resp = await ReceiveFrameAsync(timeout, cmd.Code, ct).ConfigureAwait(false);
+                if (resp != null)
+                    _log.Info($"产品 RX [{tag}]: Func=0x{resp.FunctionCode:X2} Ctrl=0x{resp.ControlCode:X2} Data=[{BitConverter.ToString(resp.Payload)}]");
+                else
+                    _log.Warn($"产品 RX [{tag}]: 超时无响应");
+                return resp;
+            }
+            finally
+            {
+                _portGate.Release();
+            }
         }
 
         /// <summary>
@@ -263,6 +277,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>
         /// 等待产品主动推送的血压测量结果（控制码 0x7B，功能码不限）。
         /// 预留：实测当前固件不主动推 0x7B（测量期间只周期推 0xCA，协议未定义），BP-004/005 已改主动轮询。
+        /// 等待期间持 <see cref="_portGate"/> 独占串口（避免与命令收发劈帧），调用方不得并发发其他命令。
         /// 帧提取复用 <see cref="TryExtractFrame"/>，修复原实现 RemoveRange 只删帧头不删整帧、
         /// 非目标帧 break 后残留帧体被重复误扫导致的缓冲区错位问题。
         /// </summary>
@@ -271,7 +286,10 @@ namespace TORNPISolution.Service.Devices
         {
             _log.Info($"等待产品推送血压结果（超时 {timeoutMs}ms）...");
 
-            return await Task.Run(() =>
+            await _portGate.WaitAsync(ct).ConfigureAwait(false);
+            try
+            {
+                return await Task.Run(() =>
             {
                 var buffer = new List<byte>();
                 var deadline = Environment.TickCount64 + timeoutMs;
@@ -312,7 +330,12 @@ namespace TORNPISolution.Service.Devices
 
                 _log.Warn($"产品血压结果推送超时（{timeoutMs}ms）");
                 return null;
-            }, ct).ConfigureAwait(false);
+                }, ct).ConfigureAwait(false);
+            }
+            finally
+            {
+                _portGate.Release();
+            }
         }
 
         /// <summary>
@@ -395,13 +418,42 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 读取产品当前静态压力值（0x7E）。
-        /// BP-003 静态压力精度测试用：产品传感器检测到的 BPA700 施加的稳压值。
+        /// 启动压力传感器（0x07 0x65）：产品进入压力静态测试态，静态压力校准流程的前置命令。
+        /// </summary>
+        public async Task StartPressureSensorAsync(CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送启动压力传感器（0x65）");
+            await SendCommandAsync(ProductProtocol.StartPressureSensor, "StartPressureSensor", ct: ct).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 校准压力传感器（0x07 0x66 + uint16 LE 校准压力）：仪器稳压到位后逐点发送，
+        /// 产品以当前压力为该校准点基准（帧样例 EF 04 07 66 3C 00 xx xx FE = 60mmHg）。
+        /// </summary>
+        public async Task CalibratePressureSensorAsync(ushort pressureMmHg, CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送压力传感器校准（0x66）校准点={pressureMmHg}mmHg");
+            await SendCommandAsync(ProductProtocol.CalibratePressureSensor, "CalibratePressureSensor",
+                new byte[] { (byte)(pressureMmHg & 0xFF), (byte)(pressureMmHg >> 8) }, ct: ct).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 关闭压力传感器（0x07 0x67）：校准模块全部测试项结束后发送，归还产品常态。
+        /// </summary>
+        public async Task ClosePressureSensorAsync(CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送关闭压力传感器（0x67）");
+            await SendCommandAsync(ProductProtocol.ClosePressureSensor, "ClosePressureSensor", ct: ct).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 读取产品当前静态压力值（0x76 读产品压力值，实测帧 EF 02 05 76 17 86 FE）。
+        /// BP-003 静态压力精度测试用：产品传感器检测到的模拟仪施加的稳压值。
         /// 协议定义 uint32（4 字节），实测当前固件回 2 字节：按长度自适应（≥4 字节 uint32 LE，2 字节 uint16 LE），单位 mmHg。
         /// </summary>
         public async Task<double> ReadProductPressureAsync(CancellationToken ct = default)
         {
-            var resp = await SendCommandAsync(ProductProtocol.GetStaticPress, "ReadProductPressure", ct: ct).ConfigureAwait(false);
+            var resp = await SendCommandAsync(ProductProtocol.GetPressure, "ReadProductPressure", ct: ct).ConfigureAwait(false);
             if (resp == null || resp.Payload.Length < 2)
             {
                 _log.Warn("产品静态压力读取失败或 payload 不足 2 字节");
@@ -551,6 +603,7 @@ namespace TORNPISolution.Service.Devices
             if (_port.IsOpen)
                 _port.Close();
             _port.Dispose();
+            _portGate.Dispose();
             GC.SuppressFinalize(this);
         }
     }

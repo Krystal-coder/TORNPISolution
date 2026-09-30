@@ -35,8 +35,17 @@ namespace TORNPISolution.Interface
         /// <param name="status">0=进入测量 1=退出测量（默认 0）</param>
         Task SetTestModeAsync(byte mode, byte status = 0, CancellationToken ct = default);
 
+        /// <summary>启动压力传感器（0x07 0x65）：产品进入压力静态测试态，静态压力校准流程的前置命令</summary>
+        Task StartPressureSensorAsync(CancellationToken ct = default);
+
+        /// <summary>校准压力传感器（0x07 0x66 + uint16 LE 校准压力）：仪器稳压到位后逐点发送</summary>
+        Task CalibratePressureSensorAsync(ushort pressureMmHg, CancellationToken ct = default);
+
+        /// <summary>关闭压力传感器（0x07 0x67）：校准模块全部测试项结束后发送，归还产品常态</summary>
+        Task ClosePressureSensorAsync(CancellationToken ct = default);
+
         /// <summary>
-        /// 读取产品当前静态压力值（0x7E）。
+        /// 读取产品当前静态压力值（0x76 读产品压力值）。
         /// BP-003 用：产品传感器检测到的 BPA700 施加的稳压值（mmHg）。
         /// </summary>
         Task<double> ReadProductPressureAsync(CancellationToken ct = default);

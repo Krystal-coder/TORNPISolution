@@ -225,8 +225,13 @@ namespace TORNPISolution.ViewModels
                     _instrumentValue = result.InstrumentValue;
                     _productValue = result.ProductValue ?? result.Value;
                     break;
+                case "Error":
+                    // 误差口径项（BP-003 一点一项）：主值=误差，仪器列=稳压值、产品列=上报值
+                    _instrumentValue = result.InstrumentValue;
+                    _productValue = result.ProductValue;
+                    break;
                 case "Points":
-                    // 逐点判定项（BP-003）：父行双值列只显示显式回传值（通常为空，显示 --），逐点双值在子表
+                    // 逐点判定项（BP-003）：父行双值列只显示显式回传值（通常为空，显示 --）
                     _instrumentValue = result.InstrumentValue;
                     _productValue = result.ProductValue;
                     break;
@@ -285,17 +290,16 @@ namespace TORNPISolution.ViewModels
         }
 
         /// <summary>
-        /// 模块未报告结果时强制判 FAIL（测试值保持 0 用于显示，避免落入规格区间被误判为 Pass）。
+        /// 模块未报告结果时强制判 FAIL：测试值与仪器/产品双值列一律显示 0（跑过没结果也显示 0，不显示空 --），
+        /// 同时避免落入规格区间被误判为 Pass。
         /// </summary>
         public void MarkNotReportedAsFail()
         {
             _measuredValue = 0;
             _instrumentText = null;
             _productText = null;
-            if (_model.ValueSource == "Product" || _model.ValueSource == "Both")
-                _productValue = 0;
-            else if (_model.ValueSource != "Points")   // Points 项（BP-003）双值列保持空显示 --
-                _instrumentValue = 0;
+            _instrumentValue = 0;
+            _productValue = 0;
             OnPropertyChanged(nameof(InstrumentValueText));
             OnPropertyChanged(nameof(ProductValueText));
             OnPropertyChanged(nameof(MeasuredValue));

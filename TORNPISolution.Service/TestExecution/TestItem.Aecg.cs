@@ -203,18 +203,12 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// ECG 信号质量与波形（ECG-009~012）：
-        /// 按 YY 9706.247-2021 标准要求，AECG100 发出标准测试信号，产品回传测量值后由上位机判定。
-        ///   ECG-009 动态范围和线性（201.12.4.4.101）：输出 6mV 三角波 + ±300mV DC 偏置，
-        ///         判定：DUT 回放幅度衰减 < 50μV（需产品回传 ADC 采样值）
-        ///   ECG-010 输入阻抗（201.12.4.4.102）：输出 10Hz 5mV 正弦波，开关断开/闭合两种状态，
-        ///         判定：振幅变化 ≤ 6% → 输入阻抗 > 10MΩ（需产品回传 + 外部开关控制）
-        ///   ECG-011 增益准确性（201.12.4.4.104）：输出 5Hz 2mV 正弦波，各增益档验证，
-        ///         判定：幅度误差 ≤ ±10%（需产品回传各增益档测量值）
-        ///   ECG-012 频率响应（201.12.4.4.108）：0.67Hz~40Hz 逐频点输出 2mV 正弦波，
-        ///         判定：各频点响应在 5Hz 响应的 70%~140%（需产品回传各频点测量幅度）
-        /// 当前阶段：AECG100 发出标准信号，产品回传比对逻辑预留，默认 PASS。
-        /// TODO: 产品串口协议定稿后，补充各测试项的产品回传读取与判定逻辑。
+        /// ECG 信号质量与波形（ECG-009~012，按 YY 9706.247-2021）：AECG100 发标准信号，产品回传后由上位机判定。
+        ///   ECG-009 动态范围和线性（201.12.4.4.101）：6mV 三角波 + ±300mV DC 偏置，判定 DUT 回放幅度衰减 < 50μV（需回传 ADC 采样值）；
+        ///   ECG-010 输入阻抗（201.12.4.4.102）：10Hz 5mV 正弦波，开关断开/闭合两态，振幅变化 ≤ 6% → 输入阻抗 > 10MΩ（需回传 + 外部开关）；
+        ///   ECG-011 增益准确性（201.12.4.4.104）：5Hz 2mV 正弦波各增益档验证，幅度误差 ≤ ±10%（需回传各档测量值）；
+        ///   ECG-012 频率响应（201.12.4.4.108）：0.67Hz~40Hz 逐频点 2mV 正弦波，各频点响应在 5Hz 的 70%~140%（需回传各频点幅度）。
+        /// 当前阶段：产品回传比对逻辑预留、默认 PASS；TODO 协议定稿后补各项回传读取与判定。
         /// </summary>
         //测试项目**************************---M10---**************************ECG信号质量与波形（ECG-009~012）
         public async Task EcgSignalQualityTestModule(TestItemResultCollector collector, CancellationToken token)
@@ -591,8 +585,7 @@ namespace TORNPISolution.Service
         //测试项目**************************---M14---**************************SpO2灌注与抗干扰测试（SPO2-008/009/010）
         public async Task Spo2PerfusionModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血氧灌注指数测试")) return;
-            // 产品通讯集中在 M16 产品通讯初始化，本模块全为预留不判定项，无需打开产品串口
+            // 全为预留不判定项（不碰仪器/产品）：任何模式都报不判定，不被演示拦截误判 FAIL
             _log.Info("SPO2-008/009/010 为预留不判定项（仪器 PI 幅度控制与环境光控制暂未具备自动化条件），报不判定");
             await collector.SetAsync(SpecItems.Spo2008WeakPerfusion, TestItemResult.Demo("预留（不判定）"));
             await collector.SetAsync(SpecItems.Spo2009PerfusionHint, TestItemResult.Demo("预留（不判定）"));

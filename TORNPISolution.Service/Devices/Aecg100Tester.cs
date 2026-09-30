@@ -431,17 +431,8 @@ namespace TORNPISolution.Service.Devices
 
     /// <summary>
     /// 鲸扬 AECG100 多功能综合性能测试仪（WhaleTeq）控制类。
-    /// 通过 P/Invoke 调用 AECG100x64.dll 原生 SDK（与 BPA700 相同的接入方式），
-    /// 不走串口协议，SDK 内部处理 USB VCP 通讯。
-    ///
-    /// SDK 关键 API（完整声明见 Native 区）：
-    ///   WTQInit(cb) / WTQConnect(port, timeout) / WTQFree() → 连接生命周期
-    ///   WTQOutputECG / WTQOutputECGAndPPG / WTQOutputPPG*      → 单机波形输出
-    ///   WTQOutputFrequencyScan*                                 → 频率扫描
-    ///   WTQPlay* / WTQWaveformPlayerOutput*                     → 调制呼吸 / 原始数据回放
-    ///   WTQEnableSampling / WTQStartSampling                    → PPG 采样
-    ///   WTQEnableRLD / WTQReadRLD                               → ECG RLD 测试
-    ///   WTQ*StandaloneMode*                                     → 独立模式波形读写
+    /// 通过 P/Invoke 调用 AECG100x64.dll 原生 SDK（与 BPA700 相同接入方式），不走串口协议，SDK 内部处理 USB VCP 通讯。
+    /// SDK 关键 API 分组见下方 Native 区声明（连接生命周期 / 波形输出 / 频率扫描 / 回放 / PPG 采样 / RLD / 独立模式）。
     /// </summary>
     public class Aecg100Tester : IDisposable
     {

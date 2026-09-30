@@ -4,9 +4,8 @@ namespace TORNPISolution.Interface
 {
     /// <summary>
     /// 测试项目执行服务接口（由 TestItem 类实现）。
-    /// 参照传统测试程式：一个测试模块 = 一个独立的 TestItem，
     /// 按方案拖拽排序后的执行序号（xx，从 1 开始）调用 TestItemxx(xx)，
-    /// 一次执行完整个模块流程，返回该模块全部测试项的结果（测试值，可附带动态规格）。
+    /// 一次执行完整个模块流程，返回该模块全部测试项结果（测试值，可附带动态规格）。
     /// </summary>
     public interface ITestItemService
     {

@@ -67,7 +67,7 @@ namespace TORNPISolution.Service
         //测试项目**************************---M15---**************************充电测试
         public async Task ChargingTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("充电测试")) return;
+            // 纯产品模块（0x6D/0x6C，不依赖任何仪器）：无仪器演示模式也照常回读产品
             var config = _configService.Load();
             using var product = _productFactory();
 
