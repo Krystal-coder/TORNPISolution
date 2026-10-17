@@ -1,8 +1,7 @@
 namespace TORNPISolution.Interface
 {
     /// <summary>
-    /// 统一日志接口：各层只依赖本接口写日志，不直接依赖具体日志框架，
-    /// 保证分层结构（UI / Service / 设备层均可注入使用）。
+    /// 统一日志接口：各层只依赖本接口写日志
     /// </summary>
     public interface ILogService
     {

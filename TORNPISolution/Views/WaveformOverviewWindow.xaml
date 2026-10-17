@@ -1,0 +1,64 @@
+<Window x:Class="TORNPISolution.Views.WaveformOverviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:TORNPISolution.Views"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        Title="ECG Signal"
+        Width="850" Height="450"
+        Icon="/Images/logo.ico"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Background="White">
+    <DockPanel LastChildFill="True">
+
+        <!-- 顶栏 -->
+        <Border DockPanel.Dock="Top" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Background="#FAFAFA" Padding="10,6">
+            <WrapPanel VerticalAlignment="Center">
+                <CheckBox x:Name="StripDc" Content="设定侧曲线去直流" FontSize="12"
+                          VerticalAlignment="Center" Checked="StripDc_Changed" Unchecked="StripDc_Changed"
+                          ToolTip="勾上：把每段设定侧曲线按段中点平移回零，与回读侧曲线共用同一量程（大偏置档不会把小量程顶出屏）；取消：显示含直流偏置的原值，需要自己把 Y Max 调大或勾上底栏的自适应"/>
+                <Separator Width="1" Height="18" Margin="14,0" Background="#E0E0E0"/>
+                <Button Content="复位视图" FontSize="12" Padding="10,2" Click="ResetView_Click"
+                        ToolTip="取消缩放并回到最新一段"/>
+                <TextBlock x:Name="StatusText" FontSize="12" Foreground="#616161"
+                           Margin="14,0,0,0" VerticalAlignment="Center"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- 底栏：初值由模块在 Spec 目录里声明，改完立即重画；滚轮缩放也会写回 X Width -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Background="#F5F5F5" Padding="10,6">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="X Width:" Style="{StaticResource Style.CfgLabel}"/>
+                <hc:NumericUpDown Width="80" Minimum="0.5" Maximum="300" Increment="1"
+                                  ValueFormat="0.###" VerticalAlignment="Center"
+                                  Value="{Binding XWidth, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="整个图幅显示多少秒；小格 = 该值 / 60（12s → 每小格 0.2s）"/>
+                <TextBlock Text="sec" Style="{StaticResource Style.CfgLabel}" Margin="6,0,0,0"/>
+                <TextBlock Text="Y Min:" Style="{StaticResource Style.CfgLabel}" Margin="20,0,8,0"/>
+                <hc:NumericUpDown Width="80" Minimum="-100000" Maximum="100000" Increment="0.5"
+                                  ValueFormat="0.###" VerticalAlignment="Center"
+                                  Value="{Binding YMinValue, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="纵轴下限（单位见后面字样）；上限小于等于下限时自动退回按数据取量程"/>
+                <TextBlock x:Name="YMinUnit" Text="mV" Style="{StaticResource Style.CfgLabel}" Margin="6,0,0,0"/>
+                <TextBlock Text="Y Max:" Style="{StaticResource Style.CfgLabel}" Margin="20,0,8,0"/>
+                <hc:NumericUpDown Width="80" Minimum="-100000" Maximum="100000" Increment="0.5"
+                                  ValueFormat="0.###" VerticalAlignment="Center"
+                                  Value="{Binding YMaxValue, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="纵轴上限；±5 就是 5mm/mV 灵敏度"/>
+                <TextBlock x:Name="YMaxUnit" Text="mV" Style="{StaticResource Style.CfgLabel}" Margin="6,0,0,0"/>
+                <CheckBox x:Name="AutoY" Content="自适应" FontSize="12" Margin="20,0,0,0" VerticalAlignment="Center"
+                          Checked="AutoY_Changed" Unchecked="AutoY_Changed"
+                          ToolTip="勾上：忽略 Y Min / Y Max，按当前数据幅度自动取量程（改任一个输入框会自动取消）"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 两条曲线的图例说明 -->
+        <TextBlock x:Name="LegendNote" DockPanel.Dock="Bottom" Margin="12,2,12,6" FontSize="11"
+                   Foreground="#9E9E9E" TextWrapping="Wrap"/>
+
+        <!-- 单位与曲线名由代码按 profile 赋给 Chart（见 WaveformOverviewWindow.xaml.cs） -->
+        <views:PressureWaveformControl x:Name="Chart" Margin="6,4,6,0"
+                                       EcgGrid="True"
+                                       VisibleSeconds="{Binding XWidth, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </DockPanel>
+</Window>

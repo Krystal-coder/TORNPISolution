@@ -52,7 +52,7 @@
   "CtrlSetMode": {
     "Code": 115,
     "FuncCode": 5,
-    "Description": "设置测试模式（参数 uint8 test_mode）"
+    "Description": "设置测试模式（参数 2 字节：uint8 test_mode + uint8 status，status 0=进入测量 1=退出测量；开始ECG=EF 04 05 73 05 00 15 03 FE，结束ECG=EF 04 05 73 05 01 D4 C3 FE）"
   },
   "CtrlGetState": {
     "Code": 116,
@@ -62,7 +62,7 @@
   "CtrlStartInflate": {
     "Code": 117,
     "FuncCode": 5,
-    "Description": "开始充气"
+    "Description": "开始充气 s_test_start_inflate（参数 4 字节：uint16 LE 目标压力mmHg + uint16 LE 最长充气时间秒；超时后产品底层自行放气）"
   },
   "CtrlGetPressure": {
     "Code": 118,
@@ -82,7 +82,7 @@
   "CtrlStartBpMeasure": {
     "Code": 121,
     "FuncCode": 5,
-    "Description": "写开始完整血压测量"
+    "Description": "开始/关闭一次完整血压测量 s_test_start_bp_measure（参数 uint8 status：0=开始一次测量 1=关闭一次完整测量；测完须发一次关闭才能再次开始）"
   },
   "CtrlGetBpValue": {
     "Code": 122,
@@ -102,7 +102,7 @@
   "CtrlStopBpMeasure": {
     "Code": 125,
     "FuncCode": 5,
-    "Description": "写停止完整血压测量"
+    "Description": "已作废：协议文档已删除本命令，停止测量改走 0x79 status=1（本表项仅留档，代码不再下发）"
   },
   "CtrlGetStaticPress": {
     "Code": 126,
@@ -117,7 +117,7 @@
   "CtrlGetOverPressureStatus": {
     "Code": 128,
     "FuncCode": 5,
-    "Description": "读过压状态"
+    "Description": "读过压状态 s_test_get_over_pressure_state（无参数，返回 2 字节 uint16：0=无过压 1=过压；实时状态，泄压完成后回落 0）"
   },
   "CtrlStartSpo2": {
     "Code": 129,
@@ -175,9 +175,9 @@
     "Description": "读取喇叭音量"
   },
   "CtrlPushEcgWave": {
-    "Code": 16,
-    "FuncCode": 6,
-    "Description": "上报心电波形数据（产品主动推送）"
+    "Code": 141,
+    "FuncCode": 5,
+    "Description": "上报心电电压值"
   },
   "CtrlPushEcgHr": {
     "Code": 17,

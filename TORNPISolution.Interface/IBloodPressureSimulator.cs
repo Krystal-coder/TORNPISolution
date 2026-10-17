@@ -31,7 +31,8 @@ namespace TORNPISolution.Interface
         /// <param name="systolic">目标收缩压 mmHg</param>
         /// <param name="diastolic">目标舒张压 mmHg</param>
         /// <param name="heartRate">心率 bpm</param>
-        Task StartSimulationAsync(int systolic, int diastolic, int heartRate, CancellationToken ct = default);
+        /// <param name="pulseVolume">脉搏量 ml（0=用设备默认值；康伟达入 0x02 帧 ×100，BPA700 SDK 无此参数忽略）</param>
+        Task StartSimulationAsync(int systolic, int diastolic, int heartRate, double pulseVolume = 0, CancellationToken ct = default);
 
         /// <summary>
         /// 静态压力测试：设置恒定标准压力并保持稳定（用于静态压力精度测试）。
@@ -61,8 +62,9 @@ namespace TORNPISolution.Interface
         /// </summary>
         /// <param name="waitStartTimeoutMs">等待产品启动充气（离开 Wait）的超时</param>
         /// <param name="totalTimeoutMs">整轮测量总超时</param>
+        /// <param name="pulseVolume">脉搏量 ml（0=用设备默认值；康伟达入 0x02 帧，取血压模拟仪配置→动态血压→脉搏量）</param>
         Task<BpTestRunResult> RunBpMeasurementAsync(
-            int systolic, int diastolic, int heartRate,
+            int systolic, int diastolic, int heartRate, double pulseVolume = 0,
             int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
             CancellationToken ct = default);
 
@@ -81,7 +83,7 @@ namespace TORNPISolution.Interface
         /// <summary>等待静态压力测试 Finish 信号（康伟达无异步测试态，空操作）</summary>
         Task WaitStaticPressureFinishAsync(int timeoutMs = 60_000, CancellationToken ct = default);
 
-        /// <summary>最近一次静态压力稳压后的实测值（BP-006 读回判定用）</summary>
+        /// <summary>最近一次静态压力稳压后的实测值（BP-003 标准值用）</summary>
         double LastStaticPressure { get; }
 
         /// <summary>
@@ -106,8 +108,8 @@ namespace TORNPISolution.Interface
         Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default);
 
         /// <summary>
-        /// 过压保护测试（BP-009）：持续充气至产品触发保护泄压，返回触发时峰值压力。
-        /// 康伟达：压力源充向目标压力，AA 监测峰值后的骤降判产品保护动作。
+        /// 仪器过压保护测试（保留本能力）：持续充气至触发保护泄压，返回触发时峰值压力。
+        /// 康伟达：压力源充向目标压力，AA 监测峰值后的骤降。
         /// </summary>
         Task<double> RunOverpressureTestAsync(
             double pressure, double threshold1, double threshold2,
@@ -138,7 +140,6 @@ namespace TORNPISolution.Interface
         /// <summary>
         /// 响应连接验证（心跳）。
         /// 康伟达：下位机空闲时发 0x09 询问，须 7 秒内原样回复 0x09 否则设备断开；
-        /// 读循环已自动应答，此方法仅为长阻塞流程手动补发用。
         /// </summary>
         Task RespondToHeartbeatAsync(CancellationToken ct = default);
     }

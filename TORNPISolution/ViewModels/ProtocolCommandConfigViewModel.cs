@@ -7,13 +7,11 @@ using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.ViewModels
 {
-    /// <summary>产品协议命令码配置 ViewModel：DataGrid 展示 16 条 Ctrl* 命令，保存前需密码验证</summary>
+    /// <summary>产品协议命令码配置 ViewModel：DataGrid 按 <see cref="OrderedKeys"/> 顺序展示全部 Ctrl* 命令，保存前需密码验证</summary>
     public class ProtocolCommandConfigViewModel : ViewModelBase
     {
         private readonly IProtocolCommandConfigService _configService;
         private readonly ILogService _log = new LogService(nameof(ProtocolCommandConfigViewModel));
-
-        public ProtocolCommandConfigViewModel() : this(new ProtocolCommandConfigService()) { }
 
         public ProtocolCommandConfigViewModel(IProtocolCommandConfigService configService)
         {
@@ -24,7 +22,11 @@ namespace TORNPISolution.ViewModels
             foreach (var key in OrderedKeys)
             {
                 if (loaded.TryGetValue(key, out var entry))
-                    Commands.Add(new ProtocolCommandRow { Name = key, Code = entry.Code, FuncCode = entry.FuncCode, Description = entry.Description });
+                    Commands.Add(new ProtocolCommandRow
+                    {
+                        Name = key, Code = entry.Code, FuncCode = entry.FuncCode,
+                        Description = entry.Description, Data = entry.Data,
+                    });
             }
         }
 
@@ -37,7 +39,7 @@ namespace TORNPISolution.ViewModels
             "CtrlGetProductTime", "CtrlGetAllUserParams", "CtrlGetUserCount", "CtrlGetProductConfig",
             "CtrlGetProductStatus", "CtrlGetDisconnectInfo", "CtrlGetResetInfo", "CtrlGetVersionInfo",
             // 测量控制（Func=0x05）
-            "CtrlGetVersion", "CtrlSetMode", "CtrlGetState", "CtrlStartInflate",
+            "CtrlGetVersion", "CtrlSetMode", "CtrlStartEcgTest", "CtrlStopEcgTest", "CtrlGetState", "CtrlStartInflate",
             "CtrlGetPressure", "CtrlStartDeflate", "CtrlInflateStop", "CtrlStartBpMeasure",
             "CtrlGetBpValue", "CtrlGetBpResult", "CtrlGetHrValue", "CtrlStopBpMeasure",
             "CtrlGetStaticPress", "CtrlSetOverPressureThreshold", "CtrlGetOverPressureStatus",
@@ -75,7 +77,11 @@ namespace TORNPISolution.ViewModels
 
                 var dict = new Dictionary<string, ProtocolCommandEntry>();
                 foreach (var row in Commands)
-                    dict[row.Name] = new ProtocolCommandEntry { Code = row.Code, FuncCode = row.FuncCode, Description = row.Description };
+                    dict[row.Name] = new ProtocolCommandEntry
+                    {
+                        Code = row.Code, FuncCode = row.FuncCode,
+                        Description = row.Description, Data = row.Data,
+                    };
 
                 _configService.Save(dict);
                 ProductProtocol.ReloadCommands();
@@ -110,5 +116,9 @@ namespace TORNPISolution.ViewModels
 
         private string _description = string.Empty;
         public string Description { get => _description; set => SetProperty(ref _description, value); }
+
+        /// <summary>默认参数字节（HEX 文本如 "05 00"）；仅同码不同参的语义命令需要，留空 = 参数由代码给定</summary>
+        private string? _data;
+        public string? Data { get => _data; set => SetProperty(ref _data, value); }
     }
 }

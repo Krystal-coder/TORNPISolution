@@ -34,16 +34,14 @@ namespace TORNPISolution.Share.Models
         public SerialLinkSettings Product { get; set; } = new() { BaudRate = 921600 };
 
         /// <summary>
-        /// 无产品演示模式：产品串口未接时，血压相关模块（M04 压力控制 / M06 动态压力精度）
+        /// 无产品演示模式：产品串口未接时，血压相关模块（A04 压力控制 / A06 动态压力精度）
         /// 仅驱动模拟仪完成充放气流程验证仪器侧行为；依赖产品读回的结果项由收尾扫描按读回缺失判 FAIL；
         /// 接上产品后务必取消勾选恢复。
         /// </summary>
         public bool NoProductDemoMode { get; set; }
 
         /// <summary>
-        /// 无仪器演示模式：只读产品串口数据（进入产测模式 → 0x72 → 0x74），跳过全部仪器控制
-        /// （模拟仪/AECG/NFC/电源等）；各模块执行完产品通讯即返回，
-        /// 其余未报告结果项由收尾扫描按读回缺失判 FAIL；正式测试务必取消勾选恢复。
+        /// 无仪器演示模式：只读产品串口数据（进入产测模式 → 0x72 → 0x74），各模块执行完产品通讯即返回
         /// </summary>
         public bool NoInstrumentDemoMode { get; set; }
 
@@ -62,7 +60,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>鲸扬 BPA700 模拟仪串口参数（USB VCP，默认 115200bps，含 Category/单位/袖带容量初始化设置）</summary>
         public Bpa700Settings BPA700Simulator { get; set; } = new() { BaudRate = 115200 };
 
-        /// <summary>鲸扬 AECG100 多功能综合性能测试仪（USB VCP + 原生 SDK，COM 口留空为自动选择）</summary>
+        /// <summary>鲸扬 AECG100 多功能综合性能测试仪（COM 口留空为自动选择）</summary>
         public Aecg100Settings Aecg100Tester { get; set; } = new();
 
         /// <summary>THS_HF NFC 读卡器（岩柱 YZ806/YZ906，串口连接，默认 115200bps）</summary>
@@ -77,15 +75,57 @@ namespace TORNPISolution.Share.Models
         /// <summary>电子负载（预留，默认禁用）</summary>
         public SerialLinkSettings ElectronicLoad { get; set; } = new();
 
+        // ==================== 单板工位仪器（都是网口，台数写在清单里，用不到的把 Enabled 关掉） ====================
+
+        /// <summary>
+        /// CRY5242/5243 四通道电流电压综测仪清单。
+        /// Port 填通道 A 的端口，B/C/D 依次 +1（5025~5028）；
+        /// IP 末段由仪器背板拨码算出（32 + 左档×16 + 右档×1），两台必须拨成不同值。
+        /// 清单顺序就是供电槽位顺序（只有 Enabled 的行参与编号），每台按硬件固定的四个通道连着占四项。
+        /// </summary>
+        public List<Cry5242Settings> Cry5242Testers { get; set; } = new()
+        {
+            new() { Name = "综测仪1", IpAddress = "169.254.1.32", Port = 5025 },
+            new() { Name = "综测仪2", IpAddress = "169.254.1.33", Port = 5025 },
+        };
+
+        /// <summary>
+        /// 研为 EW-DTU09 蓝牙网关清单（每台一个 IP:端口，一条 AT 指令连接）。
+        /// 端口是网关自己的 TCP 端口，不是固定的，以网关上位配置为准。
+        /// 清单顺序就是槽位顺序（只有 Enabled 的行参与编号），一项一个地址与一个信号强度。
+        /// </summary>
+        public List<BluetoothGatewaySettings> BluetoothGateways { get; set; } = new()
+        {
+            new() { Name = "网关1", IpAddress = "192.168.1.101", Port = 8080 },
+            new() { Name = "网关2", IpAddress = "192.168.1.102", Port = 8080 },
+            new() { Name = "网关3", IpAddress = "192.168.1.103", Port = 8080 },
+            new() { Name = "网关4", IpAddress = "192.168.1.104", Port = 8080 },
+            new() { Name = "网关5", IpAddress = "192.168.1.105", Port = 8080 },
+            new() { Name = "网关6", IpAddress = "192.168.1.106", Port = 8080 },
+            new() { Name = "网关7", IpAddress = "192.168.1.107", Port = 8080 },
+            new() { Name = "网关8", IpAddress = "192.168.1.108", Port = 8080 },
+        };
+
+        /// <summary>
+        /// 海康 MV-ID 读码器清单（触发端口与结果端口各一条连接，参数要和相机侧一致）。
+        /// 清单顺序就是槽位顺序（只有 Enabled 的行参与编号），每台按 SlotsPerReader 连着占几个槽位。
+        /// </summary>
+        public List<HikBarcodeReaderSettings> BarcodeReaders { get; set; } = new()
+        {
+            new() { Name = "读码器1", IpAddress = "192.168.1.16", Port = 2002 },
+            new() { Name = "读码器2", IpAddress = "192.168.1.17", Port = 2002 },
+            new() { Name = "读码器3", IpAddress = "192.168.1.18", Port = 2002 },
+            new() { Name = "读码器4", IpAddress = "192.168.1.19", Port = 2002 },
+        };
+
         /// <summary>
         /// 当前启用血压模拟仪的测试参数：康伟达读康伟达节点、BPA700/未选择读 BPA700 节点。
-        /// 测试模块（M03/M04/M05 等）统一从这里取参，不再硬编码 BPA700Simulator.TestParams，
-        /// 避免“连的康伟达、读的却是 BPA700 参数”的误导。
+        /// 测试模块（A03/A04/A05 等）统一从这里取参
         /// </summary>
         public BpaTestParams ActiveBpTestParams
             => ActiveSimulator == SimulatorType.Kangwenda ? KangwendaSimulator.TestParams : BPA700Simulator.TestParams;
 
-        /// <summary>当前启用血压模拟仪的静态加压超时（秒）：随 ActiveSimulator 路由</summary>
+        /// <summary>当前启用血压模拟仪的静态加压超时（秒）</summary>
         public int ActiveStaticPressureTimeoutSeconds
             => ActiveSimulator == SimulatorType.Kangwenda ? KangwendaSimulator.StaticPressureTimeoutSeconds : BPA700Simulator.StaticPressureTimeoutSeconds;
 

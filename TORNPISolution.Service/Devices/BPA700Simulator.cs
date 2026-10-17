@@ -5,19 +5,12 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// 鲸扬 BPA700 无创血压模拟仪控制类。
-    /// 通过 P/Invoke 调用 BPA700x64.dll 原生 SDK，
-    /// 不走串口协议，SDK 内部处理 USB VCP 通讯。
-    ///
-    /// SDK 关键 API：
-    ///   BPAConnect(portNumber, timeout)  → 连接设备
-    ///   BPARunBPTest(envelope, callback) → 执行血压模拟
-    ///   BPAStopTest()                    → 停止测试
-    ///   BPAFree()                        → 释放资源
+    /// 鲸扬 BPA700 无创血压模拟仪控制类：P/Invoke 调用 BPA700x64.dll，不走串口协议（SDK 内部处理 USB VCP 通讯）。
+    /// 使用上的坑集中在“一轮静态压力测完设备仍处激活态”，约束写在 SetStaticPressureAsync。
     /// </summary>
     public class BPA700Simulator : IBloodPressureSimulator
     {
-        #region 原生 SDK P/Invoke 声明
+        #region  SDK P/Invoke 声明
 
         private const string DllName = "BPA700x64.dll";
 
@@ -126,7 +119,7 @@ namespace TORNPISolution.Service.Devices
         private const int ValveFastRelease = 3;   // BPAValve.FastValve 快速放气阀
         private const int ValveSlowRelease = 4;   // BPAValve.SlowValve 慢速放气阀
 
-        // 过压保护测试（BP-009）：官方 BPA700.h 签名为 (bool inflation, double pressure, double threshold1, double threshold2, cb)；
+        // 仪器过压保护测试（保留本能力）：官方 BPA700.h 签名为 (bool inflation, double pressure, double threshold1, double threshold2, cb)；
         // 回调共 8 个参数，peakPressure 即触发保护时的峰值压力（测试值），overTime/over10Time 为超时类结果参数
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void OverpressureTestCallbackDelegate(int status, double waitTime, double peakPressure, double inflatableTime, double deflationTime, double totalTime, double overTime, double over10Time);
@@ -334,7 +327,8 @@ namespace TORNPISolution.Service.Devices
         /// <param name="systolic">收缩压（单位跟随仪器设置，mmHg 25~300）</param>
         /// <param name="diastolic">舒张压（单位跟随仪器设置，mmHg 10~250）</param>
         /// <param name="heartRate">心率 BPM（30~300）</param>
-        public async Task StartSimulationAsync(int systolic, int diastolic, int heartRate, CancellationToken ct = default)
+        /// <param name="pulseVolume">脉搏量 ml（接口统一参数；SDK 脉搏量走独立设置，此处忽略）</param>
+        public async Task StartSimulationAsync(int systolic, int diastolic, int heartRate, double pulseVolume = 0, CancellationToken ct = default)
         {
             if (!_connected)
                 throw new InvalidOperationException("BPA700 未连接");
@@ -535,15 +529,11 @@ namespace TORNPISolution.Service.Devices
         /// 静态压力测试：设置恒定标准压力并等待稳定（BPARunStaticPressure）。
         /// inflation=true 时 BPA700 自行充气到目标压力并保持 stableSeconds 秒；
         /// inflation=false 为由外部设备充气（官方语义，无"放气模式"；放气用 SetSlowValve/SetFastValve 开气阀）。
-        /// 回调状态到达 Stable(3) 认为压力到位，方法返回；此时设备上本轮测试仍在激活态（稳压保持），
-        /// 调用方做完本点操作后必须调 WaitStaticPressureFinishAsync 等 Finish(4)，
+        /// 回调到 Stable(3) 即返回，但设备上本轮仍在激活态（稳压保持）：做完本点操作必须调 WaitStaticPressureFinishAsync 等 Finish(4)，
         /// 否则下一次 BPARunStaticPressure 会被设备拒绝（返回 false）。
-        /// 等待过程中持续监控实际压力采样值：若压力长时间不变化（≥30s）则记录警告；
-        /// 超时后抛出 TimeoutException 并报告实际达到的压力值，便于诊断气路问题。
-        /// 实际稳压值取自压力采样回调的近期均值（回调的 waitTime 参数不是压力），记录在 LastStaticPressure；
-        /// 未开采样时回退用目标压力值。
-        /// 压力值单位跟随仪器当前压力单位设置，
-        /// mmHg 时 20~400，kPa 时 2.7~53.3，调用方不要自行换算。
+        /// 等待中持续盯采样值：≥30s 不变化记警告；超时抛 TimeoutException 并报实际达到的压力，便于诊断气路问题。
+        /// 实际稳压值取采样回调的近期均值（回调的 waitTime 参数不是压力），记在 LastStaticPressure；未开采样时回退用目标值。
+        /// 压力单位跟随仪器当前设置，调用方不要自行换算（数值范围见 pressure 参数）。
         /// </summary>
         /// <param name="pressure">标准压力值（单位跟随仪器当前设置：mmHg 20~400 / kPa 2.7~53.3）</param>
         /// <param name="stableSeconds">稳压保持时间（秒，0~999）</param>
@@ -619,9 +609,9 @@ namespace TORNPISolution.Service.Devices
         public async Task StartStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default)
             => await StartStaticPressureTestAsync(pressure, stableSeconds, inflation, ct).ConfigureAwait(false);
 
-        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变）</summary>
+        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变；pulseVolume 为接口统一参数，SDK 忽略）</summary>
         public Task<BpTestRunResult> RunBpMeasurementAsync(
-            int systolic, int diastolic, int heartRate,
+            int systolic, int diastolic, int heartRate, double pulseVolume = 0,
             int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
             CancellationToken ct = default)
             => RunBPTestAsync(systolic, diastolic, heartRate, waitStartTimeoutMs, totalTimeoutMs, ct);
@@ -742,11 +732,11 @@ namespace TORNPISolution.Service.Devices
             return true;
         }
 
-        /// <summary>静态压力到位后的实际稳压值（采样读回均值，BP-003 标准值 / BP-006 最高充气压力验证用）</summary>
+        /// <summary>静态压力到位后的实际稳压值（采样读回均值，BP-003 标准值用）</summary>
         public double LastStaticPressure { get; private set; }
 
         /// <summary>
-        /// 过压保护测试（BP-009，官方 BPA700.h）：BPARunOverpressureTest(inflation, pressure, threshold1, threshold2, cb)。
+        /// 仪器过压保护测试（保留本能力，官方 BPA700.h）：BPARunOverpressureTest(inflation, pressure, threshold1, threshold2, cb)。
         /// BPA700 充气至超过阈值触发保护放气，回调 Finish(4) 时直接回传结果：
         /// peakPressure=触发保护时的峰值压力（测试值），另有充气/放气/总时长及 overTime/over10Time。
         /// 产品需在充气全程实时上报压力（协议预留），若产品未先触发保护则由 BPA700 兜底。

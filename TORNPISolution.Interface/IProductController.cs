@@ -3,8 +3,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Interface
 {
     /// <summary>
-    /// 被测产品（DUT）控制接口：通过串口 115200 8N1 二进制协议与产品通讯。
-    /// 帧结构：[Head 0xEF] [Len] [Func] [Ctrl] [Data...] [CRC16-MODBUS 2B] [Tail 0xFE]
+    /// 被测产品（DUT）控制接口
     /// </summary>
     public interface IProductController : IDisposable
     {
@@ -29,6 +28,13 @@ namespace TORNPISolution.Interface
 
         /// <summary>产品当前状态查询（0x74）：读取测试模式和状态</summary>
         Task<string> QueryProductStatusAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 读设备端状态（0x74）的原始两字节（测试模式 + 测试状态），供按字节判定用
+        /// （如短按启动键后应为 03 01=测量中、短按停止键后应为 03 00=待机）；
+        /// 无响应或回包长度不足 2 字节时返回 null，由调用方按"读不到"处理。
+        /// </summary>
+        Task<(byte TestMode, byte TestState)?> ReadDeviceStateAsync(CancellationToken ct = default);
 
         /// <summary>设置测试模式（0x73）：每次测量前必须先设置对应模式；协议参数 2 字节（mode + status）</summary>
         /// <param name="mode">0=空闲 1=袖带充放气 2=血压测试 3=静态压力 4=血氧 5=心电 6=加速度</param>
@@ -65,11 +71,37 @@ namespace TORNPISolution.Interface
         /// <summary>开始/关闭一次完整血压测量（0x79，参数 0=开始 1=关闭；协议要求测完后发一次关闭才能再次开始）</summary>
         Task StartBpMeasureAsync(bool start = true, CancellationToken ct = default);
 
-        /// <summary>停止血压测量（0x7D）</summary>
-        Task StopBpMeasureAsync(CancellationToken ct = default);
+        /// <summary>
+        /// 开始充气（0x75 + 4 字节参数：uint16 LE 目标压力mmHg 在前、uint16 LE 最长充气时间秒在后）：
+        /// 由产品气泵自行充到目标压（仪器不参与加压），超时后产品底层自行放气。
+        /// </summary>
+        Task StartInflateAsync(ushort targetMmHg, ushort timeoutSeconds, CancellationToken ct = default);
+
+        /// <summary>读取过压状态（0x80，返回 2 字节 uint16：0=无过压 1=过压）：实时状态，无响应回 null</summary>
+        Task<bool?> ReadOverPressureStateAsync(CancellationToken ct = default);
 
         /// <summary>读取 ECG 导联状态（0x88）</summary>
         Task<byte[]> ReadLeadStateAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 开始 ECG 测试（0x73 设置测试模式 mode=5 心电 status=0 进入测量）：
+        /// 帧 EF 04 05 73 05 00 15 03 FE，产品收到后开始持续推送心电波形（0x8D）。
+        /// </summary>
+        Task StartEcgTestAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 结束 ECG 测试（0x73 设置测试模式 mode=5 心电 status=1 退出测量）：
+        /// 帧 EF 04 05 73 05 01 D4 C3 FE，产品停止推送心电波形。
+        /// </summary>
+        Task StopEcgTestAsync(CancellationToken ct = default);
+
+        /// <param name="durationMs">有效记录时长（毫秒）</param>
+        /// <param name="skipMs">先丢弃不记录的时长（毫秒）：避开刚进入心电测量的起始瞬态，回调里的帧时刻已含本偏移量</param>
+        /// <param name="onFrame">每解出一帧回调（帧首点绝对时刻 秒（含 skipMs 偏移），该帧电压数组 mV）；后台线程调用</param>
+        /// <param name="ct">取消令牌</param>
+        /// <returns>实际记录到的采样点数（不含丢弃段）；0 = 未收到任何波形帧</returns>
+        /// </summary>
+        Task<int> CaptureEcgWaveAsync(int durationMs, int skipMs = 0, Action<double, double[]>? onFrame = null, CancellationToken ct = default);
 
         /// <summary>读取心率测量值（0x7C）</summary>
         Task<double> ReadHeartRateAsync(CancellationToken ct = default);
@@ -91,13 +123,12 @@ namespace TORNPISolution.Interface
         Task<byte> ReadChargingStatusAsync(CancellationToken ct = default);
 
         /// <summary>
-        /// 通用命令发送：按协议命令配置（protocol_commands.json）发送任意命令并返回响应 payload。
-        /// 命令的功能码/控制码完全取自配置，供新增命令/实机联调使用，无需为每条命令写专用方法。
-        /// </summary>
+        /// 通用命令发送：按协议命令配置（protocol_commands.json）
         /// <param name="cmd">命令标识（功能码 + 控制码）</param>
         /// <param name="data">参数数据（可为 null）</param>
         /// <param name="timeoutMs">超时（毫秒，0 表示用默认）</param>
         /// <returns>响应帧 payload；无响应返回 null</returns>
+        /// </summary>
         Task<byte[]?> SendRawCommandAsync(ProductCmd cmd, byte[]? data = null, int timeoutMs = 0, CancellationToken ct = default);
     }
 }

@@ -1,0 +1,535 @@
+<UserControl x:Class="TORNPISolution.Views.BoardChannelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TORNPISolution.ViewModels"
+             xmlns:conv="clr-namespace:TORNPISolution.Converters"
+             mc:Ignorable="d"
+             FontFamily="Microsoft YaHei UI"
+             d:DataContext="{d:DesignInstance Type=viewModels:BoardChannelViewModel}"
+             d:DesignHeight="720" d:DesignWidth="1400">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+
+        <!-- ============ 通道条里的一格：一行摆完「勾选框 + 通道号 + 结论角标」，颜色与角标讲结论（跑哪几项在下面的表里看） ============ -->
+        <!-- Margin 四边各 3：横排八格要的是行列都留缝，原来那个「只留底部 5」是给竖排准备的 -->
+        <Style x:Key="Style.BoardCard" TargetType="Border">
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Margin" Value="3"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Running}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Primary.Light}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Success}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Pass.Light}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Pass}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Failed}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Fail.Light}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Fail}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Skipped}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Skipped.Light}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Skipped}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 通道卡右上角的角标：实心底 + 白字，只在落定后出现（吃 HasResult），所以底色必然命中下面某个触发器。
+             别把它搬到没 HasResult 兜着的地方用，Idle 时四个触发器一个都不中，白字压在默认浅底上等于没写 -->
+        <Style x:Key="Style.BoardBadge" TargetType="Border">
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Padding" Value="7,2"/>
+            <Setter Property="Background" Value="#E9EEF4"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Running}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Primary}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Success}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Pass}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Failed}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Fail}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Skipped}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Skipped}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Style.BoardBadgeText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- 下方详情头部的结论徽章：跟整机页同一位置那块用同一种画法（浅底 + 彩色粗字）。
+             这里不能沿用上面那个卡片角标：详情头部这块从开页起就一直在，Idle 时实心底取不到任何触发器，
+             白字压在 #E9EEF4 上就是隐形的。浅底配彩字则每个状态都读得出来。
+             底色吃 Brush.*.Light，与整机页那两处写死的 #E6F4EA / #FDECEC 本就是同一组值 -->
+        <Style x:Key="Style.DetailBadge" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="Background" Value="#EEF1F5"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Running}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Primary.Light}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Success}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Pass.Light}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Failed}">
+                    <Setter Property="Background" Value="{StaticResource Brush.Fail.Light}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Style.DetailBadgeText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.NotTested}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Running}">
+                    <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Success}">
+                    <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Visual}" Value="{x:Static viewModels:ChannelVisual.Failed}">
+                    <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 通道条那一行的整批级项：结论配色直接用应用级那套（与明细表同一语义），只再紧凑一档（这一行要跟计数挤在一起） -->
+        <Style x:Key="Style.BatchResult" TargetType="TextBlock" BasedOn="{StaticResource Style.ResultText}">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+
+        <!-- 通道右键菜单写在模板里而不是取共用资源（八张卡共用一份 ContextMenu 时，它在两次右键之间要换宿主）；
+             菜单项走 code-behind：ContextMenu 不在卡片的视觉树里，靠 AncestorType 找页面 VM 会抓空，
+             而 PlacementTarget 的 DataContext 一定是被右键的那张卡。
+             这里只留“跑不跑”两件事；这一路的参数在菜单「配置 → 单板配置」的通道表里改，不再另开一扇单路小窗 -->
+        <DataTemplate x:Key="Tpl.ChannelCard">
+            <Border Style="{StaticResource Style.BoardCard}">
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="开始测试" Click="ChannelStart_Click"
+                                  ToolTip="只跑这一路（哪怕它没勾参与整批）；本轮已有别的路在跑时不会叠开"/>
+                        <MenuItem Header="停止测试" Click="ChannelStop_Click"
+                                  ToolTip="停掉当前这一轮（单板的读码器、网关、综测仪是整批共用的，拆不出单独一路）"/>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <!-- 内容居中成一组：格子按八等分约 170 宽，而“勾选框 + 通道号”只有 75 左右，
+                     左对齐时右半截全空，八格排一排看着就是八个空盒子。居中后留白左右对称，
+                     出结论时角标跟着整组走，也不会出现内容忽左忽右的跳动感 -->
+                <Grid HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- 「本轮跑」：只决定当下这一轮跑不跑它，与「参与整批」（这条道接没接）是两件事，跟烧录页同一套双开关。
+                         跑起来不给改：本轮范围在开轮那一刻就定下来了，中途改勾会让界面与结果对不上 -->
+                    <CheckBox Grid.Column="0" IsChecked="{Binding Selected, Mode=TwoWay}"
+                              VerticalAlignment="Center" Margin="0,0,6,0"
+                              ToolTip="本轮跑这一路（不影响这条道接没接）">
+                        <CheckBox.Style>
+                            <Style TargetType="CheckBox">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.IsRunning, RelativeSource={RelativeSource AncestorType=ListBox}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                    <!-- 卡片就一行：位号、"这一路有几项"、耗时都是重复信息——位号与耗时在下方详情头部本来就写着，
+                         项数在右边那一列行里。竖排时它们挤在两行里没人抱怨，横排一行摆不下，正好一起收掉 -->
+                    <!-- 项名是固定格式“通道 N”，一般长不到需要截断；但 TextTrimming 得留着——
+                         中间列是 Auto，一旦格子被压窄（通道数改多、或 Columns 改大）导致整组摆不下，
+                         有它是个省略号，没它就是硬裁半个字 -->
+                    <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="12" FontWeight="Bold"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource Brush.Text.Main}"/>
+                    <!-- 角标只在落定后出现：没结论时卡片底色与下方表格已经说过状态 -->
+                    <Border Grid.Column="2" Style="{StaticResource Style.BoardBadge}"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding ResultText}" Style="{StaticResource Style.BoardBadgeText}"/>
+                    </Border>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- 页头 / 通道条 / 明细 / 状态条四行：通道条只报一行文字那么高，剩下的整宽整高全给明细表 -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MinHeight="260"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ==================== 页头：本轮跑什么 + 整批开始/停止 ==================== -->
+        <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="14,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <TextBlock Text="单板测试工位" Style="{StaticResource Style.PanelTitle}"/>
+                    <TextBlock Text="{Binding SelectedItemsText}" Style="{StaticResource Style.SubText}" Margin="0,3,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="清空结果" Style="{StaticResource Style.ToolButton}"
+                            Command="{Binding ResetResultsCommand}"
+                            ToolTip="把本页回到没跑过的样子（行按当前勾选重新摆回去，配置不动）"/>
+                    <Button Content="停止" Style="{StaticResource Style.ToolButton}"
+                            Command="{Binding StopAllCommand}"
+                            ToolTip="正在跑的那一项尽快退出，后面的模块不再执行"/>
+                    <Button Content="开始测试" Style="{StaticResource Style.PrimaryButton}"
+                            Command="{Binding RunAllCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                            ToolTip="跑卡片上勾了「本轮跑」的那几路（跑哪几项在菜单「测试项」里勾）"/>
+                </StackPanel>
+
+                <!-- 这句得跟着本轮范围走：只跑一路时还念“八条通道共用同一组”，会把人引去怀疑其余几路是不是没配好设备 -->
+                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Style.SubText}"
+                           TextWrapping="Wrap" Margin="0,8,0,0"
+                           Text="{Binding RoundStatusText}"/>
+            </Grid>
+        </Border>
+
+        <!-- ==================== 主体：上=八条通道的通道条，下=选中通道的项与时间线 ==================== -->
+        <!-- 通道条以前是左侧 180 宽的竖排：八张卡两行高，在 720 高的窗口里刚好溢出出滚动条，底下还空一截，
+             而明细表被挤在右边那点宽度里。横过来占满整宽后这一条只占两行文字的高度，五列表格吃满整宽 -->
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="12,8">
+                <StackPanel>
+                    <!-- 第一行：栏名、三个计数、整批级项、两个快捷勾法——一行就够，不再为它们留一块竖排位置 -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="测试通道" Style="{StaticResource Style.PanelTitle}"
+                                   VerticalAlignment="Center"/>
+                        <!-- 只报三个数并各自上色：跑哪几项页头已经写了，这里再念一遍项名就是第三份重复。
+                             拆成三段而不是一句十二个字，是因为拼成一句在窄屏下必然被裁掉尾巴 -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding SuccessCount, StringFormat=通过 {0}}" FontSize="11"
+                                       Foreground="{StaticResource Brush.Pass}"/>
+                            <TextBlock Text="{Binding FailedCount, StringFormat=未通过 {0}}" FontSize="11" Margin="12,0,0,0"
+                                       Foreground="{StaticResource Brush.Fail}"/>
+                            <TextBlock Text="{Binding IdleCount, StringFormat=未测试 {0}}" FontSize="11" Margin="12,0,0,0"
+                                       Foreground="{StaticResource Brush.NotTested}"/>
+                        </StackPanel>
+
+                        <!-- 整批级项：判的是整批、一轮只有一个结论，跟选中哪一路无关，所以摆在讲“全部通道”的这一栏，
+                             不插进下方那一路的标题与表格之间（摆那里会被读成通道自己的结论）。
+                             目前没有这类项（重码那一项已按现场要求收掉），清单为空时这一栏不占位 -->
+                        <ItemsControl Grid.Column="2" ItemsSource="{Binding BatchItems}" Margin="16,0,0,0"
+                                      VerticalAlignment="Center"
+                                      Visibility="{Binding HasBatchItems, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                        <TextBlock Text="{Binding ResultText}" Style="{StaticResource Style.BatchResult}"
+                                                   HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 本轮范围的两个快捷勾法：要“只跑 2、3、4、5”时，先全不选再点那四下，比逐路取消快得多 -->
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="全选" Style="{StaticResource Style.ToolButton}" Padding="8,2" FontSize="11" Margin="0"
+                                    Command="{Binding CheckAllChannelsCommand}" ToolTip="把已接入整批的路都勾上本轮跑"/>
+                            <Button Content="全不选" Style="{StaticResource Style.ToolButton}" Padding="8,2" FontSize="11" Margin="6,0,0,0"
+                                    Command="{Binding UncheckAllChannelsCommand}" ToolTip="取消全部「本轮跑」；单独点名某一路仍可用卡片右键「开始测试」"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 第二行：八格横排。一行八格在 1340 宽下每格约 160，摆得下 勾选框 + 通道号 + 结论角标；
+                         通道数配得更多时 UniformGrid 自动往下换行，不会把格子挤窄 -->
+                    <ListBox Margin="0,3,0,0" ItemsSource="{Binding Channels}"
+                             SelectedItem="{Binding SelectedCard, Mode=TwoWay}"
+                             ItemTemplate="{StaticResource Tpl.ChannelCard}"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             HorizontalContentAlignment="Stretch"
+                             BorderThickness="0" Background="Transparent">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="8"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <!-- 键盘焦点的点阵框要去掉：它是 Adorner 层画的，换了 ItemTemplate 也不会带走，
+                                     与下面那圈选中描边叠在一起就是两层边、而且圆角不一致，看着像边框画歪了。
+                                     这里不会丢信息：ListBox 的方向键走到哪张卡，选中也就在哪张，描边就是焦点指示 -->
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <!-- 选中只做描边：卡片底色讲的是这一路的结论，不能被选中色盖掉 -->
+                                            <Border x:Name="Ring" BorderThickness="0" CornerRadius="8">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Ring" Property="BorderBrush" Value="{StaticResource Brush.Text.Sub}"/>
+                                                    <Setter TargetName="Ring" Property="BorderThickness" Value="1"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== 下：这一路的各项结果 + 时间线 ==================== -->
+            <Border Grid.Row="2" Style="{StaticResource Style.PanelCard}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="点上方的通道格看这一路的各项结果" Style="{StaticResource Style.SubText}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16"
+                               Visibility="{Binding HasSelectedCard, Converter={StaticResource InverseBoolToVisibility}}"/>
+
+                    <Grid Grid.Row="0" Margin="14,10,14,0"
+                          Visibility="{Binding HasSelectedCard, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding SelectedCard.Title}" Style="{StaticResource Style.PanelTitle}"/>
+                            <TextBlock Style="{StaticResource Style.SubText}" Margin="0,4,0,0"
+                                       Text="{Binding SelectedCard.Name, StringFormat=位号：{0}}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                                    DataContext="{Binding SelectedCard}">
+                            <TextBlock Text="{Binding ElapsedText}" Style="{StaticResource Style.SubText}"
+                                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Border Style="{StaticResource Style.DetailBadge}">
+                                <TextBlock Text="{Binding ResultText}" Style="{StaticResource Style.DetailBadgeText}"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 明细表：直接拿整机页那张 DataGrid 的同一套外观（表头浅底粗体、行高 36、只留横向分隔线）。
+                         两页讲的是同一种东西（测试项 / 说明 / 规格 / 测试值 / 结果），没道理长得不一样。
+                         列比整机少两列：单板的四项都按 InstrumentText 上报（见 TestItemResult.OfText），
+                         “产品上报值”整列都是空值；波形单板也不上抛——摆两列永远空着只会让人以为设备没连上。
+                         留下的五列沿用整机页那 1.4 / 1.4 / 1.2 / 1 / 0.7 的星号比例，两页同一列的相对宽窄就一致 -->
+                    <DataGrid Grid.Row="1" Margin="14,8,14,0"
+                              ItemsSource="{Binding SelectedCard.Items}"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              EnableRowVirtualization="False" EnableColumnVirtualization="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False"
+                              CanUserResizeRows="False" CanUserResizeColumns="False"
+                              CanUserReorderColumns="False" CanUserSortColumns="False"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{StaticResource Brush.Panel.Border}"
+                              Background="Transparent" BorderThickness="0"
+                              RowHeight="36" FontSize="12"
+                              SelectionMode="Single" SelectionUnit="FullRow"
+                              Visibility="{Binding HasSelectedCard, Converter={StaticResource BoolToVisibility}}">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader}"/>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="测试内容" Binding="{Binding Name, Mode=OneWay}" Width="1.4*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}"/>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="说明" Binding="{Binding Description, Mode=OneWay}" Width="1.4*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
+                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="规格范围" Binding="{Binding SpecText, Mode=OneWay}" Width="1.2*">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText.Center}"/>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="仪器测试值" Binding="{Binding InstrumentValueText, Mode=OneWay}" Width="*">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CellText.Center}"/>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="结果" Width="0.7*">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ResultText, Mode=OneWay}" Style="{StaticResource Style.ResultText}"
+                                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- 一行都没建出来有两种原因，必须分开说：
+                         点名了却没设备可对上是配置问题；压根没点名（只跑了别的一路）与配置无关。
+                         以前只判 Items.Count==0 合成一句，单跑一路时其余七路全在报“没有对上的设备”，白让人去翻仪器配置 -->
+                    <TextBlock Grid.Row="1" Text="这一路没有可跑的项：勾的项在这条槽位上没有对上的设备（菜单「配置→单板配置」的工位仪器里把这类设备启用）"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Style.SubText}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding SelectedCard.Items.Count}" Value="0"/>
+                                            <Condition Binding="{Binding SelectedCard.InRound}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Text="{Binding NotInRoundHint}" TextWrapping="Wrap"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Style.SubText}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCard.InRound}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- 时间线：这一轮每一项的结论都落一行，出问题时现场要能看见值与规格。
+                         没跑过时这里一句都没有，空着就别占一条（看着跟一块废物一样）；
+                         两个条件任一不满足就收起，所以用“命中即隐藏”的触发器而不是把两个布尔相与 -->
+                    <Expander Grid.Row="2" Margin="14,6,14,0" IsExpanded="False">
+                        <Expander.Style>
+                            <Style TargetType="Expander">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasSelectedCard}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding SelectedCard.HasTrace}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Expander.Style>
+                        <Expander.Header>
+                            <TextBlock Text="{Binding SelectedCard.Title, StringFormat=这一路的往来明细}"
+                                       Style="{StaticResource Style.SubText}"/>
+                        </Expander.Header>
+                        <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto" Margin="0,4,0,0">
+                            <ItemsControl ItemsSource="{Binding SelectedCard.Trace}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="11"
+                                                   TextWrapping="NoWrap" Margin="0,1"
+                                                   Foreground="{StaticResource Brush.Text.Main}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Expander>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 状态条 ==================== -->
+        <Border Grid.Row="2" Margin="0,10,0,0" Style="{StaticResource Style.PanelCard}" Padding="14,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding StatusText}" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource Brush.Text.Main}"
+                               Visibility="{Binding HasStatusText, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding RoundId}" Style="{StaticResource Style.SubText}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding RoundElapsedText}" Style="{StaticResource Style.SubText}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Button Content="复制明细" Style="{StaticResource Style.ToolButton}"
+                            Command="{Binding CopyTraceCommand}"
+                            ToolTip="把选中通道的往来明细贴到剪贴板，发厂商或写报告直接粘"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

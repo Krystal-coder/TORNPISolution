@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Core;
 using TORNPISolution.Interface;
+using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
 {
@@ -42,13 +43,20 @@ namespace TORNPISolution.Service
             _logger = Root.Value.ForContext("Source", source);
         }
 
-        public void Debug(string message) => _logger.Debug("{Message}", message);
+        public void Debug(string message) => _logger.Debug("{Message}", WithScope(message));
 
-        public void Info(string message) => _logger.Information("{Message}", message);
+        public void Info(string message) => _logger.Information("{Message}", WithScope(message));
 
-        public void Warn(string message) => _logger.Warning("{Message}", message);
+        public void Warn(string message) => _logger.Warning("{Message}", WithScope(message));
 
-        public void Error(string message, Exception? ex = null) => _logger.Error(ex, "{Message}", message);
+        public void Error(string message, Exception? ex = null) => _logger.Error(ex, "{Message}", WithScope(message));
+
+        /// <summary>
+        /// 自动附加测试项追踪上下文前缀（见 <see cref="TraceScope"/>）：
+        /// 串口 TX/RX、解析值、判定这几行会带上 [A05静态压力精度·BP-003@90mmHg]，按前缀即可检索一整组。
+        /// </summary>
+        private static string WithScope(string message)
+            => TraceScope.IsActive ? $"[{TraceScope.Text}] {message}" : message;
 
         /// <summary>程序退出前调用，确保缓冲日志全部落盘</summary>
         public static void CloseAndFlush()

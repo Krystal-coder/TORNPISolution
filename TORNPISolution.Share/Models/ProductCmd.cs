@@ -1,7 +1,7 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 产品命令标识：功能码 + 控制码 二元组。
+    /// 产品命令标识：功能码 + 控制码
     /// 同一控制码在不同功能码下是不同命令（如 0x80/Func=0x05 读过压状态 vs 0x80/Func=0x07 启动ECG+PPG测量），
     /// 因此命令身份必须由 (Func, Code) 共同确定，不能只靠 Code 反查 Func。
     /// 放在 Share 层以便 Interface（IProductController）与 Service（ProductProtocol）共用。

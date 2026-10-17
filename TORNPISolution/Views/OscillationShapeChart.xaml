@@ -1,21 +1,1 @@
-<UserControl x:Class="TORNPISolution.Views.OscillationShapeChart"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             FontFamily="Microsoft YaHei UI">
-
-    <!-- 包络曲线预览：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100 -->
-    <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
-            CornerRadius="4" Background="White">
-        <Grid>
-            <Canvas x:Name="RootCanvas"/>
-
-            <!-- 轴标注 -->
-            <TextBlock Text="Pulse (%)" FontSize="11" Margin="8,6,0,0"
-                       HorizontalAlignment="Left" VerticalAlignment="Top"
-                       Foreground="{StaticResource Brush.Text.Sub}"/>
-            <TextBlock Text="Manometer (mmHg)" FontSize="11" Margin="0,0,8,4"
-                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                       Foreground="{StaticResource Brush.Text.Sub}"/>
-        </Grid>
-    </Border>
-</UserControl>
+<UserControl x:Class="TORNPISolution.Views.OscillationShapeChart"             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             FontFamily="Microsoft YaHei UI">    <!-- 包络曲线预览：横轴 Manometer(mmHg) 0~360、纵轴 Pulse(%) 0~100 -->    <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"            CornerRadius="4" Background="White">        <Grid>            <Canvas x:Name="RootCanvas"/>            <!-- 轴标注 -->            <TextBlock Text="Pulse (%)" FontSize="11" Margin="8,6,0,0"                       HorizontalAlignment="Left" VerticalAlignment="Top"                       Foreground="{StaticResource Brush.Text.Sub}"/>            <TextBlock Text="Manometer (mmHg)" FontSize="11" Margin="0,0,8,4"                       HorizontalAlignment="Right" VerticalAlignment="Bottom"                       Foreground="{StaticResource Brush.Text.Sub}"/>        </Grid>    </Border></UserControl>

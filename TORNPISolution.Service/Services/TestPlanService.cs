@@ -54,6 +54,41 @@ namespace TORNPISolution.Service
         }
 
         /// <inheritdoc/>
+        public IReadOnlyDictionary<string, TestPlanConfig> GetAllPlans()
+        {
+            var result = new Dictionary<string, TestPlanConfig>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                if (!Directory.Exists(_plansDirectory))
+                {
+                    return result;
+                }
+
+                // 这里不逐个文件进出日志（列表过滤会反复用到），坏文件只记一行警告
+                foreach (var file in Directory.GetFiles(_plansDirectory, "*.json"))
+                {
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    if (string.IsNullOrEmpty(name)) continue;
+
+                    try
+                    {
+                        var config = JsonSerializer.Deserialize<TestPlanConfig>(File.ReadAllText(file), JsonOptions);
+                        if (config != null) result[name] = config;
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn($"方案文件解析失败，列表已跳过：{file}（{ex.Message}）");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"An error occured in TestPlanService.class GetAllPlans method, message: {ex}", ex);
+            }
+            return result;
+        }
+
+        /// <inheritdoc/>
         public TestPlanConfig? LoadPlan(string planName)
         {
             _log.Info($"{DateTime.Now} Start calling the TestPlanService.LoadPlan() method . {Environment.NewLine}");

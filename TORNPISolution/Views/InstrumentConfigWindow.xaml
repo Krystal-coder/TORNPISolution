@@ -1,17 +1,12 @@
 <Window x:Class="TORNPISolution.Views.InstrumentConfigWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:TORNPISolution.ViewModels"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="仪器链接配置" Width="760" Height="580"
         Icon="/Images/logo.ico"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="{StaticResource Brush.Window.Background}"
         FontFamily="Microsoft YaHei UI">
-
-    <Window.DataContext>
-        <vm:InstrumentConfigViewModel/>
-    </Window.DataContext>
 
     <Window.Resources>
 
@@ -158,7 +153,7 @@
                     Style="{StaticResource Style.ToolButton}" Margin="0"
                     Command="{Binding RefreshPortsCommand}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- 运行期锁定配置保存：灰显不可点，与血压模拟仪测试配置页一致 -->
+                <!-- 锁定配置保存 -->
                 <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
                            VerticalAlignment="Center" Margin="0,0,12,0"
                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
@@ -175,7 +170,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ========== 左侧：设备导航列表（按类别分组，可滚动） ========== -->
+            <!-- ========== 左侧：设备导航列表 ========== -->
             <ListBox Grid.Column="0" Margin="16,12,8,0" Padding="0"
                      ItemsSource="{Binding DeviceNavView}"
                      SelectedItem="{Binding SelectedDevice}"
@@ -201,7 +196,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- ========== 右侧：详情面板（与导航项 Key 一一对应，选中切换显示） ========== -->
+            <!-- ========== 右侧：详情面板 ========== -->
             <Grid Grid.Column="1" Margin="8,12,16,0">
 
                 <!-- ====== 被测产品（DUT） ====== -->
@@ -232,17 +227,17 @@
                             <ContentControl Content="{Binding Config.Product}"
                                             ContentTemplate="{StaticResource Template.SerialEditor}"/>
                             <StackPanel Margin="14,0,14,10">
-                                <CheckBox Content="无产品演示模式（产品未接时仅验证仪器侧行为，产品依赖项判 FAIL）"
+                                <CheckBox Content="无产品演示模式（产品未接时仅验证仪器，产品依赖项判 FAIL）"
                                           IsChecked="{Binding Config.NoProductDemoMode}" FontSize="12"/>
                                 <TextBlock Margin="0,2,0,0" FontSize="10" TextWrapping="Wrap"
                                            Foreground="{StaticResource Brush.Text.Sub}"
-                                           Text="勾选后：产品串口不可用时 M04 压力控制 / M06 动态压力精度仅驱动模拟仪完成充放气流程，依赖产品读回的结果项按读回缺失判 FAIL，通讯项按实际通讯结果判定；接上产品后务必取消勾选恢复正式判定。"/>
+                                           Text="勾选后：产品串口不可用时 A04 压力控制 / A06 血压动态精度 / A21 血压心率精度仅驱动模拟仪完成充放气流程，依赖产品读回的结果项按读回缺失判 FAIL，通讯项按实际通讯结果判定。"/>
                                 <CheckBox Margin="0,8,0,0"
                                           Content="无仪器演示模式（只读产品串口数据，忽略全部仪器控制）"
                                           IsChecked="{Binding Config.NoInstrumentDemoMode}" FontSize="12"/>
                                 <TextBlock Margin="0,2,0,0" FontSize="10" TextWrapping="Wrap"
                                            Foreground="{StaticResource Brush.Text.Sub}"
-                                           Text="勾选后：各测试模块只执行产品通讯（进入产测模式/0x72/0x74），跳过模拟仪/AECG/NFC/电源等仪器控制，其余结果项按读回缺失判 FAIL；正式测试务必取消勾选恢复。"/>
+                                           Text="勾选后：各测试模块只执行产品通讯（进入产测模式/0x72/0x74），跳过模拟仪/AECG/NFC/电源等仪器控制，其余结果项按读回缺失判 FAIL"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -369,7 +364,7 @@
                             </RadioButton.Content>
                         </RadioButton>
                         
-                        <!-- BPA700 使用原生 SDK，只需选择 COM 口，无需串口参数 -->
+                        <!-- BPA700 -->
                         <Grid Margin="24,2,0,6">
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -393,7 +388,7 @@
                                       Text="{Binding Config.BPA700Simulator.PortName, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                         
-                        <!-- BPA700 初始化设置：Category / 压力单位 / 袖带容量（默认 Adult/mmHg/500ml，初始化时随连接下发） -->
+                        <!-- BPA700 初始化设置：Category / 压力单位 / 袖带容量（默认 Adult/mmHg/500ml） -->
                         <Grid Margin="24,2,0,6">
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -488,9 +483,9 @@
                                                              Foreground="{StaticResource Brush.Primary}"
                                                              VerticalAlignment="Center" Margin="0,0,8,0"/>
                                     <StackPanel>
-                                        <TextBlock Text="鲸扬 AECG100 多功能综合性能测试仪（WhaleTeq）"
+                                        <TextBlock Text="鲸扬 AECG100 多功能综合性能测试仪"
                                                    Style="{StaticResource Style.PanelTitle}"/>
-                                        <TextBlock Text="USB VCP · 原生 SDK（AECG100x64）· ECG/PPG/SpO2/PWV"
+                                        <TextBlock Text=" ECG/PPG/SpO2/PWV"
                                                    Style="{StaticResource Style.SubText}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -522,7 +517,7 @@
                                           IsChecked="{Binding Config.Aecg100Tester.Enabled}"/>
                                 <TextBlock Margin="12,4" FontSize="10" TextWrapping="Wrap"
                                            Foreground="{StaticResource Brush.Text.Sub}"
-                                           Text="通讯由原生 SDK 处理，无需设置波特率；COM 口留空表示自动选择；超时 -1 为无限等待"/>
+                                           Text="COM 口留空表示自动选择；超时 -1 为无限等待"/>
                             </StackPanel>
                         </Border>
                         <TextBlock Margin="4,4" FontSize="11" TextWrapping="Wrap"
@@ -552,7 +547,7 @@
                                 <StackPanel>
                                     <TextBlock Text="THS_HF 高频读写器（岩柱 YZ806/YZ906）"
                                                Style="{StaticResource Style.PanelTitle}"/>
-                                    <TextBlock Text="串口连接 · 厂商 SDK（Reader_DLLV1）· NTAG 读写"
+                                    <TextBlock Text="串口连接 NTAG 读写"
                                                Style="{StaticResource Style.SubText}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </StackPanel>

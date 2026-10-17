@@ -3,7 +3,6 @@ using System.IO.Ports;
 using System.Windows.Data;
 using System.Windows.Input;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
 using TORNPISolution.Models;
@@ -20,11 +19,6 @@ namespace TORNPISolution.ViewModels
     {
         private readonly IInstrumentConfigService _configService;
         private readonly ILogService _log = new LogService(nameof(InstrumentConfigViewModel));
-
-       // 实例化
-        public InstrumentConfigViewModel() : this(App.Services.GetRequiredService<IInstrumentConfigService>())
-        {
-        }
 
         public InstrumentConfigViewModel(IInstrumentConfigService configService)
         {
@@ -54,9 +48,11 @@ namespace TORNPISolution.ViewModels
             new() { Key = "MassFlowController",  Name = "质量流量控制器",     Category = "测量仪器",  Icon = PackIconKind.Waves },
             new() { Key = "Simulator",           Name = "血压模拟仪",        Category = "血压模拟仪", Icon = PackIconKind.HeartPulse },
             new() { Key = "Aecg100",             Name = "AECG100 综合性能测试仪", Category = "多功能测试仪", Icon = PackIconKind.Pulse },
-            new() { Key = "NfcReader",           Name = "NFC 读卡器",        Category = "NFC 读卡器", Icon = PackIconKind.NfcVariant },
-            new() { Key = "PowerSupply",         Name = "IT6411 直流电源",   Category = "直流电源",  Icon = PackIconKind.PowerPlug },
-            new() { Key = "Reserved",            Name = "预留设备",          Category = "预留",      Icon = PackIconKind.PlusBoxOutline }
+            // 综测仪 / 蓝牙网关 / 读码器这三块挪到了「配置→单板配置」的「工位仪器」页：
+            // 它们只服务单板工位，摆在这里会让人以为整机测试也要配它们，而且同一份数组会出现两个编辑入口
+            //new() { Key = "NfcReader",           Name = "NFC 读卡器",        Category = "NFC 读卡器", Icon = PackIconKind.NfcVariant },
+            //new() { Key = "PowerSupply",         Name = "IT6411 直流电源",   Category = "直流电源",  Icon = PackIconKind.PowerPlug },
+            //new() { Key = "Reserved",            Name = "预留设备",          Category = "预留",      Icon = PackIconKind.PlusBoxOutline }
         };
 
         /// <summary>导航列表视图（按 Category 分组）</summary>
@@ -222,17 +218,28 @@ namespace TORNPISolution.ViewModels
 
         private void Save()
         {
+            if (SaveCore()) CloseRequested?.Invoke();
+        }
+
+        /// <summary>
+        /// 只落盘、不发“关窗”信号：单板配置页也要拿仪器配置写自己那三块（综测仪/网关/读码器），
+        /// 它有自己的关窗时机，不能一保存就把仪器链接配置那扇窗也带走。
+        /// 两个窗口各持一份快照不会互抹：Save 里面是按字段合并的，只回写本窗口真改过的项。
+        /// </summary>
+        public bool SaveCore()
+        {
             _log.Info($"{DateTime.Now} Start calling the InstrumentConfigViewModel.Save() method . {Environment.NewLine}");
             try
             {
                 _configService.Save(Config);
-                CloseRequested?.Invoke();
+                return true;
             }
             catch (Exception ex)
             {
                 _log.Error($"An error occured in InstrumentConfigViewModel.class Save method, message: {ex}", ex);
-                System.Windows.MessageBox.Show($"保存失败：{ex.Message}", "仪器链接配置",
+                System.Windows.MessageBox.Show($"保存失败：{ex.Message}", "仪器配置",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return false;
             }
             finally
             {

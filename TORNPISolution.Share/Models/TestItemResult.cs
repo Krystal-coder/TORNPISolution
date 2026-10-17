@@ -1,14 +1,9 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 单个测试项的一次执行结果（TestItem 测量后回传给 UI）。
-    /// 与 Spec 的关系：
-    ///   Spec 定义测试项清单与静态规格（项名/说明/单位/默认上下限）；
-    ///   实测值与"本次运行的动态规格"由 TestItem 运行时产生、装在这个类里回传。
-    /// 动态规格：部分测试项的规格要按仪器读回的标准值现算
-    ///   （如血压：SpecMin/SpecMax = 仪器读回值 ± 容差），
-    ///   此时给 SpecMin/SpecMax 赋值，UI 用动态规格覆盖显示并判定；
-    ///   不赋值（null）的项按 Spec 里的静态规格判定。
+    /// 单个测试项的一次执行结果 
+    /// Spec 定义测试项清单与静态规格（项名/说明/单位/默认上下限）
+    /// 动态规格：部分测试项的规格要按仪器读回的标准值现算（如血压：SpecMin/SpecMax = 仪器读回值 ± 容差）
     /// </summary>
     public class TestItemResult
     {
@@ -38,6 +33,12 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>演示/跳过标记：该项仅展示、不参与合格判定（结果保持“未测试”），用于无产品演示模式等场景</summary>
         public bool NotJudged { get; set; }
+
+        /// <summary>
+        /// 只展示不判定标记（如 BP-005 的平均值项）：测试值与行详情子表照常回填，结果列显示“—”。
+        /// 与 <see cref="NotJudged"/> 的区别：那个会把双值列和子表一起清空，这个要保留统计量给人看。
+        /// </summary>
+        public bool DisplayOnly { get; set; }
 
         /// <summary>普通项便捷构造：只有测试值，按 Spec 静态规格判定</summary>
         public static TestItemResult Of(double value) => new() { Value = value };

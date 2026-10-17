@@ -1,8 +1,7 @@
 namespace TORNPISolution.Interface
 {
     /// <summary>
-    /// NFC 读卡器公共接口（THS_HF 高频读写器，如岩柱 YZ806/YZ906）。
-    /// 支持 NTAG 系列标签的页读写，用于 NFC 功能测试（MAC 信息写入与验证）。
+    /// NFC 读卡器公共接口（THS_HF 高频读写器，如岩柱 YZ806/YZ906）
     /// </summary>
     public interface INfcReader : IDisposable
     {

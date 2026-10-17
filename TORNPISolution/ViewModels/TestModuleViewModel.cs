@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using TORNPISolution.Common;
+using TORNPISolution.Share.Enum;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.ViewModels
@@ -35,6 +36,9 @@ namespace TORNPISolution.ViewModels
         /// <summary>模块唯一标识</summary>
         public string Id => _model.Id;
 
+        /// <summary>所属工位类别（整机/单板）：模块库按它决定这个模块显示在哪一面</summary>
+        public ModuleCategory Category => _model.Category;
+
         /// <summary>底层模块定义（供 TestItem 按方案序号执行整个模块时使用）</summary>
         public TestModuleModel Model => _model;
 
@@ -51,9 +55,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>模块说明</summary>
         public string Description => _model.Description;
 
-        /// <summary>模块图标</summary>
-        public string Icon => _model.Icon;
-
         /// <summary>本模块的测试项集合</summary>
         public ObservableCollection<TestItemViewModel> Items { get; }
 
@@ -61,14 +62,13 @@ namespace TORNPISolution.ViewModels
         public string ItemCountText => $"{Items.Count} 项";
 
         /// <summary>
-        /// 模块级判定：不判定项（演示/预留，本轮上报过 NotJudged）不参与统计，
-        /// 其余项全部合格为合格，任一不合格为不合格，否则未测试
+        /// 模块级判定
         /// </summary>
         public TestResultStatus ModuleResult
         {
             get
             {
-                var judgedItems = Items.Where(i => !i.IsReportedNotJudged).ToList();
+                var judgedItems = Items.Where(i => !i.IsReportedNotJudged && !i.IsDisplayOnly).ToList();
                 if (judgedItems.Count == 0) return TestResultStatus.NotTested;
 
                 if (judgedItems.Any(i => i.Result == TestResultStatus.Fail))

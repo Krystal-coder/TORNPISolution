@@ -40,6 +40,11 @@ namespace TORNPISolution.Service
         public event Action<string, string>? DeviceConnectionFailed;
 
         /// <summary>
+        /// 人工操作提示（模块名 + 提示文本）：UI 层订阅后弹模态框，本类在返回的 Task 上等测试员点确定（见 PromptOperatorAsync）。
+        /// </summary>
+        public event Func<string, string, Task>? OperatorPromptRequested;
+
+        /// <summary>
         /// 压力采样点实时上抛（测试项名 + 带相对开始秒数的采样点，供 UI 在对应行下画波形，后台线程触发）
         /// </summary>
         public event Action<string, PressureSamplePoint>? PressureSampled;
@@ -54,13 +59,34 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 方案级产品通讯状态：本轮 M16 产品通讯初始化握手后的记录（true=可用/false=不可用）；
+        /// 方案级产品通讯状态：本轮 A16 产品通讯初始化握手后的记录（true=可用/false=不可用）；
         /// null = 本轮方案未包含初始化模块。方案开始时由 BeginPlanRun 复位。
         /// </summary>
         private bool? _productCommOk;
 
-        /// <summary>复位方案级状态（MainViewModel.RunPlan 开始时调用）：产品通讯状态回到“初始化模块未执行”</summary>
-        public void BeginPlanRun() => _productCommOk = null;
+        /// <summary>复位方案级状态（MainViewModel.RunPlan 开始时调用）：产品通讯状态回到“初始化模块未执行”；
+        /// 同时清掉槽位范围，免得上一轮单板按通道跑的范围渗到整机方案里</summary>
+        public void BeginPlanRun(IReadOnlyList<int>? slotScope = null)
+        {
+            _productCommOk = null;
+            _slotScope = slotScope is { Count: > 0 } ? slotScope.ToHashSet() : null;
+        }
+
+        /// <summary>
+        /// 单板“只跑这几路”的作用范围：null 表示整批（所有已启用的槽位）。
+        /// 为什么走字段而不是方法参数：模块方法体的签名是一个入口统一调的（ collector+token 两个），
+        /// 槽位只在 B02/B03/B04 这三个体内要过滤，为这一个需求把二十几个模块方法都改签名不划算；
+        /// 与 _productCommOk 同一类：“本轮跑什么”的方案级状态，BeginPlanRun 复位，不跨轮残留。
+        /// 同一时刻只有一轮在跑（界面那边用 TestRunState 挡着），不存在两个范围互相覆写。
+        /// </summary>
+        private HashSet<int>? _slotScope;
+
+        /// <summary>这个槽位在本轮范围内吗（没限范围就全算）</summary>
+        private bool InSlotScope(int slot) => _slotScope == null || _slotScope.Contains(slot);
+
+        /// <summary>把算出来的槽位清单按本轮范围筛一遍：单板右键“只跑通道 3”时，其余七路不驱动也不上报</summary>
+        private List<T> WithinSlotScope<T>(IEnumerable<T> rows, Func<T, int> slotOf)
+            => _slotScope == null ? rows.ToList() : rows.Where(r => InSlotScope(slotOf(r))).ToList();
 
         /// <summary>
         /// 按方案序号执行测试模块
@@ -82,9 +108,16 @@ namespace TORNPISolution.Service
                 var (moduleName, body, onError) = ResolveModule(module.Id, collector, token);
                 await RunModuleAsync(moduleName, body, onError);
 
-                // 自检：模块方法写入了本模块 Spec 里不存在的项名
-                foreach (var key in results.Keys.Where(k => module.Items.All(i => i.Name != k)))
-                    _log.Warn($"TestItem{index}：结果项 \"{key}\" 不在 Spec 定义中，请检查项名拼写");
+                // 自检：目录项清单（Spec）与模块实际上报名单双向对一遍，两边不同源时界面上看不出问题，只能靠这一条日志
+                //   ① 模块报了目录里没有的名 → UI 按目录项名取结果，这条上报被静默丢掉（项名拼错、或动态项名生成口径与目录不一致）
+                //   ② 目录里有、模块一个字没报 → UI 收尾按读回缺失强制判 FAIL，这里点出漏报的是哪几项
+                var unknown = results.Keys.Where(k => module.Items.All(i => i.Name != k)).ToList();
+                if (unknown.Count > 0)
+                    _log.Error($"TestItem{index}：上报了 Spec 里不存在的结果项 {unknown.Count} 个（不会出现在明细表）：{string.Join("、", unknown)}");
+
+                var unreported = module.Items.Where(i => !collector.WrittenKeys.Contains(i.Name)).Select(i => i.Name).ToList();
+                if (unreported.Count > 0)
+                    _log.Warn($"TestItem{index}：未上报结果的项目 {unreported.Count} 个（界面按读回缺失判 FAIL）：{string.Join("、", unreported)}");
 
                 _log.Info($"TestItem{index}：{module.Name} 执行完成，共 {results.Count} 项结果");
                 return results;
@@ -112,13 +145,20 @@ namespace TORNPISolution.Service
             string moduleId, TestItemResultCollector collector, CancellationToken token) => moduleId switch
         {
             TestModuleIds.InitInstruments => (nameof(InitInstrumentsModule), () => InitInstrumentsModule(collector, token), null),
+            TestModuleIds.BoardInitInstruments => (nameof(BoardInitInstrumentsModule), () => BoardInitInstrumentsModule(collector, token), null),
+            TestModuleIds.BoardBarcodeRead => (nameof(BoardBarcodeModule), () => BoardBarcodeModule(collector, token), null),
+            TestModuleIds.BoardBluetoothTest => (nameof(BoardBluetoothModule), () => BoardBluetoothModule(collector, token), null),
+            TestModuleIds.BoardPowerOn => (nameof(BoardPowerOnModule), () => BoardPowerOnModule(collector, token), null),
             TestModuleIds.BpDeviceInit => (nameof(BpDeviceInitModule), () => BpDeviceInitModule(collector, token), _ => BpDeviceInitFailedAsync(collector)),
             TestModuleIds.NfcFunctionTest => (nameof(NfcFunctionModule), () => NfcFunctionModule(collector, token), null),
             TestModuleIds.BpAccuracyTest => (nameof(BpAccuracyTestModule), () => BpAccuracyTestModule(collector, token), null),
+            TestModuleIds.PressureControlTest => (nameof(PressureControlModule), () => PressureControlModule(collector, token), null),
             TestModuleIds.BpStaticAccuracyTest => (nameof(BpStaticAccuracyModule), () => BpStaticAccuracyModule(collector, token), null),
             TestModuleIds.ProductStaticPressureCalibration => (nameof(ProductStaticPressureCalibrationModule), () => ProductStaticPressureCalibrationModule(collector, token), null),
+            TestModuleIds.Jjg692DeflationRateTest => (nameof(Jjg692DeflationRateModule), () => Jjg692DeflationRateModule(collector, token), null),
+            TestModuleIds.Jjg692AirtightnessTest => (nameof(Jjg692AirtightnessModule), () => Jjg692AirtightnessModule(collector, token), null),
             TestModuleIds.BpDynamicAccuracyTest => (nameof(BpDynamicAccuracyModule), () => BpDynamicAccuracyModule(collector, token), null),
-            TestModuleIds.PressureControlTest => (nameof(PressureControlModule), () => PressureControlModule(collector, token), null),
+            TestModuleIds.BpHeartRateAccuracyTest => (nameof(BpHeartRateAccuracyModule), () => BpHeartRateAccuracyModule(collector, token), null),
             TestModuleIds.Aecg100Init => (nameof(Aecg100InitModule), () => Aecg100InitModule(collector, token), null),
             TestModuleIds.EcgAcquisitionTest => (nameof(EcgAcquisitionTestModule), () => EcgAcquisitionTestModule(collector, token), null),
             TestModuleIds.EcgHeartRateTest => (nameof(EcgHeartRateTestModule), () => EcgHeartRateTestModule(collector, token), null),
@@ -132,7 +172,17 @@ namespace TORNPISolution.Service
             _ => throw new NotSupportedException($"未实现的测试模块：{moduleId}")
         };
 
-        /// <summary>M01 血压仪初始化异常钩子：写 0 并通知 UI 设备连接失败（异常本身已由 RunModuleAsync 记 Error）</summary>
+        /// <summary>
+        /// 这个模块 Id 在分派表里有没有实现：只走一遍 switch 组 lambda，不跑测试动作，喂个空收集器就能探。
+        /// 分派表就是唯一清单，这里不重复列一遍。
+        /// </summary>
+        public bool ImplementsModule(string moduleId)
+        {
+            try { ResolveModule(moduleId, new TestItemResultCollector(new(), null), CancellationToken.None); return true; }
+            catch (NotSupportedException) { return false; }
+        }
+
+        /// <summary>A01 血压仪初始化异常钩子：写 0 并通知 UI 设备连接失败（异常本身已由 RunModuleAsync 记 Error）</summary>
         private async Task BpDeviceInitFailedAsync(TestItemResultCollector collector)
         {
             await collector.SetAsync(SpecItems.BpSimulatorInit, TestItemResult.Of(0));
@@ -144,25 +194,30 @@ namespace TORNPISolution.Service
         /// </summary>
         private async Task RunModuleAsync(string moduleName, Func<Task> body, Func<Exception, Task>? onError = null)
         {
-            _log.Info($"{DateTime.Now} Start calling the TestItem.{moduleName}() method . {Environment.NewLine}");
-            try
+            // 模块级追踪上下文：本模块内每一条日志（含产品串口 TX/RX）自动带 [模块名] 前缀，
+            // 点位/轮次在流程内用 TraceScope.Push 追加，各模块分部文件里按需调用
+            using (TraceScope.Begin(moduleName))
             {
-                await body();
-            }
-            catch (OperationCanceledException)
-            {
-                // 用户点"停止"：向上层传递，不当作测试异常
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _log.Error($"An error occured in TestItem.class {moduleName} method, message: {ex}", ex);
-                if (onError != null)
-                    await onError(ex);
-            }
-            finally
-            {
-                _log.Info($"{DateTime.Now} Ended calling the TestItem.{moduleName}() method . {Environment.NewLine}");
+                _log.Info($"{DateTime.Now} Start calling the TestItem.{moduleName}() method . {Environment.NewLine}");
+                try
+                {
+                    await body();
+                }
+                catch (OperationCanceledException)
+                {
+                    // 用户点"停止"：向上层传递，不当作测试异常
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _log.Error($"An error occured in TestItem.class {moduleName} method, message: {ex}", ex);
+                    if (onError != null)
+                        await onError(ex);
+                }
+                finally
+                {
+                    _log.Info($"{DateTime.Now} Ended calling the TestItem.{moduleName}() method . {Environment.NewLine}");
+                }
             }
         }
     }

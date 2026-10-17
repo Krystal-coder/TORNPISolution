@@ -1,9 +1,14 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
+using Microsoft.Extensions.DependencyInjection;
+using TORNPISolution.Share.Enum;
 using TORNPISolution.ViewModels;
 
 namespace TORNPISolution.Views
@@ -14,11 +19,10 @@ namespace TORNPISolution.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewModel viewModel)
         {
-            // 方案列表空白区域的左键点击在类级预览阶段直接吞掉：
-            // 类处理器先于所有实例处理器（含 gong-wpf-dragdrop 注册的处理）
-            // 执行，从源头阻止拖拽库清空列表选中
+            DataContext = viewModel;
+
             EventManager.RegisterClassHandler(typeof(MainWindow),
                 UIElement.PreviewMouseLeftButtonDownEvent,
                 new MouseButtonEventHandler(BlankArea_PreviewMouseLeftButtonDown));
@@ -28,12 +32,14 @@ namespace TORNPISolution.Views
             ViewModel.SavePlanRequested += ViewModel_SavePlanRequested;
             ViewModel.LoadPlanRequested += ViewModel_LoadPlanRequested;
             ViewModel.SelectedPlanModuleChanged += ViewModel_SelectedPlanModuleChanged;
+            // 方案里有声明ECG Signal的模块时，每轮开始执行前自动带出该模块的总览窗口（按模块 Id 各一个，非模态不挡执行）
+            ViewModel.WaveformOverviewRequested += ViewModel_WaveformOverviewRequested;
 
             // 波形折叠按钮点击保险：展开/收起这个开关取反
             DetailGrid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
                 new MouseButtonEventHandler(DetailGrid_WaveformToggle_ForceClick), handledEventsToo: true);
 
-            // 启动时自动加载的方案可能已选中模块，同步一次列表高亮与明细表
+            // 启动时自动加载的方案可能已选中模块，同步一次列表明细
             Loaded += (_, _) =>
             {
                 SyncPlanListSelection();
@@ -42,6 +48,19 @@ namespace TORNPISolution.Views
         }
 
         private MainViewModel ViewModel => (MainViewModel)DataContext;
+
+        /// <summary>
+        /// 关窗口时先让三边各自把收尾做完：测试项（退测试模式、泄压、关共享会话）、单板轮次（断设备连接）
+        /// 与烧录轮（杀工具进程、写记录），再走销毁。
+        /// 否则进程一退，设备就留在带压的测试模式里，综测仪还挂着输出，烧录工具则作为孤儿进程继续占着那几路的串口。
+        /// </summary>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            ViewModel.StopAndAwaitWrapUp();
+            ViewModel.Board.StopAndAwaitWrapUp();
+            ViewModel.Flashing.StopAndAwaitWrapUp();
+            base.OnClosing(e);
+        }
 
         /// <summary>
         /// 波形折叠/展开点击
@@ -57,7 +76,7 @@ namespace TORNPISolution.Views
             item.IsWaveformExpanded = !item.IsWaveformExpanded;
             e.Handled = true;
 
-            // 延迟强制行重新布局（保险）
+            // 延迟强制行重新布局
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var row = DetailGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
@@ -67,7 +86,7 @@ namespace TORNPISolution.Views
 
         // ==================== 中间方案列表：选中同步 ====================
 
-        /// <summary>程序正在同步列表选中（防止 SelectionChanged 回写重入）</summary>
+        /// <summary>程序正在同步列表选中</summary>
         private bool _syncingPlanSelection;
 
         /// <summary>
@@ -77,7 +96,7 @@ namespace TORNPISolution.Views
         {
             var source = e.OriginalSource as DependencyObject;
 
-            // 只拦截方案列表内的空白点击，其余控件（模块库、表格等）不受影响
+            // 拦截方案列表内的空白点击
             if (FindAncestor<ListBox>(source) != PlanList)
             {
                 return;
@@ -135,13 +154,42 @@ namespace TORNPISolution.Views
             RefreshDetailGrid();
         }
 
+        /// <summary>本轮方案里有声明ECG Signal的模块：把各自的长图窗口带出来（窗口按模块 Id 保证一个模块只一个，与手动按钮同一条路径）</summary>
+        private void ViewModel_WaveformOverviewRequested(WaveformOverviewRequest request)
+            => WaveformOverviewWindow.ShowOrRefresh(request, this);
+
+        /// <summary>上次绑进明细表的集合与它当时的分组状态</summary>
+        private ObservableCollection<TestItemViewModel>? _detailItems;
+        private bool _detailGrouped;
+
         /// <summary>
-        /// 切换选中模块时先置空 ItemsSource 再赋新集合， DataGrid 整表重建
+        /// 切换选中模块
         /// </summary>
         private void RefreshDetailGrid()
         {
+            var items = ViewModel.SelectedModuleItems;
+
+            var grouped = items.Any(i => !string.IsNullOrEmpty(i.GroupLabel));
+
+            if (items.Count > 0 && ReferenceEquals(_detailItems, items) && _detailGrouped == grouped)
+            {
+                return;
+            }
+
+            _detailItems = items;
+            _detailGrouped = grouped;
+
             DetailGrid.ItemsSource = null;
-            DetailGrid.ItemsSource = ViewModel.SelectedModuleItems;
+            if (grouped)
+            {
+                var view = new ListCollectionView(items);
+                view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(TestItemViewModel.GroupLabel)));
+                DetailGrid.ItemsSource = view;
+            }
+            else
+            {
+                DetailGrid.ItemsSource = items;
+            }
         }
 
         /// <summary>把列表选中同步为 VM 当前模块（带重入保护）</summary>
@@ -186,29 +234,72 @@ namespace TORNPISolution.Views
         /// <summary>配置 → 仪器链接配置：打开串口参数配置对话框</summary>
         private void MenuInstrumentConfig_Click(object sender, RoutedEventArgs e)
         {
-            var window = new InstrumentConfigWindow { Owner = this };
+            var window = new InstrumentConfigWindow(App.Services.GetRequiredService<InstrumentConfigViewModel>()) { Owner = this };
             window.ShowDialog();
+        }
+
+        /// <summary>配置 → 单板配置：通道信息 / 工位仪器两页收在一扇窗里（与烧录配置同形）</summary>
+        private void MenuBoardConfig_Click(object sender, RoutedEventArgs e)
+        {
+            // 跑着的时候不开：本轮范围与勾选项在开跑那一刻就定下来了，中途改只会让界面和结果对不上
+            if (!ViewModel.Board.TryOpenConfig()) return;
+
+            new BoardConfigWindow(ViewModel.Board, App.Services.GetRequiredService<InstrumentConfigViewModel>())
+                { Owner = this }.ShowDialog();
+        }
+
+        /// <summary>配置 → 烧录配置：打开两颗芯片的全局参数对话框（直接吃烧录页那份活配置，不另存一份）</summary>
+        private void MenuFlashingConfig_Click(object sender, RoutedEventArgs e)
+        {
+            new FlashConfigWindow(ViewModel.Flashing) { Owner = this }.ShowDialog();
+        }
+
+        /// <summary>
+        /// 测试项 → 勾选本轮要跑哪几项：项数会长到几十，所以开弹窗而不做菜单下拉。
+        /// 这扇窗只管勾选：通道与仪器是「配置→单板配置」的事，两处各管一处，不再一扇窗里夹两件事。
+        /// </summary>
+        private void MenuBoardTestItems_Click(object sender, RoutedEventArgs e)
+        {
+            // 与单板配置同一个闸门：跑着的时候本轮范围已经定死，中途改勾选项只会让界面与结果对不上
+            if (!ViewModel.Board.TryOpenConfig()) return;
+
+            new BoardTestItemsWindow(ViewModel.Board) { Owner = this }.ShowDialog();
         }
 
         /// <summary>配置 → 血压模拟仪测试配置：打开 BPA700 / 康伟达 测试参数配置对话框（外层页签区分设备）</summary>
         private void MenuBpaParamConfig_Click(object sender, RoutedEventArgs e)
         {
-            var window = new BpaParamConfigWindow { Owner = this };
+            var window = new BpaParamConfigWindow(App.Services.GetRequiredService<BpaParamConfigViewModel>()) { Owner = this };
             window.ShowDialog();
         }
 
         /// <summary>配置 → ECG参数配置：打开 AECG100 ECG 测试参数配置对话框</summary>
         private void MenuAecg100ParamConfig_Click(object sender, RoutedEventArgs e)
         {
-            var window = new Aecg100ParamConfigWindow { Owner = this };
+            var window = new Aecg100ParamConfigWindow(App.Services.GetRequiredService<Aecg100ParamConfigViewModel>()) { Owner = this };
             window.ShowDialog();
         }
 
         /// <summary>配置 → 协议命令配置：打开产品串口协议命令码配置对话框（需密码验证）</summary>
         private void MenuProtocolCommandConfig_Click(object sender, RoutedEventArgs e)
         {
-            var window = new ProtocolCommandConfigWindow { Owner = this };
+            var window = new ProtocolCommandConfigWindow(App.Services.GetRequiredService<ProtocolCommandConfigViewModel>()) { Owner = this };
             window.ShowDialog();
+        }
+
+        /// <summary>明细头部 → 波形窗口：弹出（或复用已开的）当前模块的ECG Signal窗口，非模态、可最大化/最小化</summary>
+        private void OpenWaveformOverview_Click(object sender, RoutedEventArgs e)
+        {
+            var module = ViewModel.SelectedPlanModule;
+            var request = module == null ? null : ViewModel.BuildOverviewRequest(module.Id);
+            if (request == null || request.Items.Count == 0)
+            {
+                MessageBox.Show(this, $"当前方案里没有可用于ECG Signal的波形测试项（模块「{module?.Name ?? "未选中"}」未在目录声明该模式）。",
+                    "波形窗口", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            WaveformOverviewWindow.ShowOrRefresh(request, this);
         }
 
         /// <summary>文件 → 保存方案</summary>
@@ -236,19 +327,30 @@ namespace TORNPISolution.Views
         {
             var defaultName = ViewModel.CurrentPlanName;
             var input = ShowInputDialog("保存测试方案", "请输入方案名称:", defaultName);
-            if (input != null)
+            if (string.IsNullOrWhiteSpace(input))
             {
-                ViewModel.SavePlanWithName(input);
+                return;
             }
+
+            // 方案名就是文件名，同名直接覆盖：另一类工位已有这个名时拦一下（两面界面看着毫不相关，撞了很难查）
+            if (ViewModel.IsPlanNameTakenByOtherCategory(input)
+                && MessageBox.Show(this,
+                    $"「{input}」已经是另一类工位的方案名（当前在：{ViewModel.LibraryCategoryText}），保存会把它覆盖掉。\n仍要保存吗？",
+                    "方案名重名", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            ViewModel.SavePlanWithName(input);
         }
 
-        /// <summary>加载方案：弹出选择框让用户选择要加载的方案</summary>
+        /// <summary>加载方案：弹出选择框让用户选择要加载的方案（只列当前工位的那几份）</summary>
         private void ViewModel_LoadPlanRequested(object? sender, EventArgs e)
         {
             var plans = ViewModel.GetAvailablePlanNames();
             if (plans.Count == 0)
             {
-                MessageBox.Show("暂无已保存的方案", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"{ViewModel.LibraryCategoryText}还没有已保存的方案", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -349,7 +451,7 @@ namespace TORNPISolution.Views
 
         // ==================== 辅助方法 ====================
 
-        /// <summary>获取鼠标事件命中的模块（ListBoxItem 的 DataContext）</summary>
+        /// <summary>获取鼠标事件命中的模块</summary>
         private static TestModuleViewModel? GetModuleUnderMouse(MouseEventArgs e)
         {
             var element = e.OriginalSource as DependencyObject;

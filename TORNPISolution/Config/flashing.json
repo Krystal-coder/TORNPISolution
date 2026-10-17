@@ -1,0 +1,73 @@
+{
+  "Channels": [
+    {
+      "Enabled": true,
+      "Name": "通道1",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道2",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道3",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道4",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道5",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道6",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道7",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    },
+    {
+      "Enabled": true,
+      "Name": "通道8",
+      "WizProPortName": "",
+      "FreqchipPortName": ""
+    }
+  ],
+  "WizPro": {
+    "AppPath": "",
+    "ProjectPath": "",
+    "CloseAppAfterDownload": true,
+    "DownloadTimeoutMs": 30000,
+    "SelfCheckBeforeProgram": true,
+    "BaudRate": 1000000,
+    "DataBits": 8,
+    "StopBits": 2,
+    "ResponseTimeoutMs": 5000,
+    "ProgramTimeoutMs": 120000
+  },
+  "Freqchip": {
+    "ToolPath": "",
+    "FirmwarePath": "",
+    "Chip": 4,
+    "HandshakeTimeoutSeconds": 20,
+    "BaudRate": 460800,
+    "EraseSize": "200000",
+    "ProcessTimeoutMs": 180000
+  }
+}

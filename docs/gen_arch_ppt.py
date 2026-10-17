@@ -578,7 +578,7 @@ def s12_conventions():
     ]
     right = [
         (0, "**无仪器演示模式**：模块入口 NoInstrumentDemo 检查。纯产品模块（M15 充电）、预留不判定（M14 SpO2）不拦截。", False),
-        (0, "**配置即时生效**：InstrumentConfigService.Load() 每次读盘，别加内存缓存。", False),
+        (0, "**配置生效时机**：Load() 走文件时间戳缓存、Save 后即刷新；但模块库/明细表是快照，改完配置要重开模块库、加载方案或点运行才重建。", False),
         (0, "**产品通讯集中在 M16**：其他模块不再重复握手，读方案级 _productCommOk 记录。", False),
         (0, "**日志规范**：每方法 Start/Ended 三段式；临时诊断代码确认后要删，别污染日志。", False),
     ]

@@ -9,18 +9,17 @@ namespace TORNPISolution.Views
     /// </summary>
     public partial class BpaParamConfigWindow : Window
     {
-        public BpaParamConfigWindow()
+        public BpaParamConfigWindow(BpaParamConfigViewModel viewModel)
         {
+            // DataContext 先于 InitializeComponent 
+            DataContext = viewModel;
             InitializeComponent();
 
-            if (DataContext is BpaParamConfigViewModel vm)
+            viewModel.CloseRequested += () =>
             {
-                vm.CloseRequested += () =>
-                {
-                    DialogResult = true;
-                    Close();
-                };
-            }
+                DialogResult = true;
+                Close();
+            };
         }
 
         /// <summary>动态血压方法 = Customized 时，点包络曲线图标打开 Oscillation Shape 配置页</summary>

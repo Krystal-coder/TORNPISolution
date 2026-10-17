@@ -9,18 +9,17 @@ namespace TORNPISolution.Views
     /// </summary>
     public partial class InstrumentConfigWindow : Window
     {
-        public InstrumentConfigWindow()
+        public InstrumentConfigWindow(InstrumentConfigViewModel viewModel)
         {
+            // DataContext 先于 InitializeComponent 
+            DataContext = viewModel;
             InitializeComponent();
 
-            if (DataContext is InstrumentConfigViewModel vm)
+            viewModel.CloseRequested += () =>
             {
-                vm.CloseRequested += () =>
-                {
-                    DialogResult = true;
-                    Close();
-                };
-            }
+                DialogResult = true;
+                Close();
+            };
         }
     }
 }

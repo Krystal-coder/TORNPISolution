@@ -1,23 +1,27 @@
 using GongSolutions.Wpf.DragDrop;
 using HandyControl.Controls;
-using Microsoft.Extensions.DependencyInjection;
+using HandyControl.Data;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using TORNPISolution.Common;
 using TORNPISolution.Interface;
 using TORNPISolution.Service;
 using TORNPISolution.Service.Devices;
+using TORNPISolution.Service.Flashing;
+using TORNPISolution.Share.Enum;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 主窗口 ViewModel：
-    /// 模块库（左） → 拖拽组建测试方案（中） → 查看模块测试明细（右）
-    /// 拖放由 gong-wpf-dragdrop 接管，IDropTarget 处理落点逻辑。
-    /// 规格在 Spec 类、测量在 TestItem 类。
+    /// 主窗口 ViewModel：启动先停在工位选择页，点哪个进哪个（整机测试 / 单板测试 / 烧录），各页自带返回键。
+    /// 整机页三栏：模块库（左）→ 拖拽组建测试方案（中）→ 查看模块测试明细（右）。
+    /// 三个工位各一层页面而不是顶部并排页签：一台机器只干一摊活，把另外两摊的按钮一直摆在眼前只会让人怀疑走错了工位。
+    /// 单板不走模块库与方案（固定四项、按通道跑），所以方案那套只服务整机。
+    /// 类别以 TestModuleModel.Category 为准（Spec 目录逐个声明），界面只按它过滤，不按模块 Id 前缀猜。
     /// </summary>
     public class MainViewModel : ViewModelBase, IDropTarget
     {
@@ -25,34 +29,50 @@ namespace TORNPISolution.ViewModels
         private readonly ITestItemService _testItemService;
         private readonly ITestPlanService _testPlanService;
         private readonly ITestModuleService _moduleService;
+        private readonly IAppStateService _appState;
+        // 烧录工位的界面数据：与测试方案共用一个窗口但各跑各的一轮，切页与开方案时互当闸门
+        private readonly FlashingViewModel _flashing;
+        // 单板工位的界面数据：按通道跑固定几项，不走模块库与方案
+        private readonly BoardChannelViewModel _board;
+        // 主窗口停在哪个页面：启动永远先落在工位选择页，让人自己点进去
+        private WorkbenchPage _selectedPage = WorkbenchPage.Entry;
+        // 上一次进的工位：只在入口页念一句“上次在…”，不替人决定进哪一页
+        private WorkbenchPage _lastStation = WorkbenchPage.WholeMachine;
+        // 模块库当前停在哪个类别：单板已改成按通道跑，这一项现在恒为整机
+        private ModuleCategory _libraryCategory = ModuleCategory.WholeMachine;
+        // 全量目录快照（整机+单板都在这）：按 Id 查模块只认这份，界面上的过滤清单另开一份
+        private readonly List<TestModuleViewModel> _catalog = new();
         private TestModuleViewModel? _selectedPlanModule;
         private bool _isLibraryVisible = false;
         private bool _isRunning;
         private string _currentPlanName = string.Empty;
         // 运行期间的取消令牌：点"停止"时 Cancel
         private CancellationTokenSource? _runCts;
+        // 一轮 RunPlan 收尾（含 finally 里的退测试模式/泄压/关共享会话）完成后置位，供关窗口时等待
+        private TaskCompletionSource? _runDone;
+        // 关窗口时已在等收尾：避免重复点关闭叠多层消息泵
+        private bool _awaitingWrapUp;
 
         /// <summary>血压模拟仪方案级共享会话（单例）：RunPlan 开始建立、结束关闭，模块间不复关复开串口</summary>
-        private readonly BloodPressureSimulatorSession? _simSession;
+        private readonly BloodPressureSimulatorSession _simSession;
 
-        // XAML <vm:MainViewModel/> 要求无参构造：依赖从 App 组合根解析（Spec/TestItem 均为单例，事件订阅同一实例）
-        public MainViewModel()
-            : this(App.Services.GetRequiredService<ITestModuleService>(),
-                   App.Services.GetRequiredService<ITestItemService>(),
-                   App.Services.GetRequiredService<ITestPlanService>())
-        {
-        }
-
-        public MainViewModel(ITestModuleService moduleService, ITestItemService testItemService, ITestPlanService? testPlanService = null)
+        public MainViewModel(ITestModuleService moduleService, ITestItemService testItemService,
+                             ITestPlanService testPlanService, IAppStateService appState,
+                             FlashingViewModel flashing, BoardChannelViewModel board,
+                             BloodPressureSimulatorSession simSession)
         {
             _testItemService = testItemService;
             _moduleService = moduleService;
-            _testPlanService = testPlanService ?? App.Services.GetRequiredService<ITestPlanService>();
-            try { _simSession = App.Services.GetRequiredService<BloodPressureSimulatorSession>(); }
-            catch { /* 设计期上下文等容器不可用时忽略，RunPlan 不建共享会话 */ }
+            _testPlanService = testPlanService;
+            _appState = appState;
+            _flashing = flashing;
+            _board = board;
+            _simSession = simSession;
 
-            AvailableModules = new ObservableCollection<TestModuleViewModel>(
-                moduleService.GetAllModules().Select(m => new TestModuleViewModel(m)));
+            // 启动一律先回工位选择页；上一次在哪个工位只当一句提示，不再直接把人带进那一页
+            _lastStation = appState.LoadLastPage();
+            if (_lastStation == WorkbenchPage.Entry) _lastStation = WorkbenchPage.WholeMachine;
+            RefreshModuleCatalog();
 
             AddToPlanCommand = new RelayCommand<TestModuleViewModel>(m => AddModuleToPlan(m));
             RemoveFromPlanCommand = new RelayCommand<TestModuleViewModel>(RemoveModuleFromPlan, _ => !IsRunning);
@@ -61,11 +81,20 @@ namespace TORNPISolution.ViewModels
             RunOrStopCommand = new RelayCommand(RunOrStop, () => PlanModules.Count > 0 || IsRunning);
             ResetPlanCommand = new RelayCommand(ResetPlan, () => PlanModules.Count > 0 && !IsRunning);
             ToggleLibraryCommand = new RelayCommand(() => IsLibraryVisible = !IsLibraryVisible);
+            // 三个入口各一个命令（入口页上点），各工位页左上角一个返回键；任一边在跑就不让走
+            OpenWholeMachinePageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.WholeMachine), CanSwitchPage);
+            OpenBoardPageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.Board), CanSwitchPage);
+            OpenFlashingPageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.Flashing), CanSwitchPage);
+            BackToEntryCommand = new RelayCommand(BackToEntry, CanSwitchPage);
             SavePlanCommand = new RelayCommand(SavePlan, () => PlanModules.Count > 0 && !IsRunning);
             LoadPlanCommand = new RelayCommand(LoadPlan, () => !IsRunning);
 
             // 方案增删/移动时统一刷新执行序号，保证序号始终跟随数据顺序
-            PlanModules.CollectionChanged += (_, _) => RefreshSequences();
+            PlanModules.CollectionChanged += (_, _) =>
+            {
+                RefreshSequences();
+                OnPropertyChanged(nameof(ShowOverviewWaveformButton));
+            };
 
             // BP-001 压力采样点实时上抛 → 收集后节流刷新波形图
             _testItemService.PressureSampled += OnPressureSampled;
@@ -73,28 +102,39 @@ namespace TORNPISolution.ViewModels
             // 设备连接失败 → 弹出 HandyControl Growl 通知
             _testItemService.DeviceConnectionFailed += OnDeviceConnectionFailed;
 
-            // 启动时自动加载上次使用的方案
+            // 测试项需要人工操作（如短按产品物理键）→ 弹模态提示框，测试员点确定后测试线程才继续跑
+            _testItemService.OperatorPromptRequested += OnOperatorPromptRequested;
+
+            // 启动时自动加载原有使用的方案
             AutoLoadLastPlan();
         }
 
-        // ==================== 测试项压力波形（每个带波形的测试项独立采集/展开） ====================
+        // ==================== 测试项波形（每个带波形的测试项独立采集/展开，一项可上两条曲线） ====================
+
+        /// <summary>曲线编号：产品回传曲线（与 TestItem.WaveformSeriesProduct 同一约定）</summary>
+        private const int ProductWaveformSeries = 1;
 
         private readonly object _waveformLock = new();
-        private readonly Dictionary<string, List<PressureSamplePoint>> _waveformBuffers = new();
+        /// <summary>采样缓存：键=(测试项名, 曲线号)，0=仪器输出曲线、1=产品回传曲线（仅 A10 用 1）</summary>
+        private readonly Dictionary<(string Item, int Series), List<PressureSamplePoint>> _waveformBuffers = new();
+        /// <summary>本轮新增过采样点的缓冲键：刷新 UI 只复制这些键，长采集下不随全部缓冲点数放大</summary>
+        private readonly HashSet<(string Item, int Series)> _waveformDirty = new();
         private DateTime _lastWaveformFlush = DateTime.MinValue;
 
-        /// <summary>压力采样点回调（后台线程，带测试项名）：按项名入缓存，最多 150ms 节流刷一次 UI</summary>
+        /// <summary>采样点回调（后台线程，带测试项名与曲线号）：入对应缓存并标脏，最多 150ms 节流刷一次 UI</summary>
         private void OnPressureSampled(string itemName, PressureSamplePoint point)
         {
+            var key = (itemName, point.Series);
             lock (_waveformLock)
             {
-                if (!_waveformBuffers.TryGetValue(itemName, out var list))
+                if (!_waveformBuffers.TryGetValue(key, out var list))
                 {
                     list = new List<PressureSamplePoint>();
-                    _waveformBuffers[itemName] = list;
+                    _waveformBuffers[key] = list;
                 }
 
                 list.Add(point);
+                _waveformDirty.Add(key);
             }
 
             var now = DateTime.UtcNow;
@@ -107,13 +147,24 @@ namespace TORNPISolution.ViewModels
             FlushWaveform();
         }
 
-        /// <summary>把各测试项的采样点快照刷到对应 TestItemViewModel（调度到主线程，按项名匹配）</summary>
+        /// <summary>把本轮变化的采样点快照刷到对应 TestItemViewModel（调度到主线程，按项名+曲线号匹配）</summary>
         private void FlushWaveform()
         {
-            Dictionary<string, PressureSamplePoint[]> snapshots;
+            List<(string Item, int Series, PressureSamplePoint[] Points)> snapshots;
             lock (_waveformLock)
             {
-                snapshots = _waveformBuffers.ToDictionary(kv => kv.Key, kv => kv.Value.ToArray());
+                if (_waveformDirty.Count == 0)
+                {
+                    return;
+                }
+
+                snapshots = new List<(string Item, int Series, PressureSamplePoint[] Points)>(_waveformDirty.Count);
+                foreach (var key in _waveformDirty)
+                {
+                    if (_waveformBuffers.TryGetValue(key, out var list))
+                        snapshots.Add((key.Item, key.Series, list.ToArray()));
+                }
+                _waveformDirty.Clear();
             }
 
             Application.Current?.Dispatcher.InvokeAsync(() =>
@@ -122,21 +173,25 @@ namespace TORNPISolution.ViewModels
                 {
                     foreach (var item in module.Items)
                     {
-                        if (item.HasWaveform && snapshots.TryGetValue(item.Name, out var pts))
+                        if (!item.HasWaveform) continue;
+                        foreach (var (name, series, points) in snapshots)
                         {
-                            item.WaveformSamples = pts;
+                            if (name != item.Name) continue;
+                            if (series == ProductWaveformSeries) item.ProductWaveformSamples = points;
+                            else item.WaveformSamples = points;
                         }
                     }
                 }
             });
         }
 
-        /// <summary>清空波形数据（每轮运行开始前调用：缓存与各测试项的采样点快照）</summary>
+        /// <summary>清空波形数据（每轮运行开始前调用：缓存与各测试项的采样点快照，含产品回传曲线）</summary>
         private void ClearWaveform()
         {
             lock (_waveformLock)
             {
                 _waveformBuffers.Clear();
+                _waveformDirty.Clear();
             }
 
             foreach (var module in PlanModules)
@@ -146,18 +201,85 @@ namespace TORNPISolution.ViewModels
                     if (item.HasWaveform)
                     {
                         item.WaveformSamples = Array.Empty<PressureSamplePoint>();
+                        item.ProductWaveformSamples = Array.Empty<PressureSamplePoint>();
                     }
                 }
             }
         }
 
-        /// <summary>设备连接失败通知：弹出 HandyControl Growl 错误提示</summary>
+        /// <summary>
+        /// 组装某个模块的ECG Signal请求：同一模块多次加入方案时，各次加入的档位项合并在同一条长图上。
+        /// 模块没声明总览（目录里 Overview 为空）则返回 null。
+        /// </summary>
+        public WaveformOverviewRequest? BuildOverviewRequest(string moduleId)
+        {
+            var matched = PlanModules.Where(m => m.Id == moduleId && m.Model.Overview != null).ToList();
+            if (matched.Count == 0) return null;
+            var items = matched.SelectMany(m => m.Items.Where(i => i.HasOverviewWaveform)).ToList();
+            return new WaveformOverviewRequest(moduleId, matched[0].Name, matched[0].Model.Overview!, items);
+        }
+
+        /// <summary>右侧明细头部是否显示“波形窗口”按钮：当前选中模块声明了ECG Signal即显示</summary>
+        public bool ShowOverviewWaveformButton => SelectedPlanModule?.Model.Overview != null;
+
+        /// <summary>
+        /// ECG Signal窗口请求（按模块发起，View 层按模块 Id 各开一个窗口）。
+        /// </summary>
+        public event Action<WaveformOverviewRequest>? WaveformOverviewRequested;
+
+        /// <summary>方案里排到了声明总览的模块，就把它们各自的长图窗口带上来（同一模块只开一个）</summary>
+        private void RaiseWaveformOverviewRequested()
+        {
+            foreach (var id in PlanModules.Where(m => m.Model.Overview != null).Select(m => m.Id).Distinct())
+            {
+                var request = BuildOverviewRequest(id);
+                if (request != null)
+                    WaveformOverviewRequested?.Invoke(request);
+            }
+        }
+
+        /// <summary>设备连接失败的气泡留几秒：够读完两行字，又不至于跑几轮就攒一屏要点关闭的框（HandyControl 内部最低 2 秒）</summary>
+        private const int DeviceFailGrowlSeconds = 5;
+
+        /// <summary>
+        /// 设备连接失败通知：Growl 错误气泡，几秒后自己收。
+        /// HandyControl 的 Error 档在 !IsCustom 时硬置 StaysOpen=true（就是不自动关），8 路一起报错就得挨个点关闭；
+        /// 走 IsCustom=true 才会上启动关闭的计时器，而图标与红色仍按 Error 默认给（源码那边是 ??= 兜底），外观不变。
+        /// 鼠标停在气泡上 HandyControl 会把计时清零，不怕来不及看；同一份内容在页底状态条、明细表与日志里都还在。
+        /// </summary>
         private void OnDeviceConnectionFailed(string moduleName, string message)
         {
             Application.Current?.Dispatcher.InvokeAsync(() =>
             {
-                Growl.ErrorGlobal($"【{moduleName}】{message}");
+                Growl.ErrorGlobal(new GrowlInfo
+                {
+                    Message = $"【{moduleName}】{message}",
+                    WaitTime = DeviceFailGrowlSeconds,
+                    IsCustom = true,
+                });
             });
+        }
+
+        /// <summary>
+        /// 人工操作提示：弹模态框告知测试员该按哪个键，用户点确定前测试线程挂在这里等。
+        /// MessageBox 自己的模态消息循环会继续泵消息，UI 线程不会冻住；点确定后 InvokeAsync 的 Task 完成。
+        /// 注意：模态框期间主窗口不可操作，“停止”按钮要等点完确定才点得到。
+        /// </summary>
+        private Task OnOperatorPromptRequested(string moduleName, string message)
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null) return Task.CompletedTask;
+
+            return dispatcher.InvokeAsync(() =>
+            {
+                const string caption = "测试操作提示";
+                var text = $"【{moduleName}】\n\n{message}";
+                var owner = Application.Current?.MainWindow;
+                if (owner != null && owner.IsLoaded)
+                    System.Windows.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                    System.Windows.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            }).Task;
         }
 
         // ==================== gong-wpf-dragdrop 落点处理 ====================
@@ -171,7 +293,7 @@ namespace TORNPISolution.ViewModels
             }
 
             dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
-            dropInfo.Effects = ReferenceEquals(dropInfo.DragInfo?.SourceCollection, AvailableModules)
+            dropInfo.Effects = ReferenceEquals(dropInfo.DragInfo?.SourceCollection, LibraryModules)
                 ? DragDropEffects.Copy
                 : DragDropEffects.Move;
         }
@@ -186,7 +308,7 @@ namespace TORNPISolution.ViewModels
 
             var insertIndex = dropInfo.InsertIndex;
 
-            if (ReferenceEquals(dropInfo.DragInfo?.SourceCollection, AvailableModules))
+            if (ReferenceEquals(dropInfo.DragInfo?.SourceCollection, LibraryModules))
             {
                 AddModuleToPlan(module, insertIndex);
                 return;
@@ -210,18 +332,88 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>模块库：所有可用的测试模块（模板）</summary>
-        public ObservableCollection<TestModuleViewModel> AvailableModules { get; }
+        /// <summary>
+        /// 模块库显示清单：只放当前工位类别的模块，XAML 绑定与拖拽源都吃它。
+        /// 全量清单在 _catalog：方案加载/重建要按 Id 查任意类别的模块，拿这份过滤后的清单查会静默查不着、方案变空。
+        /// </summary>
+        public ObservableCollection<TestModuleViewModel> LibraryModules { get; } = new();
+
+        /// <summary>当前工位类别显示名（模块库副标题）</summary>
+        public string LibraryCategoryText => _libraryCategory.ToDisplay();
+
+        /// <summary>模块库标题：直接写清这一页是哪类工位，不再靠卡片翻面表达</summary>
+        public string LibraryTitleText => $"{_libraryCategory.ToShortDisplay()}模块库";
+
+        /// <summary>这一页有没有模块：单板目录项少，空了就在列表位置显示占位提示</summary>
+        public bool HasLibraryModules => LibraryModules.Count > 0;
+
+        /// <summary>烧录工位的界面数据：XAML 把 FlashingView 的 DataContext 接到它上</summary>
+        public FlashingViewModel Flashing => _flashing;
+
+        /// <summary>单板工位的界面数据：XAML 把 BoardChannelView 的 DataContext 接到它上</summary>
+        public BoardChannelViewModel Board => _board;
+
+        /// <summary>主窗口当前停在哪个页面（只能由入口页的四个命令改，绑定不回写）</summary>
+        public WorkbenchPage SelectedPage
+        {
+            get => _selectedPage;
+            private set
+            {
+                if (!SetProperty(ref _selectedPage, value)) return;
+
+                OnPropertyChanged(nameof(IsEntryPage));
+                OnPropertyChanged(nameof(IsWholeMachinePage));
+                OnPropertyChanged(nameof(IsBoardPage));
+                OnPropertyChanged(nameof(IsFlashingPage));
+                OnPropertyChanged(nameof(ShowBackButton));
+                OnPropertyChanged(nameof(LastStationHintText));
+            }
+        }
+
+        /// <summary>停在工位选择页：三个入口都在这，进去了就不该再看见另外两摊</summary>
+        public bool IsEntryPage => SelectedPage == WorkbenchPage.Entry;
+
+        /// <summary>停在整机页：只有这一页还走模块库 + 方案那三栏</summary>
+        public bool IsWholeMachinePage => SelectedPage == WorkbenchPage.WholeMachine;
+
+        /// <summary>停在单板页：按通道跑的界面，与模块库无关</summary>
+        public bool IsBoardPage => SelectedPage == WorkbenchPage.Board;
+
+        /// <summary>停在烧录页</summary>
+        public bool IsFlashingPage => SelectedPage == WorkbenchPage.Flashing;
+
+        /// <summary>菜单行最右侧那枚返回键要不要给（入口页上没有自己可返）</summary>
+        public bool ShowBackButton => !IsEntryPage;
+
+        /// <summary>入口页注释</summary>
+        public string LastStationHintText => $"上次这台机器用的是：{_lastStation.ToDisplay()}";
 
         /// <summary>
-        /// 重建模块库快照：M05 等目录项按当前仪器配置动态生成（如 BP-003 一点一项），
-        /// 配置改点后无需重启——加载方案、展开模块库、点运行时都会先走这里。
+        /// 重建模块库快照：A05/A06/A21 等目录项按当前仪器配置动态生成（BP-003 一点一项、BP-004 一组一轮一项 + 每组重复性、BP-005 一点一轮一项 + 每点重复性），
+        /// 配置改点后无需重启，但只有走到本方法才重建快照：展开模块库、加载方案、点运行三处；关掉配置对话框不触发，改完直接拖模块拿到的仍是上一份快照。
         /// </summary>
         private void RefreshModuleCatalog()
         {
-            AvailableModules.Clear();
+            BuildCatalog();
+            FillLibraryModules();
+        }
+
+        /// <summary>全量快照：两类工位的目录项都收进来，按 Id 查模块（方案加载、方案内重建）</summary>
+        private void BuildCatalog()
+        {
+            _catalog.Clear();
             foreach (var m in _moduleService.GetAllModules())
-                AvailableModules.Add(new TestModuleViewModel(m));
+                _catalog.Add(new TestModuleViewModel(m));
+        }
+
+        /// <summary>显示清单</summary>
+        private void FillLibraryModules()
+        {
+            LibraryModules.Clear();
+            foreach (var m in _catalog.Where(x => x.Category == _libraryCategory))
+                LibraryModules.Add(m);
+
+            OnPropertyChanged(nameof(HasLibraryModules));
         }
 
         /// <summary>按最新目录重建方案内模块实例，保证运行判定与界面项清单一致</summary>
@@ -230,7 +422,7 @@ namespace TORNPISolution.ViewModels
             var selectedId = SelectedPlanModule?.Id;
             for (var i = 0; i < PlanModules.Count; i++)
             {
-                var fresh = AvailableModules.FirstOrDefault(m => m.Id == PlanModules[i].Id);
+                var fresh = _catalog.FirstOrDefault(m => m.Id == PlanModules[i].Id);
                 if (fresh != null)
                     PlanModules[i] = fresh.CreateInstance();
             }
@@ -252,6 +444,7 @@ namespace TORNPISolution.ViewModels
                 {
                     HasSelectedPlanModule = _selectedPlanModule != null;
                     OnPropertyChanged(nameof(SelectedModuleItems));
+                    OnPropertyChanged(nameof(ShowOverviewWaveformButton));
                     SelectedPlanModuleChanged?.Invoke(this, value);
                 }
             }
@@ -261,12 +454,11 @@ namespace TORNPISolution.ViewModels
         public event EventHandler<TestModuleViewModel?>? SelectedPlanModuleChanged;
 
         /// <summary>
-        /// 当前选中模块的测试项集合（右侧明细表直接绑定此拍平属性，
-        /// 不用 SelectedPlanModule.Items 深层路径，避免选中切换时路径绑定失效）
+        /// 当前选中模块的测试项集合
         /// </summary>
         public ObservableCollection<TestItemViewModel> SelectedModuleItems =>SelectedPlanModule?.Items ?? new ObservableCollection<TestItemViewModel>();
 
-        /// <summary>模块库面板是否展开；展开时按最新配置重建目录（M05 等动态项跟随压力点勾选）</summary>
+        /// <summary>模块库面板是否展开；展开时按最新配置重建目录</summary>
         public bool IsLibraryVisible
         {
             get => _isLibraryVisible;
@@ -282,7 +474,13 @@ namespace TORNPISolution.ViewModels
         public bool IsRunning
         {
             get => _isRunning;
-            private set => SetProperty(ref _isRunning, value);
+            private set
+            {
+                if (!SetProperty(ref _isRunning, value)) return;
+
+                // 方案跑完是后台回调落回 UI 线程，没有输入事件，不补这一句那一排按钮会一直灰着等人去点别处
+                RequeryCommands();
+            }
         }
 
         /// <summary>
@@ -313,8 +511,7 @@ namespace TORNPISolution.ViewModels
         };
 
         /// <summary>
-        /// 右侧明细面板是否有内容可显示：独立标志手动控制，仅在选中模块
-        /// 变化时更新，UI 重新求值时直接读标志，不再依赖计算属性
+        /// 右侧明细面板是否有内容可显示
         /// </summary>
         private bool _hasSelectedPlanModule;
         public bool HasSelectedPlanModule
@@ -332,6 +529,10 @@ namespace TORNPISolution.ViewModels
         public ICommand RunOrStopCommand { get; }
         public ICommand ResetPlanCommand { get; }
         public ICommand ToggleLibraryCommand { get; }
+        public ICommand OpenWholeMachinePageCommand { get; }
+        public ICommand OpenBoardPageCommand { get; }
+        public ICommand OpenFlashingPageCommand { get; }
+        public ICommand BackToEntryCommand { get; }
         public ICommand SavePlanCommand { get; }
         public ICommand LoadPlanCommand { get; }
 
@@ -501,6 +702,21 @@ namespace TORNPISolution.ViewModels
                     return;
                 }
 
+                // 烧录轮跑着时不开测试方案：两边都是现场人手一直在盯着的活，叠着跑只会两边都看不清结果
+                if (FlashRunState.IsRunning)
+                {
+                    _log.Warn("烧录轮正在跑，忽略启动测试方案的请求");
+                    return;
+                }
+
+                // 单板那一轮也在抢同一批仪器（综测仪/读码器/网关），它跑着时同样不开方案：
+                // 上面已经挡过自己的 IsRunning，所以 TestRunState 这里为真只可能是单板那一轮占着
+                if (TestRunState.IsRunning)
+                {
+                    _log.Warn("单板轮次正在跑，忽略启动测试方案的请求");
+                    return;
+                }
+
                 RunPlan();
             }
             catch (Exception ex)
@@ -515,10 +731,8 @@ namespace TORNPISolution.ViewModels
         }
 
         /// <summary>
-        /// 运行整体测试方案（异步）：按方案顺序逐个模块执行，失败不中断，
+        /// 运行整体测试方案（异步）：、
         /// 全部测完后统一汇总：任一小项失败即整体 NG。
-        /// 异步执行期间 UI 不卡顿，可实时看到每个模块的结果逐个刷新。
-        /// 具体测量逻辑在 TestItem 类里，按方案拖拽排序的执行序号逐模块调用（TestItemxx）。
         /// 运行中点"停止"会取消令牌：当前模块尽快退出，后续模块不再执行。
         /// </summary>
         private async void RunPlan()
@@ -530,22 +744,23 @@ namespace TORNPISolution.ViewModels
 
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
             IsRunning = true;
-            TestRunState.SetRunning(true);  
+            TestRunState.SetRunning(true);
             _runCts = new CancellationTokenSource();
-            var token = _runCts.Token;
-
-            // 动态项跟随最新配置：重建目录与方案实例（M05 一点一项等），再开始本轮，
-            // 保证运行判定、结果回填与界面项清单用的是同一份最新目录
-            RefreshModuleCatalog();
-            RebuildPlanModulesFromCatalog();
-
-            _testItemService.BeginPlanRun();   // 复位方案级产品通讯状态
-            ClearWaveform();   // 新一轮测试清空上一轮波形
-            _log.Info($"===== 开始执行测试方案，共 {PlanModules.Count} 个模块 =====");
-            
+            _runDone = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
             try
             {
+                var token = _runCts.Token;
+
+                // 动态项跟随最新配置
+                RefreshModuleCatalog();
+                RebuildPlanModulesFromCatalog();
+
+                _testItemService.BeginPlanRun();   // 复位方案级产品通讯状态
+                ClearWaveform();   // 新一轮测试清空上一轮波形
+                RaiseWaveformOverviewRequested();   // 声明了ECG Signal的模块，每轮开始执行前自动带出长图窗口
+                _log.Info($"===== 开始执行测试方案，共 {PlanModules.Count} 个模块 =====");
+
                 // 新一轮测试前先清除上一轮结果
                 foreach (var module in PlanModules)
                 {
@@ -566,8 +781,9 @@ namespace TORNPISolution.ViewModels
                     async Task OnItemCompleted(string itemName, TestItemResult result)
                     {
                         var item = module.Items.FirstOrDefault(it => it.Name == itemName);
-                        if (item == null) return;   
-                        Application.Current.Dispatcher.Invoke(() => item.ApplyResult(result));
+                        if (item == null) return;
+                        // 用可等的 InvokeAsync，不用阻塞式 Invoke：UI 线程忙（正画波形）时会把上报线程硬按住且取消不下来
+                        await Application.Current.Dispatcher.InvokeAsync(() => item.ApplyResult(result));
                         if (item.Result == TestResultStatus.Fail)
                             _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} = {item.MeasuredValueText} 超规格 {item.SpecText} -> FAIL");
                         await Task.Delay(300, token);
@@ -583,8 +799,8 @@ namespace TORNPISolution.ViewModels
                     {
                         foreach (var item in module.Items)
                         {
-                            // 不判定项（演示/预留）保持“未测试”，不强制 FAIL
-                            if (item.IsReportedNotJudged) continue;   
+                            // 不判定项（演示/预留/仅统计）保持“未测试”，不强制 FAIL
+                            if (item.IsReportedNotJudged || item.IsDisplayOnly) continue;
                             if (results.ContainsKey(item.Name) && item.Result != TestResultStatus.NotTested) continue;
                             if (item.Result == TestResultStatus.NotTested)
                             {
@@ -624,11 +840,49 @@ namespace TORNPISolution.ViewModels
                     catch (Exception ex) { _log.Warn($"血压模拟仪共享会话关闭异常：{ex.Message}"); }
                 }
 
-                _runCts.Dispose();
+                _runCts?.Dispose();
                 _runCts = null;
                 IsRunning = false;
                 TestRunState.SetRunning(false);
                 _log.Info($"{DateTime.Now} Ended calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
+
+                // 收尾全部做完才放行关窗口的等待（前面任何一步抛异常也不能漏这一句）
+                _runDone?.TrySetResult();
+            }
+        }
+
+        /// <summary>
+        /// 关窗口前调用：运行中先请求停止
+        /// </summary>
+        public void StopAndAwaitWrapUp(int timeoutMs = 10_000)
+        {
+            if (!IsRunning || _awaitingWrapUp) return;   // 消息泵期间再进来一次（比如又点一次关闭）直接返回，不叠消息泵
+            _awaitingWrapUp = true;
+
+            try
+            {
+                _log.Info("===== 关闭窗口：先请求停止，等测试项收尾 =====");
+                _runCts?.Cancel();
+
+                var pending = _runDone;
+                if (pending == null || pending.Task.IsCompleted) return;
+
+                var dispatcher = Application.Current?.Dispatcher;
+                if (dispatcher == null) return;
+
+                // 收尾靠 UI 线程继续跑，只能泵消息等它。两个回调都排回 UI 线程执行：
+                // UI 线程没进泵循环之前 Invoke 不会返回，顺带避开“退出标志比 PushFrame 先生效”的抢时间问题
+                var frame = new DispatcherFrame();
+                pending.Task.ContinueWith(_ => dispatcher.Invoke(() => frame.Continue = false), TaskScheduler.Default);
+                _ = Task.Delay(timeoutMs).ContinueWith(_ => dispatcher.Invoke(() => frame.Continue = false), TaskScheduler.Default);
+                Dispatcher.PushFrame(frame);   // 静态方法：当前就在 UI 线程上泵消息
+
+                if (IsRunning)
+                    _log.Warn($"测试项收尾等待 {timeoutMs / 1000}s 仍未完成，不阻拦退出；设备可能还停在测试模式，建议手动停气/断电");
+            }
+            finally
+            {
+                _awaitingWrapUp = false;
             }
         }
 
@@ -663,13 +917,73 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(PlanResultText));
         }
 
+        // ==================== 页面切换（工位选择页 ↔ 三个工位） ====================
+
+
+        private bool CanSwitchPage() => !IsRunning && !_flashing.IsRunning && !_board.IsRunning;
+
+        /// <summary>
+        /// 各页自己的方案
+        /// </summary>
+        private void SwitchPage(WorkbenchPage target)
+        {
+            _log.Info($"{DateTime.Now} Start calling the MainViewModel.SwitchPage() method . {Environment.NewLine}");
+            try
+            {
+                if (target == SelectedPage || target == WorkbenchPage.Entry) return;
+
+                if (!CanSwitchPage())
+                {
+                    _log.Warn($"测试方案、单板轮次或烧录轮正在跑，忽略进入{target.ToDisplay()}的请求");
+                    return;
+                }
+
+                SelectedPage = target;
+                _lastStation = target;
+                _appState.SaveLastPage(target);
+                OnPropertyChanged(nameof(LastStationHintText));
+
+                _log.Info($"已进入{target.ToDisplay()}：模块库 {LibraryModules.Count} 项，方案 {PlanModules.Count} 个模块（各页东西互不清）");
+            }
+            finally
+            {
+                _log.Info($"{DateTime.Now} Ended calling the MainViewModel.SwitchPage() method . {Environment.NewLine}");
+            }
+        }
+
+        /// <summary>从工位页回选择页</summary>
+        private void BackToEntry()
+        {
+            if (SelectedPage == WorkbenchPage.Entry) return;
+
+            if (!CanSwitchPage())
+            {
+                _log.Warn("这一轮还在跑，先停下再回工位选择页");
+                return;
+            }
+
+            var from = SelectedPage;
+            SelectedPage = WorkbenchPage.Entry;
+            _log.Info($"已从{from.ToDisplay()}页回到工位选择页");
+        }
+
+        /// <summary>
+        /// 加载方案后确实换了一层界面：这里只刷标题与列表
+        /// </summary>
+        private void ApplyPlanCategory(ModuleCategory category)
+        {
+            if (category == ModuleCategory.Board)
+                _log.Warn("这仍是一份单板方案：单板页现在按通道跑固定几项，这份方案里的模块仍会在整机页里整批跑");
+
+            OnPropertyChanged(nameof(LibraryCategoryText));
+            OnPropertyChanged(nameof(LibraryTitleText));
+        }
+
         // ==================== 方案保存/加载 ====================
 
         /// <summary>保存当前方案为 JSON</summary>
         private void SavePlan()
         {
-            // 实际保存逻辑由 SavePlanWithName 方法完成，View 层调用
-            // 这里触发一个事件让 View 弹出输入框
             SavePlanRequested?.Invoke(this, EventArgs.Empty);
         }
 
@@ -690,6 +1004,8 @@ namespace TORNPISolution.ViewModels
                 var config = new TestPlanConfig
                 {
                     PlanName = planName,
+                    // 存下所属工位：下次从另一面看到这名字也知道不是自己这一摊，方案列表也按它过滤
+                    Category = _libraryCategory,
                     ModuleIds = PlanModules.Select(m => m.Id).ToList()
                 };
 
@@ -707,7 +1023,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>加载方案（由 View 层提供方案名称选择）</summary>
+        /// <summary>加载方案</summary>
         private void LoadPlan()
         {
             LoadPlanRequested?.Invoke(this, EventArgs.Empty);
@@ -716,10 +1032,41 @@ namespace TORNPISolution.ViewModels
         /// <summary>方案加载请求事件</summary>
         public event EventHandler? LoadPlanRequested;
 
-        /// <summary>获取所有已保存的方案名称</summary>
+        /// <summary>
+        /// 当前工位可加载的方案名
+        /// </summary>
         public IReadOnlyList<string> GetAvailablePlanNames()
         {
-            return _testPlanService.GetPlanNames();
+            // 要知道每份方案属于哪一类就得拿全量目录查，这时还没走到加载那一步，先把快照建好
+            BuildCatalog();
+            return _testPlanService.GetAllPlans()
+                .Where(kv => ResolvePlanCategory(kv.Value) == _libraryCategory)
+                .Select(kv => kv.Key)
+                .OrderBy(name => name)
+                .ToList();
+        }
+
+        /// <summary>方案属于哪个工位：存盘字段优先，缺失就按模块在全量目录里查到的类别推断，还查不出来就算当前这一面</summary>
+        private ModuleCategory ResolvePlanCategory(TestPlanConfig config)
+            => config.Category
+               ?? config.ModuleIds.Select(TestModuleIds.NormalizeLegacyId)
+                                  .Select(id => _catalog.FirstOrDefault(m => m.Id == id)?.Category)
+                                  .FirstOrDefault(c => c.HasValue)
+               ?? _libraryCategory;
+
+        /// <summary>
+        /// 别的工位类别是不是已经占了这个名字（View 保存前问一句）：方案名就是文件名，
+        /// 整机/单板同名会互相覆盖，而两边界面看着毫无关系，撞了很难查——所以拦一下。
+        /// </summary>
+        public bool IsPlanNameTakenByOtherCategory(string planName)
+        {
+            if (string.IsNullOrWhiteSpace(planName)) return false;
+
+            BuildCatalog();
+            return _testPlanService.GetAllPlans()
+                .Where(kv => ResolvePlanCategory(kv.Value) != _libraryCategory)
+                .Any(kv => string.Equals(kv.Key, planName, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(kv.Value.PlanName, planName, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>按名称加载方案</summary>
@@ -740,30 +1087,43 @@ namespace TORNPISolution.ViewModels
                     return;
                 }
 
-                // 按最新配置重建目录，再按 Id 取模块
-                RefreshModuleCatalog();
+                // 按最新配置重建全量目录（推断方案类别、按 Id 取模块都靠它）
+                BuildCatalog();
+
+                // 老方案文件里存的是已弃用的 M 编号：读入时映射成同尾号的 A，下次保存自然升级
+                var moduleIds = config.ModuleIds.Select(TestModuleIds.NormalizeLegacyId).ToList();
+                var planCategory = ResolvePlanCategory(config);
+
+                // 加载触发的换面走程序路径
+                ApplyPlanCategory(planCategory);
+                FillLibraryModules();
 
                 // 清空当前方案
                 SelectedPlanModule = null;
                 PlanModules.Clear();
 
-                // 按配置顺序从模块库中查找并加入方案
-                foreach (var moduleId in config.ModuleIds)
+                // 按配置顺序从全量目录中查找并加入方案
+                foreach (var moduleId in moduleIds)
                 {
-                    var module = AvailableModules.FirstOrDefault(m => m.Id == moduleId);
-                    if (module != null)
-                    {
-                        var instance = module.CreateInstance();
-                        PlanModules.Add(instance);
-                    }
-                    else
+                    var module = _catalog.FirstOrDefault(m => m.Id == moduleId);
+                    if (module == null)
                     {
                         _log.Warn($"模块 [{moduleId}] 在模块库中不存在，已跳过");
+                        continue;
                     }
+
+                    // 手改文件塞进了另一类工位的模块：只装本类的，其余跳过，免得一份方案跨两套治具
+                    if (module.Category != planCategory)
+                    {
+                        _log.Warn($"模块 [{moduleId}] 属于{module.Category.ToDisplay()}，与方案所属的{planCategory.ToDisplay()}不是同一工位，已跳过");
+                        continue;
+                    }
+
+                    PlanModules.Add(module.CreateInstance());
                 }
 
                 CurrentPlanName = planName;
-                _log.Info($"方案 [{planName}] 已加载，共 {PlanModules.Count} 个模块");
+                _log.Info($"方案 [{planName}] 已加载（{planCategory.ToDisplay()}），共 {PlanModules.Count} 个模块");
             }
             catch (Exception ex)
             {
@@ -775,7 +1135,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>启动时自动加载上次使用的方案</summary>
+        /// <summary>启动时自动加载原有使用的方案</summary>
         private void AutoLoadLastPlan()
         {
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.AutoLoadLastPlan() method . {Environment.NewLine}");

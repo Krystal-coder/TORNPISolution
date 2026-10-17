@@ -10,6 +10,7 @@ namespace TORNPISolution.Service
     public sealed class TestItemResultCollector
     {
         private readonly Dictionary<string, TestItemResult> _results;
+        private readonly HashSet<string> _written = new();
         private readonly Func<string, TestItemResult, Task>? _onItemCompleted;
 
         public TestItemResultCollector(
@@ -28,9 +29,13 @@ namespace TORNPISolution.Service
         public async Task SetAsync(string key, TestItemResult value)
         {
             _results[key] = value;
+            _written.Add(key);
             if (_onItemCompleted != null)
                 await _onItemCompleted(key, value);
         }
+
+        /// <summary>本模块实际报过名的项（自检拿它和目录项清单比对，看哪一项漏报）</summary>
+        public IReadOnlyCollection<string> WrittenKeys => _written;
 
         /// <summary>底层结果字典（TestItemxx 最终返回用）</summary>
         public Dictionary<string, TestItemResult> Results => _results;

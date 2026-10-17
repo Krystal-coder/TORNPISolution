@@ -21,14 +21,26 @@ namespace TORNPISolution.Share.Models
         public string Unit { get; set; } = string.Empty;
 
         /// <summary>
-        /// 是否带波形显示（行内波形折叠按钮）：
-        /// 该测试项执行时会上抛实时采样点（压力曲线/仪器输出波形）的项在 Spec 定义时置 true，
-        /// 波形归属与测试项定义放在一起，避免 UI 维护项名白名单。
+        /// 波形呈现模式（无 / 行内折叠 / ECG Signal）：
         /// </summary>
-        public bool ShowWaveform { get; set; }
+        public WaveformPresentation Waveform { get; set; } = WaveformPresentation.None;
 
         /// <summary>
-        /// 测试值来源标识（决定 UI 双列显示位置）：
+        /// 曲线纵轴单位（压力类为 mmHg，电位类为微伏/毫伏）：与规格单位 Unit 不同源，
+        /// 放气速率项规格是 mmHg/s、心率项规格是 BPM，曲线画的仍是压力；空 = 沿用 Unit
+        /// </summary>
+        public string WaveformUnit { get; set; } = string.Empty;
+
+        /// <summary>曲线横轴倍率的配置来源（由目录声明，None = 用界面默认倍率）</summary>
+        public WaveformConfigSource WaveformConfigSource { get; set; } = WaveformConfigSource.None;
+
+        /// <summary>
+        /// 明细表分节标题：同一模块内这个值相同的相邻项归到同一节（节头可折叠），由 Spec 目录声明
+        /// </summary>
+        public string GroupLabel { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 测试值来源标识
         ///   Instrument（默认）= 测试值为仪器侧值，显示在"仪器测试值"列；
         ///   Product = 测试值为产品上报值，显示在"产品上报值"列（如产品信息获取/状态查询）；
         ///   Both = 仪器值与产品上报值双列显示（精度比对类测试项）；
@@ -45,9 +57,7 @@ namespace TORNPISolution.Share.Models
         public bool HideSpecRange { get; set; }
 
         /// <summary>
-        /// 字符串规格（非数值规格项用，如嵌软版本管控）：
-        /// 非空时规格列直接显示该文本，判定由模块执行处按该文本比对；
-        /// 为空时回落到 HideSpecRange/数值范围的显示规则。
+        /// 字符串规格
         /// </summary>
         public string SpecText { get; set; } = string.Empty;
     }

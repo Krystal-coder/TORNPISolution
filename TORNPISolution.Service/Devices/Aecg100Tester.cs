@@ -431,12 +431,12 @@ namespace TORNPISolution.Service.Devices
 
     /// <summary>
     /// 鲸扬 AECG100 多功能综合性能测试仪（WhaleTeq）控制类。
-    /// 通过 P/Invoke 调用 AECG100x64.dll 原生 SDK（与 BPA700 相同接入方式），不走串口协议，SDK 内部处理 USB VCP 通讯。
+    /// 通过 P/Invoke 调用 AECG100x64.dll SDK 内部处理 USB VCP 通讯。
     /// SDK 关键 API 分组见下方 Native 区声明（连接生命周期 / 波形输出 / 频率扫描 / 回放 / PPG 采样 / RLD / 独立模式）。
     /// </summary>
     public class Aecg100Tester : IDisposable
     {
-        #region 原生 SDK P/Invoke 声明（按官方 AECG100.h 1.0.5.4 逐条对齐）
+        #region SDK P/Invoke 声明（按官方 AECG100.h 1.0.5.4 逐条对齐）
 
         private const string DllName = "AECG100x64.dll";
 
@@ -458,7 +458,7 @@ namespace TORNPISolution.Service.Devices
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void SamplingErrorCallbackDelegate(int error);
 
-        // ---------- 原生结构体 ----------
+        // ---------- 结构体 ----------
 
         [StructLayout(LayoutKind.Sequential)]
         private struct MODEL_INFORMATION
@@ -856,7 +856,7 @@ namespace TORNPISolution.Service.Devices
         private readonly ILogService _log;
         private readonly TORNPISolution.Share.Models.Aecg100Settings _settings;
 
-        // 回调委托必须以字段持有，防止被 GC 回收（原生回调发生在 SDK 内部线程）
+        // 回调委托必须以字段持有，防止被 GC 回收（回调发生在 SDK 内部线程）
         private ConnectedCallbackDelegate? _connectedCallback;
         private SamplingCallbackDelegate? _samplingCallback;
         private SamplingErrorCallbackDelegate? _samplingErrorCallback;
@@ -1454,7 +1454,7 @@ namespace TORNPISolution.Service.Devices
 
         #endregion
 
-        #region 托管 ↔ 原生 转换
+        #region 托管 ↔  转换
 
         private OutputSignalCallbackDelegate Wrap(Action<double, int, int>? onData)
         {

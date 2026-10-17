@@ -19,6 +19,12 @@ namespace TORNPISolution.Service.Communication
 
         /// <summary>命令名 → (FuncCode, Code)。键为命令名，天然避免同 Code 不同 Func 的冲突。</summary>
         private static readonly Dictionary<string, ProductCmd> _commands = new();
+
+        /// <summary>
+        /// 命令名 → 默认参数字节（取配置项的 Data 字段）。
+        /// 只给「同 Func+Ctrl、靠参数区分语义」的命令登记（如开始/关闭ECG测试），无参命令不入表。
+        /// </summary>
+        private static readonly Dictionary<string, byte[]> _commandData = new();
         private static readonly object _lock = new();
 
         static ProductProtocol()
@@ -33,9 +39,33 @@ namespace TORNPISolution.Service.Communication
             lock (_lock)
             {
                 _commands.Clear();
+                _commandData.Clear();
                 foreach (var kvp in entries)
+                {
                     _commands[kvp.Key] = new ProductCmd(kvp.Value.FuncCode, kvp.Value.Code);
+                    var data = ParseHexBytes(kvp.Value.Data);
+                    if (data != null)
+                        _commandData[kvp.Key] = data;
+                }
             }
+        }
+
+        /// <summary>解析 HEX 参数文本（空格/短横/逗号分隔）；空、非法或无字节返回 null（由调用方回退代码默认值）。</summary>
+        private static byte[]? ParseHexBytes(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            var tokens = text.Split(new[] { ' ', '-', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            var bytes = new List<byte>(tokens.Length);
+            try
+            {
+                foreach (var t in tokens)
+                    bytes.Add(Convert.ToByte(t, 16));
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            return bytes.Count > 0 ? bytes.ToArray() : null;
         }
 
         /// <summary>重新从 JSON 加载命令码（配置窗口保存后调用）</summary>
@@ -46,6 +76,16 @@ namespace TORNPISolution.Service.Communication
         {
             lock (_lock)
                 return _commands.TryGetValue(name, out var cmd) ? cmd : new ProductCmd(FuncRead, 0x00);
+        }
+
+        /// <summary>
+        /// 按命令名取配置页里的默认参数字节；未配置或配置为空时用 <paramref name="fallback"/>。
+        /// 这样参数在协议命令配置页改了即生效，不改也能跑。
+        /// </summary>
+        public static byte[] ResolveCmdData(string name, byte[] fallback)
+        {
+            lock (_lock)
+                return _commandData.TryGetValue(name, out var data) && data.Length > 0 ? data : fallback;
         }
 
         // ==================== 帧常量 ====================
@@ -113,7 +153,15 @@ namespace TORNPISolution.Service.Communication
         public static ProductCmd GetAccelTilt            => GetCmd("CtrlGetAccelTilt");
         public static ProductCmd GetSpeakerVolume        => GetCmd("CtrlGetSpeakerVolume");
 
-        // ---- 主动推送（Func=0x06，产品→上位机，仅用于识别收到的帧）----
+        // ---- 开始/关闭ECG测试（Func=0x05/Ctrl=0x73，与 CtrlSetMode 同码，参数字节见配置页 Data 列）----
+        // A10 ECG-009 只靠这两条控制产品推送：开始 → 产品持续推 0x8D，关闭 → 停止推送
+        public static ProductCmd StartEcgTest           => GetCmd("CtrlStartEcgTest");
+        public static ProductCmd StopEcgTest            => GetCmd("CtrlStopEcgTest");
+        public const string StartEcgTestKey = "CtrlStartEcgTest";
+        public const string StopEcgTestKey  = "CtrlStopEcgTest";
+
+        // ---- 主动推送（产品→上位机，仅用于识别收到的帧）----
+        // 心电波形实机走 Func=0x05/Ctrl=0x8D（见 protocol_commands.json），其余推送项仍按文档 Func=0x06 登记
         public static ProductCmd PushEcgWave  => GetCmd("CtrlPushEcgWave");
         public static ProductCmd PushEcgHr    => GetCmd("CtrlPushEcgHr");
         public static ProductCmd PushPpgHr    => GetCmd("CtrlPushPpgHr");
@@ -141,12 +189,41 @@ namespace TORNPISolution.Service.Communication
         // ==================== 测试模式枚举（0x73 参数） ====================
 
         public const byte ModeIdle     = 0;
-        public const byte ModeCuffTest = 1;   // 袖带充放气测试（BP-001/002）
+        public const byte ModeCuffTest = 1;   // 袖带充放气模式
         public const byte ModeBpTest   = 2;   // 血压测试（BP-004/005）
         public const byte ModeStatic   = 3;   // 静态压力检测（BP-003）
         public const byte ModeSpo2     = 4;   // 血氧测试
         public const byte ModeEcg      = 5;   // 心电测试（ECG-001~012）
         public const byte ModeAccel    = 6;   // 加速度测试
+
+        // ==================== 心电波形上报（0x8D s_test_report_ecg_wave）====================
+
+        /// <summary>心电波形采样率（SPS）：实机 250 点/秒（设置采样率命令 0x62 未启用，按文档固定值推算时间轴）</summary>
+        public const int EcgSampleRate = 250;
+
+        /// <summary>单帧上报数据长度（字节）：文档“上报数据长度 150” = 75 点 × 2 字节</summary>
+        public const int EcgWavePayloadBytes = 150;
+
+        /// <summary>单帧采样点数：75（= 300ms @ 250SPS）</summary>
+        public const int EcgWaveSamplesPerFrame = EcgWavePayloadBytes / 2;
+
+        /// <summary>
+        /// 解析 0x8D 帧的心电电压数据：payload = 75 × int16 小端，码值 /100 = mV（1 码值 = 10μV）。
+        /// 文档写 uint16_t s_ecg_wave_cache[75]，但实机基线附近为 F8 FF（按 uint16 = 655.28mV 明显不成立），
+        /// 故按 int16 补码解析（负值 = 基线以下），与“收到后需要/100，单位 mV”一致。
+        /// </summary>
+        /// <param name="payload">帧数据区（不含 Func/Ctrl/CRC）</param>
+        /// <returns>mV 数组；payload 不足 2 字节返回 null</returns>
+        public static double[]? ParseEcgWave(byte[] payload)
+        {
+            var count = payload.Length / 2;
+            if (count == 0) return null;
+
+            var millivolts = new double[count];
+            for (var i = 0; i < count; i++)
+                millivolts[i] = (short)ReadUInt16LE(payload, i * 2) / 100.0;
+            return millivolts;
+        }
 
         // ==================== 包构建 ====================
 

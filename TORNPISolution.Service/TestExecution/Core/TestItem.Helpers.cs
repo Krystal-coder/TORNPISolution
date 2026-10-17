@@ -5,7 +5,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：跨模块共用辅助方法（产品握手、PPG 在位检测、心率回读、导联脱落判定、SpO2 精度扫描、波形构建与采集）。
+    /// TestItem 分部：跨模块共用辅助（PPG 在位检测、心率回读、导联脱落判定、SpO2 精度扫描、波形构建与采集，
+    /// 以及 NoInstrumentDemo / GetProductAvailable / PromptOperatorAsync 这些每个模块开头都要调的）。模块本体不放这里。
     /// </summary>
     public partial class TestItem
     {
@@ -55,7 +56,7 @@ namespace TORNPISolution.Service
         /// SpO2 精度扫描公共逻辑：逐点输出红光/红外双通道信号，产品回读比对，按最大偏差点上报双值。
         /// sweepPulseRate=false：points 为血氧设定点（%），脉搏率固定 cfg.Spo2PulseRate，回读产品血氧（0x81）；
         /// sweepPulseRate=true ：points 为脉搏率设定点（BPM），血氧固定 cfg.Spo2PulseRateRefSpo2，回读产品脉搏率（0x7C）。
-        /// 产品不可用/回读失败时比对预留（无有效回读则按 Of(0) 预留上报）。
+        /// 产品不可用/回读失败时本次比对不计入；全程没取到一次有效回读则按“无上报值”判 FAIL（与 BP-003 同口径）。
         /// </summary>
         private async Task RunSpo2AccuracySweepAsync(
             InstrumentConnectionConfig config, TestItemResultCollector collector, string itemName,
@@ -96,7 +97,7 @@ namespace TORNPISolution.Service
                     continue;
                 }
 
-                // 产品回读血氧（0x81）或脉搏率（0x7C）比对；产品不可用时比对预留（偏差计 0）
+                // 产品回读血氧（0x81）或脉搏率（0x7C）比对；无有效回读的这一次不计入偏差统计（不参与“取最大偏差”）
                 if (productAvailable)
                 {
                     using var productRead = _productFactory();
@@ -121,13 +122,13 @@ namespace TORNPISolution.Service
                         }
                         else
                         {
-                            _log.Warn($"{itemName} 设定={point}：产品回读无效（{readValue}），本次比对预留");
+                            _log.Warn($"{itemName} 设定={point}：产品回读无效（{readValue}），本次不计入偏差统计");
                         }
                     }
                     catch (OperationCanceledException) { throw; }
                     catch (Exception ex)
                     {
-                        _log.Warn($"{itemName} 设定={point}：产品回读失败（比对预留）：{ex.Message}");
+                        _log.Warn($"{itemName} 设定={point}：产品回读失败（本次不计入偏差统计）：{ex.Message}");
                     }
                 }
 
@@ -135,12 +136,23 @@ namespace TORNPISolution.Service
                 await Task.Delay(500, token);
             }
 
-            // 取最大偏差点上报双值：仪器列=设定值，产品列=回读值，动态规格=设定值±容差
+            // 取最大偏差点上报双值：仪器列=设定值，产品列=回读值，动态规格=设定值±容差。
+            // 一次有效回读都没拿到时不能再报“偏差 0”：0 落在规格内等于没测到也算合格，
+            // 按 BP-003 同一口径判 FAIL（测试值 NaN 在列里显示 --，产品列写清原因）
             if (double.IsNaN(worstRead))
-                await collector.SetAsync(itemName, TestItemResult.Of(Math.Round(maxDeviation, 2)));
-            else
-                await collector.SetAsync(itemName, TestItemResult.WithDualValues(
-                    worstSet, worstRead, worstSet - tolerance, worstSet + tolerance));
+            {
+                _log.Warn($"{itemName} FAIL：全程未取到产品有效回读（无响应/回读为 0/读取异常），不按偏差 0 判定");
+                await collector.SetAsync(itemName, new TestItemResult
+                {
+                    Value = double.NaN,
+                    InstrumentValue = double.IsNaN(worstSet) ? null : worstSet,
+                    ProductText = productAvailable ? "无产品有效回读" : "产品未连接，无回读"
+                });
+                return;
+            }
+
+            await collector.SetAsync(itemName, TestItemResult.WithDualValues(
+                worstSet, worstRead, worstSet - tolerance, worstSet + tolerance));
         }
 
         /// <summary>
@@ -195,6 +207,12 @@ namespace TORNPISolution.Service
                 return double.NaN;
             }
         }
+
+        /// <summary>波形曲线编号：仪器输出曲线（PressureSamplePoint.Series 默认值，其余模块的单波形项一律用本值）</summary>
+        protected const int WaveformSeriesInstrument = 0;
+
+        /// <summary>波形曲线编号：产品回传曲线（仅 A10 ECG-009 用，UI 与仪器输出曲线叠在同一张图上异色对照）</summary>
+        protected const int WaveformSeriesProduct = 1;
 
         /// <summary>
         /// 输出 ECG 波形并采集回调数据，通过 PressureSampled 事件推送给 UI 显示。
@@ -394,7 +412,7 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 无仪器演示模式拦截：跳过本模块的全部仪器控制（模拟仪/AECG/NFC/电源等）；
-        /// 产品通讯集中在 M16 产品通讯初始化模块，本拦截不再打开产品串口；
+        /// 产品通讯集中在 A16 产品通讯初始化模块，本拦截不再打开产品串口；
         /// 模块内未报告项由 MainViewModel 收尾扫描按读回缺失统一判 FAIL。
         /// 返回 true = 已被本模式拦截，调用方模块应立即 return。
         /// </summary>
@@ -402,12 +420,12 @@ namespace TORNPISolution.Service
         {
             if (!_configService.Load().NoInstrumentDemoMode) return false;
 
-            _log.Info($"{moduleName}：无仪器演示模式，跳过仪器控制（产品通讯集中在 M16 产品通讯初始化）");
+            _log.Info($"{moduleName}：无仪器演示模式，跳过仪器控制（产品通讯集中在 A16 产品通讯初始化）");
             return true;
         }
 
         /// <summary>
-        /// 本轮产品可用性：以 M16 产品通讯初始化握手后的记录为准（不再逐模块重复 0x72/0x74 问询）；
+        /// 本轮产品可用性：以 A16 产品通讯初始化握手后的记录为准（不再逐模块重复 0x72/0x74 问询）；
         /// 本轮方案未包含初始化模块（null）时按模式推断：正式模式视为可用（以实际通讯结果说话），
         /// 无产品演示模式视为不可用（走仪器侧演示分支）。
         /// </summary>
@@ -415,110 +433,20 @@ namespace TORNPISolution.Service
             => _productCommOk ?? !noProductDemoMode;
 
         /// <summary>
-        /// M16 产品通讯初始化：打开产品串口 → 进入产测模式（防休眠，产品断电前不再休眠）→ 0x72 → 0x74。
-        /// 全方案唯一执行产品通讯判定的模块，并记录本轮产品通讯状态供后续模块快速跳过/演示分支；
-        /// 后续模块不再重发进入产测模式与 0x72/0x74。无仪器演示模式下本模块即“只读产品串口”的主体，照常执行。
+        /// 让测试员动手操作（按产品物理键等）：UI 弹模态框，点确定才返回；提示语同时进日志，界面未订阅时只记日志不阻断。
+        /// token 取消就不再等人工确认（已弹出的框仍需人点掉），否则按下“停止”也要等框点完流程才动得起来。
         /// </summary>
-        //测试项目**************************---M16---**************************产品通讯初始化
-        public async Task ProductCommInitModule(TestItemResultCollector collector, CancellationToken token)
+        private async Task PromptOperatorAsync(string moduleName, string message, CancellationToken token)
         {
-            using var product = _productFactory();
-            _productCommOk = await ProductHandshakeAsync(product, collector, token);
-            if (_productCommOk.Value)
-                _log.Info("产品通讯初始化成功：产品已进入产测模式，断电前不会再休眠；后续模块不再重发进入产测模式/0x72/0x74");
-            else
-                _log.Warn("产品通讯初始化失败：后续模块产品依赖项将快速跳过或按读回缺失判 FAIL");
-        }
+            _log.Info($"{moduleName}：{message}");
 
-        /// <summary>
-        /// 打开产品并执行“进入产测模式 + 产品信息获取（MAC/嵌软版本）+ 产品当前状态查询”（仅 M16 产品通讯初始化调用）。
-        /// MAC 读回不为空即合格；嵌软版本与管控规格 Spec.ExpectedFirmwareVersion 比对（烧录老版本 FAIL）。
-        /// 产品未连接/无响应时仅这三项 FAIL，不阻断仪器控制流程——
-        /// 没接产品也能调试 BPA700 侧逻辑，无需在调试器里跳语句。
-        /// 返回产品通讯是否可用。
-        /// </summary>
-        private async Task<bool> ProductHandshakeAsync(IProductController product, TestItemResultCollector collector, CancellationToken token)
-        {
-            try
+            var handler = OperatorPromptRequested;
+            if (handler == null)
             {
-                await product.OpenAsync(token);
-
-                // 进入产测模式（0x07/0x01）：打开串口后立即发送防产品休眠（约10秒无通讯即休眠）；
-                // 协议要求：必须在 0x72/0x74 查询之前发送
-                try
-                {
-                    await product.EnterProductionTestModeAsync(token);
-                    _log.Info("产品进入产测模式发送成功（防休眠）");
-                }
-                catch (Exception ex)
-                {
-                    _log.Warn($"产品进入产测模式发送失败（继续尝试问询）：{ex.Message}");
-                }
-
-                // 产品信息获取（0x72）：回读 MAC + 嵌软版本，拆两项分别上报
-                var (mac, version) = await product.QueryProductInfoAsync(token);
-
-                // MAC 地址：读回不为空即合格
-                if (mac.Length == 0)
-                {
-                    await collector.SetAsync(SpecItems.ProductMacAddress, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品信息获取(MAC地址)无响应（串口已打开但产品无返回），判 FAIL");
-                }
-                else
-                {
-                    await collector.SetAsync(SpecItems.ProductMacAddress, TestItemResult.OfProductText(1, mac));
-                    _log.Info($"产品信息获取(MAC地址)：{mac}");
-                }
-
-                // 嵌软版本：与管控规格比对（版本升级改 Spec.ExpectedFirmwareVersion 一处）
-                var expected = Spec.ExpectedFirmwareVersion;
-                if (version.Length == 0)
-                {
-                    await collector.SetAsync(SpecItems.ProductFirmwareVersion, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品信息获取(嵌软版本)无响应（串口已打开但产品无返回），判 FAIL");
-                }
-                else
-                {
-                    var match = string.Equals(version, expected, StringComparison.OrdinalIgnoreCase);
-                    if (match)
-                        _log.Info($"产品信息获取(嵌软版本)：{version}，与管控规格一致");
-                    else
-                        _log.Warn($"嵌软版本不一致：读回 {version}，管控规格 {expected}，判 FAIL（请确认是否烧录了老版本）");
-                    await collector.SetAsync(SpecItems.ProductFirmwareVersion, TestItemResult.OfProductText(match ? 1 : 0, version));
-                }
-
-                // 产品当前状态查询（返回内容预留待定：有返回即通过，读回内容原样显示在产品列）
-                var status = await product.QueryProductStatusAsync(token);
-                if (!string.IsNullOrWhiteSpace(status))
-                {
-                    await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(1, status));
-                }
-                else
-                {
-                    await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品当前状态查询无响应（串口已打开但产品无返回），判 FAIL");
-                }
-                // TODO: 状态返回格式确定后，改为按状态内容判定
-
-                return true;
+                _log.Warn($"{moduleName}：界面无接收操作提示，未确认测试员是否已按提示操作");
+                return;
             }
-            catch (OperationCanceledException)
-            {
-                // 用户点“停止”：向上层传递，不当作测试异常
-                throw;
-            }
-            catch (Exception ex)
-            {
-                // 产品串口不存在（如 Could not find file 'COM16'）是最常见根因，
-                // 附上系统当前实际存在的串口清单，便于直接核对仪器链接配置里的产品端口
-                var existPorts = string.Join(", ", System.IO.Ports.SerialPort.GetPortNames());
-                _log.Warn($"产品通讯不可用（打开/问询/状态查询失败），[产品信息获取(MAC地址)]/[产品信息获取(嵌软版本)]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：{ex.Message}；系统当前存在串口：[{existPorts}]，请核对仪器链接配置的产品串口号与物理接线");
-                var failResult = TestItemResult.OfProductText(0, "通讯失败");
-                await collector.SetAsync(SpecItems.ProductMacAddress, failResult);
-                await collector.SetAsync(SpecItems.ProductFirmwareVersion, failResult);
-                await collector.SetAsync(SpecItems.ProductStatusQuery, failResult);
-                return false;
-            }
+            await handler(moduleName, message).WaitAsync(token).ConfigureAwait(false);
         }
     }
 }

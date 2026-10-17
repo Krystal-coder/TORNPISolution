@@ -2,7 +2,7 @@ namespace TORNPISolution.Share.Models
 {
     /// <summary>
     /// 鲸扬 AECG100 多功能综合性能测试仪（WhaleTeq）连接与测试配置。
-    /// 设备通过 USB 虚拟串口（VCP）连接，通讯由官方原生 SDK（AECG100x64.dll）处理，
+    /// 设备通过 USB 虚拟串口（VCP）连接，通讯由官方SDK（AECG100x64.dll）处理，
     /// 上位机只需指定 COM 口与连接超时；串口号留空表示自动选择第一台 AECG100。
     /// </summary>
     public class Aecg100Settings
@@ -97,7 +97,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>起搏速率 BPM（默认 60）</summary>
         public int PacingRate { get; set; } = 60;
 
-        // ==================== ECG-009/012 频率扫描配置 ====================
+        // ==================== ECG-009/012 频率扫描配置（ECG-012 暂未实现，保留字段） ====================
 
         /// <summary>频率扫描幅度 mV（默认 1.0）</summary>
         public double FrequencyScanAmplitude { get; set; } = 1.0;
@@ -111,6 +111,66 @@ namespace TORNPISolution.Share.Models
         /// <summary>频率扫描时长 s（默认 30）</summary>
         public int FrequencyScanDuration { get; set; } = 30;
 
+        // ==================== ECG-009 动态范围和线性配置（A10 唯一实现项） ====================
+        // 一项一点，**幅度档为外层、DC 偏置档为内层**（需求给定的推进顺序）：
+        // 0.5mV → 偏置{0,300,-300} 为一轮，1mV、2mV、10mV 同理 → 默认 4 幅度 × 3 偏置 = 12 项。
+        // 项名见 SpecItems.Ecg009Point，Spec 目录与执行端同源生成；幅度档由小到大即“动态范围”，
+        // 同一偏置下各幅度偏差的分布即“线性”。
+
+        /// <summary>ECG-009 三角波幅度档 mV 波峰-波谷（法规值 0.5/1/2/10；≤0 的档在目录构建与执行端均被过滤）</summary>
+        public List<double> Ecg009Amplitudes { get; set; } = new() { 0.5, 1, 2, 10 };
+
+        /// <summary>ECG-009 DC 偏置档 mV（仪器固定偏置模式支持 300/0/-300，即法规三档）</summary>
+        public List<int> Ecg009DcOffsets { get; set; } = new() { 0, 300, -300 };
+
+        /// <summary>ECG-009 波形频率 Hz（法规 6.25，即 160ms 一周期）</summary>
+        public double Ecg009Frequency { get; set; } = 6.25;
+
+        /// <summary>ECG-009 波形类型（0=Sine 1=Triangle 2=Square 3=RectanglePulse 4=TrianglePulse 5=Exponential 6=ECG；法规要 Triangle=1）</summary>
+        public int Ecg009WaveformType { get; set; } = 1;
+
+        /// <summary>ECG-009 输出电极（0=RA/R，255=LA/L，界面二选一）</summary>
+        public int Ecg009Electrode { get; set; } = 0;
+
+        /// <summary>ECG-009 噪声发生器频率（0=Off 1=50Hz 2=60Hz 3=100Hz 4=120Hz；法规要 Off）</summary>
+        public int Ecg009NoiseFrequency { get; set; }
+
+        /// <summary>ECG-009 是否串入 620kΩ 输入阻抗（默认 false＝短路；勾选后本档波形经 620kΩ 输出）</summary>
+        public bool Ecg009Impedance { get; set; }
+
+        /// <summary>
+        /// ECG-009 串口采集丢弃时长 s（仪器开始输出后，先把这么多秒的产品 0x8D 数据丢掉不记录，
+        /// 避开产品刚进入心电测量的起始瞬态；默认 20，即“从第 20 秒开始记”）。
+        /// </summary>
+        public int Ecg009DiscardSeconds { get; set; } = 20;
+
+        /// <summary>
+        /// ECG-009 串口有效采集时长 s（丢弃之后连续记录这么多秒用于判定；默认 60，即有数据段 20s~80s）。
+        /// 单项耗时 = 丢弃 + 有效（+ 换档等待），到点即停仪器输出进下一档。
+        /// </summary>
+        public int Ecg009RecordSeconds { get; set; } = 60;
+
+        /// <summary>ECG-009 换档等待 ms（停输出→下一档开始输出之间，默认 500；替掉原来硬编码的 300ms）</summary>
+        public int Ecg009StepDelayMs { get; set; } = 500;
+
+        /// <summary>ECG-009 允差分段分界幅度 mV（默认 2：≤本值用绝对允差，>本值用百分比允差）</summary>
+        public double Ecg009ToleranceSplitMv { get; set; } = 2;
+
+        /// <summary>ECG-009 幅值允差 %（默认 10；仅用于 >分界档 的幅度档，如 10mV 档 → ±1mV）</summary>
+        public double Ecg009TolerancePercent { get; set; } = 10;
+
+        /// <summary>ECG-009 幅值绝对允差 μV（默认 50；用于 ≤分界档 的小幅度档，即 0.5/1/2mV 三档）</summary>
+        public double Ecg009ToleranceFloorUv { get; set; } = 50;
+
+        /// <summary>
+        /// ECG-009 单档允差（mV），法规分段口径的唯一实现处（Spec 目录与执行端都调本方法，避免两边算法漂开）：
+        /// 幅度 ≤ 分界档（默认 2mV）→ 绝对允差 50μV；幅度 > 分界档（默认 10mV）→ 设定幅度 × 10%。
+        /// </summary>
+        public double Ecg009ToleranceMv(double amplitude)
+            => amplitude <= (Ecg009ToleranceSplitMv > 0 ? Ecg009ToleranceSplitMv : 2)
+                ? (Ecg009ToleranceFloorUv >= 0 ? Ecg009ToleranceFloorUv : 50) / 1000.0
+                : amplitude * (Ecg009TolerancePercent > 0 ? Ecg009TolerancePercent : 10) / 100.0;
+
         // ==================== ECG DC 偏置配置 ====================
 
         /// <summary>DC 偏置模式（0=固定 300/0/-300，1=可变 -500~500）</summary>
@@ -119,7 +179,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>DC 偏置值 mV（固定模式：300/0/-300；可变模式：-500~500）</summary>
         public int DCOffset { get; set; }
 
-        // ==================== ECG 呼吸调制配置（官方上位机 ECG 模式的 Respiration 参数） ====================
+        // ==================== ECG 呼吸调制配置（ECG 模式的 Respiration 参数） ====================
 
         /// <summary>呼吸模式（AecgRespirationMode 位组合：0=Off, 1=基线, 2=幅度, 4=频率, 128=阻抗式）</summary>
         public int DefaultRespirationMode { get; set; }
@@ -215,9 +275,9 @@ namespace TORNPISolution.Share.Models
         public int Spo2CaptureTimeMs { get; set; } = 8000;
 
         /// <summary>
-        /// 按测试项名存放的波形配置。
-        /// 例如 "ECG-009a动态范围(无偏置)"、"ECG-010输入阻抗" 等。
-        /// 未配置的项使用代码内置默认值。
+        /// 按测试项名存放的波形配置，AECG100 输出的 ECG/PPG/SpO2 固定项名的项共用（如 "ECG-002导联脱落检测"、"SPO2-004血氧饱和度精度"）。
+        /// 界面按目录声明读 TimeScale 画横轴，执行端只有 ECG-001/002/004 读 Frequency/CaptureTimeMs。
+        /// 未配置的项使用代码内置默认值；A10 的 ECG-009 项名按档位动态生成，不走本字典，用上面的 Ecg009* 字段。
         /// </summary>
         public Dictionary<string, EcgWaveformItemConfig> WaveformItemConfigs { get; set; } = new();
 
@@ -234,7 +294,7 @@ namespace TORNPISolution.Share.Models
 
     /// <summary>
     /// 单个 ECG 测试项的波形与显示配置。
-    /// 键值放在 <see cref="Aecg100Settings.WaveformItemConfigs"/> 中，按测试项名（如 ECG-009a...）查找。
+    /// 键值放在 <see cref="Aecg100Settings.WaveformItemConfigs"/> 中，按测试项名（如 ECG-002...）查找。
     /// 任何字段 ≤0 时使用默认值。
     /// </summary>
     public class EcgWaveformItemConfig

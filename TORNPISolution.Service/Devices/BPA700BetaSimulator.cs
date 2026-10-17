@@ -20,7 +20,7 @@ namespace TORNPISolution.Service.Devices
             SlowValve = 4
         }
 
-        #region 原生 SDK P/Invoke 声明（Beta 1.0.4.0，handle-based）
+        #region  SDK P/Invoke 声明（Beta 1.0.4.0，handle-based）
 
         private const string DllName = "BPA700x64Beta.dll";
 
@@ -323,9 +323,9 @@ namespace TORNPISolution.Service.Devices
         public async Task StartStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default)
             => await StartStaticPressureTestAsync(pressure, stableSeconds, inflation, ct).ConfigureAwait(false);
 
-        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变）</summary>
+        /// <summary>接口成员：RunBPTestAsync 的统一入口别名，供上层经接口调用（逻辑不变；pulseVolume 为接口统一参数，SDK 忽略）</summary>
         public Task<BpTestRunResult> RunBpMeasurementAsync(
-            int systolic, int diastolic, int heartRate,
+            int systolic, int diastolic, int heartRate, double pulseVolume = 0,
             int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
             CancellationToken ct = default)
             => RunBPTestAsync(systolic, diastolic, heartRate, waitStartTimeoutMs, totalTimeoutMs, ct);
@@ -424,7 +424,9 @@ namespace TORNPISolution.Service.Devices
             if (await Task.WhenAny(finishTcs.Task, Task.Delay(timeoutMs, ct)).ConfigureAwait(false) != finishTcs.Task)
             {
                 _log.Warn($"BPA700Beta：静态压力序列 {timeoutMs / 1000}s 未收到 Finish，主动 BPAStopTest 结束");
-                await Task.Run(() => BPAStopTest(_handle), ct).ConfigureAwait(false);
+                // 不传 ct：走到这里常常正是因为取消才没等到 Finish，带上已取消的令牌会让委托根本不执行，
+                // 仪器就停在带压状态（与 WaitStaticPressureFinishAsync 里的同类兜底保持一致）
+                await Task.Run(() => BPAStopTest(_handle)).ConfigureAwait(false);
             }
 
             return stablePressures;
@@ -539,9 +541,9 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 接口兼容方法：直接调用 BPARunBPTest 进入待测状态，等待 Finish。
+        /// 接口兼容方法：直接调用 BPARunBPTest 进入待测状态，等待 Finish（pulseVolume 为接口统一参数，SDK 忽略）。
         /// </summary>
-        public async Task StartSimulationAsync(int systolic, int diastolic, int heartRate, CancellationToken ct = default)
+        public async Task StartSimulationAsync(int systolic, int diastolic, int heartRate, double pulseVolume = 0, CancellationToken ct = default)
         {
             await RunBPTestAsync(systolic, diastolic, heartRate, ct: ct).ConfigureAwait(false);
         }
@@ -667,7 +669,7 @@ namespace TORNPISolution.Service.Devices
             return true;
         }
 
-        /// <summary>过压保护测试（BP-009）</summary>
+        /// <summary>仪器过压保护测试（保留本能力）</summary>
         public async Task<double> RunOverpressureTestAsync(
             double pressure, double threshold1, double threshold2,
             bool inflation = true, int timeoutMs = 120_000, CancellationToken ct = default)

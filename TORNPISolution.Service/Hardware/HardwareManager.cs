@@ -31,7 +31,7 @@ namespace TORNPISolution.Service.Hardware
 
         /// <summary>
         /// 按配置初始化 AECG100 并连接（如已连接则直接返回）。
-        /// 由 M07 Aecg100InitModule 调用。
+        /// 由 A07 Aecg100InitModule 调用。
         /// </summary>
         public async Task<bool> ConnectAecg100Async(Aecg100Settings settings)
         {

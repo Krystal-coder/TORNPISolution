@@ -6,12 +6,9 @@
 *.userosscache
 *.sln.docstates
 
-# 编译输出（核心！）
+# 编译输出（核心！）：bin/ 与 obj/ 已覆盖其下全部子目录，不要再为临时产物单加忽略规则
 bin/
 obj/
-# 一次性验证构建产物（非源码，可随时删除并由构建重新生成）
-binVerifyBuild/
-VerifyBuild/
 *.dll
 *.pdb
 *.exe

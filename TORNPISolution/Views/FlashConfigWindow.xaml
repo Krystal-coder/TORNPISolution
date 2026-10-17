@@ -1,0 +1,425 @@
+<Window x:Class="TORNPISolution.Views.FlashConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:conv="clr-namespace:TORNPISolution.Converters"
+        xmlns:viewModels="clr-namespace:TORNPISolution.ViewModels"
+        mc:Ignorable="d"
+        Title="烧录配置" Width="1240" Height="660" MinWidth="1080" MinHeight="520"
+        Icon="/Images/logo.ico"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource Brush.Window.Background}"
+        FontFamily="Microsoft YaHei UI"
+        d:DataContext="{d:DesignInstance Type=viewModels:FlashingViewModel}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <conv:LenientNumberConverter x:Key="Num"/>
+
+        <!-- 说明文字：长句必须换行，否则会被列宽裁掉后半句 -->
+        <Style x:Key="Style.HintWrap" TargetType="TextBlock" BasedOn="{StaticResource Style.Hint}">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="LineHeight" Value="16"/>
+        </Style>
+
+        <!-- 卡片内的小节标题：一行只占一次，把"路径 / 行为开关 / 超时 / 串口"分开 -->
+        <Style x:Key="Style.SectionTitle" TargetType="TextBlock" BasedOn="{StaticResource Style.GroupTitle}">
+            <Setter Property="Margin" Value="0,16,0,8"/>
+        </Style>
+
+        <!-- 标签在输入框上方的字段：整幅布局里每格都用它，节奏才一致 -->
+        <Style x:Key="Style.CellLabel" TargetType="TextBlock" BasedOn="{StaticResource Style.FieldLabel}">
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <!-- 复选框：文字要能换行（"烧前先复位自检（回 WPGN …）"这种长句会被 CheckBox 切掉后半句） -->
+        <Style x:Key="Style.CfgCheck" TargetType="CheckBox">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap" LineHeight="16"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 通道表里的串口下拉：口名可能已经掉了，给成可输，让人能直接改回来 -->
+        <Style x:Key="Style.GridPort" TargetType="ComboBox">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="IsEditable" Value="True"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 通道表头：与下面每一行写死同一组列宽，所以能正对上 -->
+        <Style x:Key="Style.GridHead" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </Window.Resources>
+
+    <!-- 三页签：全局参数、八条通道各自的口、串口探测各占一页，谁也不用从谁身上抢高度。
+         每页都按整幅宽度排（一行放 2 个或 4 个字段），因为窗口是扁的——
+         之前左右两栏各 500 宽，内容窄而高、右边那张卡片下半截全是空白 -->
+    <Grid Margin="18,16,18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="2,0,2,12">
+            <TextBlock Text="烧录配置" Style="{StaticResource Style.PanelTitle}"/>
+            <TextBlock Style="{StaticResource Style.SubText}" TextWrapping="Wrap" LineHeight="18" Margin="0,6,0,0"
+                       Text="「全局参数」两颗芯片共用，「通道配置」八条通道各走哪个口；改的就是烧录页那八张卡背后同一份配置，点保存才落盘。"/>
+        </StackPanel>
+
+        <!-- Style.NavTabControl 的模板是左侧竖排页签，TabPanel 横排还是竖排看 TabStripPlacement，必须写 Left -->
+        <TabControl Grid.Row="1" Style="{StaticResource Style.NavTabControl}" TabStripPlacement="Left"
+                    ItemContainerStyle="{StaticResource Style.NavTabItem}">
+
+            <!-- ==================== 页签一：两颗芯片的全局参数 ==================== -->
+            <TabItem Header="全局参数">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10,2,4,10">
+
+                        <!-- SPI Flash 烧录器 -->
+                        <Border Style="{StaticResource Style.PanelCard}" Padding="22,16">
+                            <StackPanel>
+                                <TextBlock Text="SPI Flash 烧录（迈斯威志 WizPro）"
+                                           Style="{StaticResource Style.GroupTitle}" Margin="0,0,0,4"/>
+
+                                <TextBlock Text="工具与工程" Style="{StaticResource Style.SectionTitle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="上位机 APP" Style="{StaticResource Style.CellLabel}"/>
+                                        <DockPanel>
+                                            <Button DockPanel.Dock="Right" Content="浏览" Style="{StaticResource Style.ToolButton}"
+                                                    Margin="8,0,0,0" Click="BrowseWizProApp_Click"/>
+                                            <TextBox x:Name="WizProAppBox" Style="{StaticResource Style.CfgBox}"
+                                                     Text="{Binding Config.WizPro.AppPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="工程文件" Style="{StaticResource Style.CellLabel}"/>
+                                        <DockPanel>
+                                            <Button DockPanel.Dock="Right" Content="浏览" Style="{StaticResource Style.ToolButton}"
+                                                    Margin="8,0,0,0" Click="BrowseWizProProject_Click"/>
+                                            <TextBox x:Name="WizProProjectBox" Style="{StaticResource Style.CfgBox}"
+                                                     Text="{Binding Config.WizPro.ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="行为开关" Style="{StaticResource Style.SectionTitle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <CheckBox Style="{StaticResource Style.CfgCheck}"
+                                                  IsChecked="{Binding Config.WizPro.CloseAppAfterDownload}"
+                                                  Content="下载完自动关掉上位机"/>
+                                        <TextBlock Style="{StaticResource Style.HintWrap}" Margin="0,4,0,0"
+                                                   Text="下载完让 APP 自己退出：不带这一项，APP 不退出就不生成 ResDW.Txt，下载结果永远等不到"/>
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="2" Style="{StaticResource Style.CfgCheck}" VerticalAlignment="Top"
+                                              IsChecked="{Binding Config.WizPro.SelfCheckBeforeProgram}"
+                                              Content="烧前先复位自检（回 WPGN 说明内部数据异常，要重新下载）"/>
+                                </Grid>
+
+                                <TextBlock Text="超时" Style="{StaticResource Style.SectionTitle}"/>
+                                <UniformGrid Columns="4">
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="下载超时ms" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.WizPro.DownloadTimeoutMs, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="指令超时ms" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.WizPro.ResponseTimeoutMs, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="整轮超时ms" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.WizPro.ProgramTimeoutMs, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="波特率" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.WizPro.BaudRate, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                </UniformGrid>
+
+                                <TextBlock Text="串口参数" Style="{StaticResource Style.SectionTitle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,18,0">
+                                        <TextBlock Text="数据位" Style="{StaticResource Style.CellLabel}"/>
+                                        <ComboBox Height="30" VerticalContentAlignment="Center"
+                                                  ItemsSource="{Binding DataBitsOptions}"
+                                                  SelectedItem="{Binding Config.WizPro.DataBits}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="0,0,18,0">
+                                        <TextBlock Text="停止位" Style="{StaticResource Style.CellLabel}"/>
+                                        <ComboBox Height="30" VerticalContentAlignment="Center"
+                                                  ItemsSource="{Binding StopBitsOptions}"
+                                                  SelectedItem="{Binding Config.WizPro.StopBits}"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" Style="{StaticResource Style.HintWrap}"
+                                               Text="默认 1M、8 数据位、2 停止位；转接芯片不支持 1M 时会一直收不到帧"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 富芮坤主控 -->
+                        <Border Style="{StaticResource Style.PanelCard}" Padding="22,16" Margin="0,16,0,0">
+                            <StackPanel>
+                                <TextBlock Text="富芮坤主控烧录（命令行工具）"
+                                           Style="{StaticResource Style.GroupTitle}" Margin="0,0,0,4"/>
+
+                                <TextBlock Text="工具与固件" Style="{StaticResource Style.SectionTitle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="烧录工具 exe" Style="{StaticResource Style.CellLabel}"/>
+                                        <DockPanel>
+                                            <Button DockPanel.Dock="Right" Content="浏览" Style="{StaticResource Style.ToolButton}"
+                                                    Margin="8,0,0,0" Click="BrowseFreqchipTool_Click"/>
+                                            <TextBox x:Name="FreqchipToolBox" Style="{StaticResource Style.CfgBox}"
+                                                     Text="{Binding Config.Freqchip.ToolPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="固件文件" Style="{StaticResource Style.CellLabel}"/>
+                                        <DockPanel>
+                                            <Button DockPanel.Dock="Right" Content="浏览" Style="{StaticResource Style.ToolButton}"
+                                                    Margin="8,0,0,0" Click="BrowseFreqchipFirmware_Click"/>
+                                            <TextBox x:Name="FreqchipFirmwareBox" Style="{StaticResource Style.CfgBox}"
+                                                     Text="{Binding Config.Freqchip.FirmwarePath, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="芯片、超时与串口" Style="{StaticResource Style.SectionTitle}"/>
+                                <UniformGrid Columns="4">
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="芯片系列" Style="{StaticResource Style.CellLabel}"/>
+                                        <ComboBox Height="30" VerticalContentAlignment="Center"
+                                                  ItemsSource="{Binding ChipOptions}"
+                                                  DisplayMemberPath="Label" SelectedValuePath="Value"
+                                                  SelectedValue="{Binding Config.Freqchip.Chip}"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="擦除范围" Style="{StaticResource Style.CellLabel}"/>
+                                        <ComboBox Height="30" VerticalContentAlignment="Center" IsEditable="True"
+                                                  ItemsSource="{Binding EraseSizeOptions}"
+                                                  Text="{Binding Config.Freqchip.EraseSize, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,18,0">
+                                        <TextBlock Text="握手超时s" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.Freqchip.HandshakeTimeoutSeconds, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="波特率" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.Freqchip.BaudRate, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                </UniformGrid>
+
+                                <Grid Margin="0,14,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,18,0">
+                                        <TextBlock Text="整轮超时ms" Style="{StaticResource Style.CellLabel}"/>
+                                        <TextBox Style="{StaticResource Style.CfgBox}"
+                                                 Text="{Binding Config.Freqchip.ProcessTimeoutMs, Converter={StaticResource Num}}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,18,0">
+                                        <TextBlock Style="{StaticResource Style.HintWrap}" Margin="0,0,0,4"
+                                                   Text="握手超时就是留给操作员按复位键的窗口，逐路手按时别设太小；30xx 系列波特率上限 460800"/>
+                                        <TextBlock Style="{StaticResource Style.HintWrap}"
+                                                   Text="整轮超时是工具卡住不退出时的兜底：到点杀进程并按失败记这一路"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ==================== 页签二：八条通道各自的配置 ==================== -->
+            <TabItem Header="通道配置">
+                <Grid Margin="10,2,4,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 表格整块包进一张卡片：行数是固定的八行，卡片撑满可用高度，
+                         行没占满的那部分留在卡片内部，看上去是"表就这么高"而不是"页面空了一块" -->
+                    <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="18,12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="72"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="86"/>
+                                        <ColumnDefinition Width="86"/>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="210"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="通道" Style="{StaticResource Style.GridHead}"/>
+                                    <TextBlock Grid.Column="1" Text="位号" Style="{StaticResource Style.GridHead}"/>
+                                    <TextBlock Grid.Column="2" Text="参与整批" Style="{StaticResource Style.GridHead}" Margin="0,0,6,0"/>
+                                    <TextBlock Grid.Column="3" Text="本轮烧录" Style="{StaticResource Style.GridHead}" Margin="0,0,6,0"/>
+                                    <TextBlock Grid.Column="4" Text="烧录器串口（SPI Flash）" Style="{StaticResource Style.GridHead}" Margin="0,0,10,0"/>
+                                    <TextBlock Grid.Column="5" Text="主控串口（富芮坤）" Style="{StaticResource Style.GridHead}" Margin="0,0,10,0"/>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Channels}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="0,0,0,1"
+                                                    Padding="0,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="72"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="86"/>
+                                                        <ColumnDefinition Width="86"/>
+                                                        <ColumnDefinition Width="210"/>
+                                                        <ColumnDefinition Width="210"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Title}" FontSize="12"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{StaticResource Brush.Text.Main}"/>
+                                                    <TextBox Grid.Column="1" Style="{StaticResource Style.CfgBox}" Height="28"
+                                                             Margin="0,0,10,0"
+                                                             Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                             ToolTip="日志、卡片与记录文件里显示的名字，按现场贴的标签填（如 PCB03）"/>
+                                                    <CheckBox Grid.Column="2" IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                              ToolTip="关掉的路整批时直接跳过（用于暂时没接好的道）；这里关掉不影响在烧录页右键单独开始它"/>
+                                                    <CheckBox Grid.Column="3" IsChecked="{Binding Selected, Mode=TwoWay}"
+                                                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                              ToolTip="本轮要不要烧这一路：整批只跑勾着的。与左边「参与整批」是两件事——那个是这条道接没接，这个是本轮跑不跑"/>
+                                                    <ComboBox Grid.Column="4" Style="{StaticResource Style.GridPort}" Margin="0,0,10,0"
+                                                              ItemsSource="{Binding DataContext.AvailablePorts, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              Text="{Binding WizProPortName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <ComboBox Grid.Column="5" Style="{StaticResource Style.GridPort}" Margin="0,0,10,0"
+                                                              ItemsSource="{Binding DataContext.AvailablePorts, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              Text="{Binding FreqchipPortName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Row="1" Margin="2,10,2,0">
+                        <!-- 串口重复占用、配了已经不存在的口、本轮要用却没配：改一行串口就重算一次，
+                             这一页就是填口的地方，红字得长在它旁边，而不是让人切到「串口与探测」页去看 -->
+                        <Border Background="#FDECEC" BorderBrush="{StaticResource Brush.Fail}" BorderThickness="1"
+                                CornerRadius="4" Padding="12,8"
+                                Visibility="{Binding HasConfigIssueText, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{Binding ConfigIssueText}" FontSize="12" TextWrapping="Wrap" LineHeight="18"
+                                       Foreground="{StaticResource Brush.Fail}"/>
+                        </Border>
+                        <TextBlock Style="{StaticResource Style.HintWrap}" Margin="0,10,0,0"
+                                   Text="COM 号不自动推断（转接口的枚举顺序不保证与接线一致），要对着编号填；想知道哪个口挂着几号烧录器，去「串口与探测」页点探测。"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- ==================== 页签三：本机串口与探测 ==================== -->
+            <TabItem Header="串口与探测">
+                <Grid Margin="10,2,4,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button Content="刷新串口" Style="{StaticResource Style.ToolButton}" Margin="0"
+                                Command="{Binding RefreshPortsCommand}"/>
+                        <Button Content="探测烧录器" Style="{StaticResource Style.ToolButton}"
+                                Margin="8,0,0,0" Command="{Binding DetectProgrammersCommand}"
+                                ToolTip="逐个串口发 RDMC，把设备自报的通道号念出来给人对着填（不替你填）"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="1" Text="{Binding AvailablePortsText, StringFormat=本机串口：{0}}"
+                               Style="{StaticResource Style.SubText}" TextWrapping="Wrap" LineHeight="18"/>
+                    <TextBlock Grid.Row="2" Text="{Binding IsDetectingText}" Style="{StaticResource Style.SubText}"
+                               TextWrapping="Wrap" LineHeight="18" Margin="0,8,0,0"/>
+
+                    <Border Grid.Row="3" Style="{StaticResource Style.PanelCard}" Padding="14,10" Margin="0,10,0,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding DetectText}" FontFamily="Consolas" FontSize="11"
+                                       TextWrapping="Wrap" LineHeight="17" Foreground="{StaticResource Brush.Text.Main}"/>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- 配置问题红字只留在「通道配置」那一页：口是在那一页填的，冲突提示得长在输入的地方。
+                         这一页只讲探测结果，不再摆第二块一模一样的清单，否则同一句警告在这一扇窗里出现两遍 -->
+                    <TextBlock Grid.Row="4" Style="{StaticResource Style.HintWrap}" Margin="0,10,0,0"
+                               Text="探测只念设备自报的通道号，不替人往任何一路里填：谁是第几路只有现场知道；填完哪一路撞了口，回「通道配置」页底部看清单。"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- 按钮行：固定在窗口底部，不跟着内容滚走 -->
+        <DockPanel Grid.Row="2" Margin="2,12,2,0" LastChildFill="False">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StatusText}" Style="{StaticResource Style.SubText}"
+                       VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="620" LineHeight="18"/>
+
+            <Button DockPanel.Dock="Right" Content="关闭" Style="{StaticResource Style.ToolButton}"
+                    Margin="10,0,0,0" Click="Close_Click" IsCancel="True"/>
+            <Button DockPanel.Dock="Right" Content="重新载入" Style="{StaticResource Style.ToolButton}"
+                    Margin="10,0,0,0" Click="Reload_Click"
+                    ToolTip="按盘上的 flashing.json 重读（界面上没保存的改动会被覆盖）"/>
+            <Button DockPanel.Dock="Right" Content="保存" Style="{StaticResource Style.PrimaryButton}"
+                    Click="Save_Click"
+                    ToolTip="写进 flashing.json；开烧前页面也会自动保存一次，但改完就关掉的人应该手动点这一下"/>
+        </DockPanel>
+    </Grid>
+</Window>

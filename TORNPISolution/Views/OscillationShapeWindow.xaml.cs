@@ -5,9 +5,8 @@ using TORNPISolution.ViewModels;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// Oscillation Shape 包络曲线配置对话框（仿官方上位机）：
-    /// 曲线预览（彩色标记 + 图例）+ x 轴八点（含收缩压/舒张压）/ y 轴五点比率滑块调参，
-    /// 实时写回动态血压 Customized 参数；确定保留修改，取消还原到打开前的值。
+    /// Oscillation Shape 包络曲线配置对话框：
+    /// 曲线预览（彩色标记 + 图例）+ x 轴八点（含收缩压/舒张压）/ y 轴五点比率滑块调参
     /// </summary>
     public partial class OscillationShapeWindow : Window
     {
@@ -31,7 +30,7 @@ namespace TORNPISolution.Views
             Close();
         }
 
-        /// <summary>取消：还原到打开前的参数快照</summary>
+        /// <summary>取消：还原到打开前的参数</summary>
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             _vm.RestoreSnapshot();

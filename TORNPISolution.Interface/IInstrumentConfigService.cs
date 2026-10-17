@@ -3,8 +3,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Interface
 {
     /// <summary>
-    /// 仪器链接配置服务：负责配置的读取与保存，
-    /// 界面层只依赖本接口，不关心存储介质与格式。
+    /// 仪器链接配置服务：负责配置的读取与保存
     /// </summary>
     public interface IInstrumentConfigService
     {

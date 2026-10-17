@@ -43,6 +43,9 @@
     <None Update="Config\protocol_commands.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="Config\flashing.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- 配置文件（解决方案资源管理器可见）：
@@ -59,6 +62,12 @@
        配置窗按 OrderedKeys 展示全部键，用户下次保存即完整落盘。 -->
   <Target Name="EnsureProtocolCommandsJson" BeforeTargets="PreBuildEvent">
     <Copy SourceFiles="Config\protocol_commands.json" DestinationFiles="$(OutDir)Config\protocol_commands.json" Condition="!Exists('$(OutDir)Config\protocol_commands.json')" />
+  </Target>
+
+  <!-- 烧录工位配置模板：只在输出目录没有 flashing.json 时才复制（与 instruments.json 一致）。
+       现场在烧录页配的通道串口、工具与固件路径写入输出目录，重新编译不会覆盖。 -->
+  <Target Name="EnsureFlashingJson" BeforeTargets="PreBuildEvent">
+    <Copy SourceFiles="Config\flashing.json" DestinationFiles="$(OutDir)Config\flashing.json" Condition="!Exists('$(OutDir)Config\flashing.json')" />
   </Target>
 
 </Project>

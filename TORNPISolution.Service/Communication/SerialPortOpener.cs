@@ -4,11 +4,7 @@ using System.Runtime.ExceptionServices;
 namespace TORNPISolution.Service.Communication
 {
     /// <summary>
-    /// SerialPort.Open() 是原生阻塞调用：无超时、不可取消。
-    /// 端口处于异常态（上次未正常关闭的残留、USB 转串口芯片挂死、被其他进程占用等）时会无限期挂起：
-    /// 模块线程卡死、方案收尾不执行、停止按钮无效、UI 全部按钮保持禁用——整个软件表现为"点不动"。
-    /// 故在独立后台线程上打开并限时等待：超时即放弃该线程与端口对象
-    /// （对仍在打开中的端口调 Close 同样会挂起），快速失败交上层按测试失败路径处理。
+    /// SerialPort.Open() 是阻塞调用：无超时、不可取消。
     /// 项目内所有串口（康伟达模拟仪/产品/Modbus/通用）一律经此处打开。
     /// </summary>
     public static class SerialPortOpener
@@ -20,7 +16,10 @@ namespace TORNPISolution.Service.Communication
         public static void Open(SerialPort port, int timeoutMs = DefaultTimeoutMs)
         {
             Exception? error = null;
-            using var done = new ManualResetEventSlim(false);
+            // 不能用 using：超时时这里的 Dispose 会和弃管线程的 done.Set() 抢时间，
+            // 句柄已释放再 Set 会抛 ObjectDisposedException，而它出现在后台线程的 finally 里，
+            // UI 的异常钩子接不到，整个进程跟着崩。改成确认线程已 Set 之后才释放。
+            var done = new ManualResetEventSlim(false);
             var thread = new Thread(() =>
             {
                 try { port.Open(); }
@@ -45,6 +44,8 @@ namespace TORNPISolution.Service.Communication
                 throw new TimeoutException(
                     $"串口 {port.PortName} 打开超时（{timeoutMs}ms）：端口可能被其他程序占用或驱动处于异常态，请检查设备管理器、拔插 USB 串口或重启电脑。");
             }
+
+            done.Dispose();   // 走到这里说明线程已完成 Set()，此时释放才安全
 
             if (error != null) ExceptionDispatchInfo.Capture(error).Throw();
         }

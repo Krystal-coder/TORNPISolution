@@ -7,10 +7,10 @@
         <!-- 网格线 / 时间刻度 / 内置横向进度条 -->
         <Canvas x:Name="AxisCanvas"/>
 
-        <!-- 波形曲线（按测试点分段着色，只绘制当前可视时间窗口内的点） -->
+        <!-- 波形曲线（按测试点分段着色） -->
         <Canvas x:Name="WaveLayer"/>
 
-        <!-- 悬停覆盖层：十字线 + 气泡 -->
+        <!-- 悬停覆盖层 -->
         <Canvas x:Name="HoverLayer" IsHitTestVisible="False">
             <Line x:Name="CrosshairV" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
             <Line x:Name="CrosshairH" Stroke="#FF9800" StrokeThickness="1" StrokeDashArray="3 2" Visibility="Collapsed"/>
@@ -21,11 +21,11 @@
         </Canvas>
 
         <!-- 量程标注 -->
-        <StackPanel Orientation="Horizontal" Margin="6,2,0,0">
+        <StackPanel x:Name="MaxLabelPanel" Orientation="Horizontal" Margin="6,2,0,0">
             <TextBlock x:Name="MaxLabel" Text="300" FontSize="10" Foreground="#9E9E9E"/>
             <TextBlock FontSize="10" Foreground="#9E9E9E" Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat=' {0}'}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="6,0,0,22" VerticalAlignment="Bottom">
+        <StackPanel x:Name="MinLabelPanel" Orientation="Horizontal" Margin="6,0,0,22" VerticalAlignment="Bottom">
             <TextBlock x:Name="MinLabel" Text="0" FontSize="10" Foreground="#9E9E9E"/>
             <TextBlock FontSize="10" Foreground="#9E9E9E" Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat=' {0}'}"/>
         </StackPanel>
@@ -33,6 +33,10 @@
         <!-- 右下角：总时长标注 -->
         <TextBlock x:Name="DurationLabel" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    Margin="0,0,8,22" FontSize="10" Foreground="#9E9E9E"/>
+
+        <!-- 多曲线图例 -->
+        <StackPanel x:Name="LegendPanel" Orientation="Horizontal" HorizontalAlignment="Right"
+                    VerticalAlignment="Top" Margin="0,4,10,0" Visibility="Collapsed" IsHitTestVisible="False"/>
 
         <!-- 空态提示 -->
         <TextBlock x:Name="EmptyText" Text="暂无采样数据" Foreground="#BDBDBD" FontSize="12"

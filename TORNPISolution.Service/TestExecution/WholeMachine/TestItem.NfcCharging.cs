@@ -7,7 +7,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：M00 初始化仪器 / M02 NFC功能测试 / M15 充电测试。
+    /// TestItem 分部：A00 初始化仪器 / A02 NFC功能测试 / A15 充电测试。
     /// 模块执行包装与分派见 TestItem.cs 主文件，项名统一引用 <see cref="SpecItems"/>。
     /// </summary>
     public partial class TestItem
@@ -22,7 +22,7 @@ namespace TORNPISolution.Service
         /// 初始化仪器：固高IO模块等硬件初始化。
         /// 成功写 1，失败/异常保持初始化的 0（规格 1~1，成功才 PASS）。
         /// </summary>
-        //测试项目**************************---M00---**************************初始化仪器
+        //测试项目**************************---A00---**************************初始化仪器
         public async Task InitInstrumentsModule(TestItemResultCollector collector, CancellationToken token)
         {
             if (NoInstrumentDemo("初始化仪器")) return;
@@ -43,7 +43,7 @@ namespace TORNPISolution.Service
         /// 寻卡 → 写 MAC → 回读验证 → 读标签内容，一次性执行完整流程，
         /// 返回全部测试项结果（1=PASS / 0=FAIL，按 Spec 静态规格 1~1 判定）。
         /// </summary>
-        //测试项目**************************---M02---**************************NFC功能测试
+        //测试项目**************************---A02---**************************NFC功能测试
         public async Task NfcFunctionModule(TestItemResultCollector collector, CancellationToken token)
         {
             if (NoInstrumentDemo("NFC 功能测试")) return;
@@ -64,17 +64,17 @@ namespace TORNPISolution.Service
         /// 充电测试（充电状态判断 / 当前电池电量测量 / 电池百分比获取）：
         /// 通过产品串口协议读取充电状态（0x6D）和电池信息（0x6C：电压 uint32 LE + 百分比）。
         /// </summary>
-        //测试项目**************************---M15---**************************充电测试
+        //测试项目**************************---A15---**************************充电测试
         public async Task ChargingTestModule(TestItemResultCollector collector, CancellationToken token)
         {
             // 纯产品模块（0x6D/0x6C，不依赖任何仪器）：无仪器演示模式也照常回读产品
             var config = _configService.Load();
             using var product = _productFactory();
 
-            // 产品可用性以本轮 M16 产品通讯初始化记录为准（进入产测模式/0x72/0x74 均不再重发）；
+            // 产品可用性以本轮 A16 产品通讯初始化记录为准（进入产测模式/0x72/0x74 均不再重发）；
             // 本模块仍需打开产品串口读充电状态 0x6D / 电池信息 0x6C
             if (!GetProductAvailable(config.NoProductDemoMode))
-                _log.Warn("产品不可用（以 M16 产品通讯初始化记录为准）：充电测试项可能读回失败判 FAIL");
+                _log.Warn("产品不可用（以 A16 产品通讯初始化记录为准）：充电测试项可能读回失败判 FAIL");
             try
             {
                 await product.OpenAsync(token);

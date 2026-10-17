@@ -11,5 +11,10 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>命令描述（中文说明）</summary>
         public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 命令默认参数字节，HEX 文本、空格/短横/逗号分隔（如 "05 00"）
+        /// </summary>
+        public string? Data { get; set; }
     }
 }

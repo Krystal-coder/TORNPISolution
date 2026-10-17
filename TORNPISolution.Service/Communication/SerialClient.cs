@@ -4,9 +4,10 @@ using TORNPISolution.Interface;
 namespace TORNPISolution.Service.Communication
 {
     /// <summary>
-    /// 通用串口客户端：支持文本（AT 指令）和二进制（固定帧）两种通讯模式。
-    /// 所有请求经 SemaphoreSlim 串行化，避免并发读写串口。
-    /// 适用于产品（AT 指令）、康伟达模拟仪（16字节帧）等非 Modbus 协议设备。
+    /// 通用串口客户端：文本（AT 指令）、二进制（固定帧）、自行分帧（设备主动连发）三种通讯模式。
+    /// 现阶段唯一用户是 WizProProgrammer，只用自行分帧那一组（一个端口一个实例，写与读在它自己流程里串行）。
+    /// 自行分帧不持 _lock：主流程轮询 ReadRaw 期间还要 WriteRaw，加锁只是把两条命令交织换成必然等满超时。
+    /// 接第二个用户前先弄清会不会并发写同一端口：要么一端口一实例，要么把锁补上。
     /// </summary>
     public class SerialClient : IDisposable
     {
@@ -45,7 +46,7 @@ namespace TORNPISolution.Service.Communication
         {
             if (!_port.IsOpen)
             {
-                SerialPortOpener.Open(_port);   // 限时打开：原生 Open() 无超时，端口异常时会无限期挂起
+                SerialPortOpener.Open(_port);   // 限时打开： Open() 无超时，端口异常时会无限期挂起
                 _log.Info($"串口 {_port.PortName} 已打开（{_port.BaudRate},{_port.Parity},{_port.DataBits},{_port.StopBits}）");
             }
         }, ct);
@@ -217,6 +218,59 @@ namespace TORNPISolution.Service.Communication
             {
                 return null;
             }
+        }
+
+        // ==================== 自行分帧的协议（设备主动连发、帧长不固定） ====================
+
+        /// <summary>
+        /// 直接写字节、不等应答：用于“发一条指令后设备连续主动上报”的协议（如启动烧写后一路推状态帧）。
+        /// 不持锁也不清接收缓冲，调用方自己保证串行；上一轮的残留要显式 <see cref="DiscardInBuffer"/> 丢掉。
+        /// </summary>
+        public void WriteRaw(byte[] data, CancellationToken ct = default)
+        {
+            if (!_port.IsOpen)
+                throw new InvalidOperationException($"串口 {_port.PortName} 未打开");
+
+            ct.ThrowIfCancellationRequested();
+            _port.Write(data, 0, data.Length);
+            _log.Debug($"TX Raw [{data.Length}]: {BitConverter.ToString(data)}");
+        }
+
+        /// <summary>
+        /// 读一次可用字节：有数据就立即返回（不保证是一整帧，由调用方自己拼帧），窗口内一个字节也没有返回空数组。
+        /// 与 <see cref="ListenAsync"/> 的差别是不做“等一帧”的固定停顿，攒帧节奏完全交给调用方。
+        /// </summary>
+        public byte[] ReadRaw(int waitMs, CancellationToken ct = default)
+        {
+            if (!_port.IsOpen)
+                throw new InvalidOperationException($"串口 {_port.PortName} 未打开");
+
+            var deadline = Environment.TickCount64 + waitMs;
+            while (true)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var available = _port.BytesToRead;
+                if (available > 0)
+                {
+                    var buffer = new byte[available];
+                    var read = _port.Read(buffer, 0, available);
+                    if (read == available) return buffer;
+
+                    var trimmed = new byte[read];
+                    Array.Copy(buffer, trimmed, read);
+                    return trimmed;
+                }
+
+                if (Environment.TickCount64 >= deadline) return Array.Empty<byte>();
+                Thread.Sleep(5);
+            }
+        }
+
+        /// <summary>丢掉接收缓冲里的残留（上一轮没读完的状态帧，不清会被当成本轮的开头）</summary>
+        public void DiscardInBuffer()
+        {
+            if (_port.IsOpen) _port.DiscardInBuffer();
         }
 
         public void Dispose()

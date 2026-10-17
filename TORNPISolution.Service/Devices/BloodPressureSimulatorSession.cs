@@ -72,7 +72,7 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 连接活性校验：康伟达重发复位并等待回显（无应答抛异常）；BPA700 仅确认已打开。
-        /// M01 在会话已建立时用它做真实连接测试。
+        /// A01 在会话已建立时用它做真实连接测试。
         /// </summary>
         public async Task VerifyConnectionAsync(CancellationToken ct = default)
         {

@@ -1,18 +1,13 @@
 <Window x:Class="TORNPISolution.Views.Aecg100ParamConfigWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:TORNPISolution.ViewModels"
         xmlns:conv="clr-namespace:TORNPISolution.Converters"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="AECG100参数配置（鲸扬 AECG100）" Width="760" Height="640"
+        Title="AECG100参数配置（鲸扬 AECG100）" Width="880" Height="520"
         Icon="/Images/logo.ico"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="{StaticResource Brush.Window.Background}"
         FontFamily="Microsoft YaHei UI">
-
-    <Window.DataContext>
-        <vm:Aecg100ParamConfigViewModel/>
-    </Window.DataContext>
 
     <Window.Resources>
 
@@ -21,40 +16,11 @@
         <!-- 数字转换器 -->
         <conv:LenientNumberConverter x:Key="LenientNumber"/>
 
-        <!-- 字段标签 -->
-        <Style x:Key="Style.CfgLabel" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-        </Style>
+        <!-- 单选组直接绑整数/枚举值 -->
+        <conv:ValueEqualsConverter x:Key="ValueEquals"/>
 
-        <!-- 数值输入框 -->
-        <Style x:Key="Style.CfgBox" TargetType="TextBox">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="8,0"/>
-        </Style>
-
-        <!-- 分组标题 -->
-        <Style x:Key="Style.GroupTitle" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
-            <Setter Property="Margin" Value="0,14,0,8"/>
-        </Style>
-
-        <!-- 单位/范围提示小字 -->
-        <Style x:Key="Style.Hint" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-
-        <!-- 参数字段标签 -->
-        <Style x:Key="Style.FieldLabel" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
-            <Setter Property="Margin" Value="0,0,0,3"/>
-        </Style>
+        <!-- 输入框 / 标签 / 分组标题规格统一用 App.xaml  -->
+        <Style TargetType="TextBox" BasedOn="{StaticResource Style.CfgBox}"/>
 
     </Window.Resources>
 
@@ -65,7 +31,7 @@
             <TextBlock Text="保存后写入 Config\instruments.json（Aecg100Tester），测试模块按需读取"
                        Style="{StaticResource Style.Hint}" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- 运行期锁定配置保存：灰显不可点，与血压模拟仪测试配置页一致 -->
+                <!-- 运行期锁定配置保存：灰显不可点-->
                 <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
                            VerticalAlignment="Center" Margin="0,0,12,0"
                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
@@ -75,9 +41,9 @@
             </StackPanel>
         </Grid>
 
-        <!-- ====== 五类测试参数 TabControl ====== -->
-        <TabControl Margin="12,10,12,0" Background="Transparent"
-                    materialDesign:TabAssist.UseNavigationPanel="True">
+        <!-- ====== 测试参数 ====== -->
+        <TabControl Margin="12,10,12,0" Style="{StaticResource Style.NavTabControl}" Background="Transparent" TabStripPlacement="Left"
+                    ItemContainerStyle="{StaticResource Style.NavTabItem}">
 
             <!-- ============ ECG-004 心率测试 ============ -->
             <TabItem>
@@ -104,19 +70,11 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.Resources>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="VerticalAlignment" Value="Center"/>
-                                            <Setter Property="Margin" Value="0,0,8,0"/>
-                                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                            <Setter Property="FontSize" Value="12"/>
-                                        </Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                        </Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                     </Grid.Resources>
                                     <TextBlock Text="测试点(BPM)"/>
                                     <TextBox Grid.Column="1"
-                                             Text="{Binding HeartRateTestPointsText, UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding HeartRateTestPointsText, UpdateSourceTrigger=LostFocus}"
                                              ToolTip="逗号分隔的心率测试点，如 40,60,80,100,120,160"/>
                                     <TextBlock Grid.Column="3" Text="重复次数"/>
                                     <TextBox Grid.Column="4" Width="60" HorizontalAlignment="Left"
@@ -171,15 +129,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="幅度(mV)"/>
                                 <TextBox Grid.Column="1"
@@ -196,7 +146,7 @@
 
                         <!-- 阻抗 -->
                         <TextBlock Text="ECG 阻抗" Style="{StaticResource Style.GroupTitle}"/>
-                        <CheckBox Content="启用 620K 阻抗（ECG-010 输入阻抗测试）"
+                        <CheckBox Content="启用 620K 阻抗"
                                   IsChecked="{Binding Params.ImpedanceEnabled}"
                                   Margin="0,0,0,6" FontSize="12"/>
 
@@ -222,15 +172,7 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid.Resources>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="VerticalAlignment" Value="Center"/>
-                                            <Setter Property="Margin" Value="0,0,8,0"/>
-                                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                            <Setter Property="FontSize" Value="12"/>
-                                        </Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                        </Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                     </Grid.Resources>
                                     <TextBlock Text="幅度(mV)"/>
                                     <TextBox Grid.Column="1"
@@ -246,7 +188,7 @@
                         </Border>
 
                         <!-- 呼吸调制 -->
-                        <TextBlock Text="ECG 呼吸调制（Respiration，对应官方上位机 ECG 模式同名参数）" Style="{StaticResource Style.GroupTitle}"/>
+                        <TextBlock Text="ECG 呼吸调制（Respiration）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
                             <Grid>
@@ -263,15 +205,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="呼吸模式"/>
                                 <ComboBox Grid.Column="1"
@@ -297,6 +231,180 @@
                 </ScrollViewer>
             </TabItem>
 
+            <!-- ============ ECG-009 动态范围和线性（A10 唯一实现项） ============ -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Waves" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="ECG-009动态范围" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="8,4">
+
+                        <TextBlock Text="仪器输出" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="Margin" Value="0,0,10,0"/>
+                                    </Style>
+                                </Grid.Resources>
+
+                                <!-- 幅度/偏置档 -->
+                                <TextBlock Text="幅度档(mV)"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding Ecg009AmplitudesText, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip="逗号分隔的峰-谷幅度档，法规值 0.5,1,2,10"/>
+                                <TextBlock Grid.Column="3" Text="偏置档(mV)"/>
+                                <TextBox Grid.Column="4"
+                                         Text="{Binding Ecg009DcOffsetsText, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip="逗号分隔的 DC 偏置档，法规值 0,300,-300"/>
+
+                                <TextBlock Grid.Row="2" Text="波形频率(Hz)"/>
+                                <TextBox Grid.Row="2" Grid.Column="1"
+                                         Text="{Binding Params.Ecg009Frequency, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="法规 6.25Hz（160ms 一周期）"/>
+                                <TextBlock Grid.Row="2" Grid.Column="3" Text="噪声频率"/>
+                                <ComboBox Grid.Row="2" Grid.Column="4" Height="26" VerticalContentAlignment="Center"
+                                          SelectedIndex="{Binding Params.Ecg009NoiseFrequency}"
+                                          ToolTip="噪声发生器频率；法规要求 Off，勾了噪声会叠加在波形上影响幅值判定">
+                                    <ComboBoxItem Content="Off（关）"/>
+                                    <ComboBoxItem Content="50Hz"/>
+                                    <ComboBoxItem Content="60Hz"/>
+                                    <ComboBoxItem Content="100Hz"/>
+                                    <ComboBoxItem Content="120Hz"/>
+                                </ComboBox>
+
+                                <TextBlock Grid.Row="4" Text="电极"/>
+                                <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+                                    <RadioButton Content="RA/R"
+                                                 IsChecked="{Binding Params.Ecg009Electrode, Converter={StaticResource ValueEquals}, ConverterParameter=0, Mode=TwoWay}"
+                                                 ToolTip="右臂输出"/>
+                                    <RadioButton Content="LA/L"
+                                                 IsChecked="{Binding Params.Ecg009Electrode, Converter={StaticResource ValueEquals}, ConverterParameter=255, Mode=TwoWay}"
+                                                 ToolTip="左臂输出"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Row="6" Text="波形"/>
+                                <WrapPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4">
+                                    <RadioButton Content="三角波"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=1, Mode=TwoWay}"
+                                                 ToolTip="Triangle，法规要求本项用三角波"/>
+                                    <RadioButton Content="正弦波"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=0, Mode=TwoWay}"/>
+                                    <RadioButton Content="方波"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=2, Mode=TwoWay}"/>
+                                    <RadioButton Content="矩形脉冲"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=3, Mode=TwoWay}"/>
+                                    <RadioButton Content="三角脉冲"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=4, Mode=TwoWay}"/>
+                                    <RadioButton Content="ECG"
+                                                 IsChecked="{Binding Params.Ecg009WaveformType, Converter={StaticResource ValueEquals}, ConverterParameter=6, Mode=TwoWay}"/>
+                                </WrapPanel>
+
+                                <TextBlock Grid.Row="8" Text="620kΩ 阻抗"/>
+                                <CheckBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4" Content="串入 620kΩ 输入阻抗（不勾＝短路，直接输出）"
+                                          IsChecked="{Binding Params.Ecg009Impedance}" FontSize="12" VerticalAlignment="Center"
+                                          ToolTip="只作用于本项各档位的输出，不受“噪声/阻抗/起搏”页里的勾选影响"/>
+
+                                <TextBlock Grid.Row="10" Grid.ColumnSpan="5" Style="{StaticResource Style.Hint}" TextWrapping="Wrap"
+                                           Text="脉冲宽度固定 100ms"/>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock Text="串口采集与判定" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="Margin" Value="0,0,10,0"/>
+                                    </Style>
+                                </Grid.Resources>
+
+                                <TextBlock Text="丢弃前(s)"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding Params.Ecg009DiscardSeconds, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="仪器开始输出后，避开刚进入心电测量的起始瞬态"/>
+                                <TextBlock Grid.Column="3" Text="有效采集(s)"/>
+                                <TextBox Grid.Column="4"
+                                         Text="{Binding Params.Ecg009RecordSeconds, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="丢弃段之后连续记录这么多秒用于判定（默认 20+60 即取 20s~80s 这段）；采完立刻停输出进下一档"/>
+
+                                <TextBlock Grid.Row="2" Text="换档等待(ms)"/>
+                                <TextBox Grid.Row="2" Grid.Column="1"
+                                         Text="{Binding Params.Ecg009StepDelayMs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="停输出→下一档开始输出之间的等待"/>
+                                <TextBlock Grid.Row="2" Grid.Column="3" Text="允差分界(mV)"/>
+                                <TextBox Grid.Row="2" Grid.Column="4"
+                                         Text="{Binding Params.Ecg009ToleranceSplitMv, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="分段判定的分界幅度：≤本值的档用绝对允差，>本值的档用百分比允差（默认 2）"/>
+
+                                <TextBlock Grid.Row="4" Text="分界内允差(μV)"/>
+                                <TextBox Grid.Row="4" Grid.Column="1"
+                                         Text="{Binding Params.Ecg009ToleranceFloorUv, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="默认 50：0.5/1/2mV 这类小幅度档按绝对值判，判 |回读波峰-波谷−设定| ≤ 本值"/>
+                                <TextBlock Grid.Row="4" Grid.Column="3" Text="分界外允差(%)"/>
+                                <TextBox Grid.Row="4" Grid.Column="4"
+                                         Text="{Binding Params.Ecg009TolerancePercent, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"
+                                         ToolTip="默认 10：10mV 这类大幅度档按相对值判，判 |回读波峰-波谷−设定| ≤ 设定×本百分比"/>
+
+                                <TextBlock Grid.Row="6" Grid.ColumnSpan="5" Style="{StaticResource Style.Hint}" TextWrapping="Wrap"
+                                           Text="判定量 = 波峰-波谷，忽略单点毛刺"/>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
+                                   Text="说明：一个幅度跑完 0/300/-300 三个偏置为一轮，共 12 项。"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <!-- ============ 频率扫描 / DC 偏置 ============ -->
             <TabItem>
                 <TabItem.Header>
@@ -310,7 +418,7 @@
                     <StackPanel Margin="8,4">
 
                         <!-- 频率扫描 -->
-                        <TextBlock Text="频率扫描参数（ECG-009/012 动态范围与频率响应用）" Style="{StaticResource Style.GroupTitle}"/>
+                        <TextBlock Text="频率扫描参数" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
                             <Grid>
@@ -327,15 +435,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="幅度(mV)"/>
                                 <TextBox Grid.Column="1"
@@ -365,15 +465,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <CheckBox Content="可变偏置模式（-500~500mV）"
                                           IsChecked="{Binding Params.DCOffsetVariable}"
@@ -385,7 +477,7 @@
                         </Border>
 
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
-                                   Text="说明：固定偏置模式仅允许 300/0/-300 mV 三档（由测试模块自动切换）；&#10;可变偏置模式允许 -500~500mV 自由设定。"/>
+                                   Text="说明：偏置 300/0/-300 mV "/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -419,19 +511,11 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="测试点(BPM)"/>
                                 <TextBox Grid.Column="1"
-                                         Text="{Binding PpgHeartRateTestPointsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding PpgHeartRateTestPointsText, UpdateSourceTrigger=LostFocus}"
                                          ToolTip="逗号分隔的 PPG 心率测试点，如 60,80,100,120"/>
                                 <TextBlock Grid.Column="3" Text="每档重复"/>
                                 <TextBox Grid.Column="4"
@@ -467,15 +551,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="直流分量(mV)"/>
                                 <TextBox Grid.Column="1"
@@ -545,20 +621,12 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="血氧测试点(%)"
                                            ToolTip="SPO2-004 血氧饱和度精度测试点，逗号分隔，如 75,80,90,95,100"/>
                                 <TextBox Grid.Column="1"
-                                         Text="{Binding Spo2TestPointsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding Spo2TestPointsText, UpdateSourceTrigger=LostFocus}"
                                          ToolTip="逗号分隔的 SpO2 测试点，如 75,80,90,95,100"/>
                                 <TextBlock Grid.Column="3" Text="脉搏率(BPM)"
                                            ToolTip="SPO2-004/006 血氧点测试时使用的固定脉搏率"/>
@@ -576,19 +644,19 @@
                                 <TextBox Grid.Row="4" Grid.Column="1"
                                          Text="{Binding Params.Spo2CaptureTimeMs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="3" Text="参考血氧(%)"
-                                           ToolTip="SPO2-005 脉搏率测试与 M12 测量信号使用的固定血氧设定值"/>
+                                           ToolTip="SPO2-005 脉搏率测试与 A12 测量信号使用的固定血氧设定值"/>
                                 <TextBox Grid.Row="4" Grid.Column="4"
                                          Text="{Binding Params.Spo2PulseRateRefSpo2, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
 
                                 <TextBlock Grid.Row="6" Text="脉搏率测试点(BPM)"
                                            ToolTip="SPO2-005 脉搏率精度测试点，逗号分隔，如 40,60,80,100,120,160"/>
                                 <TextBox Grid.Row="6" Grid.Column="1"
-                                         Text="{Binding Spo2PulseRateTestPointsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding Spo2PulseRateTestPointsText, UpdateSourceTrigger=LostFocus}"
                                          ToolTip="逗号分隔的脉搏率测试点，如 40,60,80,100,120,160"/>
                                 <TextBlock Grid.Row="6" Grid.Column="3" Text="低氧测试点(%)"
                                            ToolTip="SPO2-006 低氧范围精度测试点，逗号分隔，如 50,60,70"/>
                                 <TextBox Grid.Row="6" Grid.Column="4"
-                                         Text="{Binding Spo2LowRangeTestPointsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding Spo2LowRangeTestPointsText, UpdateSourceTrigger=LostFocus}"
                                          ToolTip="逗号分隔的低氧测试点，如 50,60,70"/>
 
                                 <TextBlock Grid.Row="8" Text="低氧容差(±%)"/>
@@ -614,15 +682,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
                                 <TextBlock Text="系数 A"/>
                                 <TextBox Grid.Column="1"
@@ -740,15 +800,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
 
                                 <TextBlock Text="波形类型"/>
@@ -809,15 +861,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="0,0,8,0"/>
-                                        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Style.CfgLabel}"/>
                                 </Grid.Resources>
 
                                 <TextBlock Text="PR间期(ms)"/>

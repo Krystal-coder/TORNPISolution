@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:TORNPISolution.ViewModels"
         xmlns:views="clr-namespace:TORNPISolution.Views"
+        xmlns:conv="clr-namespace:TORNPISolution.Converters"
         xmlns:models="clr-namespace:TORNPISolution.Share.Models;assembly=TORNPISolution.Share"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
@@ -14,55 +14,63 @@
         Title="TOR NPI Solution" Height="720" Width="1400"
         WindowStartupLocation="CenterScreen">
 
-    <Window.DataContext>
-        <vm:MainViewModel/>
-    </Window.DataContext>
-
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
 
-        <!-- 明细表单元格文字：垂直居中 + 左边距 8 -->
-        <Style x:Key="Style.CellText" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="8,0"/>
+        <!-- 明细表分节头-->
+        <Style x:Key="Style.DetailGroup" TargetType="GroupItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupItem">
+                        <StackPanel>
+                            <ToggleButton x:Name="GroupHeader" IsChecked="True" Focusable="False"
+                                          Background="#EEF2F7" BorderBrush="{StaticResource Brush.Panel.Border}"
+                                          BorderThickness="0,0,0,1" Cursor="Hand">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}" Padding="8,5">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon x:Name="Chevron" Kind="ChevronDown"
+                                                                         Width="16" Height="16" VerticalAlignment="Center"
+                                                                         Foreground="#5A6B7B"/>
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                           Margin="6,0,0,0" VerticalAlignment="Center" Foreground="#2F3E4E"/>
+                                                <TextBlock Text="{Binding ItemCount, StringFormat={}{0} 项}" FontSize="11"
+                                                           Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#5A6B7B"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E4EAF1"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter TargetName="Chevron" Property="Kind" Value="ChevronRight"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ItemsPresenter x:Name="GroupBody"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger SourceName="GroupHeader" Property="IsChecked" Value="False">
+                                <Setter TargetName="GroupBody" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding Name}" Value="">
+                                <Setter TargetName="GroupHeader" Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <!-- 短数值列（规格范围/测试值）：垂直 + 水平居中 -->
-        <Style x:Key="Style.CellText.Center" TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="0"/>
-        </Style>
-
-        <!-- 明细表表头：共享基础样式 -->
-        <Style x:Key="Style.GridColumnHeader" TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#F0F3F7"/>
-            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Padding" Value="8,0"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
-        </Style>
-
-        <!-- 短数值列表头：水平居中 -->
-        <Style x:Key="Style.GridColumnHeader.Center" TargetType="DataGridColumnHeader"
-               BasedOn="{StaticResource Style.GridColumnHeader}">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
-
-        <!-- 结果文字颜色：未测试灰 / 合格绿 / 不合格红 -->
-        <Style x:Key="Style.ResultText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource Brush.NotTested}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Result}" Value="{x:Static models:TestResultStatus.Pass}">
-                    <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Result}" Value="{x:Static models:TestResultStatus.Fail}">
-                    <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+        <!-- 明细表的单元格 / 表头 / 结果配色样式（Style.CellText、Style.GridColumnHeader、Style.ResultText）
+             已提到 App.xaml 的应用级资源：单板页要用同一套表格外观，而它是个 UserControl，
+             解析自己那份 BAML 时还没有宿主，拿不到写在窗口资源里的 key——放这里就只有一页能用 -->
 
         <!-- 模块级结果徽章 -->
         <Style x:Key="Style.ModuleResultBadge" TargetType="Border">
@@ -151,9 +159,14 @@
 
     <DockPanel>
 
-        <!-- 第一行：菜单（MaterialDesign 样式） -->
-        <Menu DockPanel.Dock="Top" Style="{StaticResource MaterialDesignMenu}"
-              Background="{DynamicResource PrimaryHueMidBrush}">
+        <!-- 第一行：菜单（最右侧给返回键，不再单独占一行报“现在在哪个工位”） -->
+        <!-- 上下留一点内边距：菜单项只有 30 高，与按钮等高时按钮会顶到窗口边看上去像被标题栏切了 -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource PrimaryHueMidBrush}"
+                Padding="10,5,14,5">
+            <Grid>
+                <!-- 返回键走命令而不走 Click：任一边在跑时 CanExecute 直接把它灰掉，避开跑一半切页丢结果 -->
+                <Menu HorizontalAlignment="Left" VerticalAlignment="Center"
+                      Style="{StaticResource MaterialDesignMenu}" Background="Transparent">
             <Menu.ItemContainerStyle>
                 <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
                     <Setter Property="Padding" Value="0,0,0,0"/>
@@ -187,9 +200,12 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
                 <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                <MenuItem Header="单板配置" Click="MenuBoardConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
+                          ToolTip="八条路各自的位号与跑不跑，以及单板工位的综测仪/蓝牙网关/读码器；本轮跑哪几项在旁边的「测试项」里勾"/>
+                <MenuItem Header="烧录配置" Click="MenuFlashingConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
+                          ToolTip="SPI Flash 烧录器与富芮坤主控工具的参数（所有通道共用），以及八条通道各走哪个口"/>
                 <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                 <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <!--<MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>-->
             </MenuItem>
 
             <!-- 通讯菜单 -->
@@ -204,10 +220,36 @@
                 </MenuItem.HeaderTemplate>
                 <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
             </MenuItem>
-        </Menu>
+            
+            <!-- 单板要跑哪几项：单独一扇窗，不再挤在「单板配置」里当第三页——一个是作业定义，一个是工装配置
+                 项数会长到几十，所以下拉不候选，只能弹窗 -->
+            <MenuItem Header="测试项" Click="MenuBoardTestItems_Click"
+                      Style="{StaticResource MaterialDesignMenuItem}" Height="30"
+                      ToolTip="勾选单板工位本轮要跑的测试项（所有通道共用同一组，勾选项存在 board-test.json）">
+                <MenuItem.Icon>
+                    <materialDesign:PackIcon Kind="FormatListChecks" Width="15" Height="15" Margin="0"/>
+                </MenuItem.Icon>
+                <MenuItem.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                    </DataTemplate>
+                </MenuItem.HeaderTemplate>
+            </MenuItem>
+                </Menu>
 
-        <!-- 第二行：内容区 -->
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Content="← 返回工位选择" Command="{Binding BackToEntryCommand}"
+                        Style="{StaticResource Style.ToolButton}"
+                        Visibility="{Binding ShowBackButton, Converter={StaticResource BoolToVisibility}}"
+                        ToolTip="回到工位选择页（任一工位正在跑时不可点）"/>
+            </Grid>
+        </Border>
+
+        <!-- 内容区 -->
         <Grid Margin="12">
+        <views:WorkbenchEntryView Visibility="{Binding IsEntryPage, Converter={StaticResource BoolToVisibility}}"/>
+
+        <Grid Visibility="{Binding IsWholeMachinePage, Converter={StaticResource BoolToVisibility}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="12"/>
@@ -236,15 +278,12 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="»" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"
-                               Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,10"/>
-                    <TextBlock Text="模&#10;块&#10;库" FontSize="13" LineHeight="20" TextAlignment="Center"
-                               Foreground="{StaticResource Brush.Text.Main}"/>
-                </StackPanel>
+                <!-- 收起态只留展开按钮：在哪一面由展开后的副标题说 -->
+                <TextBlock Text="»" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"
+                           VerticalAlignment="Center" Foreground="{StaticResource Brush.Primary}"/>
             </Border>
 
-            <!-- 展开态：完整模块库 -->
+            <!-- 展开完整模块库 -->
             <Border Width="250" Style="{StaticResource Style.PanelCard}"
                     Visibility="{Binding IsLibraryVisible, Converter={StaticResource BoolToVisibility}}">
                 <Grid>
@@ -253,16 +292,20 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- 面板标题 -->
                     <Grid Grid.Row="0" Margin="14,12,10,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="测试模块库" Style="{StaticResource Style.PanelTitle}"/>
-                            <TextBlock Text="拖拽或双击模块，加入右侧测试方案"
+
+                        <!-- 面板标题：写清当前是哪类工位的模块库（工位由顶部页签定，不在这里翻面） -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding LibraryTitleText}" Style="{StaticResource Style.PanelTitle}"/>
+                            <TextBlock Text="拖拽或双击模块"
                                        Style="{StaticResource Style.SubText}" Margin="0,4,0,0"/>
                         </StackPanel>
+
                         <Button Grid.Column="1" Content="«" FontSize="14" FontWeight="Bold"
                                 Width="26" Height="26" Padding="0" VerticalAlignment="Top"
                                 Style="{StaticResource Style.ToolButton}" Margin="0"
@@ -271,7 +314,7 @@
                     </Grid>
 
                     <ListBox x:Name="LibraryList" Grid.Row="1"
-                             ItemsSource="{Binding AvailableModules}"
+                             ItemsSource="{Binding LibraryModules}"
                              BorderThickness="0" Background="Transparent"
                              Margin="8,0,8,8"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -324,6 +367,12 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+
+                    <!-- 这一页没有目录项时的占位说明：不然看着像界面坏了 -->
+                    <TextBlock Grid.Row="1" Text="该工位还没有测试模块&#10;在 Spec 目录里声明一项就会显示在这里"
+                               Style="{StaticResource Style.SubText}" TextAlignment="Center" TextWrapping="Wrap"
+                               VerticalAlignment="Center" Margin="16,0"
+                               Visibility="{Binding HasLibraryModules, Converter={StaticResource InverseBoolToVisibility}}"/>
                 </Grid>
             </Border>
         </Grid>
@@ -343,12 +392,11 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="{Binding PlanTitleText}" Style="{StaticResource Style.PanelTitle}"/>
-                        <TextBlock Text="{Binding PlanSummaryText}" Style="{StaticResource Style.SubText}" Margin="0,4,0,0"/>
-                    </StackPanel>
-                    <!-- 整体判定：任一模块 FAIL 即 NG，全部 PASS 才 PASS -->
-                    <Border Grid.Column="1" Style="{StaticResource Style.PlanResultBadge}"
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding PlanTitleText}" Style="{StaticResource Style.PanelTitle}"/>
+                            <TextBlock Text="{Binding PlanSummaryText}" Style="{StaticResource Style.SubText}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="1" Style="{StaticResource Style.PlanResultBadge}"
                             VerticalAlignment="Center" Margin="0,0,8,0">
                         <TextBlock Text="{Binding PlanResultText}" Style="{StaticResource Style.PlanResultBadgeText}"/>
                     </Border>
@@ -356,7 +404,7 @@
                             VerticalAlignment="Center" Command="{Binding ClearPlanCommand}"/>
                 </Grid>
 
-                <!-- 方案模块列表（可拖拽排序，点击查看明细） -->
+                <!-- 方案模块列表 -->
                 <ListBox x:Name="PlanList" Grid.Row="1"
                          ItemsSource="{Binding PlanModules}"
                          SelectionChanged="PlanList_SelectionChanged"
@@ -459,10 +507,9 @@
                 </TextBlock>
 
                 <!-- 方案操作区 -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
                             Margin="14,6,14,12">
-                    <!-- 图标用 PackIcon 而非 emoji 字符串：emoji 补面字符在 WPF 字体回落下宽度测量异常，曾导致按钮塌成单字形 -->
-                    <Button Style="{StaticResource Style.ToolButton}"
+                        <Button Style="{StaticResource Style.ToolButton}"
                             Command="{Binding SavePlanCommand}" Margin="0,0,8,0"
                             ToolTip="将当前测试方案保存到磁盘">
                         <StackPanel Orientation="Horizontal">
@@ -484,7 +531,7 @@
                             Command="{Binding ResetPlanCommand}"/>
                     <Button Style="{StaticResource Style.PrimaryButton}"
                             Command="{Binding RunOrStopCommand}">
-                        <!-- 空闲时"运行方案"，运行中变"停止"（点停止取消执行，结束后自动变回） -->
+                        <!-- 空闲时"运行方案"，运行中变"停止" -->
                         <TextBlock>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -539,11 +586,22 @@
                             <TextBlock Text="{Binding SelectedPlanModule.Description}"
                                        Style="{StaticResource Style.SubText}" Margin="0,4,0,0"/>
                         </StackPanel>
-                        <Border Grid.Column="1" Style="{StaticResource Style.DetailResultBadge}"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="{Binding SelectedPlanModule.ModuleResultText}"
-                                       Style="{StaticResource Style.DetailResultBadgeText}"/>
-                        </Border>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource Style.ToolButton}" Margin="0,0,8,0"
+                                    Click="OpenWaveformOverview_Click"
+                                    Visibility="{Binding ShowOverviewWaveformButton, Converter={StaticResource BoolToVisibility}}"
+                                    ToolTip="打开本模块的ECG Signal窗口：各档位曲线按时间轴首尾相接成一张长图，设定侧与回读侧同图两条曲线（可缩放/平移/最大化）">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="ChartLine" Width="14" Height="14"
+                                                             VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Text="波形窗口" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Border Style="{StaticResource Style.DetailResultBadge}">
+                                <TextBlock Text="{Binding SelectedPlanModule.ModuleResultText}"
+                                           Style="{StaticResource Style.DetailResultBadgeText}"/>
+                            </Border>
+                        </StackPanel>
                     </Grid>
 
                     <!-- 测试项明细表：测试内容 / 规格 / 测试值 / 结果 -->
@@ -552,87 +610,120 @@
                               RowDetailsVisibilityMode="Visible"
                               EnableRowVirtualization="False" EnableColumnVirtualization="False"
                               CanUserAddRows="False" CanUserDeleteRows="False"
-                              CanUserResizeRows="False" HeadersVisibility="Column"
+                              CanUserResizeRows="False" CanUserSortColumns="False" HeadersVisibility="Column"
                               GridLinesVisibility="Horizontal"
                               HorizontalGridLinesBrush="{StaticResource Brush.Panel.Border}"
                               Background="Transparent" BorderThickness="0"
                               RowHeight="36" FontSize="12"
                               SelectionMode="Single" SelectionUnit="FullRow">
+
+                            <DataGrid.GroupStyle>
+                                <GroupStyle ContainerStyle="{StaticResource Style.DetailGroup}"/>
+                            </DataGrid.GroupStyle>
+
                             <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel Visibility="{Binding HasRowDetails, Converter={StaticResource BoolToVisibility}}">
-                                <!-- 逐点结果子表（BP-003）：测试点1..N 依次展示目标/仪器稳压值/产品上报值/误差/判定，哪个点 PASS 哪个点 FAIL 一目了然 -->
+
                                 <Border Margin="8,2,8,4" CornerRadius="6" Padding="12,6"
                                         Background="{StaticResource Brush.Panel.Background}"
                                         BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                         Visibility="{Binding HasPointResults, Converter={StaticResource BoolToVisibility}}">
+                                            <Border.Resources>
+                                                <Style x:Key="Style.SubTableHead" TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding LeftAlign}" Value="True">
+                                                    <Setter Property="TextAlignment" Value="Left"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+
+                                        <Style x:Key="Style.SubTableCell" TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding LeftAlign}" Value="True">
+                                                    <Setter Property="TextAlignment" Value="Left"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tone}" Value="pass">
+                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tone}" Value="fail">
+                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tone}" Value="stat">
+                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tone}" Value="sub">
+                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tone}" Value="bold">
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Resources>
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                             <materialDesign:PackIcon Kind="FormatListChecks" Width="14" Height="14"
                                                                      VerticalAlignment="Center"
                                                                      Foreground="{StaticResource Brush.Primary}"/>
-                                            <TextBlock Text="逐点结果（误差 ≤2mmHg 为 PASS）" FontWeight="Bold" FontSize="12"
+                                            <TextBlock Text="{Binding PointTableTitle}" FontWeight="Bold" FontSize="12"
                                                        Foreground="{StaticResource Brush.Text.Main}"
                                                        VerticalAlignment="Center" Margin="6,0,0,0"/>
-                                            <!-- 汇总：共 X 点 Y PASS / Z FAIL + 最大误差所在点，父行精简后这里一眼拿结论 -->
+
                                             <TextBlock Text="{Binding PointSummaryText}" FontSize="11"
                                                        Foreground="{StaticResource Brush.Text.Sub}"
                                                        VerticalAlignment="Center" Margin="10,0,0,0"/>
                                         </StackPanel>
-                                        <Grid Margin="0,0,0,2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="0.8*"/>
-                                                <ColumnDefinition Width="0.9*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="0.9*"/>
-                                                <ColumnDefinition Width="2.2*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="测试点" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" Text="目标(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2" Text="仪器测试值(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
-                                            <TextBlock Grid.Column="3" Text="产品上报值(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
-                                            <TextBlock Grid.Column="4" Text="误差(mmHg)" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Center"/>
-                                            <TextBlock Grid.Column="5" Text="判定" Style="{StaticResource Style.SubText}" FontSize="11" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                                        </Grid>
-                                        <ItemsControl ItemsSource="{Binding PointResults}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Margin="0,2">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="0.8*"/>
-                                                            <ColumnDefinition Width="0.9*"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="0.9*"/>
-                                                            <ColumnDefinition Width="2.2*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Center"
-                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
-                                                        <TextBlock Grid.Column="1" Text="{Binding TargetText}" HorizontalAlignment="Center"
-                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
-                                                        <TextBlock Grid.Column="2" Text="{Binding InstrumentText}" HorizontalAlignment="Center"
-                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
-                                                        <TextBlock Grid.Column="3" Text="{Binding ProductText}" HorizontalAlignment="Center"
-                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
-                                                        <TextBlock Grid.Column="4" Text="{Binding ErrorText}" HorizontalAlignment="Center"
-                                                                   Foreground="{StaticResource Brush.Text.Main}"/>
-                                                        <TextBlock Grid.Column="5" Text="{Binding ResultDisplay}" Margin="8,0,0,0" FontWeight="Bold">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Pass}" Value="True">
-                                                                            <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                        <!-- 列头与数据行都按列定义给固定像素宽（表头与单元格同值），窄窗口下横向滚动 -->
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                            <StackPanel>
+                                                <ItemsControl ItemsSource="{Binding SubTableColumns}" Margin="0,0,0,2">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Header}" Width="{Binding Width}"
+                                                                       Style="{StaticResource Style.SubTableHead}"
+                                                                       ToolTip="{Binding Header}"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <ItemsControl ItemsSource="{Binding SubTableRows}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <ItemsControl ItemsSource="{Binding Cells}" Margin="0,1">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Horizontal"/>
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <TextBlock Text="{Binding Text}" Width="{Binding Width}"
+                                                                                   Style="{StaticResource Style.SubTableCell}"
+                                                                                   ToolTip="{Binding Text}"/>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </ScrollViewer>
                                     </StackPanel>
                                 </Border>
                                 <!-- 波形：逐点共用一张压力曲线 -->
@@ -641,6 +732,13 @@
                                         BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                         Visibility="{Binding IsWaveformExpanded, Converter={StaticResource BoolToVisibility}}">
                                     <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -656,14 +754,20 @@
                                                        Style="{StaticResource Style.SubText}" FontSize="11"
                                                        VerticalAlignment="Center" Margin="10,0,0,0"/>
                                         </StackPanel>
-                                        <ToggleButton Grid.Column="1" Content="收起" Margin="0,0,10,4" Padding="8,2"
-                                                      FontSize="11"
-                                                      IsChecked="{Binding IsWaveformExpanded, Mode=TwoWay}"/>
-                                        <views:PressureWaveformControl Grid.ColumnSpan="2" Height="200"
-                                                                       Margin="12,26,12,10"
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,10,4">
+                                            <ToggleButton Content="收起" FontSize="11" Padding="8,2"
+                                                          IsChecked="{Binding IsWaveformExpanded, Mode=TwoWay}"/>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="仪器输出波形" FontSize="11"
+                                                   Foreground="{StaticResource Brush.Text.Sub}" Margin="12,6,0,0"
+                                                   Visibility="{Binding HasInlineWaveform, Converter={StaticResource BoolToVisibility}}"/>
+                                        <views:PressureWaveformControl Grid.Row="2" Grid.ColumnSpan="2" Height="180"
+                                                                       Margin="12,4,12,10"
                                                                        Samples="{Binding WaveformSamples}"
                                                                        Unit="{Binding WaveformUnit}"
-                                                                       PixelsPerSecond="{Binding TimeScale}"/>
+                                                                       PixelsPerSecond="{Binding TimeScale}"
+                                                                       Visibility="{Binding HasInlineWaveform, Converter={StaticResource BoolToVisibility}}"/>
                                     </Grid>
                                 </Border>
                                 </StackPanel>
@@ -730,7 +834,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <!-- 波形折叠按钮：仅带波形的测试项（BP-001）显示，点击在该行下方展开压力曲线 -->
+                            <!-- 波形折叠按钮 -->
                             <DataGridTemplateColumn Header="波形" Width="0.4*">
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader.Center}"/>
@@ -740,7 +844,7 @@
                                         <ToggleButton ToolTip="展开/收起压力波形"
                                                       VerticalAlignment="Center"
                                                       IsChecked="{Binding IsWaveformExpanded, Mode=TwoWay}"
-                                                      Visibility="{Binding HasWaveform, Converter={StaticResource BoolToVisibility}}">
+                                                      Visibility="{Binding ShowWaveformToggle, Converter={StaticResource BoolToVisibility}}">
                                             <ToggleButton.Style>
                                                 <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignFlatButton}">
                                                     <Setter Property="Padding" Value="4"/>
@@ -770,6 +874,19 @@
                 </Grid>
             </Grid>
         </Border>
+        </Grid>
+
+        <!-- 单板工位 -->
+        <views:BoardChannelView DataContext="{Binding Board}"
+                                Visibility="{Binding DataContext.IsBoardPage,
+                                             RelativeSource={RelativeSource AncestorType=Window},
+                                             Converter={StaticResource BoolToVisibility}}"/>
+
+        <!-- 烧录工位 -->
+        <views:FlashingView DataContext="{Binding Flashing}"
+                            Visibility="{Binding DataContext.IsFlashingPage,
+                                         RelativeSource={RelativeSource AncestorType=Window},
+                                         Converter={StaticResource BoolToVisibility}}"/>
         </Grid>
     </DockPanel>
 </Window>

@@ -9,18 +9,17 @@ namespace TORNPISolution.Views
     /// </summary>
     public partial class Aecg100ParamConfigWindow : Window
     {
-        public Aecg100ParamConfigWindow()
+        public Aecg100ParamConfigWindow(Aecg100ParamConfigViewModel viewModel)
         {
+            // DataContext 先于 InitializeComponent 
+            DataContext = viewModel;
             InitializeComponent();
 
-            if (DataContext is Aecg100ParamConfigViewModel vm)
+            viewModel.CloseRequested += () =>
             {
-                vm.CloseRequested += () =>
-                {
-                    DialogResult = true;
-                    Close();
-                };
-            }
+                DialogResult = true;
+                Close();
+            };
         }
     }
 }

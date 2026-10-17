@@ -1,8 +1,7 @@
 namespace TORNPISolution.Interface
 {
     /// <summary>
-    /// 压力/差压变送器设备接口（美仪 P3000-D / 2051-D / 2051LT-D / 2051DP-D）。
-    /// 485 通讯为慢速 IO，所有操作均为异步，避免阻塞 UI 线程。
+    /// 压力/差压变送器设备接口（美仪 P3000-D / 2051-D / 2051LT-D / 2051DP-D）
     /// </summary>
     public interface IPressureTransmitter : IDisposable
     {

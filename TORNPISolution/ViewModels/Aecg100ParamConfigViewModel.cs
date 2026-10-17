@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using TORNPISolution.Common; 
 using TORNPISolution.Interface;
 using TORNPISolution.Service;
@@ -14,11 +13,6 @@ namespace TORNPISolution.ViewModels
     {
         private readonly IInstrumentConfigService _configService;
         private readonly ILogService _log = new LogService(nameof(Aecg100ParamConfigViewModel));
-
-        // 实例化
-        public Aecg100ParamConfigViewModel() : this(App.Services.GetRequiredService<IInstrumentConfigService>())
-        {
-        }
 
         public Aecg100ParamConfigViewModel(IInstrumentConfigService configService)
         {
@@ -75,6 +69,41 @@ namespace TORNPISolution.ViewModels
                 if (points.Count > 0)
                     Params.HeartRateTestPoints = points;
                 OnPropertyChanged(nameof(HeartRateTestPointsText));
+            }
+        }
+
+        /// <summary>ECG-009 幅度档文本（mV 波峰-波谷，逗号分隔，双向绑定转换 List<double>）</summary>
+        public string Ecg009AmplitudesText
+        {
+            get => string.Join(",", Params.Ecg009Amplitudes.Select(a => a.ToString()));
+            set
+            {
+                var tiers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                  .Select(s => double.TryParse(s, out var n) ? n : (double?)null)
+                                  .Where(n => n.HasValue && n!.Value > 0)
+                                  .Select(n => n!.Value)
+                                  .Distinct()
+                                  .ToList();
+                // 允许清空（不填即 A10 不生成项），所以本处不在 Count==0 时保留旧值
+                Params.Ecg009Amplitudes = tiers;
+                OnPropertyChanged(nameof(Ecg009AmplitudesText));
+            }
+        }
+
+        /// <summary>ECG-009 DC 偏置档文本（mV，逗号分隔，双向绑定转换 List<int>；仪器固定模式只支持 300/0/-300）</summary>
+        public string Ecg009DcOffsetsText
+        {
+            get => string.Join(",", Params.Ecg009DcOffsets.Select(o => o.ToString()));
+            set
+            {
+                var tiers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                  .Select(s => int.TryParse(s, out var n) ? n : (int?)null)
+                                  .Where(n => n.HasValue)
+                                  .Select(n => n!.Value)
+                                  .Distinct()
+                                  .ToList();
+                Params.Ecg009DcOffsets = tiers;
+                OnPropertyChanged(nameof(Ecg009DcOffsetsText));
             }
         }
 
@@ -150,7 +179,7 @@ namespace TORNPISolution.ViewModels
 
         public RelayCommand SaveCommand { get; }
 
-        /// <summary>测试是否运行中（运行期锁定配置保存，与血压模拟仪测试配置页一致）</summary>
+        /// <summary>测试是否运行中（运行期锁定配置保存）</summary>
         public bool IsRunning => TestRunState.IsRunning;
 
         /// <summary>是否允许保存（运行期灰色不可点）</summary>

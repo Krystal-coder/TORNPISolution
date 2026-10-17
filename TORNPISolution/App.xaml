@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TORNPISolution"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             StartupUri="Views/MainWindow.xaml">
+             xmlns:models="clr-namespace:TORNPISolution.Share.Models;assembly=TORNPISolution.Share"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Application.Resources>
         <ResourceDictionary>
 
@@ -28,6 +28,14 @@
             <SolidColorBrush x:Key="Brush.Pass" Color="#2F9E44"/>
             <SolidColorBrush x:Key="Brush.Fail" Color="#E03131"/>
             <SolidColorBrush x:Key="Brush.NotTested" Color="#9AA4B2"/>
+
+            <!-- 等人动作与未参与本轮两档：测试页只有合格/不合格，烧录页还要分清"该去按一下"和"这路本轮没跑" -->
+            <SolidColorBrush x:Key="Brush.Wait" Color="#F59F0B"/>
+            <SolidColorBrush x:Key="Brush.Wait.Light" Color="#FFF6E6"/>
+            <SolidColorBrush x:Key="Brush.Skipped" Color="#9AA4B2"/>
+            <SolidColorBrush x:Key="Brush.Skipped.Light" Color="#F1F3F5"/>
+            <SolidColorBrush x:Key="Brush.Pass.Light" Color="#E6F4EA"/>
+            <SolidColorBrush x:Key="Brush.Fail.Light" Color="#FDECEC"/>
 
             <!-- ============ 面板卡片样式 ============ -->
             <Style x:Key="Style.PanelCard" TargetType="Border">
@@ -108,6 +116,164 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <!-- ============ 工位选择页上的一张入口卡片 ============ -->
+            <!-- 不做成页签样式：三个入口不是并列的关系，而是“点哪个进哪个”的门；鼠标抬起来要看得出能点 -->
+            <Style x:Key="Style.StationCard" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource Brush.Panel.Background}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Padding" Value="16,18"/>
+                <Setter Property="MinHeight" Value="250"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                        <Setter Property="Background" Value="{StaticResource Brush.Primary.Light}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- ============ 竖向页签 ============ -->
+            <Style x:Key="Style.NavTabItem" TargetType="TabItem">
+                <Setter Property="Width" Value="164"/>
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="Margin" Value="0,1"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border x:Name="Bd" Background="Transparent" CornerRadius="4"
+                                    BorderThickness="3,0,0,0" BorderBrush="Transparent">
+                                <ContentPresenter x:Name="Hdr" ContentSource="Header" Margin="10,0"
+                                                  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#F5F7FA"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource Brush.Primary.Light}"/>
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ============ 竖向页签容器 ============ -->
+            <Style x:Key="Style.NavTabControl" TargetType="TabControl">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabControl">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TabPanel IsItemsHost="True" Margin="6,4,10,4"/>
+                                <ContentPresenter Grid.Column="1" ContentSource="SelectedContent"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ============ 配置页控件统一规格 ============  -->
+
+            <!-- 字段标签（贴在输入框左侧） -->
+            <Style x:Key="Style.CfgLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
+            </Style>
+
+            <!-- 数值输入框：统一 30 高、内容垂直居中、零外边距 -->
+            <Style x:Key="Style.CfgBox" TargetType="TextBox">
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="8,0"/>
+            </Style>
+
+            <!-- 分组标题 -->
+            <Style x:Key="Style.GroupTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                <Setter Property="Margin" Value="0,14,0,8"/>
+            </Style>
+
+            <!-- 单位/范围/说明提示 -->
+            <Style x:Key="Style.Hint" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <!-- 上下排布的字段：标签在上、输入框在下 -->
+            <Style x:Key="Style.FieldLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
+                <Setter Property="Margin" Value="0,0,0,3"/>
+            </Style>
+
+            <!-- ============ 测试明细表：整机页与单板页共用同一套 ============
+                 这几个样式提到应用级而不是留在各页里：原先它们定义在 MainWindow 的窗口资源内，
+                 而单板页是个 UserControl——它解析自己那份 BAML 时还没有宿主，沿资源链拿不到窗口里的 key，
+                 想用同一套表格外观只能回到应用级资源 -->
+
+            <!-- 单元格文字：垂直居中 + 左边距 8 -->
+            <Style x:Key="Style.CellText" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="8,0"/>
+            </Style>
+
+            <!-- 短数值列（规格范围/测试值）：垂直 + 水平居中 -->
+            <Style x:Key="Style.CellText.Center" TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="0"/>
+            </Style>
+
+            <!-- 表头：浅底粗体、固定 34 高、底边一条分隔线 -->
+            <Style x:Key="Style.GridColumnHeader" TargetType="DataGridColumnHeader">
+                <Setter Property="Background" Value="#F0F3F7"/>
+                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Height" Value="34"/>
+                <Setter Property="Padding" Value="8,0"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
+            </Style>
+
+            <!-- 短数值列表头：水平居中 -->
+            <Style x:Key="Style.GridColumnHeader.Center" TargetType="DataGridColumnHeader"
+                   BasedOn="{StaticResource Style.GridColumnHeader}">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+
+            <!-- 结果文字颜色：未测试灰 / 合格绿 / 不合格红 -->
+            <Style x:Key="Style.ResultText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Brush.NotTested}"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Result}" Value="{x:Static models:TestResultStatus.Pass}">
+                        <Setter Property="Foreground" Value="{StaticResource Brush.Pass}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Result}" Value="{x:Static models:TestResultStatus.Fail}">
+                        <Setter Property="Foreground" Value="{StaticResource Brush.Fail}"/>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
 
         </ResourceDictionary>
