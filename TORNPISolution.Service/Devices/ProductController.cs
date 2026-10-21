@@ -7,11 +7,9 @@ namespace TORNPISolution.Service.Devices
 {
 
     /// <summary>
-    /// 被测产品（DUT）控制器：通过串口二进制协议与产品通讯，串口参数从仪器链接配置（SerialLinkSettings）读取。
-    /// 帧结构、功能码与控制码统一定义在 ProductProtocol（命令码来自 Config\protocol_commands.json，配置页保存后热重载）。
-    /// 命令-应答：发帧后产品回 ACK（写命令）或数据帧（读命令）；应答功能码可能与请求不同（如 05 请求 07 应答），按控制码匹配。
-    /// 主动推送：产品测量期间周期推 0xCA（协议未定义，按非目标帧跳过）；0x7B 结果实测不推送，靠主动轮询。
-    /// 多字节整数一律小端（实机电池电压证实；若联调发现数值字节反转改此处）。
+    /// 被测产品（DUT）串口控制器。
+    /// 应答功能码可能与请求不同（如 05 请求 07 应答），收帧只按控制码匹配，不要加功能码校验。
+    /// 多字节一律小端（实机电池电压证实）。0x7B 实测不推送、靠主动轮询；测量期间周期推的 0xCA 协议未定义，按非目标帧跳过。
     /// </summary>
     public class ProductController : IProductController
     {
@@ -19,14 +17,11 @@ namespace TORNPISolution.Service.Devices
         private readonly ILogService _log;
         private readonly int _commandTimeoutMs = 3000;
 
-        // 串口收发互斥门：并发调用（BP-003 多点稳压窗内并发回读、BP-006/007 后台压力轮询与启停命令重叠）时，
-        // 若两个线程同时 Read 同一串口，一帧字节可能被劈进两个接收缓冲区，导致双方都解析失败双双超时误判；
-        // 把“清缓冲→发送→收帧”整段串行化消除竞争（正常单次往返 ≈几十 ms，串行后吞吐足够）。
+        // 串口收发互斥门：两个线程同时 Read 同一串口时，一帧字节可能被劈进两个接收缓冲区，双方都解析失败、双双超时误判。
+        // 并发现场：BP-003 多点稳压窗内并发回读、BP-006/007 后台压力轮询与启停命令重叠；故把“清缓冲→发送→收帧”整段串行化（单次往返 ≈几十 ms）。
         private readonly SemaphoreSlim _portGate = new(1, 1);
 
-        /// <summary>
-        /// 创建产品控制器。串口参数从 SerialLinkSettings 读取（波特率/数据位/校验位/停止位）。
-        /// </summary>
+        /// <summary>创建产品控制器：串口参数从 SerialLinkSettings 读取（波特率/数据位/校验位/停止位）</summary>
         /// <param name="settings">仪器链接配置中的产品串口参数（config.Product）</param>
         /// <param name="log">日志服务（可选）</param>
         public ProductController(SerialLinkSettings settings, ILogService? log = null)
@@ -74,14 +69,12 @@ namespace TORNPISolution.Service.Devices
 
         // ==================== 底层收发 ====================
 
+        /// <summary>
+        /// 同步请求-应答：占住串口门 → 清接收缓冲 → 发一帧 → 等控制码相同的应答帧（超时无响应记 WARN 并返回 null）。
         /// </summary>
-        /// <param name="cmd">命令（功能码 + 控制码）</param>
         /// <param name="commandName">命令语义名（写日志用，取与协议文档一致的函数名）</param>
-        /// <param name="data">命令参数</param>
         /// <param name="timeoutMs">超时（0 = 用默认）</param>
-        /// <param name="decode">响应 payload → 可读物理量文本（如 <c>p => $"{...} mmHg"</c>），
-        /// 非 null 时解析值直接拼在 RX 行末尾，一行看全“发了什么/收到什么/等于多少”</param>
-        /// <param name="ct">取消令牌</param>
+        /// <param name="decode">响应 payload → 可读物理量文本（如 <c>p => $"{...} mmHg"</c>），非 null 时解析值拼在 RX 行末尾</param>
         private async Task<ProductProtocol.ParsedFrame?> SendCommandAsync(
             ProductCmd cmd, string commandName = "", byte[]? data = null,
             int timeoutMs = 0, Func<byte[], string>? decode = null, CancellationToken ct = default)
@@ -98,8 +91,7 @@ namespace TORNPISolution.Service.Devices
                     if (!_port.IsOpen)
                         throw new InvalidOperationException($"产品串口 {_port.PortName} 未打开");
 
-                    // 清空接收缓冲：丢弃上一命令超时未读的残留字节与期间到达的主动推送帧，
-                    // 确保接下来 ReceiveFrameAsync 读到的是本命令的应答。
+                    // 清空接收缓冲：丢弃上一命令超时未读的残留字节与期间到达的主动推送帧，确保 ReceiveFrameAsync 读到的是本命令的应答
                     try { _port.DiscardInBuffer(); }
                     catch (Exception ex) { _log.Debug($"DiscardInBuffer 失败（忽略）：{ex.Message}"); }
 
@@ -135,10 +127,7 @@ namespace TORNPISolution.Service.Devices
             }
         }
 
-        /// <summary>
-        /// 通用命令发送：按协议命令配置发送任意命令并返回响应 payload（无响应返回 null）。
-        /// 供扩展命令/实机联调使用，命令的 Func/Code 完全取自 protocol_commands.json。
-        /// </summary>
+        /// <summary>通用命令发送：命令的 Func/Code 完全取自 protocol_commands.json，返回响应 payload（无响应返回 null），供扩展命令/实机联调使用</summary>
         public async Task<byte[]?> SendRawCommandAsync(ProductCmd cmd, byte[]? data = null, int timeoutMs = 0, CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(cmd, "RawCmd", data, timeoutMs, ct: ct).ConfigureAwait(false);
@@ -146,10 +135,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 从串口接收一帧完整数据（按 Head/Len/Tail 定位帧边界，CRC 校验）。
-        /// 帧解析统一委托 <see cref="TryExtractFrame"/>，避免自行维护 scanStart 造成的跳帧/漏帧。
-        /// 按控制码匹配应答（功能码不限：实测 05 请求可能 07 应答）；
-        /// 非目标帧（0xCA 周期推送等）跳过继续等；Ctrl=0xFF 为产品错误帧，立即结束等待。
+        /// 从串口接收一帧完整数据（按 Head/Len/Tail 定位帧边界，CRC 校验），帧解析委托 <see cref="TryExtractFrame"/>。
+        /// 按控制码匹配应答（功能码不限：实测 05 请求可能 07 应答）；非目标帧（0xCA 周期推送等）跳过继续等；Ctrl=0xFF 为产品错误帧，立即结束等待。
         /// </summary>
         private async Task<ProductProtocol.ParsedFrame?> ReceiveFrameAsync(
             int timeoutMs, byte expectedCtrl, CancellationToken ct)
@@ -220,13 +207,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 从缓冲区提取一个完整且 CRC 通过的帧，并就地消费已处理的字节。
-        /// 设计要点（修复原 scanStart 跳帧 bug）：
-        ///   - 帧头前的垃圾字节直接丢弃；
-        ///   - 找到帧头但帧不完整时，<b>保留 buffer 原样</b>返回 null（帧头仍在 position 0），
-        ///     下次收到更多字节后从同一帧头继续判定，绝不会把未读完的帧头跳过；
-        ///   - 帧尾不匹配说明该 0xEF 是伪帧头，丢弃 1 字节后继续找；
-        ///   - 整帧（含 CRC 失败帧）一次性消费，避免残留帧体被误扫成新帧头。
+        /// 从缓冲区提取一个完整且 CRC 通过的帧并就地消费字节。
+        /// 帧不完整时原样保留 buffer（帧头留在 0 位）以便续读；伪帧头只丢 1 字节；整帧含 CRC 失败帧一次性消费，否则残体会被当成新帧头。
         /// </summary>
         /// <param name="buffer">接收缓冲区（会被就地修改）</param>
         /// <returns>解析成功的帧；暂无完整帧时返回 null</returns>
@@ -234,7 +216,6 @@ namespace TORNPISolution.Service.Devices
         {
             while (true)
             {
-                // 1. 定位帧头，丢弃帧头前的垃圾字节
                 var headPos = -1;
                 for (var i = 0; i < buffer.Count; i++)
                 {
@@ -256,7 +237,6 @@ namespace TORNPISolution.Service.Devices
                     buffer.RemoveRange(0, headPos);
                 }
 
-                // 2. 至少要有 Head + Len 两字节才能判断帧长
                 if (buffer.Count < 2)
                     return null;   // 等更多数据（帧头保留在 position 0）
 
@@ -269,24 +249,22 @@ namespace TORNPISolution.Service.Devices
                     continue;
                 }
 
-                // 3. 帧尾下标 = Head(0) + Len(1) + Payload(len) + CRC(2) = len + 4；整帧长 = len + 5
+                // 帧尾下标 = Head(0) + Len(1) + Payload(len) + CRC(2) = len + 4；整帧长 = len + 5
                 var frameEnd = len + 4;
                 if (frameEnd >= buffer.Count)
-                    return null;   // 帧不完整，保留 buffer（帧头在 0）等更多数据 —— 关键：不前进、不跳帧
+                    return null;   // 关键：不前进、不跳帧
 
                 if (buffer[frameEnd] != ProductProtocol.Tail)
                 {
-                    // 帧尾不匹配 → 当前 0xEF 是伪帧头，丢弃 1 字节继续扫描
                     _log.Debug($"TryExtractFrame: 帧头处 Len={len} 但帧尾非 0xFE，丢弃伪帧头");
                     buffer.RemoveRange(0, 1);
                     continue;
                 }
 
-                // 4. 取出整帧解析（CRC 校验在 ParseFrame 内）
+                // 整帧交给 ParseFrame 解析（CRC 校验在其中）
                 var frame = buffer.Take(frameEnd + 1).ToArray();
                 var parsed = ProductProtocol.ParseFrame(frame);
 
-                // 无论 CRC 是否通过，整帧都消费掉，避免残留帧体被误扫
                 buffer.RemoveRange(0, frameEnd + 1);
 
                 if (parsed != null)
@@ -298,11 +276,7 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 等待产品主动推送的血压测量结果（控制码 0x7B，功能码不限）。
-        /// 预留：实测当前固件不主动推 0x7B（测量期间只周期推 0xCA，协议未定义），BP-004/005 已改主动轮询。
-        /// 等待期间持 <see cref="_portGate"/> 独占串口（避免与命令收发劈帧），调用方不得并发发其他命令。
-        /// 帧提取复用 <see cref="TryExtractFrame"/>，修复原实现 RemoveRange 只删帧头不删整帧、
-        /// 非目标帧 break 后残留帧体被重复误扫导致的缓冲区错位问题。
+        /// 等待产品主动推送的血压结果（Ctrl=0x7B，功能码不限）：期间持 <see cref="_portGate"/> 独占串口，调用方不得并发发其他命令。
         /// </summary>
         public async Task<ProductBpReading?> WaitForBpPushResultAsync(
             int timeoutMs = 60000, CancellationToken ct = default)
@@ -316,7 +290,7 @@ namespace TORNPISolution.Service.Devices
             {
                 var buffer = new List<byte>();
                 var deadline = Environment.TickCount64 + timeoutMs;
-                var targetCode = ProductProtocol.GetBpResult.Code;     // 0x7B（功能码不限：实测应答可能 05 也可能 07）
+                var targetCode = ProductProtocol.GetBpResult.Code;     // 0x7B
 
                 while (Environment.TickCount64 < deadline)
                 {
@@ -361,10 +335,7 @@ namespace TORNPISolution.Service.Devices
             }
         }
 
-        /// <summary>
-        /// 从 0x7B 响应 payload 解析血压读数（协议 bp_measure_result_t，uint16 LE 三联）：
-        /// 收缩压 + 舒张压 + 平均压（mmHg）；心率不在本帧，由 0x7C 单独读回。
-        /// </summary>
+        /// <summary>从 0x7B 响应 payload 解析血压读数（协议 bp_measure_result_t，uint16 LE 三联：收缩压/舒张压/平均压 mmHg）；心率不在本帧，由 0x7C 单独读回</summary>
         private ProductBpReading? ParseBpReading(byte[] payload)
         {
             if (payload.Length < 6)
@@ -420,8 +391,7 @@ namespace TORNPISolution.Service.Devices
         // ==================== 具体命令方法 ====================
 
         /// <summary>
-        /// 进入产测模式（0x07/0x01）：打开串口后立即发送，防止产品进入休眠模式（约10秒无通讯即休眠）。
-        /// 协议要求：必须在 0x72/0x74 查询之前发送，每个测试模块开始时必须先调用此方法。
+        /// 进入产测模式（0x07/0x01）：打开串口后立即发送（约 10 秒无通讯产品即休眠）；协议要求必须在 0x72/0x74 查询之前、每个测试模块开始时先调用。
         /// </summary>
         public async Task EnterProductionTestModeAsync(CancellationToken ct = default)
         {
@@ -430,8 +400,7 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 产品信息获取（0x72）：回读 MAC 地址与嵌软版本（payload = 6 字节 MAC + ASCII 版本）。
-        /// MAC 格式化为空格分隔 hex（0C 5A 7A 4E D2 8F）；无响应时两者均回空串。
+        /// 产品信息获取（0x72）：payload = 6 字节 MAC + ASCII 嵌软版本，MAC 输出空格分隔 hex（如 0C 5A 7A 4E D2 8F）；无响应时两者均回空串。
         /// </summary>
         public async Task<(string MacText, string Version)> QueryProductInfoAsync(CancellationToken ct = default)
         {
@@ -449,9 +418,6 @@ namespace TORNPISolution.Service.Devices
             return (mac, version);
         }
 
-        /// <summary>
-        /// 产品当前状态查询（0x74）：读取产品当前测试模式和状态。
-        /// </summary>
         public async Task<string> QueryProductStatusAsync(CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送产品状态查询（0x74）");
@@ -463,10 +429,7 @@ namespace TORNPISolution.Service.Devices
             return BitConverter.ToString(resp.Payload);
         }
 
-        /// <summary>
-        /// 读设备端状态（0x74）原始两字节：payload = test_mode + test_state（各 1 字节）。
-        /// 与 <see cref="QueryProductStatusAsync"/> 的区别：本方法回原始字节不做字符串格式化，给需要按字节判定回读的测试项用。
-        /// </summary>
+        /// <summary>读设备端状态（0x74）原始两字节 payload = test_mode + test_state（各 1 字节），供需要按字节判定回读的测试项使用</summary>
         public async Task<(byte TestMode, byte TestState)?> ReadDeviceStateAsync(CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 读设备端状态（0x74）");
@@ -478,10 +441,9 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 设置测试模式（0x73）：每次测量前必须先设置对应模式。
-        /// 协议参数 2 字节：test_mode + status（0=进入测量 1=退出测量）；早期只发 1 字节产品不应答，按文档补齐。
+        /// 设置测试模式（0x73）：每次测量前必须先设置对应模式；协议参数固定 2 字节 test_mode + status（只发 1 字节产品不应答）。
         /// </summary>
-        /// <param name="mode">测试模式（0=空闲 1=袖带充放气 2=血压测试 3=静态压力 4=血氧 5=心电 6=加速度）</param>
+        /// <param name="mode">0=空闲 1=袖带充放气 2=血压测试 3=静态压力 4=血氧 5=心电 6=加速度</param>
         /// <param name="status">0=进入测量 1=退出测量（默认 0）</param>
         public async Task SetTestModeAsync(byte mode, byte status = 0, CancellationToken ct = default)
         {
@@ -489,19 +451,14 @@ namespace TORNPISolution.Service.Devices
             await SendCommandAsync(ProductProtocol.SetMode, "SetTestMode", new byte[] { mode, status }, ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 启动压力传感器（0x07 0x65）：产品进入压力静态测试态，静态压力校准流程的前置命令。
-        /// </summary>
+        /// <summary>启动压力传感器（0x07 0x65）：产品进入压力静态测试态，静态压力校准流程的前置命令</summary>
         public async Task StartPressureSensorAsync(CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送启动压力传感器（0x65）");
             await SendCommandAsync(ProductProtocol.StartPressureSensor, "StartPressureSensor", ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 校准压力传感器（0x07 0x66 + uint16 LE 校准压力）：仪器稳压到位后逐点发送，
-        /// 产品以当前压力为该校准点基准（帧样例 EF 04 07 66 3C 00 xx xx FE = 60mmHg）。
-        /// </summary>
+        /// <summary>校准压力传感器（0x07 0x66 + uint16 LE 校准压力）：仪器稳压到位后逐点发送，产品以当前压力为该校准点基准（帧样例 EF 04 07 66 3C 00 xx xx FE = 60mmHg）</summary>
         public async Task CalibratePressureSensorAsync(ushort pressureMmHg, CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送压力传感器校准（0x66）校准点={pressureMmHg}mmHg");
@@ -509,20 +466,14 @@ namespace TORNPISolution.Service.Devices
                 new byte[] { (byte)(pressureMmHg & 0xFF), (byte)(pressureMmHg >> 8) }, ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 关闭压力传感器（0x07 0x67）：校准模块全部测试项结束后发送，归还产品常态。
-        /// </summary>
+        /// <summary>关闭压力传感器（0x07 0x67）：校准模块全部测试项结束后发送，归还产品常态</summary>
         public async Task ClosePressureSensorAsync(CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送关闭压力传感器（0x67）");
             await SendCommandAsync(ProductProtocol.ClosePressureSensor, "ClosePressureSensor", ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 读取产品当前静态压力值（0x76 读产品压力值，实测帧 EF 02 05 76 17 86 FE）。
-        /// BP-003 静态压力精度测试用：产品传感器检测到的模拟仪施加的稳压值。
-        /// 协议定义 uint32（4 字节），实测当前固件回 2 字节：按长度自适应（见 <see cref="ParsePressureMmHg"/>），单位 mmHg。
-        /// </summary>
+        /// <summary>读取产品当前静态压力值（0x76 读产品压力值，实测帧 EF 02 05 76 17 86 FE）：BP-003 静态压力精度测试取产品传感器检测到的模拟仪施加稳压值（mmHg）；字节数自适应见 <see cref="ParsePressureMmHg"/></summary>
         public async Task<double> ReadProductPressureAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetPressure, "ReadProductPressure",
@@ -536,10 +487,7 @@ namespace TORNPISolution.Service.Devices
             return ParsePressureMmHg(resp.Payload);
         }
 
-        /// <summary>
-        /// 读取产品血压测量最终结果（0x7B）。
-        /// BP-004/BP-005 用：主动轮询读取（或等待推送后调用）。
-        /// </summary>
+        /// <summary>读取产品血压测量最终结果（0x7B）：BP-004/BP-005 用，主动轮询读取（或等待推送后调用）</summary>
         public async Task<ProductBpReading?> ReadBpResultAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetBpResult, "ReadBpResult",
@@ -548,11 +496,7 @@ namespace TORNPISolution.Service.Devices
             return ParseBpReading(resp.Payload);
         }
 
-        /// <summary>
-        /// 开始/关闭一次完整血压测量（0x79，参数 uint8 status：0=开始 1=关闭）。
-        /// 协议要求：测量完成后需下发一次关闭，才能再次开始测量。
-        /// </summary>
-        /// <param name="start">true=开始一次测量，false=关闭一次完整测量</param>
+        /// <summary>开始/关闭一次完整血压测量（0x79，参数 uint8 status：0=开始 1=关闭）；协议要求测量完成后须下发一次关闭，才能再次开始测量</summary>
         public async Task StartBpMeasureAsync(bool start = true, CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送{(start ? "开始" : "关闭")}完整血压测量指令（0x79 status={(start ? 0 : 1)}）");
@@ -560,10 +504,7 @@ namespace TORNPISolution.Service.Devices
                 new byte[] { (byte)(start ? 0 : 1) }, ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 开始充气（0x75 + 4 字节参数：uint16 LE 目标压力mmHg 在前、uint16 LE 最长充气时间秒在后）。
-        /// BP-009 过压保护用：由产品气泵自己充到指定压，模拟仪不参与加压；超时后产品底层自行放气。
-        /// </summary>
+        /// <summary>开始充气（0x75 + 4 字节参数：uint16 LE 目标压力mmHg 在前、uint16 LE 最长充气时间秒在后）：BP-009 过压保护用，由产品气泵充到指定压、模拟仪不参与加压，超时后产品底层自行放气</summary>
         public async Task StartInflateAsync(ushort targetMmHg, ushort timeoutSeconds, CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} 发送开始充气（0x75）目标压力={targetMmHg}mmHg 最长充气={timeoutSeconds}s");
@@ -575,10 +516,7 @@ namespace TORNPISolution.Service.Devices
                 }, ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 读过压状态（0x80，无参数）：payload = uint16 LE，0=无过压 1=过压，为实时状态。
-        /// BP-009 用：0→1 跳变时刻即产品保护动作时刻，比从回读曲线找骤降点可靠；无响应回 null。
-        /// </summary>
+        /// <summary>读过压状态（0x80，无参数）：payload = uint16 LE，0=无过压 1=过压，实时状态，无响应回 null；BP-009 取 0→1 跳变时刻作为产品保护动作时刻</summary>
         public async Task<bool?> ReadOverPressureStateAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetOverPressureStatus, "ReadOverPressureState",
@@ -588,10 +526,7 @@ namespace TORNPISolution.Service.Devices
             return ProductProtocol.ReadUInt16LE(resp.Payload, 0) != 0;
         }
 
-        /// <summary>
-        /// 读取 ECG 导联状态（0x88）。
-        /// ECG-002 导联脱落检测用。
-        /// </summary>
+        /// <summary>读取 ECG 导联状态（0x88）</summary>
         /// <returns>导联状态原始字节（具体位定义待实机联调确认）</returns>
         public async Task<byte[]> ReadLeadStateAsync(CancellationToken ct = default)
         {
@@ -599,27 +534,17 @@ namespace TORNPISolution.Service.Devices
             return resp?.Payload ?? Array.Empty<byte>();
         }
 
-        /// <summary>
-        /// 开始ECG测试（协议命令 CtrlStartEcgTest：Func=0x05/Ctrl=0x73，参数默认 05 00）：
-        /// 完整帧 EF 04 05 73 05 00 15 03 FE，产品开始持续推送心电波形（0x8D）直到收到关闭命令。
-        /// 参数字节可在协议命令配置页改（保存即热重载），留空则回退 mode=5/status=0。
-        /// </summary>
+        /// <summary>开始ECG测试（协议命令 CtrlStartEcgTest：Func=0x05/Ctrl=0x73，参数默认 05 00，完整帧 EF 04 05 73 05 00 15 03 FE）：产品开始持续推送心电波形（0x8D）直到收到关闭命令</summary>
         public Task StartEcgTestAsync(CancellationToken ct = default)
             => SendEcgTestToggleAsync(ProductProtocol.StartEcgTest, ProductProtocol.StartEcgTestKey,
                 "StartEcgTest", "开始ECG测试", new byte[] { ProductProtocol.ModeEcg, 0 }, ct);
 
-        /// <summary>
-        /// 关闭ECG测试（协议命令 CtrlStopEcgTest：Func=0x05/Ctrl=0x73，参数默认 05 01）：
-        /// 完整帧 EF 04 05 73 05 01 D4 C3 FE，产品停止推送心电波形。
-        /// </summary>
+        /// <summary>关闭ECG测试（协议命令 CtrlStopEcgTest：Func=0x05/Ctrl=0x73，参数默认 05 01，完整帧 EF 04 05 73 05 01 D4 C3 FE）：产品停止推送心电波形</summary>
         public Task StopEcgTestAsync(CancellationToken ct = default)
             => SendEcgTestToggleAsync(ProductProtocol.StopEcgTest, ProductProtocol.StopEcgTestKey,
                 "StopEcgTest", "关闭ECG测试", new byte[] { ProductProtocol.ModeEcg, 1 }, ct);
 
-        /// <summary>
-        /// 开始/关闭ECG测试共用发送：参数优先取协议命令配置页的 Data 列，未配置时用 <paramref name="fallbackData"/>。
-        /// 日志把实际参数写出来，换产品/改固件时一眼看出下发的是什么。
-        /// </summary>
+        /// <summary>开始/关闭ECG测试共用发送：参数优先取协议命令配置页的 Data 列，未配置时用 <paramref name="fallbackData"/></summary>
         private async Task SendEcgTestToggleAsync(ProductCmd cmd, string cmdKey, string commandName,
             string label, byte[] fallbackData, CancellationToken ct)
         {
@@ -630,10 +555,8 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 采集产品主动推送的心电波形（Func=0x05 / Ctrl=0x8D，每帧 75 点 = 300ms @ 250SPS）。
-        /// 整段采集窗口（skipMs + durationMs）持 <see cref="_portGate"/> 独占串口：命令收发写前会 DiscardInBuffer，
-        /// 若采集期间并发发命令，波形帧会被丢弃甚至拆成半帧，因此调用方不得在采集期间读其他值。
-        /// 前 skipMs 只排空串口不记录（避开产品刚进入心电测量的起始瞬态）；有数据段的帧时刻以 skipMs 为原点，
-        /// 与仪器输出曲线共用一条时间轴。跳档是整帧为单位（最多丢 300ms 边界数据）。
+        /// 整段窗口（skipMs + durationMs）持 <see cref="_portGate"/> 独占串口：命令收发写前会 DiscardInBuffer，采集期间并发发命令会丢弃波形帧甚至拆成半帧，调用方不得并发读其他值。
+        /// 前 skipMs 只排空串口不记录（避开产品刚进入心电测量的起始瞬态），数据段帧时刻以 skipMs 为原点、与仪器输出曲线共用时间轴；跳档以整帧为单位（最多丢 300ms 边界数据）。
         /// 逐帧不记日志（60s ≈ 200 帧），只在结束时汇总一条。
         /// </summary>
         public async Task<int> CaptureEcgWaveAsync(
@@ -718,10 +641,7 @@ namespace TORNPISolution.Service.Devices
             }
         }
 
-        /// <summary>
-        /// 读取心率测量值（0x7C）。
-        /// ECG-004 心率检测精度用。
-        /// </summary>
+        /// <summary>读取心率测量值（0x7C）</summary>
         public async Task<double> ReadHeartRateAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetHrValue, "ReadHeartRate",
@@ -735,10 +655,7 @@ namespace TORNPISolution.Service.Devices
             return ProductProtocol.ReadUInt16LE(resp.Payload, 0);
         }
 
-        /// <summary>
-        /// 开始/停止血氧测量（0x81，Func=0x05）。
-        /// </summary>
-        /// <param name="start">true=开始，false=停止</param>
+        /// <summary>开始/停止血氧测量（0x81，Func=0x05）</summary>
         public async Task StartSpo2MeasureAsync(bool start = true, CancellationToken ct = default)
         {
             _log.Info($"{DateTime.Now} {(start ? "开始" : "停止")}血氧测量（0x81）");
@@ -746,10 +663,7 @@ namespace TORNPISolution.Service.Devices
                 new byte[] { (byte)(start ? 0x00 : 0x01) }, ct: ct).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 读取血氧测量值（0x82，Func=0x05）。
-        /// SPO2-001 血氧饱和度精度测试用。
-        /// </summary>
+        /// <summary>读取血氧测量值（0x82，Func=0x05）</summary>
         /// <returns>SpO2（%）；读取失败返回 NaN</returns>
         public async Task<double> ReadSpo2ValueAsync(CancellationToken ct = default)
         {
@@ -765,10 +679,7 @@ namespace TORNPISolution.Service.Devices
             return ProductProtocol.ReadUInt16BE(resp.Payload, 0);
         }
 
-        /// <summary>
-        /// 读取电池信息（0x6C，Func=0x07）：响应 payload 共 8 字节（协议 fac_bat_req）。
-        ///   [0..3] 电压 uint32 LE（mV）  [4] 百分比（0-100%）  [5..7] 保留字节 rese[3]（不解析）
-        /// </summary>
+        /// <summary>读取电池信息（0x6C，Func=0x07）：响应 payload 共 8 字节（协议 fac_bat_req）— [0..3] 电压 uint32 LE（mV）、[4] 百分比（0-100%）、[5..7] 保留字节 rese[3]（不解析）</summary>
         public async Task<BatteryReading?> ReadBatteryInfoAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetBatteryInfo, "ReadBatteryInfo",
@@ -786,9 +697,7 @@ namespace TORNPISolution.Service.Devices
             return new BatteryReading(voltageMv, percentage, payload);
         }
 
-        /// <summary>
-        /// 读取充电状态（0x6D，Func=0x07）：返回充电状态字节（1=充电中，0=未充电）。
-        /// </summary>
+        /// <summary>读取充电状态（0x6D，Func=0x07）：返回充电状态字节（1=充电中，0=未充电）</summary>
         public async Task<byte> ReadChargingStatusAsync(CancellationToken ct = default)
         {
             var resp = await SendCommandAsync(ProductProtocol.GetChargingStatus, "ReadChargingStatus",
@@ -807,7 +716,7 @@ namespace TORNPISolution.Service.Devices
             if (_port.IsOpen)
                 _port.Close();
             _port.Dispose();
-            _portGate.Dispose();
+            // 不释放 _portGate：SemaphoreSlim 只在用到 AvailableWaitHandle 时持内核句柄，本类全程只用 WaitAsync/Release，交 GC 回收；显式 Dispose 会让仍在等待的调用方抛 ObjectDisposedException。
             GC.SuppressFinalize(this);
         }
     }

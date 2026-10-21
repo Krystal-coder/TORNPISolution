@@ -13,11 +13,9 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 单板测试页：八条通道各一张卡，跑哪些项在菜单「测试项」里勾（勾一次八条一起跑），也可右键单独跑某一条。
-    /// 这一页不套模块库、不组方案：单板只有固定四项，让人拖模块排顺序只会多出两种错法。
-    /// 一轮只跑一遍：读码器/网关/综测仪是整批共用的设备，两路各跑一半会互相抢连接。
-    /// 执行端按槽位过滤：不在本轮范围里的通道既不驱动也不上报，免得拿上一轮的旧值当本轮结果。
-    /// 勾选项一改就写 board-test.json：这组勾选是这台机器的作业定义，靠人记得点保存迟早会丢。
+    /// 单板测试页：八条通道各一张卡，跑哪几项在菜单「测试项」里勾（勾一次八条一起跑），也可右键单跑一路。
+    /// 一轮只跑一遍：读码器/网关/综测仪是整批共用的设备，两路各跑一半会互抢连接；不在本轮范围里的通道既不驱动也不上报。
+    /// 勾选项一改就写 board-test.json：这组勾选是本机的作业定义，不自动落盘会丢。
     /// </summary>
     public class BoardChannelViewModel : ViewModelBase
     {
@@ -37,10 +35,7 @@ namespace TORNPISolution.ViewModels
 
         private readonly Dictionary<int, BoardChannelCardViewModel> _cardsByChannel = new();
 
-        /// <summary>
-        /// 项名 → 落在哪张卡的哪一行：执行端只报项名（带"-槽位号"后缀），靠这张表回查。
-        /// Card 为 null = 整批级的那几项（项名里没有"-槽位号"后缀），它有结果但不属于任何一条通道，行放在 <see cref="BatchItems"/> 里。
-        /// </summary>
+        /// <summary>项名 → 落在哪张卡的哪一行，执行端只报项名（带"-槽位号"后缀）时靠这张表回查；Card 为 null = 整批级的那几项（项名无后缀），行放在 <see cref="BatchItems"/> 里。</summary>
         private readonly Dictionary<string, (BoardChannelCardViewModel? Card, TestItemViewModel Item)> _rowsByName = new();
 
         private readonly Dictionary<int, Stopwatch> _cardWatches = new();
@@ -89,11 +84,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>菜单「测试项」里的勾选项：显示名与是否勾选，改一下就落盘</summary>
         public ObservableCollection<BoardTestItemOption> SelectedItems { get; } = new();
 
-        /// <summary>
-        /// 整批级项目的行：这类项按整批判，报出来的名没有"-槽位号"后缀，
-        /// 挂不到任何一张通道卡上，所以单独摆一行——不建行的话执行端报的结果就没人接，界面只能看见 8 路红、看不见这一项到底过没过。
-        /// 重码那一项收掉后目前没有这类项了，机制留着：以后再加整批级的项不必再补一遍接结果的代码。
-        /// </summary>
+        /// <summary>整批级项目的行：这类项按整批判，报出来的名没有"-槽位号"后缀、挂不到任何一张通道卡上，所以单独摆一行。</summary>
         public ObservableCollection<TestItemViewModel> BatchItems { get; } = new();
 
         public bool HasBatchItems => BatchItems.Count > 0;
@@ -101,7 +92,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>通道卡片清单：行数就是配置里的通道行数</summary>
         public ObservableCollection<BoardChannelCardViewModel> Channels { get; } = new();
 
-        /// <summary>勾选项的一句话汇总（页头显示，让人一眼看到本轮到底跑几项）</summary>
+        /// <summary>勾选项汇总，页头显示本轮跑几项</summary>
         public string SelectedItemsText =>
             SelectedItems.Count(o => o.Selected) == 0
                 ? "没勾任何测试项"
@@ -219,10 +210,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>当前勾着的测试项（保持 Enum 顺序，方便按模块分组）</summary>
         private List<BoardTestItemKind> SelectedKinds => SelectedItems.Where(o => o.Selected).Select(o => o.Kind).ToList();
 
-        /// <summary>
-        /// 本轮要跑的那几路：勾了“本轮跑”且这条道接着的（与烧录页同一口径）。
-        /// 两个开关不能合一个：“这条道接没接”是工装状态，要落盘；“本轮跑不跑”是当下这一下，不该影明天。
-        /// </summary>
+        /// <summary>本轮要跑的那几路：勾了“本轮跑”且这条道接着的（与烧录页同一口径）。两个开关不能合一个：“这条道接没接”是工装状态要落盘，“本轮跑不跑”是当下这一下、不落盘。</summary>
         public List<int> TargetChannels => Channels.Where(c => c.Selected && c.Enabled).Select(c => c.Channel).ToList();
 
         /// <summary>全选/清空只动已接着的那几道：没接的路本来就不该被勾出来跑</summary>
@@ -252,12 +240,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>「单板配置」窗口点保存时走这里</summary>
         public bool SaveConfigFromDialog() => SaveConfig(quiet: false);
 
-        /// <summary>
-        /// 「单板配置」窗口保存成功后调这一句：按新仪器配置重算每路的设备落点，并按新目录重建明细行。
-        /// 重建会清掉本轮已跑结果，这与改测试项勾选是同一个口径——两处都在改“这一轮跑什么”，
-        /// 一处立即生效、另一处要人回页面再点一下按钮，只会造出“不点那一下配置就不生效”的错觉。
-        /// 这里不重建卡片对象：「本轮跑」不落盘，重建卡片会把它抹回全跑，人刚在配置窗里勾的就白勾了。
-        /// </summary>
+        /// <summary>「单板配置」窗口保存成功后调用：按新仪器配置重算每路的设备落点并按新目录重建明细行（会清掉本轮已跑结果）；这里不重建卡片对象，因为「本轮跑」不落盘，重建会把它抹回全跑。</summary>
         public void ApplySavedConfig()
         {
             var config = SafeLoadInstruments();
@@ -281,8 +264,7 @@ namespace TORNPISolution.ViewModels
 
                 // 页头那句在“跑法说明”与“测试中”之间来回切，靠的就是 IsRunning 与本轮范围，两边都得推一下
                 RaiseRoundScopeChanged();
-                // 这一页三个按钮能不能按全吃 IsRunning，而收轮是后台回调落回 UI 线程、没有输入事件，
-                // 不补这一句就得等用户点一下别处，清空结果与开始测试才肯亮
+                // 这一页三个按钮的可用性全吃 IsRunning，而收轮是后台回调落回 UI 线程、没有输入事件；不补这一句就得等用户点一下别处，清空结果与开始测试才肯亮
                 RequeryCommands();
             }
         }
@@ -350,10 +332,7 @@ namespace TORNPISolution.ViewModels
             _ => $"通道 {string.Join("、", _roundChannels)}",
         };
 
-        /// <summary>
-        /// 页头那一句：没开过时讲跑法，开跑后讲这一轮跑的是哪几路。
-        /// 单跑一路时不能再念“八条通道共用同一组”——那句会把人引去怀疑其余几路是不是没配好设备。
-        /// </summary>
+        /// <summary>页头那一句：没开过时讲跑法，开跑后讲这一轮跑的是哪几路；单跑一路时不能念“八条通道共用同一组”，那句会让人怀疑其余几路没配好设备。</summary>
         public string RoundStatusText => IsRunning
             ? _roundChannels.Count == 1
                 ? $"单通道测试中：{RoundScopeText}，其余几路本轮不跑"
@@ -392,17 +371,12 @@ namespace TORNPISolution.ViewModels
                 return;
             }
 
-            // 跟着把人带到这一路：不切的话右边还停在原来选中的那一张，跑着了也看不见它在跑，
-            // 只能看见一句“这一路没有可跑的项”
+            // 跟着把人带到这一路：不切的话右边还停在原来选中的那一张，跑着了也看不见它在跑，只能看见一句“这一路没有可跑的项”
             SelectedCard = card;
             RunCore(new[] { card.Channel });
         }
 
-        /// <summary>
-        /// 卡片右键"停止测试"。
-        /// 说清一件事：单板的三项测试是整批一轮跑完的（一台读码器一次触发收多条、一台网关一次扫描），
-        /// 停这一路就是把当前这一轮停下来；只有这一路在跑时，它就等于只停它自己。
-        /// </summary>
+        /// <summary>卡片右键"停止测试"：单板的三项测试是整批一轮跑完的（一台读码器一次触发收多条、一台网关一次扫描），停这一路就是把当前这一轮停下来；只有这一路单独在跑时它才等于只停它自己。</summary>
         public void StopChannel(BoardChannelCardViewModel? card)
         {
             if (card == null) return;
@@ -425,18 +399,14 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>
-        /// 开一轮：only 为 null 就是整批（参与的那些通道）。
-        /// 先把勾选项落盘再校验：勾选项与通道参与都写进 board-test.json，界面上改完不点也已生效，
-        /// 但这一轮用的还是内存里这份，落一次盘是为了下次开机看到的就是刚才跑的这一组。
-        /// </summary>
+        /// <summary>开一轮：先把勾选项落盘再校验——勾选项与通道参与都写进 board-test.json，界面上改完不点也已生效，落一次盘是为了下次开机看到的就是刚才跑的这一组。</summary>
+        /// <param name="only">null = 整批（参与的那些通道）；否则只跑点名的这几路。</param>
         private void RunCore(IReadOnlyList<int>? only)
         {
             _log.Info($"{DateTime.Now} Start calling the BoardChannelViewModel.RunCore() method . {Environment.NewLine}");
             try
             {
-                // 右键"开始测试"与命令按钮走的是两条路，运行期闸门只能开在这里：
-                // 叠两轮会把同一批读码器/网关抢成两半，而且 _runCts 被后一轮覆盖后前一轮就再也停不下来
+                // 右键"开始测试"与命令按钮走的是两条路，运行期闸门只能开在这里：叠两轮会把同一批读码器/网关抢成两半，且 _runCts 被后一轮覆盖后前一轮就再也停不下来
                 if (IsRunning)
                 {
                     StatusText = "本轮还在跑，不要再开一轮（读码器、网关、综测仪都是共用的）";
@@ -505,8 +475,7 @@ namespace TORNPISolution.ViewModels
             {
                 _log.Error($"开单板轮次失败：{ex.Message}", ex);
                 StatusText = $"开跑失败：{ex.Message}";
-                // 只有真开过轮才需要收尾：校验阶段就抛回来时 IsRunning 还是 false，
-                // 这时去清 TestRunState 会把整机方案占着的闸门一并抹开
+                // 只有真开过轮才需要收尾：校验阶段就抛回来时 IsRunning 还是 false，这时去清 TestRunState 会把整机方案占着的闸门一并抹开
                 if (IsRunning) FinishRun();
             }
             finally
@@ -518,10 +487,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>一个模块在本轮要跑的那几项</summary>
         private sealed record ModulePlan(TestModuleModel Module, IReadOnlyList<BoardTestItemKind> Kinds);
 
-        /// <summary>
-        /// 按固定顺序把勾选项分到模块上：执行端要的是这个顺序，界面建行要的也是它给出的项名。
-        /// 目录里没有这个模块 = 这类设备在仪器配置里全没启用，跳过并记一句，不让它拖垮其余模块。
-        /// </summary>
+        /// <summary>按固定顺序把勾选项分到模块上：执行端要这个顺序，界面建行要的也是它给出的项名；目录里没有这个模块（这类设备在仪器配置里全没启用）就跳过并记一句，不拖垮其余模块。</summary>
         private List<ModulePlan> ComposePlan(IReadOnlyList<BoardTestItemKind> kinds)
         {
             var catalog = _moduleService.GetAllModules().Where(m => m.Category == ModuleCategory.Board).ToList();
@@ -545,11 +511,7 @@ namespace TORNPISolution.ViewModels
             return plan;
         }
 
-        /// <summary>
-        /// 开一轮：把勾选项分到模块上，并为本轮那些通道建好行对象。
-        /// 建行用的就是目录里的同一批项名（"供电电压-3"这种带槽位后缀的），
-        /// 所以执行端上报的名与界面上的行必然同源，不会出现"报了名界面找不到"的静默丢结果。
-        /// </summary>
+        /// <summary>开一轮：把勾选项分到模块上并为本轮那些通道建好行对象。建行用的就是目录里的同一批项名（"供电电压-3"这种带槽位后缀的），执行端上报的名与界面上的行同源，不会"报了名界面找不到"地静默丢结果。</summary>
         private List<ModulePlan> BuildPlan(IReadOnlyList<BoardTestItemKind> kinds, List<int> targets)
         {
             var plan = ComposePlan(kinds);
@@ -562,11 +524,7 @@ namespace TORNPISolution.ViewModels
             return plan;
         }
 
-        /// <summary>
-        /// 把计划摊成界面上的行：项名里带"-槽位号"的进对应通道卡，不带的算整批级项单独一行。
-        /// slots 之外那些通道卡会撤掉行——那几路没在这一轮里，卡片就该是灰的"未参与"，
-        /// 挂着几行未测试反而像是跑坏了。
-        /// </summary>
+        /// <summary>把计划摊成界面上的行：项名里带"-槽位号"的进对应通道卡，不带的算整批级项单独一行；slots 之外的通道卡撤掉行并标灰的"未参与"，挂着几行未测试反而像是跑坏了。</summary>
         private void LayOutRows(IReadOnlyList<ModulePlan> plan, IReadOnlyCollection<int> slots)
         {
             _rowsByName.Clear();
@@ -610,11 +568,7 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(HasBatchItems));
         }
 
-        /// <summary>
-        /// 不开轮也把清单摆出来：勾了哪几项，每条通道就会跑哪几项，结论全是"未测试"。
-        /// 这些行从前只在开轮那一刻才建，于是点开通道下方一片空白——现场在开跑之前就该看见本轮要跑什么，
-        /// 而不是只能等跑完才知道勾的项落到了哪几路。跑着的时候不动手，免得把已经上来的结果抹掉。
-        /// </summary>
+        /// <summary>不开轮也把清单摆出来：勾了哪几项、每条通道就跑哪几项，结论全是"未测试"；跑着的时候不动手，免得把已经上来的结果抹掉。</summary>
         private void RebuildItemRows()
         {
             if (IsRunning) return;
@@ -712,10 +666,7 @@ namespace TORNPISolution.ViewModels
             });
         }
 
-        /// <summary>
-        /// 执行端的逐项上报（在采集线程上调用）：按项名找到那张卡的哪一行，刷值并把这行结论写进该路的明细。
-        /// 回调查不到名 = 执行端报了目录里没有的项（或这一路本轮没建行），只记日志不静默丢掉。
-        /// </summary>
+        /// <summary>执行端的逐项上报（在采集线程上调用）：按项名找到那张卡的哪一行，刷值并把这行结论写进该路的明细；回调查不到名 = 报了目录里没有的项（或这一路本轮没建行），只记日志不静默丢掉。</summary>
         private Task OnItemCompleted(string itemName, TestItemResult result)
         {
             if (!_rowsByName.TryGetValue(itemName, out var row))
@@ -854,11 +805,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>
-        /// 算某一行的设备落点；整份配置由调用方传进来，逐路算时共用同一份。
-        /// 这份说明只念不改是有意的：设定电压与 RSSI 阈值是按台给的（一台综测仪四个通道共用一个设定值），
-        /// 从一条通道进去改会把同台的其余通道一起改掉，那种改法该在单板配置的「工位仪器」页里做。
-        /// </summary>
+        /// <summary>算某一行的设备落点；整份配置由调用方传进来，逐路算时共用同一份。这份说明只念不改是有意的：设定电压与 RSSI 阈值是按台给的（一台综测仪四个通道共用一个设定值），从一条通道进去改会把同台的其余通道一起改掉，那种改法该在单板配置的「工位仪器」页里做。</summary>
         private static string DescribeChannelDevices(int channel, InstrumentConnectionConfig config)
         {
             var lines = new List<string>();
@@ -939,11 +886,7 @@ namespace TORNPISolution.ViewModels
                 }
             }
 
-            /// <summary>
-            /// 回退勾选用：不再触发一次保存（否则被拦下的那次改动又写回盘上了）。
-            /// 属性名必须手写：SetProperty 的 [CallerMemberName] 在这一行取到的是方法名 SetSelectedWithoutSave，
-            /// 通知发给个不存在的属性名，界面上的勾不会跟着变（数据对了、画面没对）。
-            /// </summary>
+            /// <summary>回退勾选用：不再触发一次保存，否则被拦下的那次改动又写回盘上。属性名必须手写——SetProperty 的 [CallerMemberName] 在这一行取到的是方法名 SetSelectedWithoutSave，通知发给个不存在的属性名，界面上的勾不会跟着变（数据对了、画面没对）。</summary>
             public void SetSelectedWithoutSave(bool value) => SetProperty(ref _selected, value, nameof(Selected));
         }
     }

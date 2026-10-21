@@ -5,10 +5,8 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// Spec：单板工位（Category=Board）。
-    /// B01 不依赖仪器配置所以是静态方法；B02/B03/B04 的项清单按仪器配置里启用的台数生成，
-    /// 所以这些 Build 方法与槽位读取辅助都是实例方法（要读 _configService），口径与执行端同用一个函数。
-    /// 书写约定与整机那份一致：#region 模块清单 里一个模块一段（//======Bxx====== 开头），段与段之间不夹辅助方法；
-    /// 读配置与算槽位的辅助统一放文件末尾的 #region 取配置与槽位辅助。
+    /// B01 不依赖仪器配置所以是静态方法；B02/B03/B04 的项清单按仪器配置里启用的台数生成，所以这些 Build 方法与槽位读取辅助都是实例方法（要读 _configService），口径与执行端同用一个函数。
+    /// 书写约定与整机那份一致：#region 模块清单 里一个模块一段（//======Bxx====== 开头），段与段之间不夹辅助方法；读配置与算槽位的辅助统一放文件末尾的 #region 取配置与槽位辅助。
     /// </summary>
     public partial class Spec
     {
@@ -29,17 +27,15 @@ namespace TORNPISolution.Service
             var ti = AddTI(TestModuleIds.BoardInitInstruments, ModuleCategory.Board, "初始化仪器",
                 "初始化固高IO等硬件，全部成功为 PASS");
 
-            AddResult(ti, name: SpecItems.GenIoInit,          // ResultName
+            AddResult(ti, name: SpecItems.GenIoInit,
                 description: "启动 EtherCAT 总线",
-                specMin: 1, specMax: 1, unit: "");          // SpecMin / SpecMax（1=成功 0=失败，成功才 PASS）
+                specMin: 1, specMax: 1, unit: "");
 
             return ti;
         }
 
         //======================================B02-----------产品条码获取
         // 一项一槽位：启用的读码器按清单顺序每台占 SlotsPerReader 个槽位（与执行端同一口径：SpecItems.BoardBarcodeSlots）。
-        // 判据：本槽位读到非空条码即 PASS（原文上到仪器列）。
-        // 整批重码那一项已按现场要求收掉（现阶段不管控条码重不重），目录里只留逐槽位的取码项。
         private TestModuleModel BuildBoardBarcodeRead()
         {
             var slots = GetBarcodeSlots();
@@ -60,7 +56,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================B03-----------蓝牙功能测试
-        // 一台已启用网关一个槽位，两项：广播地址（扫到即 PASS）与信号强度（本轮均值落在 [该行 RssiMinDbm, 0] 判 PASS）。
         // 静态规格直接取配置里的阈值：目录每次重建，改阈值无需改代码（与 B02 同一口径：SpecItems.BoardBluetoothSlots）。
         // 地址识别的取法：该行填了 ExpectedMac 就按它匹配，没填则取识别窗口里信号最强的一条。
         private TestModuleModel BuildBoardBluetoothTest()
@@ -89,7 +84,6 @@ namespace TORNPISolution.Service
 
         //======================================B04-----------综测仪上电
         // 一台已启用综测仪占四个硬件固定通道，一项一通道（与执行端同一口径：SpecItems.BoardPowerSlots）。
-        // 判定区间的上下限直接取配置里的设定值与容差：目录每次重建，改电压无需改代码。
         // 上电时可选先 *RST 清掉残留与过流锁，回读走 po 通路；跑完只断网络连接、输出保持供电。
         private TestModuleModel BuildBoardPowerOn()
         {

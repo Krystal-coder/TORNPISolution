@@ -6,17 +6,14 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// TestItem 分部：B03 蓝牙功能测试（单板工位）。
-    /// 一台已启用网关出一个槽位、两项结果，分两步：
-    ///   ① 识别广播地址：按该行 ExpectedMac 开过滤扫一段时间；ExpectedMac 留空就不指定地址，
-    ///      取识别窗口内信号强度最高的那条广播当本行要收的地址；
+    /// 一台已启用网关出一个槽位、两项结果，分两步（槽位号口径与目录构建同一个函数 <see cref="SpecItems.BoardBluetoothSlots"/>）：
+    ///   ① 识别广播地址：按该行 ExpectedMac 开过滤扫一段时间；ExpectedMac 留空就不指定地址，取识别窗口内信号强度最高的那条广播当本行要收的地址；
     ///   ② 采信号强度：把定下来的地址交给 <see cref="IBluetoothGateway.ReadRssiAsync"/> 攒样本，上报均值。
-    /// 槽位号口径与目录构建同一个函数（<see cref="SpecItems.BoardBluetoothSlots"/>）。
-    /// 逐台并发（每台一条独立 TCP 连接、各自扫描与复位），采集结果串行上报——结果字典不是线程安全的。
-    /// 某台连不上只判它自己那两项 FAIL，不拦别的网关。
+    /// 逐台并发（每台一条独立 TCP 连接、各自扫描与复位），采集结果串行上报（结果字典不是线程安全的）；某台连不上只判它自己那两项 FAIL，不拦别的网关。
     /// </summary>
     public partial class TestItem
     {
-        /// <summary>识别窗口最短给多少：配成 0 或负数也不让这条指令白跑一轮</summary>
+        /// <summary>识别窗口下限：配置填 0 或负数也按这个下限扫，不让这条指令空跑一轮</summary>
         private const int MinIdentifyWindowMs = 200;
 
         //测试项目**************************---B03---**************************蓝牙功能测试（单板）
@@ -80,10 +77,7 @@ namespace TORNPISolution.Service
             _log.Info($"蓝牙功能测试完成：{slots.Count - failed}/{slots.Count} 个槽位识别到广播地址");
         }
 
-        /// <summary>
-        /// 一台网关跑完「识别地址 → 采信号强度」，任何异常都收进返回的 Failure 里（不让整模块抛）。
-        /// 建链这一步已经确认网关在 AT 模式下应答 AT，后面每条指令才不会各自等满超时。
-        /// </summary>
+        /// <summary>一台网关跑完「识别地址 → 采信号强度」，任何异常都收进返回的 Failure 里（不让整模块抛）；建链这一步已经确认网关在 AT 模式下应答 AT，后面每条指令才不会各自等满超时。</summary>
         private async Task<BluetoothProbe> ProbeGatewayAsync(BluetoothGatewaySettings settings, CancellationToken token)
         {
             var probe = new BluetoothProbe(settings.Name);
@@ -96,8 +90,7 @@ namespace TORNPISolution.Service
                 var found = await gateway.ScanAsync(Math.Max(MinIdentifyWindowMs, settings.IdentifyWindowMs), expected, token)
                                       .ConfigureAwait(false);
                 // 填了预期地址时 ScanAsync 已经只留该地址的广播，没填就在全部广播里取最强的一条。
-                // 广播记录是值类型，扫空时直接取第一条拿到的是 Mac 为空的默认值而不是 null，判不出「没扫到」，
-                // 所以先看集合有没有东西，再把结果装进可空变量。
+                // 广播记录是值类型，扫空时直接取第一条拿到的是 Mac 为空的默认值而不是 null，判不出「没扫到」，所以先判集合非空再把结果装进可空变量。
                 BluetoothScanInfo? target = found.Count > 0 ? found.MaxBy(r => r.Rssi) : null;
                 if (target == null)
                 {

@@ -1,10 +1,9 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 测试模块固定 Id。
-    /// 编号约定：A 前缀=整机工位模块（尾号沿用历史 M 编号，便于老日志对照），B 前缀=单板工位模块（单板自己连号）。
+    /// 测试模块固定 Id。编号约定：A 前缀=整机工位模块（尾号沿用历史 M 编号，便于对照老日志），B 前缀=单板工位模块（单板自己连号）。
     /// 类别不由前缀决定，以 <see cref="TestModuleModel.Category"/> 为准（Spec 目录声明），前缀只是给人看的命名约定。
-    /// 历史 M 编号已弃用，仅老方案文件里还留着，读入时按 M→A 映射一次（见 MainViewModel.LoadPlanWithName）。
+    /// 已弃用的 M 编号仅存在于老方案文件，读入时按 M→A 映射一次（见 MainViewModel.LoadPlanWithName），内存里一律走新 Id。
     /// </summary>
     public static class TestModuleIds
     {
@@ -86,8 +85,7 @@ namespace TORNPISolution.Share.Models
         public const string BoardPowerOn = "B04";
 
         /// <summary>
-        /// 老编号兼容：把已弃用的 M 前缀转成同尾号的整机 A 前缀（M06→A06），其余原样返回。
-        /// 只为读旧方案文件服务：内存里一律走新 Id，下次保存自然升级。
+        /// 老编号兼容：把已弃用的 M 前缀转成同尾号的整机 A 前缀（M06→A06），其余原样返回；只服务读旧方案文件，保存时自然升级。
         /// </summary>
         public static string NormalizeLegacyId(string? id)
             => id is { Length: 3 } && (id[0] == 'M' || id[0] == 'm') && char.IsDigit(id[1]) && char.IsDigit(id[2])

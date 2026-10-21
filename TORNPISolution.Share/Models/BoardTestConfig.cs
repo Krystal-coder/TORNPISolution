@@ -1,9 +1,8 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 单板工位的可跑测试项。四项来自现有单板目录（B04 综测仪上电、B02 产品条码获取、B03 蓝牙功能测试），
-    /// 每项在结果里都是一个槽位一项，名字带"-槽位号"后缀。
-    /// 这里只到"哪一项"，不到"哪一项在第几路"：勾一次八条通道一起跑，单条跑靠点名通道而不是点名项。
+    /// 单板工位的可跑测试项：四项对应现有单板目录（B04 综测仪上电、B02 产品条码获取、B03 蓝牙功能测试），
+    /// 结果里一个槽位一项，项名带"-槽位号"后缀。只定位到"哪一项"，不定位到第几路：整批八条通道一起跑，单条跑靠点名通道而非点名项。
     /// </summary>
     public enum BoardTestItemKind
     {
@@ -41,8 +40,7 @@ namespace TORNPISolution.Share.Models
         };
 
         /// <summary>
-        /// 结果项名的前缀：执行端上报的是"供电电压-3"这种带槽位后缀的名（口径见 SpecItems）。
-        /// 界面按前缀认项、按后缀取槽位号，所以这里必须与 SpecItems 那边一字不差。
+        /// 结果项名前缀：执行端上报"供电电压-3"这类带槽位后缀的名，界面按前缀认项、按后缀取槽位号，必须与 SpecItems 一字不差。
         /// </summary>
         public static string ItemPrefix(this BoardTestItemKind kind) => kind switch
         {
@@ -54,12 +52,7 @@ namespace TORNPISolution.Share.Models
         };
     }
 
-    /// <summary>
-    /// 单板工位的运行配置：勾了哪几项、哪几路参与。
-    /// 与烧录那份分文件存放的理由一样：两个工位的"通道"口径不同（这里的通道是测试槽位，
-    /// 一台设备占一个槽位或多条，烧录那边是一路一台烧录器），混在一份文件里迟早互相踩。
-    /// 仪器的 IP/端口/阈值仍在 instruments.json，这一份只记"跑什么、跑哪几路"。
-    /// </summary>
+    /// <summary>单板工位运行配置：只记"跑什么、跑哪几路"；仪器 IP/端口/阈值仍在 instruments.json</summary>
     public class BoardTestConfig
     {
         /// <summary>本轮要跑的测试项（八条通道共用这一组勾选）；默认先给供电与条码这两项</summary>

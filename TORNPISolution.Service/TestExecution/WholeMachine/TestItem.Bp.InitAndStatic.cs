@@ -5,16 +5,12 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：血压 A01 初始化连接 / A03 测试启动与停止（BP-001~002）/ A05 静态压力精度（BP-003），
-    /// 含三项各自的辅助（演示分支、产品压力回读、逐项上报）。
-    /// 模块执行包装与分派见 TestItem.cs 主文件，项名统一引用 <see cref="SpecItems"/>。
+    /// TestItem 分部：血压 A01 初始化连接 / A03 测试启动与停止（BP-001~002）/ A05 静态压力精度（BP-003），含演示分支、产品压力回读、逐项上报等辅助。
     /// </summary>
     public partial class TestItem
     {
         /// <summary>
-        /// 血压仪初始化连接：按仪器链接配置中选择的血压模拟仪初始化（经共享会话，懒建立）。
-        /// 会话未建立时租约首次打开即真实连接测试；已建立时发复位等回显做活性校验；
-        /// 未选择模拟仪 → FAIL。连接成功写 1，失败/异常保持 0。
+        /// 血压仪初始化连接：按仪器链接配置中选择的血压模拟仪初始化（经共享会话）；未选择模拟仪 → FAIL；连接成功写 1，失败/异常保持 0。
         /// </summary>
         //测试项目**************************---A01---**************************血压仪初始化连接
         public async Task BpDeviceInitModule(TestItemResultCollector collector, CancellationToken token)
@@ -36,14 +32,11 @@ namespace TORNPISolution.Service
             else
             {
                 await using var lease = await _simSession.RentAsync(token);
-                if (lease.Simulator is BPA700BetaSimulator bpa)
-                    await bpa.ApplySettingsAsync(
-                        config.BPA700Simulator.Category,
-                        config.BPA700Simulator.PressureUnit,
-                        config.BPA700Simulator.AirReservoir,
-                        token);
-                else
-                    _log.Info("康伟达 NIBP 模拟仪初始化成功");
+                await lease.Simulator.ApplySettingsAsync(
+                    config.BPA700Simulator.Category,
+                    config.BPA700Simulator.PressureUnit,
+                    config.BPA700Simulator.AirReservoir,
+                    token);
             }
 
             await collector.SetAsync(SpecItems.BpSimulatorInit, TestItemResult.Of(1));
@@ -51,10 +44,8 @@ namespace TORNPISolution.Service
 
 
         /// <summary>
-        /// 测试启动与停止功能（BP-001 短按启动键 / BP-002 短按停止键）：整机自带气源，按了键自己充放气，
-        /// 只看产品设备端状态（0x74）；产品通讯初始化仍集中在 A16（0x74 需产品处于产测模式）。
-        /// ① BP-001：弹提示让测试员短按[测量启动]键 → 等 5s → 读设备端状态，回读 03 01（测量中）为 PASS；
-        /// ② BP-002：弹提示让测试员短按[测量停止]键 → 等 5s → 读设备端状态，回读 03 00（待机）为 PASS。
+        /// 测试启动与停止功能（BP-001 短按启动键 / BP-002 短按停止键）：整机自带气源，按了键自己充放气，只看产品设备端状态（0x74）；产品通讯初始化仍集中在 A16（0x74 需产品处于产测模式）。
+        /// ① BP-001：弹提示让测试员短按[测量启动]键 → 等 5s → 读设备端状态，回读 03 01（测量中）为 PASS；② BP-002：弹提示让测试员短按[测量停止]键 → 等 5s → 读设备端状态，回读 03 00（待机）为 PASS。
         /// 两项测试值均为 1/0（规格 1~1），实际回读字节显示在产品列；无产品演示模式下两项不判定（本模块没有仪器侧内容可演示）。
         /// </summary>
         //测试项目**************************---A03---**************************测试启动与停止功能（BP-001/BP-002）
@@ -67,8 +58,7 @@ namespace TORNPISolution.Service
 
             var config = _configService.Load();
 
-            // 两项全靠产品回读，产品不可用时不必弹提示让测试员去按一个不存在的键；
-            // 可用性以本轮 A16 产品通讯初始化记录为准
+            // 两项均以产品设备端状态判定，产品不可用时不弹按键提示。
             if (!GetProductAvailable(config.NoProductDemoMode))
             {
                 if (config.NoProductDemoMode)
@@ -102,8 +92,7 @@ namespace TORNPISolution.Service
                     return;
                 }
 
-                // 一项一次往返：弹提示等按键 → 等状态落定 → 0x74 读回两字节与期望比对；
-                // 读失败也报出结果，不让另一项跟着消失（未上报项会被收尾扫描再补一条 FAIL，但看不出原因）
+                // 一项一次往返：弹提示等按键 → 等状态落定 → 0x74 读回两字节与期望比对；读失败也报出结果，不让另一项跟着消失（未上报项会被收尾扫描再补一条 FAIL，但看不出原因）
                 async Task CheckAsync(string itemName, string keyName, (byte Mode, byte State) expected, string expectedDesc)
                 {
                     await PromptOperatorAsync(ModuleName, $"请短按产品[{keyName}]键，完成后点“确定”", token);
@@ -146,13 +135,10 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 血压静态压力精度测试（BP-003），产品通讯统一在 A16 初始化：
-        /// ① 逐点加压（压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力，仅勾选点参与），
-        ///    经 RunStaticPressureSequenceAsync 执行（BPA700=SDK 序列；康伟达=逐点压力源+AA 回读收敛）；
+        /// ① 逐点加压（压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力，仅勾选点参与），经 RunStaticPressureSequenceAsync 执行（BPA700=SDK 序列；康伟达=逐点压力源+AA 回读收敛）；
         ///    每点到稳压保持（PressurePointStable 事件）时并发回读产品压力（0x76），保证与仪器稳定值同时刻口径；
-        /// ② 逐点判定 |产品−仪器| ≤3mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：
-        ///    测试值=误差（规格 -3~3），仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过。
-        /// 全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）。
-        /// 无仪器演示：不驱动模拟仪，产品侧照常回读（0x73 mode=3 + 逐点 0x76）填产品列；算不出误差，测试值落规格外判 FAIL。
+        /// ② 逐点判定 |产品−仪器| ≤3mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：测试值=误差（规格 -3~3），仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；
+        ///    全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）；无仪器演示分支见 DemoStaticAccuracyAsync。
         /// </summary>
         //测试项目**************************---A05---**************************血压静态压力精度测试（BP-003）
         public async Task BpStaticAccuracyModule(TestItemResultCollector collector, CancellationToken token)
@@ -168,7 +154,6 @@ namespace TORNPISolution.Service
                 return;
             }
 
-            // 无仪器演示：跳过模拟仪控制，但产品串口照常回读并显示上报值
             if (NoInstrumentDemo("血压静态压力精度测试"))
             {
                 await DemoStaticAccuracyAsync(collector, points, token);
@@ -183,8 +168,7 @@ namespace TORNPISolution.Service
 
             using (var product = _productFactory())
             {
-                // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）；
-                // 但本模块自建的 product 实例仍需打开产品串口，才能设置测试模式（0x73）并回读产品压力（0x76）
+                // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）；本模块自建的 product 实例仍需打开产品串口，才能设置测试模式（0x73）并回读产品压力（0x76）
                 var productAvailable = GetProductAvailable(config.NoProductDemoMode);
                 if (productAvailable)
                 {
@@ -203,11 +187,10 @@ namespace TORNPISolution.Service
                     }
                 }
 
-                // 经共享会话取模拟仪（接口调用，BPA700=Beta SDK 序列 API；康伟达=逐点压力源+AA 收敛）
+                // 经共享会话取模拟仪（接口调用：只用接口成员）
                 await using var lease = await _simSession.RentAsync(token);
                 var simulator = lease.Simulator;
 
-                // ② 逐点静态加压：一点一项，本点的采样只画给本点的项
                 var pointNames = points.Select(SpecItems.Bp003Point).ToArray();
                 var pointValues = points.ToArray();
                 var productValues = new double?[pointValues.Length];
@@ -257,8 +240,7 @@ namespace TORNPISolution.Service
                     simulator.PressurePointStable += OnPointStable;
                     await simulator.StartSamplingAsync(token);
 
-                    // 产品可用时才设置产品测试模式（0x73 mode=3）并读取产品上压力值；
-                    // 设置失败不中止仪器序列：各点产品上报值按缺失处理（产品列判 FAIL），仪器稳压值照常上报
+                    // 产品可用时才设置产品测试模式（0x73 mode=3）并读取产品上压力值；设置失败不中止仪器序列：各点产品上报值按缺失处理（产品列判 FAIL），仪器稳压值照常上报
                     if (productAvailable)
                     {
                         try
@@ -281,8 +263,7 @@ namespace TORNPISolution.Service
                         _log.Warn("BP-003：产品未连接或握手失败，各压力点将按“无产品上报值”判 FAIL");
                     }
 
-                    // 逐点单点调用（BPA700 SDK 一次只支持一个压力点，多点由上位机循环），
-                    // 每点保持窗内发起的产品回读在下一点开始前收干净
+                    // 逐点单点调用（BPA700 SDK 一次只支持一个压力点，多点由上位机循环）；每点保持窗内发起的产品回读在下一点开始前收干净
                     var stablePressures = new double[pointValues.Length];
                     for (var i = 0; i < pointValues.Length; i++)
                     {
@@ -305,16 +286,12 @@ namespace TORNPISolution.Service
                     }
                     currentPoint = -1;   // 收尾段（泄气/退模式）不再画进任何点的曲线
 
-                    // ③ 逐点判定，一点一项上报
                     await ReportStaticAccuracyAsync(collector, pointValues, stablePressures, productValues);
                 }
                 finally
                 {
-                    await simulator.StopSamplingAsync();
-                    simulator.PressureSampled -= OnSample;
-                    simulator.PressurePointStable -= OnPointStable;
-
-                    // 模块结束泄气：接大容积容器时避免残压憋到下一模块；停/异常路径也尽力泄
+                    // 模块结束泄气：接大容积容器时避免残压憋到下一模块；停/异常路径也尽力泄。
+                    // 排在停采样之前：BPA700 要靠采样回读判断是否已归零
                     try
                     {
                         await simulator.VentToZeroAsync(ct: CancellationToken.None);
@@ -324,8 +301,11 @@ namespace TORNPISolution.Service
                         _log.Warn($"BP-003：模块结束泄气失败：{ex.Message}");
                     }
 
-                    // 测试完退出静态压力模式（0x73 mode=3 status=1）；退出用 None 令牌保证停止/异常路径也执行，
-                    // 避免产品遗留在静态压力模式影响后续模块
+                    await simulator.StopSamplingAsync();
+                    simulator.PressureSampled -= OnSample;
+                    simulator.PressurePointStable -= OnPointStable;
+
+                    // 测试完退出静态压力模式（0x73 mode=3 status=1）：用 None 令牌保证停止/异常路径也执行，避免产品遗留在静态压力模式影响后续模块
                     if (staticModeEntered)
                     {
                         try
@@ -342,10 +322,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// BP-003 无仪器演示分支：不驱动模拟仪（无仪器参考值），但产品侧照常回读——
-        /// 进静态压力模式（0x73 mode=3）后逐点读产品上报压力（0x76）
-        /// </summary>
+        /// <summary>BP-003 无仪器演示分支：不驱动模拟仪（无仪器参考值），进静态压力模式（0x73 mode=3）后逐点回读产品上报压力（0x76），实测值填产品列</summary>
         private async Task DemoStaticAccuracyAsync(TestItemResultCollector collector, List<double> points, CancellationToken token)
         {
             const double Tolerance = 3;   // mmHg，与正式流程同规格
@@ -433,11 +410,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// BP-003 逐点判定与上报（一点一项）：每点 产品上报值 − 仪器稳压值 落在 ±3mmHg 内为 PASS；
-        /// 每项测试值=带符号误差（正=产品偏高、负=产品偏低，按静态规格 -3~3mmHg 判定），仪器列=稳压值、产品列=上报值；
-        /// 无产品上报/仪器未稳压的点：误差落到规格外保证 FAIL，缺值列显示 --。
-        /// </summary>
+        /// <summary>BP-003 逐点判定与上报（一点一项）：每点 产品上报值 − 仪器稳压值 按静态规格 -3~3mmHg 判定；无产品上报/仪器未稳压的点误差落到规格外保证 FAIL，缺值列显示 --。</summary>
         private async Task ReportStaticAccuracyAsync(TestItemResultCollector collector,
             double[] pointValues, double[] stablePressures, double?[] productValues)
         {
@@ -455,13 +428,12 @@ namespace TORNPISolution.Service
                     ? string.Empty
                     : !hasProduct ? "无产品上报值（产品未连接或无响应）"
                     : !hasInstrument ? "仪器未稳压到位"
-                    // 这句只说为什么没过；具体差多少看测试值列与下一行日志，那里带符号
+                    // 备注只写未通过原因，具体偏差数值看测试值列与下一行日志
                     : $"误差超过 ±{Tolerance:0}mmHg（测试值为带符号偏差：正=产品偏高）";
 
                 var itemName = SpecItems.Bp003Point(pointValues[i]);
                 _log.Info($"BP-003 {itemName}：目标={pointValues[i]:0.#} 仪器稳压={(hasInstrument ? standard.ToString("0.0") : "--")} 产品上报={(hasProduct ? productValues[i]!.Value.ToString("0.0") : "--")} 误差={(err?.ToString("0.0") ?? "--")} → {(pass ? "PASS" : "FAIL（" + remark + "）")}");
 
-                // 一点一项：测试值=带符号误差（无误差的 FAIL 点落到规格外），双列=仪器稳压值/产品上报值
                 await collector.SetAsync(itemName, new TestItemResult
                 {
                     Value = err ?? Tolerance + 1,

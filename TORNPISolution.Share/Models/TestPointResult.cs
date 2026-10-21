@@ -1,9 +1,6 @@
 namespace TORNPISolution.Share.Models
 {
-    /// <summary>
-    /// 行详情子表的列口径键（执行端指定，UI 按此生成列头与单元格取值）。
-    /// 同一测试项的 Points 必须同一口径，列数随口径变化，因此列头不再写死在界面里。
-    /// </summary>
+    /// <summary>行详情子表的列口径键（执行端指定，UI 按此生成列头与单元格取值）：同一测试项的 Points 必须同一口径，列数随口径变化，列头不再写死在界面里</summary>
     public static class TestPointSchemas
     {
         /// <summary>逐点口径：目标/仪器测试值/产品上报值/误差（默认，血压静态类项目用）</summary>

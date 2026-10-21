@@ -5,10 +5,8 @@ using TORNPISolution.ViewModels;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// 单板测试页视图：通道卡与各项结果的数据都在 <see cref="BoardChannelViewModel"/> 里，
-    /// 这里只做卡片右键菜单的两件事（点名跑一路、停当前轮）。
-    /// 菜单项走 code-behind 而不是绑定：ContextMenu 开在自己的弹出窗口里，不在这张卡片的视觉树内，
-    /// 靠 AncestorType 找页面 VM 会抓空；而 PlacementTarget 的 DataContext 一定是被右键的那张卡片。
+    /// 单板测试页视图：通道卡与各项结果的数据都在 <see cref="BoardChannelViewModel"/> 里，本类只做卡片右键菜单的两件事（点名跑一路、停当前轮）。
+    /// 菜单项走 code-behind 而不是绑定：ContextMenu 开在自己的弹出窗口里、不在这张卡片的视觉树内，靠 AncestorType 找页面 VM 会取到空；PlacementTarget 的 DataContext 才一定是被右键的那张卡片。
     /// </summary>
     public partial class BoardChannelView : UserControl
     {

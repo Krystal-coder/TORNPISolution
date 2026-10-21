@@ -5,9 +5,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 测试项目类 每个模块方法 = 该模块完整测试流程（自包含），一次执行返回全部测试项实测值。
-    /// 需现算规格的项用 WithDynamicSpec/WithDualValues 
-    /// 结果字典由入口按 Spec 项名初始化，未测到默认 0 = FAIL —— 新增测试项只需改 Spec。
+    /// 测试项目类：每个模块方法 = 该模块完整测试流程（自包含），一次执行返回全部测试项实测值。
+    /// 结果字典由入口按 Spec 项名初始化，未测到默认 0 = FAIL；新增测试项只改 Spec，需现算规格的项用 WithDynamicSpec/WithDualValues。
     /// </summary>
     public partial class TestItem : ITestItemService
     {
@@ -29,8 +28,7 @@ namespace TORNPISolution.Service
         private readonly Func<IProductController> _productFactory;
 
         /// <summary>
-        /// 血压模拟仪方案级共享会话（由组合根注入）：RunPlan 已建立时各血压模块复用同一连接，
-        /// 避免逐模块开关串口导致康伟达退出/重入 PC 控制模式的恢复窗口失联
+        /// 血压模拟仪方案级共享会话（由组合根注入）：RunPlan 建立后各血压模块复用同一连接，逐模块开关串口会使康伟达在退出/重入 PC 控制模式的恢复窗口内失联
         /// </summary>
         private readonly Devices.BloodPressureSimulatorSession _simSession;
 
@@ -59,13 +57,11 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 方案级产品通讯状态：本轮 A16 产品通讯初始化握手后的记录（true=可用/false=不可用）；
-        /// null = 本轮方案未包含初始化模块。方案开始时由 BeginPlanRun 复位。
+        /// 方案级产品通讯状态：A16 产品通讯初始化握手后的记录（true=可用/false=不可用）；null=本轮方案未包含初始化模块，方案开始时由 BeginPlanRun 复位
         /// </summary>
         private bool? _productCommOk;
 
-        /// <summary>复位方案级状态（MainViewModel.RunPlan 开始时调用）：产品通讯状态回到“初始化模块未执行”；
-        /// 同时清掉槽位范围，免得上一轮单板按通道跑的范围渗到整机方案里</summary>
+        /// <summary>复位方案级状态（MainViewModel.RunPlan 开始时调用）：产品通讯状态回到“初始化模块未执行”，并清掉槽位范围以免上一轮单板通道范围渗入整机方案</summary>
         public void BeginPlanRun(IReadOnlyList<int>? slotScope = null)
         {
             _productCommOk = null;
@@ -74,10 +70,6 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 单板“只跑这几路”的作用范围：null 表示整批（所有已启用的槽位）。
-        /// 为什么走字段而不是方法参数：模块方法体的签名是一个入口统一调的（ collector+token 两个），
-        /// 槽位只在 B02/B03/B04 这三个体内要过滤，为这一个需求把二十几个模块方法都改签名不划算；
-        /// 与 _productCommOk 同一类：“本轮跑什么”的方案级状态，BeginPlanRun 复位，不跨轮残留。
-        /// 同一时刻只有一轮在跑（界面那边用 TestRunState 挡着），不存在两个范围互相覆写。
         /// </summary>
         private HashSet<int>? _slotScope;
 
@@ -89,9 +81,7 @@ namespace TORNPISolution.Service
             => _slotScope == null ? rows.ToList() : rows.Where(r => InSlotScope(slotOf(r))).ToList();
 
         /// <summary>
-        /// 按方案序号执行测试模块
-        /// 按 module.Id 分派到对应模块方法，一次执行完整模块流程，
-        /// 返回该模块全部测试项结果（测试项名称 → 测试值/动态规格）。
+        /// 按方案序号执行测试模块：按 module.Id 分派到对应模块方法，一次执行完整流程，返回该模块全部测试项结果（测试项名称 → 测试值/动态规格）。
         /// </summary>
         public async Task<Dictionary<string, TestItemResult>> TestItemxx(int index, TestModuleModel module, Func<string, TestItemResult, Task>? onItemCompleted, CancellationToken token)
         {
@@ -99,8 +89,7 @@ namespace TORNPISolution.Service
             _log.Info($"TestItem{index}：{module.Name} 开始执行");
             try
             {
-                // 结果字典按 Spec 测试项名称统一初始化（默认测试值 0 = 未测到即 FAIL），
-                // 模块方法无需再手写项名清单，新增测试项只改 Spec 即可
+                // 结果字典按 Spec 测试项名称统一初始化（默认测试值 0 = 未测到即 FAIL），模块方法无需再手写项名清单
                 var results = module.Items.ToDictionary(i => i.Name, _ => TestItemResult.Of(0));
                 // 收集器：每次赋值自动触发 onItemCompleted 回调，UI 逐项回填
                 var collector = new TestItemResultCollector(results, onItemCompleted);
@@ -124,7 +113,6 @@ namespace TORNPISolution.Service
             }
             catch (OperationCanceledException)
             {
-                // 用户点“停止”：向上层传递，不当作测试异常
                 throw;
             }
             catch (Exception ex)
@@ -173,8 +161,7 @@ namespace TORNPISolution.Service
         };
 
         /// <summary>
-        /// 这个模块 Id 在分派表里有没有实现：只走一遍 switch 组 lambda，不跑测试动作，喂个空收集器就能探。
-        /// 分派表就是唯一清单，这里不重复列一遍。
+        /// 模块 Id 在分派表中是否有实现：只走一遍 switch 组 lambda、不执行测试动作，传入空收集器即可判定。
         /// </summary>
         public bool ImplementsModule(string moduleId)
         {
@@ -194,8 +181,7 @@ namespace TORNPISolution.Service
         /// </summary>
         private async Task RunModuleAsync(string moduleName, Func<Task> body, Func<Exception, Task>? onError = null)
         {
-            // 模块级追踪上下文：本模块内每一条日志（含产品串口 TX/RX）自动带 [模块名] 前缀，
-            // 点位/轮次在流程内用 TraceScope.Push 追加，各模块分部文件里按需调用
+            // 模块级追踪上下文：本模块内每一条日志（含产品串口 TX/RX）自动带 [模块名] 前缀，点位/轮次由流程内 TraceScope.Push 追加（各模块分部文件按需调用）
             using (TraceScope.Begin(moduleName))
             {
                 _log.Info($"{DateTime.Now} Start calling the TestItem.{moduleName}() method . {Environment.NewLine}");
@@ -205,7 +191,6 @@ namespace TORNPISolution.Service
                 }
                 catch (OperationCanceledException)
                 {
-                    // 用户点"停止"：向上层传递，不当作测试异常
                     throw;
                 }
                 catch (Exception ex)

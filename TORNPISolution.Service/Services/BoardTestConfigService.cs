@@ -6,12 +6,9 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 单板运行配置服务：保存在程序目录 Config\board-test.json。
-    /// 落盘护住现场的三样与烧录那份服务同口径：
-    ///   反序列化前剔掉显式 null（属性初始化器只在缺字段时生效，显式 null 会原样赋进去，界面直取就 NRE）；
-    ///   主文件解析不了退回上一份 .bak（退成默认会让现场以为勾选项被清空了）；
-    ///   写盘走临时文件 + 改名替换，中途断电不会留下半截 JSON。
-    /// 每次读盘不缓存：这一页与菜单各写各的（勾选项在菜单里改、通道在卡片右键改），缓存只会让两边看到不同的旧值。
+    /// 单板运行配置服务：以 JSON 保存在程序目录 Config\board-test.json。
+    /// 落盘约定与 InstrumentConfigService 同口径：反序列化前剔显式 null（属性初始化器只在缺字段时生效，显式 null 会原样赋进去、界面直取 NRE）；主文件解析不了退回上一份 .bak（退成默认会让现场以为勾选项被清空）；写盘走临时文件 + 改名替换（断电不留半截 JSON）。
+    /// 每次 Load 都读盘、不缓存：勾选项在菜单里改、通道在卡片右键改，缓存只会让两边看到不同的旧值。
     /// </summary>
     public class BoardTestConfigService : IBoardTestConfigService
     {
@@ -41,7 +38,7 @@ namespace TORNPISolution.Service
                         ? $"单板运行配置已加载：{path}"
                         : $"单板运行配置已从备份加载（主文件不可用，请检查 {ConfigPath}）");
 
-                    // 通道清单被手工删空就没有卡片可点；勾选项为空则一轮都跑不起来，两者都补回默认值并说一声
+                    // 通道清单被手工删空就没有卡片可点；勾选项为空则一轮都跑不起来，两者都补回默认值并记日志
                     if (config.Channels.Count == 0)
                     {
                         _log.Warn("单板运行配置里通道清单是空的，已按默认 8 路补回");

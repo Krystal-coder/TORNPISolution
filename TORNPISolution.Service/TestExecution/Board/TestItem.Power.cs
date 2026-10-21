@@ -6,13 +6,11 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// TestItem 分部：B04 综测仪上电（单板工位）。
-    /// 一台已启用综测仪的四个通道各占一项，每个通道三步：
+    /// 一台已启用综测仪的四个通道各占一项，每个通道三步（槽位号口径与目录构建同一个函数 <see cref="SpecItems.BoardPowerSlots"/>）：
     ///   ① 缓输出打开通路（OUTPUT:RAMP 带线制，带了线制通路就已经打开，不必再发 OUTPUT:STA）；
     ///   ② 切 po 测量通路（手册 4.2.2 要求先切再读本通道输出电压）；
     ///   ③ 回读电压换算成 mV，与设定值比，落在配置给的 ±容差内判 PASS。
-    /// 槽位号口径与目录构建同一个函数（<see cref="SpecItems.BoardPowerSlots"/>）。
-    /// 台与台并发（各自四条独立 TCP 连接），同一台内四个通道串行；采集结果串行上报——结果字典不是线程安全的。
-    /// 结束时只断连接：驱动的 CloseAsync 不动输出状态，产品要带电跑后续模块，下电是另一个动作。
+    /// 台与台并发（各自四条独立 TCP 连接），同一台内四个通道串行，采集结果串行上报（结果字典不是线程安全的）；结束时只断连接：CloseAsync 不动输出状态，产品要带电跑后续模块，下电是另一个动作。
     /// </summary>
     public partial class TestItem
     {
@@ -74,8 +72,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 一台综测仪负责的那几个通道：建链 →（可选）整机复位清残留 → 逐通道缓输出并回读。
-        /// 建链、复位或参数校验没过就把这台负责的通道整批判 FAIL；单个通道失败只影响它自己那一路。
+        /// 一台综测仪负责的那几个通道：建链 →（可选）整机复位清残留 → 逐通道缓输出并回读；建链、复位或参数校验没过就把这台负责的通道整批判 FAIL，单个通道失败只影响它自己那一路。
         /// 取消照常上抛，已经打开的输出不动它（产品保持带电，交给现场或下电动作处理）。
         /// </summary>
         private async Task<IReadOnlyList<ChannelPower>> PowerOnTesterAsync(
@@ -149,10 +146,7 @@ namespace TORNPISolution.Service
             return slots.Select(s => results[s.Channel]).ToList();
         }
 
-        /// <summary>
-        /// 回读换算成 mV：驱动把数值和单位原样带回（它不替现场猜量纲），换算放在这里按单位词做。
-        /// 单位认不出来时按数值量级兜底猜一次并记警告——把 5V 当 5mV 判会整批误判，必须在日志里留下痕迹。
-        /// </summary>
+        /// <summary>回读换算成 mV：驱动把数值和单位原样带回（它不替现场猜量纲），换算在这里按单位词做；单位认不出来时按数值量级兜底猜一次并记警告——把 5V 当 5mV 判会整批误判，必须在日志里留下痕迹。</summary>
         private double ToMilliVolts(Cry5242Reading reading, string where)
         {
             var unit = reading.Unit.Trim().ToUpperInvariant();

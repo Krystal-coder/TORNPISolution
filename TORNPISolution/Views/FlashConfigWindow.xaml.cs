@@ -6,12 +6,9 @@ using TORNPISolution.ViewModels;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// 烧录配置对话框（菜单：配置 → 烧录配置）：只管两颗芯片的全局参数与串口探测。
-    /// DataContext 直接吃烧录页那份活配置对象，不在这里另建一份再合并——两本配置迟早对不上。
-    /// 但内存里改了不等于生效：编排每一轮自己读 flashing.json，所以必须点保存落盘，
-    /// 保存失败时窗口不关，让人看清下面那句原因再改。
-    /// 没保存就关窗（✕ / 关闭 都一样）则按盘上那份重建：开烧前会先把内存里这份自动落盘，
-    /// 不退回的话一次没点保存的误改就会被下一轮坐实成正式配置。
+    /// 烧录配置对话框（菜单：配置 → 烧录配置）：只管两颗芯片的全局参数与串口探测；DataContext 直接用烧录页那份活配置对象，不另建副本。
+    /// 内存里改了不等于生效：编排每一轮自己读 flashing.json，必须点保存落盘；保存失败时窗口不关，错误原因显示在窗口下面那一行。
+    /// 未保存就关窗（✕ / 关闭 都一样）按盘上那份重建——开烧前会把内存里这份自动落盘，不退回则一次没点保存的误改会被下一轮固化成正式配置。
     /// </summary>
     public partial class FlashConfigWindow : Window
     {
@@ -60,10 +57,7 @@ namespace TORNPISolution.Views
         private void BrowseFreqchipFirmware_Click(object sender, RoutedEventArgs e)
             => Browse((TextBox)FreqchipFirmwareBox, "固件文件", "所有文件 (*.*)|*.*");
 
-        /// <summary>
-        /// 开文件框并把选中的路径写进那个文本框。取消时原值不动：
-        /// 路径框里那句现成的路径被一次误点清空，比多走两步浏览烦人得多。
-        /// </summary>
+        /// <summary>开文件框并把选中的路径写进目标文本框；取消时原值不动，避免一次误点清空路径框里现成的路径</summary>
         private void Browse(TextBox target, string title, string filter)
         {
             var dialog = new OpenFileDialog

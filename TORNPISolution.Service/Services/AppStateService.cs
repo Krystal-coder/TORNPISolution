@@ -6,8 +6,8 @@ using TORNPISolution.Share.Enum;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 应用工位状态服务：Config\app_state.json 存"上次停留的页面"与"模块库上次的工位类别"两个字段。
-    /// 读一次进内存，之后重复读不再开文件；写盘走临时文件 + 原子替换，替换失败退成全默认（整机测试）也比半截文件好。
+    /// 应用工位状态服务：程序目录 Config\app_state.json 存"上次停留的页面"与"模块库上次的工位类别"两个字段。
+    /// 文件只读一次进内存，之后重复读不再开文件；写盘走临时文件 + 改名替换，文件不可用时按默认值（整机测试）启动、不抛。
     /// </summary>
     public class AppStateService : IAppStateService
     {
@@ -120,7 +120,6 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>落盘的数据结构：以后要记别的界面状态（展开的栏目、窗口位置）往这里加字段</summary>
         private sealed class AppState
         {
             public ModuleCategory LastModuleCategory { get; set; } = ModuleCategory.WholeMachine;

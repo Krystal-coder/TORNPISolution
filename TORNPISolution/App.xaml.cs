@@ -11,9 +11,8 @@ using TORNPISolution.Views;
 namespace TORNPISolution
 {
     /// <summary>
-    /// Interaction logic for App.xaml。
-    /// 同时作为 DI 组合根（Composition Root）：全应用唯一的容器构建点。
-    /// ViewModel 只保留构造函数注入，由容器解析后交给窗口；XAML 里不再自行实例化 ViewModel。
+    /// App.xaml 交互逻辑，同时是 DI 组合根（Composition Root）：全应用唯一的容器构建点。
+    /// ViewModel 只保留构造函数注入，由容器解析后交给窗口，XAML 里不自行实例化。
     /// </summary>
     public partial class App : Application
     {
@@ -34,6 +33,11 @@ namespace TORNPISolution
             DispatcherUnhandledException += (_, args) =>
             {
                 _log.Error("UI 线程未捕获异常", args.Exception);
+                // 不置 Handled 时 WPF 会终止进程：正在执行的测试跟着中断，串口句柄与仪器控制权来不及释放。
+                // 故记账并提示后置 Handled 让进程存活，操作人员还能保存日志、重跑这一步。
+                args.Handled = true;
+                MessageBox.Show($"界面操作出现异常，本次操作已中止，程序继续运行：\n{args.Exception.Message}",
+                    "异常", MessageBoxButton.OK, MessageBoxImage.Warning);
             };
 
             // 后台线程（串口打开/回收、设备轮询等）的异常处理
@@ -62,7 +66,7 @@ namespace TORNPISolution
             services.AddSingleton<IInstrumentConfigService, InstrumentConfigService>();
             // 烧录工位配置：与测试工位的仪器清单各一份文件，互不影响
             services.AddSingleton<IFlashingConfigService, FlashingConfigService>();
-            // 单板工位运行配置（勾选项 + 通道参与）：又是单独一份 board-test.json
+            // 单板工位运行配置（勾选项 + 通道参与）：单独一份 board-test.json
             services.AddSingleton<IBoardTestConfigService, BoardTestConfigService>();
             // 烧录编排与记录：单例只持有配置服务与日志，每轮的状态在方法内自建，不跨轮残留
             services.AddSingleton<IFlashingService, FlashingService>();
@@ -104,14 +108,14 @@ namespace TORNPISolution
                 _log.Error("退出时关闭硬件失败", ex);
             }
 
-            // 释放 BPA700 Beta：程序关闭即断开对仪器的控制，仪器回到可手动操作状态
+            // 释放 BPA700：程序关闭即断开对仪器的控制，仪器回到可手动操作状态
             try
             {
-                BPA700BetaSimulator.ReleaseDeviceControl();
+                BPA700Simulator.ReleaseDeviceControl();
             }
             catch (Exception ex)
             {
-                _log.Error("退出时释放 BPA700 Beta 失败", ex);
+                _log.Error("退出时释放 BPA700 失败", ex);
             }
 
             _log.Info("========== 应用退出 ==========");

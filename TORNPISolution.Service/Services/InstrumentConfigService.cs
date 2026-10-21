@@ -6,20 +6,14 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 仪器链接配置服务实现：
-    /// 以 JSON 形式保存在程序目录 Config\instruments.json，
-    /// 读取失败时回退默认配置并记录日志，不影响程序启动。
-    /// 带文件时间戳内存缓存：文件未变时直接从缓存反序列化（不再读盘、不再记日志），
-    /// 保证启动时只真正加载一次；Save 或外部修改文件后时间戳变化，下次 Load 自动重新读取。
-    /// 落盘两处护住现场：保存前先重读磁盘、只把本次真改过的字段写回去（多个配置窗口各存一份整档快照，
-    /// 整档覆盖会把别的窗口或手工改的内容抹掉）；写盘走临时文件+改名替换，覆盖前把旧档留成 .bak，
-    /// 中途断电不会留下半截 JSON，真被改坏了 Load 还能退回上一份。
-    /// 反序列化前先剔掉 JSON 里的显式 null：属性初始化器只在"缺字段"时生效，显式 null 会原样赋进去，
-    /// 执行端 config.X.Y 直取就 NRE（目录端读同一节点是有兜底的），剔掉后两边都走默认值。
+    /// 仪器链接配置服务：配置以 JSON 存于程序目录 Config\instruments.json，读取失败时回退默认配置并记录日志，不影响程序启动。
+    /// 带文件时间戳的内存缓存：文件未变时直接从缓存反序列化（不读盘、不记日志），启动只真正加载一次；Save 或外部修改文件后下次 Load 自动重读。
+    /// 多个配置窗口各持一份整档快照，Save 必须先重读磁盘、只回写本次改过的字段，整档覆盖会丢失其它窗口或手工修改的内容（见 MergeChangedFields）。
+    /// 写盘用临时文件+改名替换，中途断电不会留下半截 JSON；覆盖前把旧档留成 .bak，主文件不可用时 Load 退回上一份（见 WriteAtomic）。
+    /// 反序列化前一律剔除显式 null：属性初始化器只在"缺字段"时生效，显式 null 会原样赋进去，执行端 config.X.Y 直取即 NRE（见 StripNulls）。
     /// </summary>
     public class InstrumentConfigService : IInstrumentConfigService
     {
-        // 配置文件保存在程序目录 Config\instruments.json
         private static readonly string ConfigPath =
             Path.Combine(AppContext.BaseDirectory, "Config", "instruments.json");
 
@@ -32,8 +26,7 @@ namespace TORNPISolution.Service
             WriteIndented = true
         };
 
-        // 内存缓存：原始 JSON + 文件时间戳（跨实例共享，避免启动时几十个 ViewModel 各自读盘）
-        // 缓存里存的文本同时当 Save 的合并基线（就是发给调用方的那一份）
+        // 内存缓存：原始 JSON + 文件时间戳（静态、跨实例共享，启动时几十个 ViewModel 不再各自读盘）；缓存文本同时是 Save 的合并基线
         private static readonly object CacheLock = new();
         private static string? _cachedJson;
         private static DateTime _cachedFileTimeUtc = DateTime.MinValue;
@@ -57,8 +50,7 @@ namespace TORNPISolution.Service
             _log.Info($"{DateTime.Now} Start calling the InstrumentConfigService.Load() method . {Environment.NewLine}");
             try
             {
-                // 主文件解析不了（半截、被手工改坏）就退到上一份 .bak：退成全默认意味着 ActiveSimulator 回到 None，
-                // 现场表现为所有血压项突然不跑，而日志只有一行反序列化失败
+                // 主文件解析不了（半截、被手工改坏）就退到上一份 .bak：退成全默认会让 ActiveSimulator 回到 None、所有血压项不跑，而日志只有一行反序列化失败
                 foreach (var path in new[] { ConfigPath, BackupPath })
                 {
                     var node = ReadConfigNode(path);
@@ -150,10 +142,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// 递归剔掉显式 null：字段当缺失处理，反序列化时走属性初始化器里的默认值（默认点位清单也在里面）。
-        /// 可空数值（double? 规格上下限）初始化值本就是 null，缺字段与显式 null 结果一样，“留空不判”的语义不变。
-        /// </summary>
+        /// <summary>递归剔除显式 null：字段按缺失处理，反序列化时走属性初始化器里的默认值（默认点位清单也在里面）；可空数值（double? 规格上下限）初始化值本就是 null，"留空不判"语义不变</summary>
         private static JsonNode StripNulls(JsonNode? node)
         {
             switch (node)
@@ -177,10 +166,8 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 三方合并：结果以磁盘最新那份为底，逐字段定活用谁的值 ——
-        /// incoming 与基线（调用方当初 Load 到的快照）相同的字段说明本窗口没改过，保留磁盘那份；不同的才用 incoming。
-        /// 对象往下递归比（所以同一节点里两个窗口各改自己的字段不会互抹），数组整份替换（配置页列所见即所存）。
-        /// 注：同一个窗口连着点两次保存时，基线以上一次落盘内容为准，本窗口内存里的值覆盖一切（界面看到什么就存什么）。
+        /// 三方合并：结果以磁盘最新那份为底，与基线（调用方当初 Load 到的快照）相同的字段说明本窗口没改过、保留磁盘那份，不同的才用 incoming。
+        /// 对象往下递归逐字段比（同一节点内两个窗口各改自己的字段不会互相覆盖），数组整份替换（配置页列所见即所存）；同一窗口连续两次保存时基线以上一次落盘内容为准，本窗口内存里的值覆盖一切。
         /// </summary>
         private static JsonObject MergeChangedFields(JsonObject disk, JsonNode? baseline, JsonObject incoming)
         {
@@ -194,7 +181,6 @@ namespace TORNPISolution.Service
                 JsonNode? baseValue = null;
                 var inBaseline = baseObj is not null && baseObj.TryGetPropertyValue(name, out baseValue);
 
-                // 与当初读到的快照一致 = 这一项本窗口没碰过，保留磁盘上那份（可能是别的窗口或手工刚写的）
                 if (inBaseline && JsonNode.DeepEquals(baseValue, value))
                     continue;
 
@@ -206,8 +192,7 @@ namespace TORNPISolution.Service
                 disk[name] = merged.DeepClone();    // DeepClone：merged 可能挂在另一棵树上，不能直接接过来
             }
 
-            // 基线里有、本次整档里没有的字段：调用方把它清成 null 了（可空规格留空=不判），落盘时要把磁盘上那份也抹掉，
-            // 否则界面上下一次读回来还是旧值，"清规格"这一下等于没保存
+            // 基线里有、本次整档里没有的字段 = 调用方已把它清成 null（可空规格留空即不判）：磁盘上那份一并删掉，否则下次读回来还是旧值、清空等于没保存
             if (baseObj != null)
                 foreach (var name in baseObj.Select(pair => pair.Key).ToList())
                     if (!incoming.ContainsKey(name)) disk.Remove(name);
@@ -215,10 +200,7 @@ namespace TORNPISolution.Service
             return disk;
         }
 
-        /// <summary>
-        /// 临时文件 + 改名替换：不存在"已经把原文件截断、新内容还没写完"的中间状态；覆盖前把旧档存成 .bak 供 Load 回退。
-        /// 目标文件被其它进程占用时直接抛（保存失败），磁盘上原有的配置仍是完整可用的。
-        /// </summary>
+        /// <summary>临时文件 + 改名替换：不存在"已截断原文件、新内容还没写完"的中间状态；覆盖前把旧档存成 .bak 供 Load 回退；目标被其它进程占用时直接抛出，磁盘上原有配置仍完整可用</summary>
         private static void WriteAtomic(string json)
         {
             File.WriteAllText(TempPath, json);
@@ -230,7 +212,6 @@ namespace TORNPISolution.Service
 
             try
             {
-                // 同盘改名，不存在"截断后写一半"的中间状态；顺带把旧档留成 .bak 供 Load 回退
                 File.Replace(TempPath, ConfigPath, BackupPath);
             }
             catch (PlatformNotSupportedException)

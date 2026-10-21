@@ -21,13 +21,8 @@ namespace TORNPISolution.Service.TestModules
     }
 
     /// <summary>
-    /// NFC 功能测试：
-    /// 测试内容为 MAC 信息写入和验证 ——
-    /// 使用 NFC 读卡器读取设备上的 NFC 标签，将 MAC 地址写入标签用户区，
-    /// 再回读标签内容进行比对验证。
-    ///
-    /// 标签约定：NTAG 系列（每页 4 字节），用户区从第 4 页开始，
-    /// MAC（6 字节）占用 2 页（补 0 到 8 字节）。
+    /// NFC 功能测试：用 NFC 读卡器读取设备上的 NFC 标签，将 MAC 地址写入标签用户区，再回读内容进行比对验证。
+    /// 标签约定：NTAG 系列（每页 4 字节），用户区从第 4 页开始；MAC（6 字节）占用 2 页（补 0 到 8 字节）。
     /// </summary>
     public class NfcFunctionTest
     {

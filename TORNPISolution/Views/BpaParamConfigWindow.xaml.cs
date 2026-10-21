@@ -11,7 +11,6 @@ namespace TORNPISolution.Views
     {
         public BpaParamConfigWindow(BpaParamConfigViewModel viewModel)
         {
-            // DataContext 先于 InitializeComponent 
             DataContext = viewModel;
             InitializeComponent();
 

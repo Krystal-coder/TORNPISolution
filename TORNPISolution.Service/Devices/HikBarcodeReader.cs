@@ -5,8 +5,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// 海康 MV-ID 读码器（智能读码相机）控制类。
-    /// 相机侧开「TCP服务器端协议」当服务端，这里作客户端连两条连接：
+    /// 海康 MV-ID 读码器（智能读码相机）控制类。相机侧开「TCP服务器端协议」当服务端，这里作客户端连两条连接：
     /// 触发端口（默认 2001）只发触发文本，结果端口（默认 2002）只收条码。
     /// 结果按 &lt;回车&gt;&lt;换行&gt;&lt;条码内容&gt;; 推送，帧边界是分号，所以读帧时把帧尾换成 ';'。
     /// 相机开了交互时，触发口会先要一轮请求/应答（hello / world），不应答它不会推码。
@@ -20,10 +19,10 @@ namespace TORNPISolution.Service.Devices
         /// <summary>没读到时相机推的标志文本（相机侧「无码输出」默认写这个）</summary>
         private const string NoReadText = "NoRead";
 
-        /// <summary>探一次交互请求时等多久：相机不玩交互就是这个等待时长</summary>
+        /// <summary>探测一次交互请求的等待时长；相机未启用交互时就是等满这个时长</summary>
         private const int InteractionProbeMs = 300;
 
-        /// <summary>一轮读取里最多让交互插几次队，防相机反复要应答把读取卡死</summary>
+        /// <summary>一轮读取中最多应答几次交互，防止相机反复要应答导致读取无法结束</summary>
         private const int MaxInteractionRounds = 3;
 
         private readonly HikBarcodeReaderSettings _settings;
@@ -34,10 +33,7 @@ namespace TORNPISolution.Service.Devices
         private TcpLineClient? _result;
         private bool _disposed;
 
-        /// <summary>
-        /// 这台相机到底要不要交互握手：建链时探一次定下来，不要就每次触发省一个探测等待；
-        /// 真读到了请求会重新置回 true。
-        /// </summary>
+        /// <summary>这台相机是否需要交互握手：建链时探测定下来，不需要时每次触发省掉一次探测等待；真读到请求会重新置回 true</summary>
         private bool _interactionRequired = true;
 
         public HikBarcodeReader(HikBarcodeReaderSettings settings, ILogService? log = null)
@@ -50,10 +46,7 @@ namespace TORNPISolution.Service.Devices
 
         public bool IsOpen => _trigger is { IsOpen: true } && _result is { IsOpen: true };
 
-        /// <summary>
-        /// 先连结果端口再连触发端口：结果端口是收码的唯一出口，
-        /// 它连不上时只连通触发端口会造成"触发得动、码一条都回不来"的假象。
-        /// </summary>
+        /// <summary>先连结果端口再连触发端口：结果端口是收码的唯一出口，它连不上而只连通触发端口时，会出现"触发得动、码一条都回不来"的假象</summary>
         public async Task OpenAsync(CancellationToken ct = default)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -92,10 +85,7 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"{_settings.Name} 两条连接已关闭");
         }
 
-        /// <summary>
-        /// 软触发一次并等结果：清掉结果端口上积压的旧码 → 发触发文本 → 应答交互请求 → 读一条结果。
-        /// 整个动作串行，两个线程同时触发会导致收到的码对不上是哪一次触发。
-        /// </summary>
+        /// <summary>软触发一次并等结果：清掉结果端口积压的旧码 → 发触发文本 → 应答交互请求 → 读一条结果；整个动作串行，两个线程同时触发会导致收到的码对不上是哪一次触发</summary>
         public async Task<string?> ScanAsync(int? timeoutMs = null, CancellationToken ct = default)
         {
             var trigger = _trigger ?? throw new InvalidOperationException($"{_settings.Name} 未连接，请先调用 OpenAsync");
@@ -133,8 +123,7 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 从结果端口读一帧：帧尾按分号切，内容里混进的回车换行由 TcpLineClient 的 Trim 去掉。
-        /// 等不到返回 null；相机推来说明没读到的标志文本也返回 null（没读到和没扫上是同一回事）。
-        /// 交互请求也可能从结果口冒出来，就地应答完接着等下一条。
+        /// 等不到返回 null，相机推无读标志文本时同样返回 null；交互请求也可能从结果口冒出来，就地应答完接着等下一条。
         /// </summary>
         private async Task<string?> ReadResultAsync(int timeoutMs, CancellationToken ct)
         {
@@ -180,9 +169,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 相机要交互应答时处理一轮：触发口会先冒出「交互请求文本」，回了「交互回复文本」它才抓拍。
-        /// 请求可能带帧尾也可能不带，所以先按行读，读不到再从缓冲区取半截。
-        /// 没配请求文本就当没交互（直接返回 false），不阻断正常触发流程。
+        /// 相机要交互应答时处理一轮：触发口先冒「交互请求文本」，回了「交互回复文本」它才抓拍。
+        /// 请求可能带帧尾也可能不带，所以先按行读、读不到再从缓冲区取半截；没配请求文本就当没交互直接返回 false，不阻断正常触发流程。
         /// </summary>
         /// <returns>这一轮确实应答过交互则为 true</returns>
         private async Task<bool> HandshakeIfRequestedAsync(TcpLineClient trigger, CancellationToken ct)
@@ -244,7 +232,7 @@ namespace TORNPISolution.Service.Devices
 
             try
             {
-                // 释放阶段只能同步等，给两条连接一点时间体面断开
+                // 释放阶段只能同步等待，给两条连接留出关闭时间
                 CloseClientsAsync(_trigger, _result).Wait(TimeSpan.FromSeconds(2));
             }
             catch { /* 释放阶段忽略 */ }

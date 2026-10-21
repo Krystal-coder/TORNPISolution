@@ -5,9 +5,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 产品协议命令码配置服务：
-    /// 以 JSON 形式保存在程序目录 Config\protocol_commands.json，
-    /// 文件不存在时自动生成默认配置；缺 key 回退默认值并记录日志。
+    /// 产品协议命令码配置服务：以 JSON 保存在程序目录 Config\protocol_commands.json，仅在该文件不存在时自动生成默认配置。
+    /// Load 以 Defaults 为底、用文件里的同名键覆盖（运行时改过的命令码重启后仍在）；文件缺 key 回退默认值并记录日志，未知键忽略。
     /// </summary>
     public class ProtocolCommandConfigService : IProtocolCommandConfigService
     {
@@ -21,11 +20,7 @@ namespace TORNPISolution.Service
 
         private readonly ILogService _log = new LogService(nameof(ProtocolCommandConfigService));
 
-        /// <summary>
-        /// 硬编码默认值（与 Config\protocol_commands.json 模板保持一致）。
-        /// 注意：同一 Code 在不同 FuncCode 下是不同命令（如 0x80/Func=0x05 读过压状态 vs 0x80/Func=0x07 启动ECG+PPG），
-        /// 因此每条命令必须同时指定 Code 与 FuncCode，不能只靠 Code 反查 Func。
-        /// </summary>
+        /// <summary>硬编码默认值（与 Config\protocol_commands.json 模板保持一致）</summary>
         private static readonly Dictionary<string, ProtocolCommandEntry> Defaults = new()
         {
             // ---- 心跳（Func=0x07）----
@@ -44,8 +39,6 @@ namespace TORNPISolution.Service
             // ---- 测量控制（Func=0x05）----
             ["CtrlGetVersion"]              = new() { Code = 0x72, FuncCode = 0x05, Description = "读产品嵌软版本+MAC地址" },
             ["CtrlSetMode"]                 = new() { Code = 0x73, FuncCode = 0x05, Description = "设置测试模式（参数 2 字节：uint8 test_mode + uint8 status，status 0=进入测量 1=退出测量；袖带/血压/静态压力/血氧等模式走本条）" },
-            // 开始/关闭ECG测试：与 CtrlSetMode 同 Func+Ctrl（只是参数固定为 mode=5），按语义各登记一条，
-            // 便于在协议命令配置页直接改参数字节（改完保存即热重载），不必改代码
             ["CtrlStartEcgTest"]            = new() { Code = 0x73, FuncCode = 0x05, Data = "05 00", Description = "开始ECG测试（样帧 EF 04 05 73 05 00 15 03 FE；产品开始持续推送 0x8D 心电波形，直到收到关闭命令）" },
             ["CtrlStopEcgTest"]             = new() { Code = 0x73, FuncCode = 0x05, Data = "05 01", Description = "关闭ECG测试（样帧 EF 04 05 73 05 01 D4 C3 FE；产品停止推送心电波形）" },
             ["CtrlGetState"]                = new() { Code = 0x74, FuncCode = 0x05, Description = "读取产品状态（待机/测量中）" },
@@ -77,7 +70,6 @@ namespace TORNPISolution.Service
             // 心电波形上报：实机抓包证实走 Func=0x05 / Ctrl=0x8D（帧 EF 98 05 8D + 150字节 = 75×int16 小端 + CRC + FE，
             // 码值×0.01 = mV，250SPS 即 300ms/帧）；协议文档旧值 0x06/0x10 见下行注释，实机对不上时换回即可。
             ["CtrlPushEcgWave"]             = new() { Code = 0x8D, FuncCode = 0x05, Description = "上报心电电压值 s_test_report_ecg_wave（产品主动推送，实机证实 0x05/0x8D；备用文档值 0x06/0x10）" },
-            // ["CtrlPushEcgWave"]         = new() { Code = 0x10, FuncCode = 0x06, Description = "上报心电波形数据（协议文档值，实机未见于该编码）" },
             ["CtrlPushEcgHr"]               = new() { Code = 0x11, FuncCode = 0x06, Description = "上报ECG测量心率数据（产品主动推送）" },
             ["CtrlPushPpgHr"]               = new() { Code = 0x12, FuncCode = 0x06, Description = "上报PPG心率数据（产品主动推送）" },
             ["CtrlPushPpgSpo2"]             = new() { Code = 0x13, FuncCode = 0x06, Description = "上报PPG测量血氧数据（产品主动推送）" },
@@ -134,7 +126,7 @@ namespace TORNPISolution.Service
                 foreach (var key in Defaults.Keys)
                 {
                     if (!loaded.ContainsKey(key))
-                        _log.Warn($"协议命令配置缺少键 '{key}'，使用默认值 0x{Defaults[key].Code:X2}");
+                        _log.Warn($"协议命令配置缺少键 '{key}'，使用默认值 Func=0x{Defaults[key].FuncCode:X2}/Code=0x{Defaults[key].Code:X2}");
                 }
 
                 return result;

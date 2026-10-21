@@ -6,12 +6,8 @@ namespace TORNPISolution.Service.Flashing
 {
     /// <summary>
     /// 烧录记录：一轮里每通道一行，追加到当天的 CSV（Config\FlashRecords\flash-yyyy-MM-dd.csv）。
-    /// 几个选择是刻意的：
-    ///   一天一个文件而不是一轮一个——产线一天几百轮，一轮一个文件会把目录淹掉，按天一个才好按日期查；
-    ///   带轮次号——单看一行只知道一路的结果，要判整批得按轮次聚合；
-    ///   写带 UTF-8 BOM——现场是直接双击用 Excel 打开看的，没 BOM 中文全是乱码；
-    ///   写失败只记日志不抛——烧录结果已经给到操作员了，不能因为文件被 Excel 占着就让人以为烧录失败。
-    /// MES 与数据库接口定了之后，这份文件仍然留着：现场要能脱离软件自查当天烧了什么。
+    /// 一天一个文件而不是一轮一个——产线一天几百轮，一轮一个会把目录淹掉，按天一个才好按日期查；行内带轮次号，单看一行只有一路的结果，判整批要按轮次聚合。
+    /// 写带 UTF-8 BOM——现场直接双击用 Excel 打开看，没 BOM 中文全是乱码。
     /// </summary>
     public class FlashRecordService : IFlashRecordService
     {
@@ -76,9 +72,7 @@ namespace TORNPISolution.Service.Flashing
             }
         }
 
-        /// <summary>
-        /// 结论列。取消与跳过要单独立出来：它们和失败混在一列里，事后统计良率会把没跑的算成不良。
-        /// </summary>
+        /// <summary>结论列：取消与跳过单独立出来，与失败混在一列里会让事后良率统计把没跑的算成不良。</summary>
         private static string VerdictOf(ChannelFlashReport report) => report.Stage switch
         {
             FlashStage.Succeeded => "成功",
@@ -87,10 +81,7 @@ namespace TORNPISolution.Service.Flashing
             _ => report.Success == true ? "成功" : "失败",
         };
 
-        /// <summary>
-        /// CSV 字段转义：原因里必然带逗号与引号（设备回原文），不转义会把一行撑成好几列。
-        /// 含逗号、引号或换行时整段加引号，内部引号按规则翻倍。
-        /// </summary>
+        /// <summary>CSV 字段转义：原因里必然带逗号与引号（设备回原文），含逗号、引号或换行时整段加引号、内部引号按规则翻倍，否则一行会被撑成好几列。</summary>
         private static string Escape(string? text)
         {
             if (string.IsNullOrEmpty(text)) return string.Empty;

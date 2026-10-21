@@ -5,13 +5,11 @@ using TORNPISolution.Service.Communication;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// Alicat 质量流量控制器控制类（Modbus RTU / RS485）。
-    /// 协议要点（见 Alicat Modbus 通讯协议手册）：
+    /// Alicat 质量流量控制器控制类（Modbus RTU / RS485），协议要点见 Alicat Modbus 通讯协议手册：
     /// - 采用 PLC 编号约定，手册寄存器号从 1 开始，报文地址需减 1；
     /// - 32 位值大端字序：高字在低地址寄存器（与美仪相反）；
     /// - 设定点必须用 0x10 写多寄存器一次写入两个寄存器；
-    /// - 命令通过寄存器 1000（命令 ID）+ 1001（命令参数）下发，
-    ///   写入完成后读回 1001 可获取执行状态（0x8001~0x8006 为错误）。
+    /// - 命令通过寄存器 1000（命令 ID）+ 1001（命令参数）下发，写完后读回 1001 取执行状态（0x8001~0x8006 为错误）。
     /// </summary>
     public class AlicatMassFlowController : IMassFlowController
     {
@@ -41,9 +39,7 @@ namespace TORNPISolution.Service.Devices
         private readonly byte _slaveId;
         private readonly ILogService _log;
 
-        /// <summary>   
-        /// 独占串口方式创建（Alicat 出厂默认 19200bps、无校验）
-        /// </summary>
+        /// <summary>独占串口方式创建（Alicat 出厂默认 19200bps、无校验）</summary>
         public AlicatMassFlowController(
             string portName,
             byte slaveId = 1,
@@ -55,9 +51,7 @@ namespace TORNPISolution.Service.Devices
             _ownsClient = true;
         }
 
-        /// <summary>
-        /// 共享总线方式创建（多设备挂同一条 485 总线时传入同一个 client）
-        /// </summary>
+        /// <summary>共享总线方式创建（多设备挂同一条 485 总线时传入同一个 client）</summary>
         public AlicatMassFlowController(ModbusRtuClient client, byte slaveId = 1, ILogService? log = null)
         {
             _client = client;
@@ -71,10 +65,7 @@ namespace TORNPISolution.Service.Devices
 
         public Task CloseAsync() => _client.CloseAsync();
 
-        /// <summary>
-        /// 一次读取质量流量控制器全部统计数据（手册 1.5.1 节）：
-        /// 1203-04 压力 / 1205-06 温度 / 1207-08 体积流量 / 1209-10 质量流量 / 1211-12 设定点
-        /// </summary>
+        /// <summary>一次读取质量流量控制器全部统计数据（手册 1.5.1 节）：1203-04 压力 / 1205-06 温度 / 1207-08 体积流量 / 1209-10 质量流量 / 1211-12 设定点</summary>
         public async Task<AlicatReading> ReadAllAsync(CancellationToken ct = default)
         {
             var regs = await _client.ReadHoldingRegistersAsync(_slaveId, RegStatsBase, 10, ct).ConfigureAwait(false);
@@ -136,10 +127,7 @@ namespace TORNPISolution.Service.Devices
         public Task SetValveAsync(ushort valveMode, CancellationToken ct = default)
             => SendCommandAsync(CmdValve, valveMode, $"阀门控制（模式 {valveMode}）", ct);
 
-        /// <summary>
-        /// 下发设备命令：0x10 同时写入命令 ID（1000）与参数（1001），
-        /// 完成后读回 1001 校验执行状态（手册 1.1 节）。
-        /// </summary>
+        /// <summary>下发设备命令：0x10 同时写入命令 ID（1000）与参数（1001），完成后读回 1001 校验执行状态（手册 1.1 节）</summary>
         private async Task SendCommandAsync(ushort commandId, ushort argument, string what, CancellationToken ct)
         {
             await _client.WriteMultipleRegistersAsync(

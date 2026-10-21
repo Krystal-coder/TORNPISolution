@@ -26,12 +26,11 @@
 
     <DockPanel>
 
-        <!-- ====== 底部按钮栏 ====== -->
+        <!-- 底部按钮栏 -->
         <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
             <TextBlock Text="保存后写入 Config\instruments.json（Aecg100Tester），测试模块按需读取"
                        Style="{StaticResource Style.Hint}" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- 运行期锁定配置保存：灰显不可点-->
                 <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
                            VerticalAlignment="Center" Margin="0,0,12,0"
                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
@@ -41,11 +40,11 @@
             </StackPanel>
         </Grid>
 
-        <!-- ====== 测试参数 ====== -->
+        <!-- 测试参数 -->
         <TabControl Margin="12,10,12,0" Style="{StaticResource Style.NavTabControl}" Background="Transparent" TabStripPlacement="Left"
                     ItemContainerStyle="{StaticResource Style.NavTabItem}">
 
-            <!-- ============ ECG-004 心率测试 ============ -->
+            <!-- ECG-004 心率测试 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -104,7 +103,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ 噪声 / 阻抗 / 起搏器 ============ -->
+            <!-- 噪声 / 阻抗 / 起搏器 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -116,7 +115,6 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="8,4">
 
-                        <!-- 噪声 -->
                         <TextBlock Text="ECG 噪声" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -144,13 +142,11 @@
                             </Grid>
                         </Border>
 
-                        <!-- 阻抗 -->
                         <TextBlock Text="ECG 阻抗" Style="{StaticResource Style.GroupTitle}"/>
                         <CheckBox Content="启用 620K 阻抗"
                                   IsChecked="{Binding Params.ImpedanceEnabled}"
                                   Margin="0,0,0,6" FontSize="12"/>
 
-                        <!-- 起搏器 -->
                         <TextBlock Text="起搏脉冲" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -187,7 +183,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 呼吸调制 -->
                         <TextBlock Text="ECG 呼吸调制（Respiration）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -231,7 +226,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ ECG-009 动态范围和线性（A10 唯一实现项） ============ -->
+            <!-- ECG-009 动态范围和线性（A10 唯一实现项） -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -405,7 +400,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ 频率扫描 / DC 偏置 ============ -->
+            <!-- 频率扫描 / DC 偏置 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -417,7 +412,6 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="8,4">
 
-                        <!-- 频率扫描 -->
                         <TextBlock Text="频率扫描参数" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -452,7 +446,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- DC 偏置 -->
                         <TextBlock Text="DC 偏置" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -482,7 +475,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ PPG 心率（PPG-1R-525 绿光模块） ============ -->
+            <!-- PPG 心率（PPG-1R-525 绿光模块） -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -586,7 +579,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ SpO2 血氧（PPG-2R-940 红+红外模块） ============ -->
+            <!-- SpO2 血氧（PPG-2R-940 红+红外模块） -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -706,7 +699,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ LED 校准 ============ -->
+            <!-- LED 校准 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -767,7 +760,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ ECG 默认波形参数 ============ -->
+            <!-- ECG 默认波形参数 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -843,7 +836,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- ECG 间期参数 -->
                         <TextBlock Text="ECG 间期参数" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">

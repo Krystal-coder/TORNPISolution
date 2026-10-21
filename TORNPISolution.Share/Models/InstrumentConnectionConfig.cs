@@ -25,24 +25,17 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 仪器链接配置：汇总所有测试用仪器的串口参数，
-    /// 由配置服务负责持久化，界面与设备层共享同一份定义。
+    /// 仪器链接配置：汇总所有测试仪器的串口/网口参数，由配置服务持久化，界面与设备层共享同一份定义。
     /// </summary>
     public class InstrumentConnectionConfig
     {
         /// <summary>被测产品（DUT，串口 232，默认 921600bps）</summary>
         public SerialLinkSettings Product { get; set; } = new() { BaudRate = 921600 };
 
-        /// <summary>
-        /// 无产品演示模式：产品串口未接时，血压相关模块（A04 压力控制 / A06 动态压力精度）
-        /// 仅驱动模拟仪完成充放气流程验证仪器侧行为；依赖产品读回的结果项由收尾扫描按读回缺失判 FAIL；
-        /// 接上产品后务必取消勾选恢复。
-        /// </summary>
+        /// <summary>无产品演示模式：产品串口未接时，血压相关模块（A04 压力控制 / A06 动态压力精度）仅驱动模拟仪完成充放气流程，验证仪器侧行为；依赖产品读回的结果项由收尾扫描按读回缺失判 FAIL，接上产品后须取消勾选恢复</summary>
         public bool NoProductDemoMode { get; set; }
 
-        /// <summary>
-        /// 无仪器演示模式：只读产品串口数据（进入产测模式 → 0x72 → 0x74），各模块执行完产品通讯即返回
-        /// </summary>
+        /// <summary>无仪器演示模式：只读产品串口数据（进入产测模式 → 0x72 → 0x74），各模块执行完产品通讯即返回</summary>
         public bool NoInstrumentDemoMode { get; set; }
 
         /// <summary>美仪压力/差压变送器（默认 9600bps）</summary>
@@ -78,10 +71,8 @@ namespace TORNPISolution.Share.Models
         // ==================== 单板工位仪器（都是网口，台数写在清单里，用不到的把 Enabled 关掉） ====================
 
         /// <summary>
-        /// CRY5242/5243 四通道电流电压综测仪清单。
-        /// Port 填通道 A 的端口，B/C/D 依次 +1（5025~5028）；
-        /// IP 末段由仪器背板拨码算出（32 + 左档×16 + 右档×1），两台必须拨成不同值。
-        /// 清单顺序就是供电槽位顺序（只有 Enabled 的行参与编号），每台按硬件固定的四个通道连着占四项。
+        /// CRY5242/5243 四通道电流电压综测仪清单：Port 填通道 A 的端口，B/C/D 依次 +1（5025~5028）。
+        /// 清单顺序即供电槽位顺序（仅 Enabled 行参与编号），每台按硬件固定的四个通道连着占四项。
         /// </summary>
         public List<Cry5242Settings> Cry5242Testers { get; set; } = new()
         {
@@ -90,9 +81,8 @@ namespace TORNPISolution.Share.Models
         };
 
         /// <summary>
-        /// 研为 EW-DTU09 蓝牙网关清单（每台一个 IP:端口，一条 AT 指令连接）。
-        /// 端口是网关自己的 TCP 端口，不是固定的，以网关上位配置为准。
-        /// 清单顺序就是槽位顺序（只有 Enabled 的行参与编号），一项一个地址与一个信号强度。
+        /// 研为 EW-DTU09 蓝牙网关清单：每台一个 IP:端口，一条 AT 指令连接；端口为网关自身的 TCP 端口，不固定，以网关上位配置为准。
+        /// 清单顺序即槽位顺序（仅 Enabled 行参与编号），一项对应一个地址与一个信号强度。
         /// </summary>
         public List<BluetoothGatewaySettings> BluetoothGateways { get; set; } = new()
         {
@@ -106,10 +96,7 @@ namespace TORNPISolution.Share.Models
             new() { Name = "网关8", IpAddress = "192.168.1.108", Port = 8080 },
         };
 
-        /// <summary>
-        /// 海康 MV-ID 读码器清单（触发端口与结果端口各一条连接，参数要和相机侧一致）。
-        /// 清单顺序就是槽位顺序（只有 Enabled 的行参与编号），每台按 SlotsPerReader 连着占几个槽位。
-        /// </summary>
+        /// <summary>海康 MV-ID 读码器清单：触发端口与结果端口各一条连接，参数须与相机侧一致；清单顺序即槽位顺序（仅 Enabled 行参与编号），每台按 SlotsPerReader 连着占几个槽位</summary>
         public List<HikBarcodeReaderSettings> BarcodeReaders { get; set; } = new()
         {
             new() { Name = "读码器1", IpAddress = "192.168.1.16", Port = 2002 },
@@ -118,10 +105,7 @@ namespace TORNPISolution.Share.Models
             new() { Name = "读码器4", IpAddress = "192.168.1.19", Port = 2002 },
         };
 
-        /// <summary>
-        /// 当前启用血压模拟仪的测试参数：康伟达读康伟达节点、BPA700/未选择读 BPA700 节点。
-        /// 测试模块（A03/A04/A05 等）统一从这里取参
-        /// </summary>
+        /// <summary>当前启用血压模拟仪的测试参数：康伟达读康伟达节点，BPA700/未选择读 BPA700 节点；测试模块（A03/A04/A05 等）统一从这里取参</summary>
         public BpaTestParams ActiveBpTestParams
             => ActiveSimulator == SimulatorType.Kangwenda ? KangwendaSimulator.TestParams : BPA700Simulator.TestParams;
 

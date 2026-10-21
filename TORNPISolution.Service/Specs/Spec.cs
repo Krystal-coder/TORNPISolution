@@ -5,12 +5,9 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 规格类：每模块一个 Build 方法，GetAllModules 是模块目录。
-    /// 测试项名称统一引用 <see cref="SpecItems"/> 常量（项名唯一来源，TestItem 上报同引用）。
-    /// 动态规格怎么定义：这里写的 SpecMin/SpecMax 只是静态规格（默认/兜底）；需按仪器读回值现算规格的项（如血压：仪器值±容差）不改这里，由 TestItem 运行时把动态规格随 TestItemResult 带回，UI 判定优先用动态规格，未测到才用这里的静态值。
-    /// 本文件留目录入口 GetAllModules（建好后与执行端对账有无实现）与两工位共用的书写辅助；模块清单按工位在分部文件里。
-    /// 分部文件的书写约定：#region 模块清单 里一个模块一段、段与段之间不夹辅助方法，辅助统一放文件末尾的 region——
-    /// 目录要从上往下扫着读，夹一行取配置的辅助就把清单断了；新模块照此加，别开特例。
+    /// 规格类：每模块一个 Build 方法，GetAllModules 是模块目录（建好后与执行端对账有无实现）；模块清单按工位在分部文件里，本文件只留目录入口与两工位共用的书写辅助。
+    /// 项名统一引用 <see cref="SpecItems"/> 常量。这里写的 SpecMin/SpecMax 只是静态规格（默认/兜底）：需按仪器读回值现算规格的项（如血压：仪器值±容差）不改这里，由 TestItem 运行时把动态规格随 TestItemResult 带回，UI 判定优先用动态规格，未测到才用这里的静态值。
+    /// 分部文件书写约定：#region 模块清单 里一个模块一段、段与段之间不夹辅助方法（夹一行取配置的辅助会把清单断开），辅助统一放文件末尾的 region，新模块照此加。
     /// </summary>
     public partial class Spec : ITestModuleService
     {
@@ -19,25 +16,18 @@ namespace TORNPISolution.Service
         private readonly ITestItemService? _items;
 
         /// <param name="configService">仪器配置服务：A05 项清单按当前勾选的静态压力点动态生成（一点一项）</param>
-        /// <param name="items">执行端，供目录建好后对账模块有无实现；可空——目录不该因为拿不到执行端就建不出来</param>
+        /// <param name="items">执行端，供目录建好后对账模块有无实现；可空</param>
         public Spec(IInstrumentConfigService configService, ITestItemService? items = null)
         {
             _configService = configService;
             _items = items;
         }
 
-        /// <summary>
-        /// 嵌软版本管控规格（A16“产品信息获取(嵌软版本)”项的规格与判定唯一来源）：
-        /// 产品读回版本与它不一致判 FAIL（防烧录老版本）；版本升级时只改这一处，规格列显示与判定同步生效。
-        /// </summary>
+        /// <summary>嵌软版本管控规格（A16“产品信息获取(嵌软版本)”项的规格与判定唯一来源）：产品读回版本与它不一致判 FAIL（防烧录老版本）；版本升级时只改这一处，规格列显示与判定同步生效。</summary>
         public const string ExpectedFirmwareVersion = "V0.1.POR264002";
 
         public const string FirmwareStatus = "03-00";
-        /// <summary>
-        /// 模块目录：先整机工位、后单板工位，各自按书写顺序（顺序即新建方案时的默认顺序，可拖拽调整）。
-        /// 页面按模块自己的 Category 过滤，所以这里返回全量不影响左右两栏各只显示本类。
-        /// 新增模块：在对应工位的分部文件里写一个 Build 方法 + 加进那一份清单，别改本方法。
-        /// </summary>
+        /// <summary>模块目录：先整机工位、后单板工位，各自按书写顺序（顺序即新建方案时的默认顺序，可拖拽调整）；页面按模块自己的 Category 过滤，所以返回全量不影响左右两栏各只显示本类。新增模块在对应工位分部文件里写 Build 方法并加进那一份清单，别改本方法。</summary>
         public IReadOnlyList<TestModuleModel> GetAllModules()
         {
             _log.Info($"{DateTime.Now} Start calling the Spec.GetAllModules() method . {Environment.NewLine}");
@@ -60,13 +50,9 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// 逐个模块 Id 向执行端对一句“有没有实现”：漏实现的模块拖进方案要跑到那一轮才抛 NotSupportedException，看上去像设备问题；
-        /// 这里在上架时就记 Error，未注入执行端则记 Warn 跳过。
-        /// </summary>
+        /// <summary>逐个模块 Id 向执行端对账有无实现：漏实现的模块拖进方案要跑到那一轮才抛 NotSupportedException（看上去像设备问题），这里在上架时就记 Error；未注入执行端时若不记 Warn 就一路无声，分不清是“没漏”还是“没查”，所以记 Warn 跳过对账。</summary>
         private void VerifyAllModulesImplemented(IReadOnlyList<TestModuleModel> modules)
         {
-            // 没注入也要留痕：正常一路不报任何内容，不报时人分不清是“没漏”还是“根本没查”
             if (_items == null)
             {
                 _log.Warn("未注入执行端，模块目录与分派表的对账已跳过（请核对组合根里 Spec 的注册）");
@@ -79,18 +65,11 @@ namespace TORNPISolution.Service
 
         #region 书写辅助（对应模板的 TIName[j]=... 与 ResultName[k]/SpecMin[k]/SpecMax[k] 赋值）
 
-        /// <summary>
-        /// 新建一个测试模块（TI），返回模块对象供追加测试项；模块进入目录的顺序由各工位的清单方法决定。对应模板 TIName[j]/TIComments[j] 一行。
-        /// 这里没有 icon 参数是有意的：模块图标从没被任何界面绑过，值又是 \uE90F 这种没人认得的码点，25 处调用各带一次只是噪声。
-        /// 以后真要加图标，走 PackIconKind 枚举名（与仪器导航那边的 DeviceNavItem.Icon 同一套），不要把码点填回来。
-        /// </summary>
+        /// <summary>新建一个测试模块（TI），返回模块对象供追加测试项；模块进入目录的顺序由各工位的清单方法决定。对应模板 TIName[j]/TIComments[j] 一行。图标走 PackIconKind 枚举名（与仪器导航的 DeviceNavItem.Icon 同一套），不要填码点。</summary>
         private static TestModuleModel AddTI(string id, ModuleCategory category, string name, string description)
             => new TestModuleModel { Id = id, Category = category, Name = name, Description = description };
 
-        /// <summary>
-        /// 追加 A16 产品通讯初始化的三个通用通讯项（仅本模块拥有，全方案只判定一次；其余模块不重复问询）：
-        /// MAC 地址（读回不为空即合格）+ 嵌软版本（与 <see cref="ExpectedFirmwareVersion"/> 比对）+ 当前状态查询。
-        /// </summary>
+        /// <summary>追加 A16 产品通讯初始化的三个通用通讯项：MAC 地址（读回不为空即合格）+ 嵌软版本（与 <see cref="ExpectedFirmwareVersion"/> 比对）+ 当前状态查询；仅本模块拥有，全方案只判定一次，其余模块不重复问询。</summary>
         private static void AddHandshakeItems(TestModuleModel ti)
         {
             AddResult(ti, name: SpecItems.ProductMacAddress,

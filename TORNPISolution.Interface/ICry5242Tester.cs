@@ -23,16 +23,10 @@ namespace TORNPISolution.Interface
         /// <summary>读取固件版本（*IDN?，形如 SG2815，CRY5242,"V 0.1.8"）</summary>
         Task<string> GetIdentityAsync(int channel, CancellationToken ct = default);
 
-        /// <summary>
-        /// 整机复位（*RST），关掉所有通道输出；过流保护动作后也只能靠它恢复。
-        /// 手册 4.6 建议连续测试每半小时复位一次。
-        /// </summary>
+        /// <summary>整机复位（*RST），关掉所有通道输出；过流保护动作后也只能靠它恢复，手册 4.6 建议连续测试每半小时复位一次</summary>
         Task ResetAsync(CancellationToken ct = default);
 
-        /// <summary>
-        /// 只设输出电压与过流保护值，不打开通路（OUTPUT 不带线制参数）。
-        /// 5242 上第三个参数是过流保护值（超了就红灯、停输出），只有 5243 拿它当限流值。
-        /// </summary>
+        /// <summary>只设输出电压与过流保护值，不打开通路（OUTPUT 不带线制参数）；5242 上第三个参数是过流保护值（超了就红灯、停输出），只有 5243 拿它当限流值</summary>
         /// <param name="voltageMilliVolts">0~6500 mV</param>
         /// <param name="currentMilliAmps">-2000~+2000 mA</param>
         Task ConfigureOutputAsync(int channel, int voltageMilliVolts, int currentMilliAmps, CancellationToken ct = default);
@@ -46,10 +40,7 @@ namespace TORNPISolution.Interface
         /// <param name="fourWire">留空取仪器配置里的 FourWire</param>
         Task SetRampOutputAsync(int channel, int voltageMilliVolts, int currentMilliAmps, int rampMilliSeconds, bool? fourWire = null, CancellationToken ct = default);
 
-        /// <summary>
-        /// 单独开/关通道输出通路（OUTPUT:STA）：没先下发 OUTPUT 时只是空开通路、没有实际输出；
-        /// OUTPUT / OUTPUT:RAMP 带了线制时通路已经打开，不需要再发这条。
-        /// </summary>
+        /// <summary>单独开/关通道输出通路（OUTPUT:STA）：没先下发 OUTPUT 时只是空开通路、没有实际输出；OUTPUT / OUTPUT:RAMP 带了线制时通路已打开，不需要再发</summary>
         Task SetOutputEnabledAsync(int channel, bool enabled, CancellationToken ct = default);
 
         /// <summary>切换该通道的测量通路（FUNCtion:SWITch）；手册里两个电压测量（DVM/CH_PO）都要求先切</summary>

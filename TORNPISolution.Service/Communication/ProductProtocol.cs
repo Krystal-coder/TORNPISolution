@@ -1,3 +1,4 @@
+using TORNPISolution.Interface;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service.Communication
@@ -9,7 +10,7 @@ namespace TORNPISolution.Service.Communication
     ///   Len     = Payload 长度（不含 CRC / Tail）
     ///   CRC     = CRC-16/MODBUS，计算范围 = Head + Len + Payload（从帧头到载荷末尾）
     ///   总帧长  = Payload.Length + 5（Head 1 + Len 1 + CRC 2 + Tail 1）
-    /// 串口参数：115200 8N1，无流控。
+    /// 本类只做帧编解码、不控制串口；串口号与通讯参数取仪器配置 Product 段（SerialLinkSettings），收发在 ProductController。
     /// 功能码按命令区分：0x02 产品信息查询 / 0x05 测量控制 / 0x06 主动推送 / 0x07 硬件控制与产测。
     /// 控制码与功能码均从 Config\protocol_commands.json 加载，支持运行时修改后热重载。
     /// </summary>
@@ -20,12 +21,14 @@ namespace TORNPISolution.Service.Communication
         /// <summary>命令名 → (FuncCode, Code)。键为命令名，天然避免同 Code 不同 Func 的冲突。</summary>
         private static readonly Dictionary<string, ProductCmd> _commands = new();
 
-        /// <summary>
-        /// 命令名 → 默认参数字节（取配置项的 Data 字段）。
-        /// 只给「同 Func+Ctrl、靠参数区分语义」的命令登记（如开始/关闭ECG测试），无参命令不入表。
-        /// </summary>
+        /// <summary>命令名 → 默认参数字节（取配置项 Data）；只给同 Func+Ctrl 靠参数区分语义的命令登记，无参命令不入表。</summary>
         private static readonly Dictionary<string, byte[]> _commandData = new();
         private static readonly object _lock = new();
+
+        /// <summary>已告警过的缺失命令名</summary>
+        private static readonly HashSet<string> _warnedMissingNames = new();
+
+        private static readonly ILogService _log = new LogService(nameof(ProductProtocol));
 
         static ProductProtocol()
         {
@@ -71,16 +74,26 @@ namespace TORNPISolution.Service.Communication
         /// <summary>重新从 JSON 加载命令码（配置窗口保存后调用）</summary>
         public static void ReloadCommands() => LoadFromConfig();
 
-        /// <summary>按命令名取 (Func, Code)；未配置时返回 Func=0x07/Code=0x00 的无效命令并记录。</summary>
+        /// <summary>按命令名取 (Func, Code)；未配置时返回 Func=0x07/Code=0x00 的无效命令，每个名字只告警一次。</summary>
         private static ProductCmd GetCmd(string name)
         {
+            bool warn;
             lock (_lock)
-                return _commands.TryGetValue(name, out var cmd) ? cmd : new ProductCmd(FuncRead, 0x00);
+            {
+                if (_commands.TryGetValue(name, out var cmd)) return cmd;
+                warn = _warnedMissingNames.Add(name);
+            }
+
+            // 日志写在锁外：Serilog 落盘是 IO，压在 _lock 里会拖住整条收发链路
+            if (warn)
+                _log.Warn($"协议命令 '{name}' 在配置与默认值中都不存在，已退化为无效命令 0x{FuncRead:X2}/0x00，" +
+                          "请在协议命令配置页补齐该命令或检查命令名拼写");
+
+            return new ProductCmd(FuncRead, 0x00);
         }
 
         /// <summary>
         /// 按命令名取配置页里的默认参数字节；未配置或配置为空时用 <paramref name="fallback"/>。
-        /// 这样参数在协议命令配置页改了即生效，不改也能跑。
         /// </summary>
         public static byte[] ResolveCmdData(string name, byte[] fallback)
         {
@@ -94,9 +107,6 @@ namespace TORNPISolution.Service.Communication
         public const byte Tail = 0xFE;
 
         // ==================== 功能码 ====================
-
-        /// <summary>ACK 应答（写命令返回）</summary>
-        public const byte FuncAck = 0x00;
 
         /// <summary>产品信息查询（0x30~0x37）</summary>
         public const byte FuncProductInfo = 0x02;
@@ -113,6 +123,7 @@ namespace TORNPISolution.Service.Communication
         // ==================== 命令（从 JSON 加载，每项含 Func + Code） ====================
 
         // ---- 进入产测模式（Func=0x07/Code=0x01）：打开串口后立即发送防产品休眠，须在 0x72/0x74 之前 ----
+        // 配置键 CtrlKeepAlive 不得改名：改名会让现场已保存的自定义码变成未知键被忽略。
         public static ProductCmd EnterProductionTestMode => GetCmd("CtrlKeepAlive");
 
         // ---- 产品信息查询（Func=0x02）----
@@ -209,8 +220,7 @@ namespace TORNPISolution.Service.Communication
 
         /// <summary>
         /// 解析 0x8D 帧的心电电压数据：payload = 75 × int16 小端，码值 /100 = mV（1 码值 = 10μV）。
-        /// 文档写 uint16_t s_ecg_wave_cache[75]，但实机基线附近为 F8 FF（按 uint16 = 655.28mV 明显不成立），
-        /// 故按 int16 补码解析（负值 = 基线以下），与“收到后需要/100，单位 mV”一致。
+        /// 文档写 uint16_t s_ecg_wave_cache[75]，但实机基线为 F8 FF（按 uint16 明显不成立），故按 int16 补码解析（负值 = 基线以下）。
         /// </summary>
         /// <param name="payload">帧数据区（不含 Func/Ctrl/CRC）</param>
         /// <returns>mV 数组；payload 不足 2 字节返回 null</returns>
@@ -227,17 +237,19 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== 包构建 ====================
 
-        /// <summary>
-        /// 构建完整协议帧：Head + Len + Payload + CRC16-MODBUS + Tail。
-        /// Len = Payload 长度（Func + Ctrl + Data），不含 CRC。
-        /// 总帧长 = Payload.Length + 5（Head 1 + Len 1 + CRC 2 + Tail 1）。
-        /// </summary>
         /// <param name="cmd">命令标识（功能码 + 控制码）</param>
         /// <param name="data">参数数据（可为 null 或空）</param>
+        /// <exception cref="ArgumentException">参数过长导致 Payload 超过 Len 字节的表示范围（255）</exception>
         public static byte[] BuildPacket(ProductCmd cmd, byte[]? data = null)
         {
             var dataLen = data?.Length ?? 0;
             var payloadLen = 2 + dataLen;                    // Func + Ctrl + Data
+            // Len 是 1 字节，写不下只能截断，截出来的帧会被产品按错误长度丢弃——宁可在这里就报错
+            if (payloadLen > byte.MaxValue)
+                throw new ArgumentException(
+                    $"协议帧参数过长：Payload={payloadLen} 字节，超过 Len 上限 {byte.MaxValue}（参数区最多 {byte.MaxValue - 2} 字节）",
+                    nameof(data));
+
             var frame = new byte[payloadLen + 5];            // Head + Len + Payload + CRC(2) + Tail
 
             frame[0] = Head;
@@ -259,9 +271,6 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== 帧解析 ====================
 
-        /// <summary>
-        /// 解析一帧完整数据。
-        /// </summary>
         /// <param name="frame">完整帧（含 Head 和 Tail）</param>
         /// <returns>解析结果；CRC 校验失败或帧无效时返回 null</returns>
         public static ParsedFrame? ParseFrame(byte[] frame)
@@ -294,13 +303,8 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== CRC-16/MODBUS ====================
 
-        /// <summary>
-        /// CRC-16/MODBUS（多项式 0xA001，初始值 0xFFFF），
-        /// 与 ModbusRtuClient 使用同一算法。
-        /// </summary>
-        /// <param name="data">数据源</param>
-        /// <param name="offset">起始偏移</param>
-        /// <param name="length">计算长度</param>
+        /// <summary>CRC-16/MODBUS（多项式 0xA001，初始值 0xFFFF），与 ModbusRtuClient 同算法。</summary>
+        /// <param name="length">从 offset 起参与计算的字节数</param>
         public static ushort ComputeCrc16Modbus(byte[] data, int offset, int length)
         {
             ushort crc = 0xFFFF;

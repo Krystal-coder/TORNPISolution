@@ -4,15 +4,12 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：血压 A04 压力控制功能（BP-006~009），
-    /// 含四项各自的辅助（0x79 完整测量、快速放气、过压保护）与本模块专用的回读轮询、放气曲线分析。
-    /// 模块执行包装与分派见 TestItem.cs 主文件，项名统一引用 <see cref="SpecItems"/>。
+    /// TestItem 分部：血压 A04 压力控制功能（BP-006~009，各项由 0x79/0x75 驱动、以 0x76/0x80 回读判定），含本模块专用的回读轮询与放气曲线分析。
     /// </summary>
     public partial class TestItem
     {
         /// <summary>
-        /// 压力控制功能测试（BP-006~009）：四项均以产品回读压力（0x76）判定产品行为，未接产品/握手失败不做模拟仪空跑；产品通讯统一在 A16 初始化。
-        /// 充气一律由产品气泵完成，模拟仪只当手臂提供脉搏波
+        /// 压力控制功能测试（BP-006~009）：四项均以产品回读压力（0x76）判定，未接产品/握手失败不做模拟仪空跑；产品通讯统一在 A16 初始化；充气一律由产品气泵完成，模拟仪只当手臂提供脉搏波。
         /// ① BP-006 最高充气压力 + ② BP-007 匀速放气控制：同一轮 0x79 完整测量，回读峰值判 ≤300mmHg、匀速段平均速率判 2~6mmHg/s（分段速率只展示）；
         /// ③ BP-008 快速放气功能：0x79 充气，回读达停止触发压力（或已从峰值回落）即发 0x79 status=1 关闭测量，从峰值降至终点压力耗时 ≤10s；
         /// ④ BP-009 过压保护：0x75 充气（目标压与超时取配置，到点产品底层自行放气），首次超响应起算压力到 0x80 过压状态置位的间隔 ≤15s、置位持续时长 ≤3s，触发点与峰值只记录。
@@ -30,12 +27,9 @@ namespace TORNPISolution.Service
 
             using (var product = _productFactory())
             {
-                // 测试参数按仪器链接配置选择的模拟仪路由
                 var testParams = config.ActiveBpTestParams;
 
-                // 四项全部依赖产品串口回读压力判定，产品不可用时不做无意义的模拟仪空跑；
-                // 结果项一律不报告，由收尾扫描统一判 FAIL（报 0 对“≤300mmHg”“≤10s”这类上限规格会误判成 PASS）；
-                // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）
+                // 产品不可用时四项结果一律不报告、由收尾判 FAIL：报 0 对“≤300mmHg”“≤10s”这类上限规格会误判成 PASS。
                 var productAvailable = GetProductAvailable(config.NoProductDemoMode);
 
                 // 经共享会话取模拟仪（接口调用：步骤只用接口成员，本模块只让它跑血压模拟）
@@ -51,8 +45,7 @@ namespace TORNPISolution.Service
                         return;
                     }
 
-                    // 无产品演示模式：新模型下模拟仪只当手臂、不加压，没有充气方就没法复现充放气过程，
-                    // 只跑一轮血压模拟验证仪器侧能被驱动；四项结果均不报告，由收尾扫描按读回缺失统一判 FAIL
+                    // 无产品演示模式：模拟仪只当手臂、不加压，没有充气方就无法复现充放气，只跑一轮血压模拟验证仪器侧能被驱动；四项结果均不报告，由收尾按读回缺失判 FAIL
                     _log.Info("BP-006~009 无产品演示模式：驱动模拟仪跑一轮血压模拟验证仪器侧，四项结果均不报告、由收尾判 FAIL");
 
                     var demoWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -83,8 +76,7 @@ namespace TORNPISolution.Service
                     return;
                 }
 
-                // 分组执行包装：每组独立异常隔离，组内结果由方法自己边测边报（一次采集可报多项）；
-                // 异常或未测得时不报告，由收尾扫描统一判 FAIL
+                // 分组执行包装：每组独立异常隔离，组内结果由方法自己边测边报（一次采集可报多项）；异常或未测得时不报告，由收尾判 FAIL
                 async Task RunGroupAsync(string label, Func<Task> body, params string[] names)
                 {
                     try
@@ -126,10 +118,8 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// BP-006 最高充气压力 + BP-007 匀速放气控制（同一轮采集）：mode2 + 0x79 让产品自己充放气，
-        /// 模拟仪并行跑一轮血压模拟只提供脉搏波（不加压）；200ms 轮询 0x76 记录整条曲线，
-        /// 回读峰值报 BP-006（≤300mmHg），峰值后匀速段平均速率报 BP-007（2~6mmHg/s）并附分段速率（只展示不判定）。
-        /// 一轮没采到有效充气（峰值过低/样本过少）时两项都不报告，由收尾判 FAIL。
+        /// BP-006 最高充气压力 + BP-007 匀速放气控制（同一轮采集）：mode2 + 0x79 让产品自己充放气，模拟仪并行跑一轮血压模拟只提供脉搏波（不加压），轮询产品回读压力记录整条曲线。
+        /// 回读峰值报 BP-006（≤300mmHg），峰值后匀速段平均速率报 BP-007（2~6mmHg/s，分段速率只展示不判定）；一轮没采到有效充气（峰值过低/样本过少）时两项都不报告，由收尾判 FAIL。
         /// </summary>
         private async Task Bp006007FullMeasureAsync(
             IBloodPressureSimulator simulator, IProductController product, BpaTestParams testParams,
@@ -159,8 +149,7 @@ namespace TORNPISolution.Service
                     (int)pc.InflateHeartRate, pc.InflatePulseVolume,
                     cuff.WaitStartTimeoutSeconds * 1000, cuff.TotalTimeoutSeconds * 1000, token);
 
-                // 放气尾部兜底：血压模拟曲线结束不等于放气到底，继续等到回读降至采样结束压力或最长等待秒数，
-                // 免得匀速段的下半截（近 30mmHg）被截掉；轮询仍在跑，只是多等一会儿
+                // 放气尾部兜底：血压模拟曲线结束不等于放气到底，继续等回读降至采样结束压力或最长等待秒数，免得匀速段下半截（近 30mmHg）被截掉；轮询仍在跑
                 var deflateDeadline = watch.Elapsed.TotalSeconds + pc.BP007MaxDeflateSeconds;
                 while (watch.Elapsed.TotalSeconds < deflateDeadline)
                 {
@@ -173,8 +162,7 @@ namespace TORNPISolution.Service
             }
             finally
             {
-                // 先退订再收尾，每句各自兜异常：前一句抛了不能把后面几句顶掉，
-                // 否则曲线还在往已结束的项里画点、产品挂着本次测量（下次 0x79 开始不被接受）
+                // 先退订再收尾，每句各自兜异常：前一句抛了不能把后面几句顶掉，否则曲线还在往已结束的项画点、产品挂着本次测量（下次 0x79 开始不被接受）
                 simulator.PressureSampled -= OnSample;
                 pollCts.Cancel();
                 try { await pollTask; }
@@ -212,11 +200,8 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// BP-008 快速放气功能：mode2 + 0x79 让产品气泵自己充气（模拟仪只当手臂提供脉搏波、不加压），100ms 轮询 0x76，
-        /// 回读达停止触发压力（配置，文档值 260）或已从峰值回落指定幅度（产品自己转入放气的兜底）
-        /// 即发 0x79 status=1 关闭测量触发快速放气，从回读峰值计时降至终点压力（配置，文档值 15mmHg）耗时 ≤10s。
-        /// 计时起点取峰值而非发停止的时刻（文档“从最高压降至15mmHg”）；超时未降到终点时测试值给到超时点，
-        /// 并在产品列写明是超时而非实测耗时；没形成有效充气则不报告，由收尾判 FAIL。
+        /// BP-008 快速放气功能：mode2 + 0x79 让产品气泵自己充气（模拟仪只当手臂提供脉搏波、不加压），100ms 轮询 0x76，回读达停止触发压力（配置，文档值 260）或已从峰值回落指定幅度（产品自己转入放气的兜底）即发 0x79 status=1 关闭测量触发快速放气；
+        /// 计时起点取回读峰值而非发停止的时刻（文档“从最高压降至15mmHg”），从峰值降至终点压力（配置，文档值 15mmHg）耗时 ≤10s；没形成有效充气则不报告，由收尾判 FAIL。
         /// </summary>
         private async Task Bp008FastDeflationAsync(
             IBloodPressureSimulator simulator, IProductController product, BpaTestParams testParams,
@@ -239,7 +224,7 @@ namespace TORNPISolution.Service
 
             simulator.PressureSampled += OnSample;
 
-            // 模拟仪只当手臂：跟产品测量并行跑一轮血压模拟提供脉搏波，中途我们发停止时连它一起取消
+            // 模拟仪只当手臂：与产品测量并行跑一轮血压模拟提供脉搏波，发停止时连它一起取消
             using var simCts = CancellationTokenSource.CreateLinkedTokenSource(token);
             var simTask = Task.Run(() => simulator.RunBpMeasurementAsync((int)pc.InflateSystolic, (int)pc.InflateDiastolic,
                 (int)pc.InflateHeartRate, pc.InflatePulseVolume,
@@ -320,8 +305,7 @@ namespace TORNPISolution.Service
             }
             finally
             {
-                // 逐句各自兜异常且用 None 令牌：点“停止”或上一句抛异常时，后面的收尾照样要做完，
-                // 否则产品还挂着本次测量（下次 0x79 开始不被接受）、模拟仪还停在血压模拟页面
+                // 逐句各自兜异常且用 None 令牌：点“停止”或上一句抛异常时后面的收尾照样要做完，否则产品还挂着本次测量（下次 0x79 开始不被接受）、模拟仪还停在血压模拟页面
                 simulator.PressureSampled -= OnSample;
                 pollCts.Cancel();
                 try { await pollTask; }
@@ -341,11 +325,9 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// BP-009 过压保护：mode3 + 0x75 让产品气泵自己充到目标压（模拟仪只当手臂、不参与加压），
-        /// 100ms 并行轮询 0x76 回读压力与 0x80 过压状态。
+        /// BP-009 过压保护：mode3 + 0x75 让产品气泵自己充到目标压（模拟仪只当手臂、不参与加压），100ms 并行轮询 0x76 回读压力与 0x80 过压状态。
         /// 判据只认 0x80：0x75 超时后产品底层同样会自行放气，把“压力骤降”当成保护动作的证据会让保护失效的产品拿到 PASS。
-        /// ① 响应时限 = 首次超压门限到 0x80 置位的间隔（≤15s）；全程未置位则把观察总时长报出去（超规格必然 FAIL）。
-        /// ② 泄压时长 = 0x80 置位持续时长（≤3s）；未置位时这项无法评估，不报告、由收尾判 FAIL。
+        /// 结果拆两行：① 响应时限 = 首次超压门限到 0x80 置位的间隔（≤15s），全程未置位则把观察总时长报出去（超规格必然 FAIL）；② 泄压时长 = 0x80 置位持续时长（≤3s），未置位时无法评估、不报告、由收尾判 FAIL。
         /// 两行的产品列都写真实峰值（不论 PASS/FAIL）；超压点/置位/回落/峰值四个关键时刻记在行详情，只记录不判定。
         /// </summary>
         private async Task Bp009OverpressureAsync(
@@ -383,8 +365,7 @@ namespace TORNPISolution.Service
                 _log.Info($"BP-009：0x75 强制充气 目标 {target}mmHg / 最长 {timeout}s（判据：首次超 {pc.BP009ResponseStartPressure:0}mmHg 起算，只认 0x80 置位）");
                 await product.StartInflateAsync(target, timeout, token);
 
-                // 观察窗 = 充气超时上限 + 15s 泄压余量（超时后产品底层自行放气，窗内足够看清保护到底动没动）；
-                // 已置位且已回落、回落后再多看 2s 就提前收尾
+                // 观察窗 = 充气超时上限 + 15s 泄压余量（超时后产品底层自行放气）；已置位且已回落、回落后再多看 2s 就提前收尾
                 var windowSeconds = timeout + 15.0;
                 while (watch.Elapsed.TotalSeconds < windowSeconds)
                 {
@@ -511,10 +492,7 @@ namespace TORNPISolution.Service
                 _log.Warn("BP-009②：0x80 全程未置位，泄压时长无法评估，不报告（由收尾判 FAIL）");
         }
 
-        /// <summary>
-        /// 后台轮询产品回读压力（0x76）：按 intervalMs 间隔采样入列（时间=秒表秒），
-        /// 单次回读失败不中断采样；取消即退出。
-        /// </summary>
+        /// <summary>后台轮询产品回读压力（0x76）：按 intervalMs 间隔采样入列（时间=秒表秒），单次回读失败不中断采样；取消即退出。</summary>
         private static async Task PollProductPressureAsync(
             IProductController product, List<(double T, double P)> samples,
             int intervalMs, System.Diagnostics.Stopwatch watch, CancellationToken ct)
@@ -528,16 +506,14 @@ namespace TORNPISolution.Service
                         lock (samples) samples.Add((watch.Elapsed.TotalSeconds, p));
                 }
                 catch (OperationCanceledException) { break; }
-                catch { /* 单次回读失败不中断采样 */ }
+                catch { }
 
                 try { await Task.Delay(intervalMs, ct); } catch (OperationCanceledException) { break; }
             }
         }
 
         /// <summary>
-        /// BP-006/007 同一轮曲线拆解：回读峰值（BP-006 测试值）+ 峰值后匀速放气段的平均速率（BP-007 测试值）。
-        /// 匀速段取配置区间（默认 130~30mmHg）内的样本，首尾点斜率即平均速率；区间内样本不足时
-        /// 退化为“峰值−5 至峰值 20%”；再按 BP007RateSliceMmHg 切段给出分段速率（只展示不判定）。
+        /// BP-006/007 同一轮曲线拆解：回读峰值（BP-006 测试值）+ 峰值后匀速放气段的平均速率（BP-007 测试值），匀速段取配置区间（默认 130~30mmHg）内样本、首尾点斜率即平均速率，区间内样本不足时退化为“峰值−5 至峰值 20%”，再按 BP007RateSliceMmHg 切段给分段速率（只展示不判定）。
         /// 没形成有效充气（峰值过低/样本过少/定不出放气段）返回 null，调用方两项都不报告。
         /// </summary>
         private static (double Peak, double Rate, int SampleCount, string SegmentDesc, List<TestPointResult> Slices)?
@@ -574,10 +550,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// 匀速段按固定压力跨度切段，逐段给速率/时长/压力区间（文档只说“匀速”、未量化“稳定”，所以分段只展示不判定）。
-        /// 最多 30 段，免得把切段跨度配得过小时刷出几百行。
-        /// </summary>
+        /// <summary>匀速段按固定压力跨度切段，逐段给速率/时长/压力区间（文档只说“匀速”、未量化“稳定”，所以分段只展示不判定）；最多 30 段，避免切段跨度配得过小时行数过多。</summary>
         private static List<TestPointResult> BuildRateSlices(List<(double T, double P)> segment, double sliceMmHg)
         {
             var rows = new List<TestPointResult>();
@@ -608,10 +581,7 @@ namespace TORNPISolution.Service
             return rows;
         }
 
-        /// <summary>
-        /// 后台轮询产品过压状态（0x80）：按 intervalMs 采样入列（时间=秒表秒），
-        /// 单次无响应不中断采样（空列 = 产品不支持本命令，由调用方按无法评估处理）；取消即退出。
-        /// </summary>
+        /// <summary>后台轮询产品过压状态（0x80）：按 intervalMs 采样入列（时间=秒表秒），单次无响应不中断采样（空列 = 产品不支持本命令，由调用方按无法评估处理）；取消即退出。</summary>
         private static async Task PollOverPressureStateAsync(
             IProductController product, List<(double T, bool Over)> states,
             int intervalMs, System.Diagnostics.Stopwatch watch, CancellationToken ct)
@@ -625,7 +595,7 @@ namespace TORNPISolution.Service
                         lock (states) states.Add((watch.Elapsed.TotalSeconds, over.Value));
                 }
                 catch (OperationCanceledException) { break; }
-                catch { /* 单次读取失败不中断采样 */ }
+                catch { }
 
                 try { await Task.Delay(intervalMs, ct); } catch (OperationCanceledException) { break; }
             }

@@ -5,11 +5,9 @@ namespace TORNPISolution.Service.Devices
 {
     /// <summary>
     /// 血压模拟仪租约会话：按仪器链接配置 ActiveSimulator 分发实例（组合根工厂逻辑唯一来源）。
-    /// 康伟达：方案级共享 + 懒建立——第一个真正需要它的血压模块借用时才打开，之后各模块复用同一连接，
-    /// RunPlan 结束才关闭（CloseAsync 发 0x00 归还本地控制）；背景：康伟达被 0x00 踢回本地模式后需数秒恢复，
-    /// 期间 ACK 正常但不执行控制指令，逐模块开关串口会导致后续模块失联（实测 BP-003 压力源帧全部无应答）。
-    /// BPA700：保持原有逐模块自建自关生命周期（SDK 设备状态/阀门逻辑不变），租约 Dispose 时真关闭。
-    /// 纯 NFC/ECG 等不用模拟仪的方案不会碰任何血压设备。
+    /// 康伟达：方案级共享 + 懒建立——第一个需要它的血压模块借用时才打开，之后各模块复用同一连接，RunPlan 结束才关闭（CloseAsync 发 0x00 归还本地控制）。
+    /// 不可逐模块开关串口：设备被 0x00 踢回本地模式后需数秒恢复，期间 ACK 正常但不执行控制指令（实测 BP-003 压力源帧全部无应答、后续模块失联）。
+    /// BPA700：保持逐模块自建自关生命周期（SDK 设备状态/阀门逻辑不变），租约 Dispose 时真关闭；纯 NFC/ECG 等不用模拟仪的方案不会碰任何血压设备。
     /// </summary>
     public sealed class BloodPressureSimulatorSession
     {
@@ -26,10 +24,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>康伟达共享会话是否已建立（BPA700 逐模块临时连接，永远为 false）</summary>
         public bool IsOpen => _shared is { IsOpen: true };
 
-        /// <summary>
-        /// 借用模拟仪：康伟达→懒建立共享实例（Dispose 仅归还计数不关连接，RunPlan 结束统一关闭）；
-        /// BPA700→新建并已打开的临时实例（Dispose 时真正关闭，与原逐模块行为一致）；未选择抛异常。
-        /// </summary>
+        /// <summary>借用模拟仪：康伟达→懒建立共享实例（Dispose 仅归还计数不关连接）；BPA700→新建并已打开的临时实例（Dispose 时真正关闭）；未选择模拟仪抛异常</summary>
         public async Task<SimulatorLease> RentAsync(CancellationToken ct = default)
         {
             var config = _configService.Load();
@@ -70,10 +65,7 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"康伟达血压模拟仪共享会话已建立（懒打开），方案内各血压模块复用同一连接");
         }
 
-        /// <summary>
-        /// 连接活性校验：康伟达重发复位并等待回显（无应答抛异常）；BPA700 仅确认已打开。
-        /// A01 在会话已建立时用它做真实连接测试。
-        /// </summary>
+        /// <summary>连接活性校验：康伟达重发复位并等待回显（无应答抛异常）、BPA700 仅确认已打开；A01 在会话已建立时用它做真实连接测试</summary>
         public async Task VerifyConnectionAsync(CancellationToken ct = default)
         {
             if (_shared is KangwendaNIBPSimulator kw)
@@ -94,19 +86,18 @@ namespace TORNPISolution.Service.Devices
             _log.Info("血压模拟仪会话已关闭。");
         }
 
-        /// <summary>按配置创建模拟仪实例（未打开）：Kangwenda→串口 232；BPA700→Beta SDK（与 Formal 切换会导致设备状态不一致）。</summary>
+        /// <summary>按配置创建模拟仪实例（未打开）：Kangwenda→串口 232；BPA700→正式版 SDK。</summary>
         private IBloodPressureSimulator CreateSimulator(InstrumentConnectionConfig config)
             => config.ActiveSimulator switch
             {
                 SimulatorType.Kangwenda => new KangwendaNIBPSimulator(
                     config.KangwendaSimulator.PortName, config.KangwendaSimulator.BaudRate, _log),
-                SimulatorType.BPA700 => new BPA700BetaSimulator(config.BPA700Simulator.PortName, _log),
+                SimulatorType.BPA700 => new BPA700Simulator(config.BPA700Simulator.PortName, _log),
                 _ => throw new InvalidOperationException("未选择血压模拟仪（仪器链接配置 → 模拟仪类型）")
             };
 
         private Task ReleaseLease()
         {
-            // 预留：并发租约监控用，当前仅计数
             if (_leaseCount > 0) _leaseCount--;
             return Task.CompletedTask;
         }

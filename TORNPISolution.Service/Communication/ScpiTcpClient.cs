@@ -6,9 +6,8 @@ namespace TORNPISolution.Service.Communication
 {
     /// <summary>
     /// SCPI Raw Socket 客户端（LAN 网口，默认端口 5025）。
-    /// 适用于支持 SCPI-over-LAN 的仪器（如艾德克斯 IT6400 系列电源）。
-    /// 命令以 \n 结尾，响应以 \n 终止；所有请求经 SemaphoreSlim 串行化
-    /// （SCPI 一问一答，避免多命令交叉串扰），异步执行不阻塞调用线程。
+    /// 命令以 \n 结尾，响应以 \n 终止。
+    /// 所有请求经 SemaphoreSlim 串行化（SCPI 一问一答，避免多命令交叉串扰）
     /// </summary>
     public class ScpiTcpClient : IDisposable
     {

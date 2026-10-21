@@ -17,17 +17,13 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 烧录页：本轮可选烧 Flash、烧富芮坤、或 All（默认 All：先整批烧 Flash，落定后再整批烧富芮坤），八条路并发跑。
-    /// 开烧前先把配置落盘：编排每轮自己读盘，没保存就开烧会把上一份配置的结果记到本轮卡片上。
-    /// All 走整批两段而不是逐路串两步：工程数据全局下载一次，八块板按复位的时机才不会被撕成一片。
-    /// 更新走每通道只留最新一份 + 节拍刷皮：逐条 Invoke 会压满 UI 队列；卡片吃完整快照，丢中间值不丢结论。
-    /// 跑起来整页锁死（串口与卡片勾选都不给改），避免跑一半改了口把结果记到别的路。
-    /// 串口不做自动推断：虚拟 COM 无法自证、枚举顺序又不保证与接线一致，只能人工配准（对话框可探测烧录器对着填）。
-    /// 参数全走菜单配置页（全局参数与八条通道各一页），这一页只讲状态；卡片右键只给单独跑、单独停这一路。
+    /// 烧录页 VM：八通道并发烧 Flash / 富芮坤 / All，参数在菜单配置页，本页只呈现状态。
+    /// 开烧前必须先落盘配置——编排每轮自己读盘，没保存就开烧会把上一份配置的结果记到本轮卡片上。
+    /// 结果不逐条 Invoke：每通道只留最新一份。
     /// </summary>
     public class FlashingViewModel : ViewModelBase
     {
-        /// <summary>刷皮节拍（毫秒）：一屏内看得清变化，又不会被进度刷爆</summary>
+        /// <summary>UI 刷新节拍（毫秒）</summary>
         private const int FlushIntervalMs = 80;
 
         /// <summary>擦除范围（工具 -size 的四个取值，十六进制页数）</summary>
@@ -109,7 +105,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>本机可用串口（配置对话框的下拉数据源）</summary>
         public List<string> AvailablePorts { get; private set; } = new();
 
-        /// <summary>串口清单的一句话文字（配置对话框里摆出来，省得人开设备管理器一个一个对编号）</summary>
         public string AvailablePortsText => AvailablePorts.Count == 0
             ? "本机没识别到任何串口（设备管理器里一个 COM 都没有）"
             : string.Join("、", AvailablePorts);
@@ -147,7 +142,6 @@ namespace TORNPISolution.ViewModels
                 var card = new FlashChannelCardViewModel(i + 1, _config.Channels[i]) { UseWizProPort = CurrentPhase == FlashAction.WizProFlash };
                 Channels.Add(card);
                 _cardsByChannel[card.Channel] = card;
-                // 改一行串口就重算一次问题清单：以前这件事在单通道弹窗里现算现显，弹窗收掉后得让整窗那一页接上
                 card.PropertyChanged += OnCardConfigChanged;
             }
 
@@ -158,10 +152,7 @@ namespace TORNPISolution.ViewModels
             ValidateConfig();
         }
 
-        /// <summary>
-        /// 刷新串口列表：已保存但当前不在本机列表里的口也留着——USB 临时掉线时若把它从下拉里抹掉，
-        /// 绑定会让配置看着像被清空了，操作员不知道该填什么。
-        /// </summary>
+        /// <summary>刷新串口列表：已保存但当前不在本机列表里的口也留着——USB 临时掉线时若把它从下拉里抹掉，绑定会让配置看着像被清空了，操作人员不知道该填什么。</summary>
         private void RefreshPorts()
         {
             var ports = SerialPort.GetPortNames().Distinct().OrderBy(p => p).ToList();
@@ -228,10 +219,7 @@ namespace TORNPISolution.ViewModels
             ? SelectedJob == FlashJob.All ? "阶段 1/2：待开始" : "阶段 1/1：待开始"
             : $"阶段 {Array.IndexOf(SelectedJob.ToPhases(), _phase.Value) + 1}/{SelectedJob.ToPhases().Length}：{_phase.Value.ToDisplayText()}";
 
-        /// <summary>
-        /// 动作旁边的一句提醒：一句话说清这一档怎么跑、人要做什么。
-        /// 为什么 Flash 没烧好的路不再进第二阶段：主控的 boot 就在 Flash 里，烧了也是白烧——这句道理写在代码里，不占界面那一句。
-        /// </summary>
+        /// <summary>动作说明</summary>
         public string ActionHintText => SelectedJob switch
         {
             FlashJob.WizProFlash => "只烧 SPI Flash：先让厂商上位机把工程下载进烧录器（一次覆盖所有），再各通道并发烧写",
@@ -327,7 +315,6 @@ namespace TORNPISolution.ViewModels
             private set => SetProperty(ref _skippedCount, value);
         }
 
-        /// <summary>正在等人按复位键的通路数：现场最容易漏看的就是这个</summary>
         public int WaitingCount
         {
             get => _waitingCount;
@@ -348,7 +335,7 @@ namespace TORNPISolution.ViewModels
             private set => SetProperty(ref _idleCount, value);
         }
 
-        /// <summary>汇总徽章的颜色语义：有路在等动作时优先用"等人"那档，催操作员去按复位</summary>
+        /// <summary>汇总徽章的颜色语义：有路在等动作时优先用"等人"那档，催操作人员去按复位</summary>
         public ChannelVisual RoundVisual => IsRunning
             ? WaitingCount > 0 ? ChannelVisual.Waiting : ChannelVisual.Running
             : SettledCount == 0 ? ChannelVisual.Idle
@@ -444,16 +431,10 @@ namespace TORNPISolution.ViewModels
 
         // ==================== 开轮与收轮 ====================
 
-        /// <summary>
-        /// 开一轮：先把界面配置落盘（编排每轮自己读盘，不落盘烧的就是上一份配置），
-        /// 再做一次校验，有拦着的问题直接不烧并写在提示里——现场宁可被拦住，也不要在八张卡片上看到同一句超时。
-        /// </summary>
+        /// <summary>开一轮：先把界面配置落盘，再做一次校验，有拦着的问题直接不烧并写在提示里——现场宁可被拦住，也不要在八张卡片上看到同一句超时。</summary>
         private void StartRound() => StartRoundCore(null);
 
-        /// <summary>
-        /// 卡片右键“开始测试”：只烧这一路，哪怕它没勾参与整批。
-        /// 单独跑与整批跑走同一条开轮代码，差别只在点名了哪几路，免得两边校验做两套对不上。
-        /// </summary>
+        /// <summary>卡片右键“开始测试”：只烧这一路，哪怕它没勾参与整批；与整批跑走同一条开轮代码，差别只在点名了哪几路，校验只做一套。</summary>
         public void StartChannel(FlashChannelCardViewModel? card)
         {
             if (card == null) return;
@@ -489,8 +470,7 @@ namespace TORNPISolution.ViewModels
             _log.Info($"{DateTime.Now} Start calling the FlashingViewModel.StartRoundCore() method . {Environment.NewLine}");
             try
             {
-                // 右键"开始测试"不经过命令的 CanExecute，运行期闸门必须在这里再补一道：
-                // 不拦的话，测试方案（整机或单板）跑着时右键能开出一轮并发烧录，两边抢同一批串口与仪器
+                // 右键"开始测试"不经过命令的 CanExecute，运行期闸门必须在这里再补一道：不拦的话测试方案（整机或单板）跑着时右键能开出一轮并发烧录，两边抢同一批串口与仪器
                 if (IsRunning)
                 {
                     StatusText = "本轮还在跑，不要再开一轮（两套设备共用这些串口，同时开两班会互抢）";
@@ -552,8 +532,7 @@ namespace TORNPISolution.ViewModels
 
         /// <summary>
         /// 把本轮选的那一档展开成阶段跑：单独动作就一步，All 则是“整批 Flash → 整批富芮坤”两段。
-        /// 下一段只接上一段烧成功的那几路：主控的 boot 程序在 Flash 里，上一颗没烧好时烧它只会拿到一句握手失败，
-        /// 反而把真因盖住。
+        /// 下一段只接上一段烧成功的那几路：主控的 boot 程序在 Flash 里，上一颗没烧好时烧它只会拿到一句握手失败，反而把真因盖住。
         /// </summary>
         private async Task RunJobAsync(List<int> targets, CancellationToken ct)
         {
@@ -582,7 +561,7 @@ namespace TORNPISolution.ViewModels
                     });
 
                     var reports = await RunPhaseAsync(phase, running, ct).ConfigureAwait(false);
-                    // 终值也走同一条队列刷皮：卡片结论与记录文件吃的是同一份快照
+                    // 终值也走同一条队列：卡片结论与记录文件吃的是同一份快照
                     foreach (var report in reports) _pending[report.Channel] = report;
                     if (reports.Count > 0) _records.AppendRound(RoundId, reports);   // 写盘在后台线程，不挡界面刷新
 
@@ -628,7 +607,7 @@ namespace TORNPISolution.ViewModels
         private Task<IReadOnlyList<ChannelFlashReport>> RunPhaseAsync(FlashAction phase, List<int> targets, CancellationToken ct)
             => _flashing.RunRoundAsync(phase, targets, OnChannelReport, ct);
 
-        /// <summary>编排回调来自各通道自己的线程：只留最新一份快照，刷皮交给节拍</summary>
+        /// <summary>编排回调来自各通道自己的线程：只留最新一份快照，交给节拍刷新</summary>
         private void OnChannelReport(ChannelFlashReport report) => _pending[report.Channel] = report;
 
         /// <summary>把动作排回 UI 线程：已经在 UI 线程就直接执行，不刻意多一次跳转</summary>
@@ -688,10 +667,8 @@ namespace TORNPISolution.ViewModels
         }
 
         /// <summary>
-        /// 关窗口前调用：先请求停止，再泵送 UI 消息等本轮收尾（杀工具进程、关串口、写记录）跑完。
-        /// 不等就退进程，富芮坤工具会作为孤儿进程继续占着那一路的 COM，
-        /// 下一次开软件看到的是"打开串口失败"，却查不出是谁占着。
-        /// 等到超时也放行，不拦住用户。
+        /// 关窗口前调用：先请求停止，再泵送 UI 消息等本轮收尾（杀工具进程、关串口、写记录）跑完；等到超时也放行，不拦住用户。
+        /// 不等就退进程，富芮坤工具会作为孤儿进程继续占着那一路的 COM，下一次开软件只看到"打开串口失败"，却查不出是谁占着。
         /// </summary>
         public void StopAndAwaitWrapUp(int timeoutMs = 10_000)
         {
@@ -709,7 +686,7 @@ namespace TORNPISolution.ViewModels
                 var dispatcher = Application.Current?.Dispatcher;
                 if (dispatcher == null) return;
 
-                // 收尾靠 UI 线程继续跑，只能泵消息等它；两个回调都排回 UI 线程，避开"退出标志比 PushFrame 先生效"的抢时间
+                // 两个回调都排回 UI 线程，避开"退出标志比 PushFrame 先生效"的抢时间
                 var frame = new DispatcherFrame();
                 pending.Task.ContinueWith(_ => dispatcher.Invoke(() => frame.Continue = false), TaskScheduler.Default);
                 _ = Task.Delay(timeoutMs).ContinueWith(_ => dispatcher.Invoke(() => frame.Continue = false), TaskScheduler.Default);
@@ -771,10 +748,7 @@ namespace TORNPISolution.ViewModels
 
         private void SaveConfig() => SaveConfigCore(quiet: false);
 
-        /// <summary>
-        /// 落盘配置。quiet=true 是开轮前的自动保存：那时没点小按钮，成功不吭声，
-        /// 失败必须吭声并让调用方别再往下开烧（配置没写进去，烧的是上一份）。
-        /// </summary>
+        /// <summary>落盘配置。quiet=true 是开轮前的自动保存：成功不吭声，失败必须吭声并让调用方别再往下开烧（配置没写进去，烧的是上一份）。</summary>
         private bool SaveConfigCore(bool quiet)
         {
             _log.Info($"{DateTime.Now} Start calling the FlashingViewModel.SaveConfigCore() method . {Environment.NewLine}");
@@ -804,20 +778,13 @@ namespace TORNPISolution.ViewModels
             StatusText = "已按盘上的配置重建通道清单（界面上没保存的改动会被覆盖）";
         }
 
-        /// <summary>
-        /// 配置对话框（全局参数或通道配置）点确定时走这里：落盘、重拼校验、刷串口列表。
-        /// 给成 public 是因为对话框改的就是页面上这份活配置，保存结果仍要写回页面状态条，
-        /// 不然关了对话框什么都没看见，下一轮却按新参数跑了。
-        /// </summary>
+        /// <summary>配置对话框（全局参数或通道配置）点确定时走这里：落盘、重拼校验、刷串口列表。</summary>
         public bool SaveConfigFromDialog() => SaveConfigCore(quiet: false);
 
         /// <summary>配置对话框里的“重新载入”：丢掉没保存的改动，按盘上那份重建</summary>
         public void ReloadConfigFromDisk() => ReloadConfig();
 
-        /// <summary>
-        /// 某一行的串口或参与开关改了：马上重查一遍配置问题，让「烧录配置 → 通道配置」那页的红字跟着手走。
-        /// 卡片实例在轮次之间不变，只在 <see cref="LoadConfig"/> 重建那一次挂上来；旧卡片连着它的委托一起被回收，不用手动摘。
-        /// </summary>
+        /// <summary>某一行的串口或参与开关改了：马上重查一遍配置问题，让「烧录配置 → 通道配置」那页的红字同步更新。卡片实例在轮次之间不变，只在 <see cref="LoadConfig"/> 重建那一次挂上来；旧卡片连着它的委托一起被回收，不用手动摘。</summary>
         private void OnCardConfigChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName is nameof(FlashChannelCardViewModel.WizProPortName)
@@ -837,8 +804,7 @@ namespace TORNPISolution.ViewModels
 
         /// <summary>
         /// 开烧前的问题清单：只列"放过去必然整批失败且看不出真因"的那几类。
-        /// 串口重复与配了已经不存在的口是现场最常见的两种错位；工具/固件路径与芯片-波特率搭配由驱动自己校验函数说，
-        /// 口径与编排那边完全一致，不在界面上另写一套。
+        /// 工具/固件路径与芯片-波特率搭配由驱动自己的校验函数说，口径与编排那边完全一致，不在界面上另写一套。
         /// </summary>
         /// <param name="targets">只看这几路（卡片右键单独开烧时传那一路）；为空表示查整批要用的那些已启用的路</param>
         private List<string> BuildIssues(IReadOnlyList<int>? targets)
@@ -944,9 +910,8 @@ namespace TORNPISolution.ViewModels
         // ==================== 烧录器探测 ====================
 
         /// <summary>
-        /// 逐个串口发 RDMC，把设备自报的通道号念出来给人对着填。
-        /// 只念不填：这台设备自报的编号与治具上的接线谁是第几路，只有现场知道，替人填错比让人自己填更糟。
-        /// 每个口都要等它回应或超时，所以口多的时候慢是预期的——进度按行念出来，别让人以为卡住了。
+        /// 逐个串口发 RDMC，把设备自报的通道号念出来给人对着填。只念不填：设备自报编号与治具接线的对应关系只有现场知道，替人填错比让人自己填更糟。
+        /// 每个口都要等它回应或超时，口多时耗时长是预期的；进度按行念出来，避免被当成卡住。
         /// </summary>
         private async Task DetectProgrammersAsync()
         {

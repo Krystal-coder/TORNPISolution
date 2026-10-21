@@ -1,8 +1,7 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 鲸扬 BPA700 测试参数配置（充放气 / 静态压力 / 动态血压三类测试），
-    /// 随 instruments.json 一起保存/加载，供测试模块执行时读取。
+    /// 鲸扬 BPA700 测试参数配置（充放气 / 静态压力 / 动态血压三类测试），随 instruments.json 一起保存/加载，供测试模块执行时读取。
     /// </summary>
     public class BpaTestParams
     {
@@ -35,11 +34,9 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// JJG692-2010 标准检测参数组（仅放气速率（0x12）/ 气密性（0x13）两项使用，按康伟达协议 0x04 功能下发）。
-    /// 判定规格值留空时只报实测值不判 PASS/FAIL。
-    /// 血压重复性不在本组：测试要求文档的 BP-004 就是“精度及重复性”，已归 A06（点位与轮数见
-    /// <see cref="BpaTestParams.BpAccuracy"/>，±2mmHg 判据按文档写死）；
-    /// 协议 0x04/0x11 设备自检帧只回“完成/失败”状态位、拿不到三轮收缩/舒张数值，算不出极差。
+    /// JJG692-2010 标准检测参数组（仅放气速率（0x12）/ 气密性（0x13）两项使用，按康伟达协议 0x04 功能下发），判定规格值留空时只报实测值不判 PASS/FAIL。
+    /// 血压重复性不在本组（即 BP-004 的"精度及重复性"，已归 A06，点位与轮数见 <see cref="BpaTestParams.BpAccuracy"/>，±2mmHg 判据按文档写死）：
+    /// 协议 0x04/0x11 设备自检帧只回"完成/失败"状态位、拿不到三轮收缩/舒张数值，算不出极差。
     /// </summary>
     public class Jjg692Params
     {
@@ -61,7 +58,6 @@ namespace TORNPISolution.Share.Models
 
     /// <summary>
     /// BP-004 血压精度/重复性参数（A06）：一行一组收缩压/舒张压，心率全模块只设一个（发给模拟仪驱动脉搏波，不参与判定）。
-    /// 每个压力组重复 Repeats 轮，每轮结束后休息 RestSeconds 秒再开始下一轮/下一组。
     /// </summary>
     public class BpaBpAccuracyParams
     {
@@ -100,8 +96,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// BP-005 心率精度/重复性参数（A21）：压力只用一组，心率一行一个点可勾选增删；
-    /// 每个心率点重复 Repeats 轮，每轮结束后休息 RestSeconds 秒。
+    /// BP-005 心率精度/重复性参数（A21）：压力只用一组，心率一行一个点可勾选增删。
     /// </summary>
     public class BpaHeartRateAccuracyParams
     {
@@ -172,8 +167,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 充放气流程的超时保护配置（需测试员按产品物理键启动的流程使用，如 BP-006）。
-    /// 超时避免产品异常时测试一直充气不停止：超时后自动停止本轮并判 FAIL。
+    /// 充放气流程的超时保护配置（需测试员按产品物理键启动的流程使用，如 BP-006）：超时后自动停止本轮并判 FAIL，避免产品异常时测试一直充气不停止。
     /// </summary>
     public class BpaCuffSpec
     {
@@ -188,8 +182,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 静态压力测试参数。SDK 一次调用只支持 1 个压力点，
-    /// 多点测试由上位机按勾选的点循环调用，最多 10 个。
+    /// 静态压力测试参数：SDK 一次调用只支持 1 个压力点，多点测试由上位机按勾选的点循环调用，最多 10 个。
     /// </summary>
     public class BpaStaticPressureParams
     {
@@ -199,7 +192,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>量测时间（每个压力点的稳压保持秒数，0~999；仅 BPA700 序列有效，康伟达按收敛判据 2.5s 稳压窗取均值、不额外保持）</summary>
         public int MeasureSeconds { get; set; } = 10;
 
-        /// <summary>点间泄压：每个压力点测完先泄回零再升下一点（false=整段序列保持压力，只在模块结束泄一次）</summary>
+        /// <summary>点间泄压：每个压力点测完先等归零并回读确认再升下一点（false=不等不确认。两台仪器点间都保不住压：BPA700 无泄压命令、残压自行回落，康伟达下一点开头的清场仪式会泄残压）</summary>
         public bool VentBetweenPoints { get; set; } = false;
 
         /// <summary>压力点列表（单位跟随仪器压力单位：mmHg 20~400 / kPa 2.7~53.3），默认官方 10 点，上限 10 个</summary>
@@ -223,8 +216,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 动态血压测试参数。方法 = Default 用 BPCommon 六参数；
-    /// 方法 = Customized 用 BPEnvelopeCustomized 包络曲线参数（此时 Default 参数不参与）。
+    /// 动态血压测试参数：方法 = Default 用 BPCommon 六参数；方法 = Customized 用 BPEnvelopeCustomized 包络曲线参数（此时 Default 参数不参与）。
     /// </summary>
     public class BpaDynamicBpParams
     {
@@ -312,8 +304,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 压力控制功能测试（A04 BP-006~009）过程参数。四项均以产品串口回读压力（0x76）判定产品行为，
-    /// 充气一律由产品气泵完成（模拟仪只当手臂提供脉搏波，不参与加压）：
+    /// 压力控制功能测试（A04 BP-006~009）过程参数：四项均以产品串口回读压力（0x76）判定产品行为，充气一律由产品气泵完成（模拟仪只当手臂提供脉搏波，不参与加压）。
     /// BP-006 最高充气压力 = 正常自动测量全程回读峰值；
     /// BP-007 匀速放气控制 = 与 BP-006 同一轮测量的匀速放气段平均速率；
     /// BP-008 快速放气功能 = 充气到触发压力发 0x79 status=1 停止后，峰值降至归零判定压力的耗时；
@@ -324,7 +315,7 @@ namespace TORNPISolution.Share.Models
     {
         // ===== 激励档（BP-006/007/008 三项共用：模拟仪扮演的“手臂”，独立于 BP-004 压力组） =====
 
-        /// <summary>激励收缩压（mmHg）：设高才能逼产品气泵充到 260mmHg 以上</summary>
+        /// <summary>激励收缩压（mmHg）：设高才能驱动产品气泵充到 260mmHg 以上</summary>
         public double InflateSystolic { get; set; } = 220;
 
         /// <summary>激励舒张压（mmHg）</summary>
@@ -372,10 +363,7 @@ namespace TORNPISolution.Share.Models
 
         // ===== BP-009 过压保护 =====
 
-        /// <summary>
-        /// 0x75 目标压力（mmHg）。当前默认 260 低于判据门限 330，本默认值下两条判据均无法评估、必然判 FAIL；
-        /// 上机确认 0x75 能动作后需调到明显高于 330（建议 350）才能出结论。
-        /// </summary>
+        /// <summary>0x75 目标压力（mmHg）：当前默认 260 低于判据门限 330，两条判据均无法评估、必然判 FAIL；上机确认 0x75 能动作后需调到明显高于 330（建议 350）才能出结论</summary>
         public double BP009InflateTargetPressure { get; set; } = 260;
 
         /// <summary>0x75 最长充气时间（秒）：到点产品底层自行放气，也是本项唯一的停气兜底，不宜设大</summary>
@@ -396,8 +384,7 @@ namespace TORNPISolution.Share.Models
     public readonly record struct PressureSamplePoint(double TimeSeconds, double Pressure, int Segment = 0, int Series = 0);
 
     /// <summary>
-    /// BPA700 波形显示配置（按测试项名存放），随 instruments.json 持久化。
-    /// Y 轴固定 mmHg；X 轴模式与时间刻度可按项自定义。
+    /// BPA700 波形显示配置（按测试项名存放），随 instruments.json 持久化；Y 轴固定 mmHg，X 轴模式与时间刻度可按项自定义。
     /// </summary>
     public class BpaWaveformDisplayConfig
     {

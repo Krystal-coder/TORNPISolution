@@ -25,7 +25,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- DataGrid：命令名称 / 命令码 / 描述 -->
         <Border Style="{StaticResource Style.PanelCard}" Margin="12,10,12,0" Padding="8">
             <DataGrid ItemsSource="{Binding Commands}"
                       AutoGenerateColumns="False"
@@ -45,6 +44,8 @@
                                         Width="80"/>
                     <DataGridTextColumn Header="命令码" Binding="{Binding Code, Converter={StaticResource HexByte}, UpdateSourceTrigger=PropertyChanged}"
                                         Width="70"/>
+                    <!-- 参数(HEX)：仅 CtrlStartEcgTest / CtrlStopEcgTest 两条真正读取本列下发（ResolveCmdData）；
+                         其余命令的参数由代码按实时值现算，改本列不生效 -->
                     <DataGridTextColumn Header="参数(HEX)" Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}"
                                         Width="88"/>
                     <DataGridTextColumn Header="描述" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}"

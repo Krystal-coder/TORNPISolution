@@ -52,7 +52,19 @@
   "CtrlSetMode": {
     "Code": 115,
     "FuncCode": 5,
-    "Description": "设置测试模式（参数 2 字节：uint8 test_mode + uint8 status，status 0=进入测量 1=退出测量；开始ECG=EF 04 05 73 05 00 15 03 FE，结束ECG=EF 04 05 73 05 01 D4 C3 FE）"
+    "Description": "设置测试模式（参数 2 字节：uint8 test_mode + uint8 status，status 0=进入测量 1=退出测量；袖带/血压/静态压力/血氧等模式走本条）"
+  },
+  "CtrlStartEcgTest": {
+    "Code": 115,
+    "FuncCode": 5,
+    "Description": "开始ECG测试（样帧 EF 04 05 73 05 00 15 03 FE；产品开始持续推送 0x8D 心电波形，直到收到关闭命令）",
+    "Data": "05 00"
+  },
+  "CtrlStopEcgTest": {
+    "Code": 115,
+    "FuncCode": 5,
+    "Description": "关闭ECG测试（样帧 EF 04 05 73 05 01 D4 C3 FE；产品停止推送心电波形）",
+    "Data": "05 01"
   },
   "CtrlGetState": {
     "Code": 116,

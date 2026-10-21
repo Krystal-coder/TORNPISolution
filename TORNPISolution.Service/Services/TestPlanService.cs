@@ -19,7 +19,6 @@ namespace TORNPISolution.Service
 
         public TestPlanService()
         {
-            // 方案文件保存在程序运行目录下的 Plans 文件夹
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
             _plansDirectory = Path.Combine(baseDir, "Plans");
             Directory.CreateDirectory(_plansDirectory);
@@ -163,10 +162,8 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>根据方案名称获取 JSON 文件完整路径</summary>
         private string GetPlanFilePath(string planName)
         {
-            // 过滤文件名中的非法字符
             var safeName = string.Join("_", planName.Split(Path.GetInvalidFileNameChars()));
             return Path.Combine(_plansDirectory, $"{safeName}.json");
         }

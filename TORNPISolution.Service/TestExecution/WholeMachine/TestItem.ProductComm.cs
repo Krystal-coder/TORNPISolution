@@ -11,9 +11,8 @@ namespace TORNPISolution.Service
     public partial class TestItem
     {
         /// <summary>
-        /// A16 产品通讯初始化：打开产品串口 → 进入产测模式（防休眠，产品断电前不再休眠）→ 0x72 → 0x74。
-        /// 全方案唯一执行产品通讯判定的模块，并记录本轮产品通讯状态供后续模块快速跳过/演示分支；
-        /// 后续模块不再重发进入产测模式与 0x72/0x74。无仪器演示模式下本模块即“只读产品串口”的主体，照常执行。
+        /// A16 产品通讯初始化：打开产品串口 → 进入产测模式（防休眠，产品断电前不再休眠）→ 0x72 → 0x74；后续模块不再重发进入产测模式与 0x72/0x74。
+        /// 无仪器演示模式下本模块即“只读产品串口”的主体，照常执行。
         /// </summary>
         //测试项目**************************---A16---**************************产品通讯初始化
         public async Task ProductCommInitModule(TestItemResultCollector collector, CancellationToken token)
@@ -29,8 +28,7 @@ namespace TORNPISolution.Service
         /// <summary>
         /// 打开产品并执行“进入产测模式 + 产品信息获取（MAC/嵌软版本）+ 产品当前状态查询”（仅 A16 产品通讯初始化调用）。
         /// MAC 读回不为空即合格；嵌软版本与管控规格 Spec.ExpectedFirmwareVersion 比对（烧录老版本 FAIL）。
-        /// 产品未连接/无响应时仅这三项 FAIL，不阻断仪器控制流程——
-        /// 没接产品也能调试 BPA700 侧逻辑，无需在调试器里跳语句。
+        /// 产品未连接/无响应时仅这三项 FAIL，不阻断仪器控制流程（可直接调试 BPA700 侧逻辑，无需在调试器里跳语句）。
         /// 返回产品通讯是否可用。
         /// </summary>
         private async Task<bool> ProductHandshakeAsync(IProductController product, TestItemResultCollector collector, CancellationToken token)
@@ -39,8 +37,7 @@ namespace TORNPISolution.Service
             {
                 await product.OpenAsync(token);
 
-                // 进入产测模式（0x07/0x01）：打开串口后立即发送防产品休眠（约10秒无通讯即休眠）；
-                // 协议要求：必须在 0x72/0x74 查询之前发送
+                // 进入产测模式（0x07/0x01）：打开串口后立即发送以防产品休眠（约10秒无通讯即休眠），协议要求必须在 0x72/0x74 查询之前发送
                 try
                 {
                     await product.EnterProductionTestModeAsync(token);
@@ -51,7 +48,6 @@ namespace TORNPISolution.Service
                     _log.Warn($"产品进入产测模式发送失败（继续尝试问询）：{ex.Message}");
                 }
 
-                // 产品信息获取（0x72）：回读 MAC + 嵌软版本，拆两项分别上报
                 var (mac, version) = await product.QueryProductInfoAsync(token);
 
                 // MAC 地址：读回不为空即合格
@@ -105,13 +101,11 @@ namespace TORNPISolution.Service
             }
             catch (OperationCanceledException)
             {
-                // 用户点“停止”：向上层传递，不当作测试异常
                 throw;
             }
             catch (Exception ex)
             {
-                // 产品串口不存在（如 Could not find file 'COM16'）是最常见根因，
-                // 附上系统当前实际存在的串口清单，便于直接核对仪器链接配置里的产品端口
+                // 产品串口不存在（如 Could not find file 'COM16'）是最常见根因，故日志附上系统当前实际存在的串口清单，便于直接核对仪器链接配置里的产品端口
                 var existPorts = string.Join(", ", System.IO.Ports.SerialPort.GetPortNames());
                 _log.Warn($"产品通讯不可用（打开/问询/状态查询失败），[产品信息获取(MAC地址)]/[产品信息获取(嵌软版本)]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：{ex.Message}；系统当前存在串口：[{existPorts}]，请核对仪器链接配置的产品串口号与物理接线");
                 var failResult = TestItemResult.OfProductText(0, "通讯失败");

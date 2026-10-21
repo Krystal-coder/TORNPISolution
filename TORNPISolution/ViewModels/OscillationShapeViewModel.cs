@@ -6,9 +6,8 @@ namespace TORNPISolution.ViewModels
 {
     /// <summary>
     /// Oscillation Shape（包络曲线）编辑 ViewModel：
-    /// x 轴八点（含收缩压/舒张压）+ y 轴五点比率共 13 个参数以桥接属性实时写回 BpaDynamicBpParams
-    /// （滑块与输入框双向联动），打开时快照一份，取消时还原；
-    /// 参数变化触发 ParamsChanged 供预览曲线重绘。
+    /// x 轴八点（含收缩压/舒张压）+ y 轴五点比率共 13 个参数以桥接属性实时写回 BpaDynamicBpParams（滑块与输入框双向联动）。
+    /// 打开时快照一份、取消时还原；参数变化触发 ParamsChanged 供预览曲线重绘。
     /// </summary>
     public class OscillationShapeViewModel : ViewModelBase
     {

@@ -11,12 +11,11 @@ namespace TORNPISolution.Service
     public partial class TestItem
     {
         /// <summary>
-        /// ECG-002 导联脱落检测：输出波形后读取产品导联状态（0x88）判定。
-        /// 判定规则：返回 lead_state = 0 表示导联脱落（PASS），非 0 表示未脱落（FAIL）。
+        /// ECG-002 导联脱落检测：输出波形后读取产品导联状态（0x88）；lead_state = 0 表示脱落（PASS），非 0 表示未脱落（FAIL）。
         /// </summary>
         private async Task RunEcgLeadOffDetectionAsync(TestItemResultCollector collector, CancellationToken token)
         {
-            // 给操作员留时间拔掉 LA 导联
+            // 给操作人员留时间拔掉 LA 导联
             try { await Task.Delay(2000, token); }
             catch (OperationCanceledException) { throw; }
 
@@ -29,7 +28,6 @@ namespace TORNPISolution.Service
                 var hex = BitConverter.ToString(leadState).Replace("-", " ");
                 _log.Info($"ECG-002：读取到产品导联状态 0x88 = {hex}");
 
-                // 协议定义：lead_state = 0 表示脱落，非 0 表示打开
                 if (leadState.Length > 0 && leadState[0] == 0)
                 {
                     await collector.SetAsync(SpecItems.Ecg002LeadOff, TestItemResult.Of(1));
@@ -54,7 +52,7 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// SpO2 精度扫描公共逻辑：逐点输出红光/红外双通道信号，产品回读比对，按最大偏差点上报双值。
-        /// sweepPulseRate=false：points 为血氧设定点（%），脉搏率固定 cfg.Spo2PulseRate，回读产品血氧（0x81）；
+        /// sweepPulseRate=false：points 为血氧设定点（%），脉搏率固定 cfg.Spo2PulseRate，回读产品血氧（0x82）；
         /// sweepPulseRate=true ：points 为脉搏率设定点（BPM），血氧固定 cfg.Spo2PulseRateRefSpo2，回读产品脉搏率（0x7C）。
         /// 产品不可用/回读失败时本次比对不计入；全程没取到一次有效回读则按“无上报值”判 FAIL（与 BP-003 同口径）。
         /// </summary>
@@ -97,7 +95,6 @@ namespace TORNPISolution.Service
                     continue;
                 }
 
-                // 产品回读血氧（0x81）或脉搏率（0x7C）比对；无有效回读的这一次不计入偏差统计（不参与“取最大偏差”）
                 if (productAvailable)
                 {
                     using var productRead = _productFactory();
@@ -137,8 +134,6 @@ namespace TORNPISolution.Service
             }
 
             // 取最大偏差点上报双值：仪器列=设定值，产品列=回读值，动态规格=设定值±容差。
-            // 一次有效回读都没拿到时不能再报“偏差 0”：0 落在规格内等于没测到也算合格，
-            // 按 BP-003 同一口径判 FAIL（测试值 NaN 在列里显示 --，产品列写清原因）
             if (double.IsNaN(worstRead))
             {
                 _log.Warn($"{itemName} FAIL：全程未取到产品有效回读（无响应/回读为 0/读取异常），不按偏差 0 判定");
@@ -156,8 +151,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// PPG 模块在位检测（测一个调一个）：PPG/SpO2 测试模块开测前先调用，
-        /// AECG100 同时只接一个 PPG 模块，在位模块与测试需求不匹配时写 0 并提示更换模块。
+        /// PPG 模块在位检测（测一个调一个）：PPG/SpO2 测试模块开测前调用；AECG100 同时只接一个 PPG 模块，在位模块与需求不匹配时写 0 并提示更换。
         /// </summary>
         private async Task<bool> EnsurePpgModuleAsync(AecgPpgModuleKind required, string itemName, string requiredName, TestItemResultCollector collector)
         {
@@ -176,8 +170,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 回读产品心率（0x7C），返回产品上报的原始心率值。
-        /// 产品不可用/回读失败时比对预留，返回 NaN（由调用方决定预留上报方式）。
+        /// 回读产品心率（0x7C），返回产品上报的原始心率值；产品不可用或回读失败时返回 NaN，由调用方决定预留上报方式。
         /// </summary>
         private async Task<double> ReadProductHeartRateAsync(bool productAvailable, CancellationToken token)
         {
@@ -215,10 +208,8 @@ namespace TORNPISolution.Service
         protected const int WaveformSeriesProduct = 1;
 
         /// <summary>
-        /// 输出 ECG 波形并采集回调数据，通过 PressureSampled 事件推送给 UI 显示。
-        /// 回调参数 (time, ac, dc) 中 ac+dc 作为波形幅度（μV），SDK time 作为时间轴（s）。
-        /// 由于 ECG 波形会持续输出直至主动停止，此处按 <paramref name="captureMs"/> 固定时长采集后返回，
-        /// 由调用方在合适的时机调用 StopOutputWaveform。
+        /// 输出 ECG 波形并采集回调数据，经 PressureSampled 事件推送给 UI；回调参数 (time, ac, dc) 中 ac+dc 为波形幅度（μV），SDK time 为时间轴（s）。
+        /// ECG 波形持续输出直至主动停止，此处按 <paramref name="captureMs"/> 固定时长采集后返回，由调用方调用 StopOutputWaveform。
         /// </summary>
         private async Task<bool> OutputEcgWithCaptureAsync(string itemName, AecgEcgWaveform waveform, int captureMs, CancellationToken token, int segment = 0)
         {
@@ -232,13 +223,12 @@ namespace TORNPISolution.Service
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             cts.CancelAfter(captureMs);
             try { await Task.Delay(captureMs, cts.Token); }
-            catch (OperationCanceledException) { /* 用户取消或采集到时时继续 */ }
+            catch (OperationCanceledException) { }
             return true;
         }
 
         /// <summary>
-        /// 输出频率扫描波形并采集回调数据，通过 PressureSampled 事件推送给 UI 显示。
-        /// 频率扫描会持续输出，因此按 <paramref name="captureMs"/> 固定时长采集后返回。
+        /// 输出频率扫描波形并采集回调数据，经 PressureSampled 事件推送给 UI；频率扫描持续输出，故按 <paramref name="captureMs"/> 固定时长采集后返回。
         /// </summary>
         private async Task<bool> OutputFrequencyScanWithCaptureAsync(string itemName, AecgFrequencyScan scan, int captureMs, CancellationToken token)
         {
@@ -252,13 +242,12 @@ namespace TORNPISolution.Service
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             cts.CancelAfter(captureMs);
             try { await Task.Delay(captureMs, cts.Token); }
-            catch (OperationCanceledException) { /* 用户取消或采集到时时继续 */ }
+            catch (OperationCanceledException) { }
             return true;
         }
 
         /// <summary>
-        /// 输出单通道 PPG 波形并采集回调数据，通过 PressureSampled 事件推送给 UI 显示。
-        /// 与 ECG 一致：按 <paramref name="captureMs"/> 固定时长采集后返回，由调用方停止输出。
+        /// 输出单通道 PPG 波形并采集回调数据，经 PressureSampled 事件推送给 UI；与 ECG 一致，按 <paramref name="captureMs"/> 固定时长采集后返回，由调用方停止输出。
         /// </summary>
         private async Task<bool> OutputPpgWithCaptureAsync(string itemName, AecgPpgChannel channel, AecgPpgWaveform waveform, int captureMs, CancellationToken token, int segment = 0)
         {
@@ -272,13 +261,12 @@ namespace TORNPISolution.Service
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             cts.CancelAfter(captureMs);
             try { await Task.Delay(captureMs, cts.Token); }
-            catch (OperationCanceledException) { /* 用户取消或采集到时时继续 */ }
+            catch (OperationCanceledException) { }
             return true;
         }
 
         /// <summary>
-        /// 输出双通道 PPG（SpO2 红光/红外）并采集红光通道回调数据推送 UI。
-        /// 同一轮采样可同时归属多个测试项（如 SPO2-001 血氧与 SPO2-002 脉搏率共用同轮波形）。
+        /// 输出双通道 PPG（SpO2 红光/红外）并采集红光通道回调数据推送 UI；同一轮采样可同时归属多个测试项（如 SPO2-001 血氧与 SPO2-002 脉搏率共用同轮波形）。
         /// </summary>
         private async Task<bool> OutputPpgExWithCaptureAsync(string[] itemNames, AecgPpgWaveform redWave, AecgPpgWaveform irWave, int captureMs, CancellationToken token, int segment = 0)
         {
@@ -294,13 +282,12 @@ namespace TORNPISolution.Service
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             cts.CancelAfter(captureMs);
             try { await Task.Delay(captureMs, cts.Token); }
-            catch (OperationCanceledException) { /* 用户取消或采集到时时继续 */ }
+            catch (OperationCanceledException) { }
             return true;
         }
 
         /// <summary>
-        /// 根据 AECG100 配置构建默认 PPG 波形（PPG-001 脉搏率测试用）。
-        /// 高心率时波形周期变短，主波/重搏时刻自动夹到周期内保证波形合法。
+        /// 根据 AECG100 配置构建默认 PPG 波形（PPG-001 脉搏率测试用）；高心率时波形周期变短，主波/重搏时刻自动夹到周期内保证波形合法。
         /// </summary>
         private static AecgPpgWaveform BuildDefaultPpgWaveform(Share.Models.Aecg100Settings cfg, double frequency)
         {
@@ -324,8 +311,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 构建 SpO2 双通道波形：ch1=红光（AC 按 R 比例）、ch2=红外（AC 固定），
-        /// DC 与脉搏率两通道一致（产品按 R=(AC红/DC)/(AC红外/DC) 换算）。
+        /// 构建 SpO2 双通道波形：ch1=红光（AC 按 R 比例）、ch2=红外（AC 固定），两通道 DC 与脉搏率一致（产品按 R=(AC红/DC)/(AC红外/DC) 换算）。
         /// </summary>
         private static (AecgPpgWaveform Red, AecgPpgWaveform Ir) BuildSpo2Waveforms(Share.Models.Aecg100Settings cfg, double frequency, double redAcMv)
         {
@@ -352,8 +338,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 根据 AECG100 配置构建默认 ECG 波形。frequency 参数用于覆盖配置中的默认频率
-        /// （心率测试时按 BPM/60 计算，其他场景传 1.0 即 60BPM）。
+        /// 根据 AECG100 配置构建默认 ECG 波形；frequency 参数覆盖配置中的默认频率（心率测试按 BPM/60 计算，其他场景传 1.0 即 60BPM）。
         /// </summary>
         private static AecgEcgWaveform BuildDefaultEcgWaveform(Share.Models.Aecg100Settings cfg, double frequency)
         {
@@ -390,9 +375,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 按测试项名读取 AECG100 波形配置并覆盖到波形对象上。
-        /// 返回（应用配置后的波形，采集时长 ms）。
-        /// 配置中 Frequency ≤0 时保留传入值；CaptureTimeMs ≤0 时使用 defaultCaptureMs。
+        /// 按测试项名读取 AECG100 波形配置并覆盖到波形对象上，返回（应用配置后的波形，采集时长 ms）；配置中 Frequency ≤0 时保留传入值，CaptureTimeMs ≤0 时使用 defaultCaptureMs。
         /// </summary>
         private static (AecgEcgWaveform waveform, int captureMs) ApplyWaveformConfig(
             Share.Models.Aecg100Settings cfg, string itemName, AecgEcgWaveform waveform, int defaultCaptureMs = 3000)
@@ -411,10 +394,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 无仪器演示模式拦截：跳过本模块的全部仪器控制（模拟仪/AECG/NFC/电源等）；
-        /// 产品通讯集中在 A16 产品通讯初始化模块，本拦截不再打开产品串口；
-        /// 模块内未报告项由 MainViewModel 收尾扫描按读回缺失统一判 FAIL。
-        /// 返回 true = 已被本模式拦截，调用方模块应立即 return。
+        /// 无仪器演示模式拦截：返回 true = 已被本模式拦截，调用方模块应立即 return；跳过本模块全部仪器控制（模拟仪/AECG/NFC/电源等），不打开产品串口（产品通讯集中在 A16 产品通讯初始化模块），模块内未报告项由 MainViewModel 收尾扫描按读回缺失统一判 FAIL。
         /// </summary>
         private bool NoInstrumentDemo(string moduleName)
         {
@@ -425,16 +405,14 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 本轮产品可用性：以 A16 产品通讯初始化握手后的记录为准（不再逐模块重复 0x72/0x74 问询）；
-        /// 本轮方案未包含初始化模块（null）时按模式推断：正式模式视为可用（以实际通讯结果说话），
-        /// 无产品演示模式视为不可用（走仪器侧演示分支）。
+        /// 本轮产品可用性：以 A16 产品通讯初始化握手后的记录为准（不再逐模块重复 0x72/0x74 问询）；为 null（本轮方案未包含初始化模块）时按模式推断——正式模式视为可用、由实际通讯结果决定，无产品演示模式视为不可用（走仪器侧演示分支）。
         /// </summary>
         private bool GetProductAvailable(bool noProductDemoMode)
             => _productCommOk ?? !noProductDemoMode;
 
         /// <summary>
         /// 让测试员动手操作（按产品物理键等）：UI 弹模态框，点确定才返回；提示语同时进日志，界面未订阅时只记日志不阻断。
-        /// token 取消就不再等人工确认（已弹出的框仍需人点掉），否则按下“停止”也要等框点完流程才动得起来。
+        /// token 取消后不再等人工确认（已弹出的框仍需人点掉），否则按下“停止”要等框点完流程才继续。
         /// </summary>
         private async Task PromptOperatorAsync(string moduleName, string message, CancellationToken token)
         {

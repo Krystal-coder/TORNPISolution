@@ -9,7 +9,7 @@ namespace TORNPISolution.Service
         /// <summary>测试方案是否正在运行</summary>
         public static bool IsRunning { get; private set; }
 
-        /// <summary>更新运行态（整机方案与单板轮次的开始/收尾两处都会调，只添新工位时要记得一并置位）</summary>
+        /// <summary>更新运行态；新增工位时须在其开始/收尾处一并置位</summary>
         public static void SetRunning(bool running) => IsRunning = running;
     }
 }

@@ -17,8 +17,7 @@ namespace TORNPISolution.Service.Communication
         {
             Exception? error = null;
             // 不能用 using：超时时这里的 Dispose 会和弃管线程的 done.Set() 抢时间，
-            // 句柄已释放再 Set 会抛 ObjectDisposedException，而它出现在后台线程的 finally 里，
-            // UI 的异常钩子接不到，整个进程跟着崩。改成确认线程已 Set 之后才释放。
+            // 句柄已释放再 Set 会抛 ObjectDisposedException，而它出现在后台线程的 finally 里
             var done = new ManualResetEventSlim(false);
             var thread = new Thread(() =>
             {

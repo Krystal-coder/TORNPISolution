@@ -876,10 +876,7 @@ namespace TORNPISolution.Service.Devices
             _log = log ?? new LogService(nameof(Aecg100Tester));
         }
 
-        /// <summary>
-        /// 连接设备：注册连接事件监听（WTQInit）后按配置 COM 口发起连接（WTQConnect）。
-        /// COM 口留空时传 0xFFFFFFFF 由 SDK 自动选择。
-        /// </summary>
+        /// <summary>连接设备：WTQInit 注册连接事件后按配置 COM 口调 WTQConnect；COM 口留空传 0xFFFFFFFF 由 SDK 自动选择。</summary>
         public async Task<bool> ConnectAsync()
         {
             _log.Info($"{DateTime.Now} Start calling the Aecg100Tester.ConnectAsync() method . {Environment.NewLine}");
@@ -988,9 +985,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 结构化检测当前在位的 PPG 模块类型（供测试模块在位校验用）。
-        /// AECG100 主机同一时刻只接一个 PPG 模块：绿光模块做 PPG 心率，红+红外模块做 SpO2，
-        /// 测试前调用本方法确认在位模块与测试需求匹配，不匹配时提示更换模块。
+        /// 检测当前在位 PPG 模块类型，供测试前确认模块与需求匹配、不匹配时提示更换。
+        /// AECG100 主机同一时刻只接一个 PPG 模块：绿光做 PPG 心率，红+红外做 SpO2。
         /// </summary>
         public AecgPpgModuleKind DetectPpgModuleKind()
         {
@@ -1168,10 +1164,7 @@ namespace TORNPISolution.Service.Devices
 
         #region 原始数据回放（WTQWaveformPlayerOutput*）
 
-        /// <summary>
-        /// 回放原始数据到 ECG 通道。ac/dc 数组在播放期间由本类固定（pin），
-        /// 调用 StopPlayRawData 后释放；停止输出时回调会收到 int 最小值哨兵。
-        /// </summary>
+        /// <summary>回放原始数据到 ECG 通道：ac/dc 数组播放期间由本类 pin，StopPlayRawData 后释放；停止输出时回调收到 int 最小值哨兵。</summary>
         public bool PlayRawDataEcg(double sampleRate, double[] ac, double[] dc, AecgSyncPulse sync,
             Action<double, int, int>? onData = null)
         {

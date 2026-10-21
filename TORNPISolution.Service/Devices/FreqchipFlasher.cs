@@ -52,9 +52,8 @@ namespace TORNPISolution.Service.Devices
         public string PortName { get; }
 
         /// <summary>
-        /// 开烧前检查参数能不能用：返回 null 表示没问题，否则是可直接展示给操作员的错因。
-        /// 芯片系列与波特率的搭配单独拦一道——30xx 最高只能 460800，填高了工具只会报握手超时，
-        /// 现场怎么也想不到是波特率的事，所以宁可在开烧前就说明白。
+        /// 开烧前检查参数能不能用：返回 null 表示没问题，否则是可直接展示给操作人员的错因。
+        /// 芯片系列与波特率的搭配单独拦一道：30xx 系列最高只能 460800，填高了工具只会报握手超时。
         /// </summary>
         public static string? CheckArguments(FreqchipFlashSettings settings, string portName)
         {
@@ -238,10 +237,7 @@ namespace TORNPISolution.Service.Devices
             Done,
         }
 
-        /// <summary>
-        /// 解析一行输出。属性名一律按大小写不敏感取：厂商文档里进度字段一会儿写 Progress 一会儿写 progress，
-        /// 用默认的区分大小写解析会静默丢掉进度数字，界面看着就像卡死在那一步。
-        /// </summary>
+        /// <summary>解析一行输出。属性名一律按大小写不敏感取：厂商文档里进度字段一会儿写 Progress 一会儿写 progress，用区分大小写解析会静默丢掉进度数字，界面看着就像卡死在那一步。</summary>
         private LineVerdict ParseLine(string line, out FlashStage stage, out int percent, out int code, out string message)
         {
             stage = FlashStage.Idle;

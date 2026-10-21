@@ -10,7 +10,6 @@ namespace TORNPISolution.Views
     {
         public ProtocolCommandConfigWindow(ProtocolCommandConfigViewModel viewModel)
         {
-            // DataContext 先于 InitializeComponent
             DataContext = viewModel;
             InitializeComponent();
 
@@ -31,9 +30,19 @@ namespace TORNPISolution.Views
             var dlg = new PasswordInputDialog { Owner = this };
             if (dlg.ShowDialog() != true) return;
 
-            if (!vm.ValidateAndSave(dlg.Username, dlg.Password))
+            try
             {
-                MessageBox.Show("用户名或密码错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (!vm.ValidateAndSave(dlg.Username, dlg.Password))
+                {
+                    MessageBox.Show("用户名或密码错误", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 落盘失败（文件被占用/只读/磁盘满）已在 ViewModel 记 Error 并原样重抛。
+                // 这里只提示、不关窗：界面里改的内容还在，修正后可直接重试保存。
+                MessageBox.Show($"保存失败：{ex.Message}\n\n配置没有写入文件，界面内容保持不变，可修正后重试。",
+                    "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

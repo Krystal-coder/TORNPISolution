@@ -16,8 +16,7 @@ namespace TORNPISolution.Interface
         string PortName { get; }
 
         /// <summary>
-        /// 起进程烧这一路。工具回 Ready 之后要等芯片复位才能握手，
-        /// 这段等待会周期性经 onProgress 报出剩余秒数，界面拿它提示操作员按复位。
+        /// 起进程烧这一路：工具回 Ready 后要等芯片复位才能握手，这段等待周期性经 onProgress 报剩余秒数，界面拿它提示操作人员按复位。
         /// 烧录失败不抛异常，统一用返回结果的 Success 与错误码表达；取消时进程会被杀掉并往上抛。
         /// </summary>
         Task<FlashResult> FlashAsync(IProgress<FlashProgress>? onProgress, CancellationToken ct = default);

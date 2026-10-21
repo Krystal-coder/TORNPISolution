@@ -88,8 +88,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>是否有逐点子结果（控制行详情子表显示）</summary>
         public bool HasPointResults => PointResults.Count > 0;
 
-        /// <summary>逐点结果摘要（子表标题栏显示）：只统计参与判定的行（多轮表里的均值/极大/极小等中间行不计入），
-        /// 父行只看结论、子表看证据时也能一眼拿到汇总</summary>
+        /// <summary>逐点结果摘要（子表标题栏显示）：只统计参与判定的行，多轮表里的均值/极大/极小等中间行不计入</summary>
         public string PointSummaryText
         {
             get
@@ -101,7 +100,7 @@ namespace TORNPISolution.ViewModels
                     .Where(p => p.Error.HasValue)
                     .OrderByDescending(p => p.Error!.Value)
                     .FirstOrDefault();
-                // 只有一行参与判定（重复性项的极差行）时直接报那行，不绕“共1行”这种废话
+                // 只有一行参与判定（重复性项的极差行）时直接报该行，不加“共1行”前缀
                 var text = judged.Count == 1
                     ? $"{judged[0].Name} {(judged[0].Pass ? "PASS" : "FAIL")}"
                     : $"共{judged.Count}行判定：{passCount} PASS / {judged.Count - passCount} FAIL";
@@ -239,10 +238,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>本次运行是否上报了“只展示不判定”结果：值与统计量可见，但不计入模块判定、收尾也不强制 FAIL</summary>
         public bool IsDisplayOnly => _displayOnly;
 
-        /// <summary>
-        /// 回填 TestItem 执行结果：先写动态规格再写测试值（保证按本次规格判定）；
-        /// 按测试项值来源（ValueSource）分发到仪器测试值/产品上报值两列
-        /// </summary>
+        /// <summary>回填 TestItem 执行结果：先写动态规格再写测试值（保证按本次规格判定），按测试项值来源（ValueSource）分发到仪器测试值/产品上报值两列</summary>
         public void ApplyResult(TestItemResult result)
         {
             _dynamicLower = result.SpecMin;
@@ -357,9 +353,7 @@ namespace TORNPISolution.ViewModels
 
         private static string Num(double? value) => value.HasValue ? value.Value.ToString("0.0") : "--";
 
-        /// <summary>
-        /// 重建子表列头与数据行；统计中间行（ShowVerdict=false）末列留空，免得被当成 PASS。
-        /// </summary>
+        /// <summary>重建子表列头与数据行；统计中间行（ShowVerdict=false）末列留空，避免被当成 PASS</summary>
         private void BuildSubTable(List<TestPointResult>? points)
         {
             SubTableColumns.Clear();
@@ -444,9 +438,6 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(ResultText));
         }
 
-        /// <summary>
-        /// 模块未报告结果时强制判 FAIL，
-        /// </summary>
         public void MarkNotReportedAsFail()
         {
             _measuredValue = 0;

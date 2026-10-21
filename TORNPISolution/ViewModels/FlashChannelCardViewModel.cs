@@ -12,7 +12,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>正在跑（下载、自检、擦除、写入、校验）</summary>
         Running,
 
-        /// <summary>在等人做动作（按复位键），需要催一下</summary>
+        /// <summary>在等人做动作（按复位键），需要提示操作人员</summary>
         Waiting,
 
         /// <summary>本轮通过</summary>
@@ -27,8 +27,7 @@ namespace TORNPISolution.ViewModels
 
     /// <summary>
     /// 烧录页的一张通道卡片：既是配置行（这一路用哪个串口），也是状态行（进度与结果）。
-    /// 两件事放同一张卡片是有意的——现场最容易出的错是盯着通道 3 的结果、实际烧的是配错串口的另一路，
-    /// 让配置和结果挨在一起、并且开烧后把串口下拉锁死，这种错位当场就能看见。
+    /// 两者放同一张卡片、且开烧后锁死串口下拉：现场最容易出的错是盯着通道 3 的结果、实际烧的是配错串口的另一路，挨在一起才能当场看出错位。
     /// </summary>
     public class FlashChannelCardViewModel : ViewModelBase
     {
@@ -59,7 +58,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>通道号，就是清单里的行号（第一行是通道 1）</summary>
         public int Channel { get; }
 
-        /// <summary>卡片标题</summary>
         public string Title => $"通道 {Channel}";
 
         /// <summary>位号（配置区可直接改，改完随 flashing.json 一起落盘）</summary>
@@ -121,7 +119,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>当前动作下这一路实际用哪个口（卡片上直接显示，省得来回对照配置）</summary>
+        /// <summary>当前动作下这一路实际用哪个口（卡片上直接显示，不必再对照配置页）</summary>
         public string PortLabel => _useWizProPort
             ? (string.IsNullOrWhiteSpace(WizProPortName) ? "未配烧录器串口" : WizProPortName)
             : (string.IsNullOrWhiteSpace(FreqchipPortName) ? "未配主控串口" : FreqchipPortName);
@@ -201,7 +199,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>这一路的明细时间线（详情页吃它）</summary>
+        /// <summary>这一路的明细时间线（详情页显示它）</summary>
         public IReadOnlyList<string> Trace
         {
             get => _trace;
@@ -232,10 +230,10 @@ namespace TORNPISolution.ViewModels
             _ => StageText,
         };
 
-        /// <summary>有结论了没：角标只在落定时显示，没落定时阶段文字已经在下面一行写过</summary>
+        /// <summary>是否已有结论：角标只在落定时显示，没落定时阶段文字已经在下面一行写过</summary>
         public bool HasResult => Success != null;
 
-        /// <summary>明细行：与阶段同名的那句不重复写（刚开局满屏"等待开始"念三遍没意义）</summary>
+        /// <summary>明细行：与阶段同名的那句不重复写，否则开局"等待开始"会在卡片上重复三遍</summary>
         public string DetailText => Detail == StageText ? string.Empty : Detail;
 
         public ChannelVisual Visual => Stage switch
@@ -270,10 +268,7 @@ namespace TORNPISolution.ViewModels
             Stage = FlashStage.Idle;
         }
 
-        /// <summary>
-        /// 界面侧取消收尾：编排那边的单路取消会自己发一份 Canceled 快照过来，
-        /// 但“工程数据下载”那一步被打断时整轮直接抛回来、单路不会再有快照，这里补上免得卡片停在“下载中”。
-        /// </summary>
+        /// <summary>界面侧取消收尾：单路取消会由编排自己发一份 Canceled 快照，但“工程数据下载”被打断时整轮直接抛回来、单路没有快照，这里补上免得卡片停在“下载中”。</summary>
         public void MarkCanceled()
         {
             if (Stage is FlashStage.Idle or FlashStage.Succeeded or FlashStage.Failed

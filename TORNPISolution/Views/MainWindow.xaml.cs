@@ -35,7 +35,6 @@ namespace TORNPISolution.Views
             // 方案里有声明ECG Signal的模块时，每轮开始执行前自动带出该模块的总览窗口（按模块 Id 各一个，非模态不挡执行）
             ViewModel.WaveformOverviewRequested += ViewModel_WaveformOverviewRequested;
 
-            // 波形折叠按钮点击保险：展开/收起这个开关取反
             DetailGrid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
                 new MouseButtonEventHandler(DetailGrid_WaveformToggle_ForceClick), handledEventsToo: true);
 
@@ -49,11 +48,7 @@ namespace TORNPISolution.Views
 
         private MainViewModel ViewModel => (MainViewModel)DataContext;
 
-        /// <summary>
-        /// 关窗口时先让三边各自把收尾做完：测试项（退测试模式、泄压、关共享会话）、单板轮次（断设备连接）
-        /// 与烧录轮（杀工具进程、写记录），再走销毁。
-        /// 否则进程一退，设备就留在带压的测试模式里，综测仪还挂着输出，烧录工具则作为孤儿进程继续占着那几路的串口。
-        /// </summary>
+        /// <summary>关闭前先让三边各自收尾：测试项（退测试模式、泄压、关共享会话）、单板轮次（断设备连接）、烧录轮（杀工具进程、写记录），再走销毁；否则进程一退设备就留在带压的测试模式、综测仪还挂着输出、烧录工具作为孤儿进程继续占着那几路的串口</summary>
         protected override void OnClosing(CancelEventArgs e)
         {
             ViewModel.StopAndAwaitWrapUp();
@@ -89,14 +84,11 @@ namespace TORNPISolution.Views
         /// <summary>程序正在同步列表选中</summary>
         private bool _syncingPlanSelection;
 
-        /// <summary>
-        /// 方案列表空白区域点击从源头吞掉
-        /// </summary>
+        /// <summary>方案列表空白区域点击从源头吞掉</summary>
         private void BlankArea_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var source = e.OriginalSource as DependencyObject;
 
-            // 拦截方案列表内的空白点击
             if (FindAncestor<ListBox>(source) != PlanList)
             {
                 return;
@@ -111,9 +103,7 @@ namespace TORNPISolution.Views
             e.Handled = true;
         }
 
-        /// <summary>
-        /// 用户点击模块卡片 → 更新 VM 选中
-        /// </summary>
+        /// <summary>用户点击模块卡片 → 更新 VM 选中</summary>
         private void PlanList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_syncingPlanSelection)
@@ -254,13 +244,9 @@ namespace TORNPISolution.Views
             new FlashConfigWindow(ViewModel.Flashing) { Owner = this }.ShowDialog();
         }
 
-        /// <summary>
-        /// 测试项 → 勾选本轮要跑哪几项：项数会长到几十，所以开弹窗而不做菜单下拉。
-        /// 这扇窗只管勾选：通道与仪器是「配置→单板配置」的事，两处各管一处，不再一扇窗里夹两件事。
-        /// </summary>
+        /// <summary>测试项 → 勾选本轮要跑哪几项：项数会长到几十，所以开弹窗而不做菜单下拉；本窗只管勾选，通道与仪器归「配置→单板配置」，两处各管一处</summary>
         private void MenuBoardTestItems_Click(object sender, RoutedEventArgs e)
         {
-            // 与单板配置同一个闸门：跑着的时候本轮范围已经定死，中途改勾选项只会让界面与结果对不上
             if (!ViewModel.Board.TryOpenConfig()) return;
 
             new BoardTestItemsWindow(ViewModel.Board) { Owner = this }.ShowDialog();
@@ -406,7 +392,6 @@ namespace TORNPISolution.Views
             return dialog.ShowDialog() == true ? result : null;
         }
 
-        /// <summary>显示方案选择对话框</summary>
         private static string? ShowPlanSelectionDialog(string title, string prompt, IReadOnlyList<string> plans)
         {
             var dialog = new Window
@@ -451,7 +436,6 @@ namespace TORNPISolution.Views
 
         // ==================== 辅助方法 ====================
 
-        /// <summary>获取鼠标事件命中的模块</summary>
         private static TestModuleViewModel? GetModuleUnderMouse(MouseEventArgs e)
         {
             var element = e.OriginalSource as DependencyObject;

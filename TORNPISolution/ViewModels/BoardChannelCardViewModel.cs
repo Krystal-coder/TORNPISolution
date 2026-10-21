@@ -5,9 +5,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.ViewModels
 {
     /// <summary>
-    /// 单板页的一张通道卡片：这一路本轮要跑的几项测试与它们的结果长在同一张卡上。
-    /// 与烧录页的通道卡片各自一套（不共用基类），是因为这里的一行是"一项测试 + 实测值 + 规格"，
-    /// 烧录那一行是"一颗芯片的进度百分比"，两者要显示的东西没有交集，硬抽公共只会留下一堆空属性。
+    /// 单板页通道卡片：一行 = 一项测试 + 实测值 + 规格（与烧录卡列语义无交集，别抽公共基类）。
     /// </summary>
     public class BoardChannelCardViewModel : ViewModelBase
     {
@@ -33,7 +31,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>通道号就是测试槽位号（第一路是槽位 1），与 B02/B03/B04 上报的"-槽位号"后缀同一口径</summary>
         public int Channel { get; }
 
-        /// <summary>卡片标题</summary>
         public string Title => $"通道 {Channel}";
 
         /// <summary>位号（在菜单「配置 → 单板配置」的通道表里改，随 board-test.json 落盘）</summary>
@@ -62,10 +59,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>
-        /// 本轮要不要跑这一路。与 <see cref="Enabled"/> 是两件事：那个是这条道接没接（落盘），
-        /// 这个是本轮跑不跑（不落盘，跑完还是默认全跑）。与烧录页同一套双开关约定。
-        /// </summary>
+        /// <summary>本轮要不要跑这一路。与 <see cref="Enabled"/> 是两件事：那个是这条道接没接（落盘），这个是本轮跑不跑（不落盘，跑完还是默认全跑）；与烧录页同一套双开关约定。</summary>
         public bool Selected
         {
             get => _selected;
@@ -85,11 +79,7 @@ namespace TORNPISolution.ViewModels
             set => SetProperty(ref _deviceText, value);
         }
 
-        /// <summary>
-        /// 这一路在不在本轮点名的范围里（右键单跑一路时其余几路就不在）。
-        /// 它只决下方详情区那句空态提示怎么说（“没点名”与“点名了但没可对上的设备”是两回事），
-        /// 不参与卡片配色：以前跟着它把没点名的路都染成灰，单跑一路时其余七路全灰，看着像它们出了毛病。
-        /// </summary>
+        /// <summary>这一路在不在本轮点名的范围里（右键单跑一路时其余几路就不在）：只决下方详情区那句空态提示怎么说（“没点名”与“点名了但没可对上的设备”是两回事），不参与卡片配色。</summary>
         public bool InRound
         {
             get => _inRound;
@@ -151,11 +141,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>这一路有没有往来明细：没跑过时一句都没有，那条折叠框就不该占着位置</summary>
         public bool HasTrace => _trace.Count > 0;
 
-        /// <summary>
-        /// 卡片配色语义。灰只讲一件事：这一路本轮不跑（这条道没接，或卡片上「本轮跑」被取消了）。
-        /// 不再看“本轮点名范围”与“建行建没建”：右键只跑一路时其余七路会被撤掉行，
-        /// 那些路自己什么毛病没有，染成灰就变成“它们坏了”的假信号。
-        /// </summary>
+        /// <summary>卡片配色语义：灰只讲这一路本轮不跑（这条道没接，或卡片上「本轮跑」被取消了）</summary>
         public ChannelVisual Visual => Success switch
         {
             true => ChannelVisual.Success,
@@ -177,10 +163,7 @@ namespace TORNPISolution.ViewModels
             AddTrace($"{Items.Count} 项开始");
         }
 
-        /// <summary>
-        /// 这一路没参与本轮（或已退回未开跑）：卡片留白比标个假 PASS 好，但要说清是没参与而不是没测出来。
-        /// 耗时一并抹掉：上一轮的秒数挂在重新建好的行旁边，会让人以为这一轮已经跑过了。
-        /// </summary>
+        /// <summary>这一路没参与本轮（或已退回未开跑）：卡片留白并说清是没参与而不是没测出来，不标假 PASS；耗时一并抹掉，否则上一轮的秒数挂在重新建好的行旁边会让人以为这一轮已经跑过。</summary>
         public void MarkIdle()
         {
             IsBusy = false;

@@ -16,7 +16,6 @@
         <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
         <conv:LenientNumberConverter x:Key="Num"/>
 
-        <!-- 页面样式 -->
         <Style x:Key="Style.FlashCard" TargetType="Border">
             <Setter Property="Background" Value="#F8FAFC"/>
             <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
@@ -146,7 +145,6 @@
 
     </UserControl.Resources>
 
-    <!-- 卡片行 -->
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -388,7 +386,7 @@
             </Border>
         </Grid>
 
-        <!-- ==================== 状态条：提示、校验问题、探测结果、记录目录 ==================== -->
+        <!-- 状态条：提示、校验问题、探测结果、记录目录 -->
         <Border Grid.Row="2" Margin="0,10,0,0" Style="{StaticResource Style.PanelCard}" Padding="14,8">
             <Grid>
                 <Grid.ColumnDefinitions>

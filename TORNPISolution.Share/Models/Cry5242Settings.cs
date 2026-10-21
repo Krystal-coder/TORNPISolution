@@ -1,11 +1,9 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// CRY5242/5243 四通道电流电压综测仪的链接参数。
-    /// 通讯为网口 Raw Socket 上的 SCPI 文本指令，一问一答，帧边界 \r\n。
-    /// 一台仪器四个通道，通道 A~D 各自开一个 TCP 端口（默认 5025~5028 连号），
-    /// 指令里仍带通道号；要同时驱动四个通道就得四个端口各建一条连接。
-    /// 仪器 IP 由背板拨码决定：169.254.1.(32 + 左档×16 + 右档×1)，改完必须重启仪器才生效。
+    /// CRY5242/5243 四通道电流电压综测仪的链接参数：网口 Raw Socket 上的 SCPI 文本指令，一问一答，帧边界 \r\n。
+    /// 一台仪器四个通道，通道 A~D 各占一个 TCP 端口（默认 5025~5028 连号），指令里仍带通道号；要同时驱动四个通道就得四个端口各建一条连接。
+    /// 仪器 IP 由背板拨码决定：169.254.1.(32 + 左档×16 + 右档×1)，改完必须重启仪器才生效；同时接两台时必须拨成不同值。
     /// </summary>
     public class Cry5242Settings : LanLinkSettings
     {
@@ -19,24 +17,14 @@ namespace TORNPISolution.Share.Models
         public string Name { get; set; } = "综测仪";
 
         /// <summary>通道 A 的端口（继承自 Port），B/C/D 依次 +1</summary>
-        // 复用 LanLinkSettings.Port，见 PortOfChannel
 
-        /// <summary>
-        /// 这台仪器现场接的是四线还是二线（指令里发 4 还是 2）：四线要把 PO+ 与 PO_S+、PO- 与 PO_S- 各自短接，
-        /// 二线时 Sense 两脚可不接。输出指令不专门指定线制时，驱动就按这个值下发。
-        /// </summary>
+        /// <summary>现场接的是四线还是二线（指令里发 4 还是 2）：四线要把 PO+ 与 PO_S+、PO- 与 PO_S- 各自短接，二线时 Sense 两脚可不接；输出指令未专门指定线制时按本值下发</summary>
         public bool FourWire { get; set; } = true;
 
-        /// <summary>
-        /// 本台四个通道统一输出的电压（mV，量程 0~6500）：改完要刷新模块库，上电项的合格区间由它算出来。
-        /// 填 0 或负数视为没配好，本台不上电并全部判 FAIL（给主板供电的这一路必须以现场实际为准）。
-        /// </summary>
+        /// <summary>本台四个通道统一输出的电压（mV，量程 0~6500）：改完要刷新模块库，上电项的合格区间由它算出；填 0 或负数视为没配好，本台不上电并全部判 FAIL（这一路直接给主板供电）</summary>
         public int OutputMilliVolts { get; set; } = 5000;
 
-        /// <summary>
-        /// 过流保护值（mA，量程 0~2000）：5242 上它是保护阈值而不是恒流点，通道电流超了就红灯、停输出，
-        /// 发 *RST 才恢复（指令表口径，拿它当限流值是高配 5243 的行为）。按产品工作电流留余量填。
-        /// </summary>
+        /// <summary>过流保护值（mA，量程 0~2000）：5242 上它是保护阈值而不是恒流点，通道电流超了就红灯、停输出，发 *RST 才恢复（指令表口径，当限流值用是高配 5243 的行为）；按产品工作电流留余量填</summary>
         public int ProtectionMilliAmps { get; set; } = 500;
 
         /// <summary>缓输出的斜率时间（ms，量程 10~100）：电压用这么久爬到位，避开板子上大电容的上电冲击电流；手册与厂商模板都用 50</summary>
@@ -45,10 +33,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>回读电压的合格窗口（±mV）：按设定值上下浮动判定，收得太窄会被仪器自己的分辨率误判</summary>
         public int VoltageToleranceMilliVolts { get; set; } = 50;
 
-        /// <summary>
-        /// 上电前先发一次 *RST：关掉本台所有通道输出，把上一轮残留的输出状态和已经动作的过流保护一起清掉
-        /// （过流保护动作后只有 *RST 能恢复）。代价是这台要多等一行回执。
-        /// </summary>
+        /// <summary>上电前先发一次 *RST：关掉本台所有通道输出，把上一轮残留的输出状态和已动作的过流保护一起清掉（过流保护动作后只有 *RST 能恢复）；代价是本台多等一行回执</summary>
         public bool ResetBeforePowerOn { get; set; } = true;
 
         /// <summary>TCP 建链超时（毫秒）</summary>
@@ -99,10 +84,7 @@ namespace TORNPISolution.Share.Models
         Po,
     }
 
-    /// <summary>
-    /// 一次测量回读：仪器回的是 CHx: [数值, '单位'] 三段，单位由仪器按档位给（V/mA/uA/nA）。
-    /// 数值原样保留，不做单位换算——换算交给调用方，避免这里替现场猜量纲。
-    /// </summary>
+    /// <summary>一次测量回读：仪器回执为 CHx: [数值, '单位'] 三段，单位由仪器按档位给（V/mA/uA/nA）；数值原样保留、不做单位换算，换算交给调用方</summary>
     public readonly record struct Cry5242Reading(int Channel, double Value, string Unit)
     {
         public override string ToString() => $"CH{Channel} {Value} {Unit}";

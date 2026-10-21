@@ -6,8 +6,7 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// Spec 分部：整机工位（Category=WholeMachine）。
-    /// 书写约定：#region 模块清单 里一个模块一段（//======Axx====== 开头），段与段之间不夹辅助方法；
-    /// 读配置与拼展示文本的辅助统一放文件末尾的 #region 取配置与展示辅助。
+    /// 书写约定：#region 模块清单 里一个模块一段（//======Axx====== 开头），段与段之间不夹辅助方法；读配置与拼展示文本的辅助统一放文件末尾的 #region 取配置与展示辅助。
     /// </summary>
     public partial class Spec
     {
@@ -45,9 +44,9 @@ namespace TORNPISolution.Service
             var ti = AddTI(TestModuleIds.InitInstruments, ModuleCategory.WholeMachine, "初始化仪器",
                 "初始化固高IO等硬件，全部成功为 PASS");
 
-            AddResult(ti, name: SpecItems.GenIoInit,          // ResultName
+            AddResult(ti, name: SpecItems.GenIoInit,
                 description: "启动 EtherCAT 总线",
-                specMin: 1, specMax: 1, unit: "");          // SpecMin / SpecMax（1=成功 0=失败，成功才 PASS）
+                specMin: 1, specMax: 1, unit: "");
 
             return ti;
         }
@@ -72,9 +71,9 @@ namespace TORNPISolution.Service
             var ti = AddTI(TestModuleIds.BpDeviceInit, ModuleCategory.WholeMachine, "血压仪初始化连接",
                 "初始化配置里选中的血压模拟仪");
 
-            AddResult(ti, name: SpecItems.BpSimulatorInit,          // ResultName
+            AddResult(ti, name: SpecItems.BpSimulatorInit,
                 description: "配置页面选择康伟达/鲸扬，未选择模拟仪则 FAIL",
-                specMin: 1, specMax: 1, unit: "");          // SpecMin / SpecMax（1=成功 0=失败，成功才 PASS）
+                specMin: 1, specMax: 1, unit: "");
 
             return ti;
         }
@@ -297,7 +296,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A07-----------AECG100 初始化连接
-        // 通过SDK（AECG100x64.dll）初始化并连接 AECG100 多功能综合性能测试仪
         private static TestModuleModel BuildAecg100Init()
         {
             var ti = AddTI(TestModuleIds.Aecg100Init, ModuleCategory.WholeMachine, "AECG100初始化连接",
@@ -320,9 +318,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A08-----------ECG 采集与启动（ECG-001/002）
-        // 产品通讯集中在 A16，本模块不再问询；
-        // ECG-001 测量启动：仪器输出 ECG 波形，验证 SDK 返回成功；
-        // ECG-002 导联脱落检测：读取产品导联状态（0x88）判定脱落。
         private static TestModuleModel BuildEcgAcquisitionTest()
         {
             var ti = AddTI(TestModuleIds.EcgAcquisitionTest, ModuleCategory.WholeMachine, "ECG采集与启动",
@@ -344,7 +339,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A09-----------ECG 心率监测（ECG-004）
-        // 产品通讯集中在 A16，本模块不再问询；
         // ECG-004 心率检测精度：配置页设置心率点（默认 40/60/80/100/120/160 BPM），
         //   每档仪器输出对应频率 ECG 波形（BPM/60 Hz），重复 3 次取最大值，
         //   取最大偏差那一次报双值：仪器列=设定值、产品列=回读值，偏差上限取配置的 HeartRateTolerance；
@@ -367,7 +361,6 @@ namespace TORNPISolution.Service
         // 按 YY 9706.247-2021 201.12.4.4.101：AECG100 输出三角波（幅度=档值 波峰-波谷 mV，叠加 DC 偏置），产品回读曲线算全局波峰-波谷与设定幅度比对。
         // 一项一点，幅度档为外层、偏置档为内层（0.5mV 跑完三个偏置再跑 1mV）；项清单按配置动态生成（项名见 SpecItems.Ecg009Point），改档无需重启。
         // 允差分段口径统一由 Aecg100Settings.Ecg009ToleranceMv 实现（≤2mV→50μV，>2mV→10%）。
-        // ECG-010 输入阻抗 / ECG-011 增益准确性 / ECG-012 频率响应 按需求暂不实现（已从目录移除）。
         private TestModuleModel BuildEcgSignalQualityTest()
         {
             var (cfg, amplitudes, offsets, frequency) = GetEcg009Params();
@@ -379,7 +372,6 @@ namespace TORNPISolution.Service
             var ti = AddTI(TestModuleIds.EcgSignalQualityTest, ModuleCategory.WholeMachine, "ECG动态范围和线性",
                 $"{amplitudes.Count} 幅度档 × {offsets.Count} 偏置档，一点一项比对回读波形幅度");
 
-            // ECG Signal窗口显示参数声明：
             ti.Overview = new WaveformOverviewProfile
             {
                 Title = "ECG Signal",
@@ -411,8 +403,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A11-----------PPG 脉搏率模拟测试（需 PPG-1R-525 绿光模块）
-        // 测前模块在位校验：检测不在位或模块不对直接拦截，提示更换为 PPG-1R-525。
-        // PPG-001：仪器经绿光 LED 输出 PPG 波形（频率 = BPM/60），产品光学传感器计算脉搏率后比对。
         private TestModuleModel BuildPpgHeartRateTest()
         {
             var hrTol = GetAecgParams().PpgHeartRateTolerance;
@@ -431,8 +421,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A12-----------SpO2 测量模块（需 PPG-2R-940 红光+红外模块）
-        // 测前模块在位校验：检测不在位或模块不对直接拦截，提示更换为 PPG-2R-940。
-        // 对应测试规范 2.2.1：SPO2-001 测量启动与停止 / SPO2-002 手指脱落检测 / SPO2-003 低氧报警。
         private static TestModuleModel BuildSpo2MeasurementTest()
         {
             var ti = AddTI(TestModuleIds.Spo2MeasurementTest, ModuleCategory.WholeMachine, "SpO2测量模块",
@@ -458,7 +446,7 @@ namespace TORNPISolution.Service
 
         //======================================A13-----------SpO2 精度检测
         // 对应测试规范 2.2.2：SPO2-004 血氧饱和度精度 / SPO2-005 脉搏率精度 / SPO2-006 低氧范围精度。
-        // 复用 AECG100 红/红外双通道输出（WTQOutputPPGEx）+ 产品回读 0x81/0x7C 比对，
+        // 复用 AECG100 红/红外双通道输出（WTQOutputPPGEx）+ 产品回读 0x82/0x7C 比对，
         // 仪器列=设定值、产品列=回读值，动态规格=设定值±容差。
         private TestModuleModel BuildSpo2AccuracyTest()
         {
@@ -483,7 +471,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A14-----------SpO2 灌注与抗干扰测试
-        // 对应测试规范 2.2.3：SPO2-008 弱灌注能力 / SPO2-009 弱灌注提示 / SPO2-010 环境光抗干扰。
         // PI（灌注指数）幅度控制与环境光控制暂未具备自动化条件，三项为预留不判定项（模块执行时报“预留（不判定）”）。
         private static TestModuleModel BuildSpo2PerfusionTest()
         {
@@ -504,7 +491,6 @@ namespace TORNPISolution.Service
         }
 
         //======================================A15-----------充电测试
-        // 通过产品串口协议读取充电状态（0x6D）、电池电压+百分比（0x6C）
         private static TestModuleModel BuildChargingTest()
         {
             var ti = AddTI(TestModuleIds.ChargingTest, ModuleCategory.WholeMachine, "充电测试",

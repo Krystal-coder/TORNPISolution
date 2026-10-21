@@ -8,14 +8,12 @@ namespace TORNPISolution.Service.Devices
 {
     /// <summary>
     /// CRY5242/5243 四通道电流电压综测仪控制类（网口 SCPI 文本指令，一问一答以 \r\n 结束）。
-    /// 每个通道单独开一条 TCP 连接（端口 = 配置的通道 A 端口 + 通道号 - 1），四个通道才能同时驱动；
-    /// 同一条连接上的"发送 + 读回执"用信号量成对锁住，避免两条命令的回执互相串。
-    /// 电压一律 mV（0~6500）、电流一律 mA（-2000~+2000），按指令表原样传整数，这里不做任何换算，只做越界拦截。
-    /// 设置类指令的回执是 CHx: done，测量类是 CHx: [数值, '单位']，回执里认不出 done 就当失败抛。
-    /// 每条指令下发前先把接收缓冲清一次（与厂商模板一致）：这里是一条连接上一个人在读，
-    /// 上一条超时后迟到的回执如果不清，就会被下一条指令当成自己的回执读走。
-    /// 5242 上输出指令的第三个参数是过流保护值（通道电流超过它就红灯、停输出，发 *RST 才恢复），不是恒流点；
-    /// 把它当限流值用是高配 5243 的行为（手册 4.1.1）。
+    /// 每通道各一条 TCP 连接（端口 = 配置的通道 A 端口 + 通道号 - 1），四个端口都建链才能同时驱动四通道；
+    /// 同一条连接上的发送与读回执由信号量串行，避免两条命令的回执互串。
+    /// 电压一律 mV（0~6500）、电流一律 mA（-2000~+2000），按指令表原样传整数，不换算，只拦越界。
+    /// 设置类指令回执为 CHx: done，测量类为 CHx: [数值, '单位']，回执认不出 done 即按失败抛。
+    /// OUTPUT 第三参数在 5242 上是过流保护值（通道电流超过它就红灯、停输出，只有 *RST 恢复），不是恒流点；
+    /// 当限流值用是高配 5243 的行为（手册 4.1.1）。
     /// </summary>
     public class Cry5242Tester : ICry5242Tester
     {
@@ -30,7 +28,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>*RST 要关四个通道的输出，比寻常指令慢得多，单独给它 10s</summary>
         private const int ResetTimeoutMs = 10000;
 
-        // 指令表给的量程，越界就不发（这台是给主板供电的，猜错量纲比报错更贵）
+        // 指令表给的量程，越界就不发：本仪器直接给主板供电，量纲错了就是往主板上错输出
         private const int MaxVoltageMilliVolts = 6500;
         private const int MinCurrentMilliAmps = -2000;
         private const int MaxCurrentMilliAmps = 2000;
@@ -71,10 +69,7 @@ namespace TORNPISolution.Service.Devices
             }
         }
 
-        /// <summary>
-        /// 逐通道建链并各读一次 *IDN? 验证链路；中途有通道连不上就把已建的收干净再抛，
-        /// 不留半开状态（半开时后续指令只会报"未连接"，现场更难查）。
-        /// </summary>
+        /// <summary>逐通道建链并各读一次 *IDN? 验证链路；任一通道连不上就把已建的收干净再抛，不留半开状态（半开时后续指令只报"未连接"）</summary>
         public async Task OpenAsync(CancellationToken ct = default)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -112,9 +107,8 @@ namespace TORNPISolution.Service.Devices
             => QueryAsync(channel, "*IDN?", ct);
 
         /// <summary>
-        /// 整机复位（*RST）：对任一通道下发即关掉全部通道的输出，过流保护动作后也只能靠它恢复。
-        /// 走哪条连接都行（这条不带通道参数），这里固定取序号最小的已连通通道。
-        /// 回执仍按厂商模板那样等一行 done（它给这条 10s）；手册 4.6 建议连续测试每半小时复位一次。
+        /// 整机复位（*RST）：不带通道参数，对任一通道下发即关掉全部通道输出，过流保护动作后也只能靠它恢复。
+        /// 回执仍按厂商模板等一行 done（这条给 10s）；手册 4.6 建议连续测试每半小时复位一次。
         /// </summary>
         public async Task ResetAsync(CancellationToken ct = default)
         {
@@ -122,10 +116,7 @@ namespace TORNPISolution.Service.Devices
             await WriteCheckedAsync(channel, "*RST", "复位", ct, ResetTimeoutMs).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// 只设输出电压与过流保护值、不打开通路（OUTPUT 三参数：不带线制就不会走通路）。
-        /// 要真输出电压得走带线制的重载或 OUTPUT:RAMP。
-        /// </summary>
+        /// <summary>只设输出电压与过流保护值、不打开通路（OUTPUT 三参数，不带线制就不会走通路）；要真输出电压走带线制的重载或 OUTPUT:RAMP</summary>
         public Task ConfigureOutputAsync(int channel, int voltageMilliVolts, int currentMilliAmps, CancellationToken ct = default)
         {
             ValidateOutput(voltageMilliVolts, currentMilliAmps);
@@ -142,10 +133,7 @@ namespace TORNPISolution.Service.Devices
                 $"设输出 {voltageMilliVolts}mV/{currentMilliAmps}mA {(wire ? "四线" : "二线")}", ct);
         }
 
-        /// <summary>
-        /// 带上升时间的缓输出（OUTPUT:RAMP），用于避开上电冲击；斜率时间 10~100ms（手册与厂商模板都用 50）。
-        /// 线制在这条上是指令表里的必选项，所以下发完就是通路已打开的状态。
-        /// </summary>
+        /// <summary>带上升时间的缓输出（OUTPUT:RAMP），避开上电冲击；斜率时间 10~100ms（手册与厂商模板都用 50），线制是指令表的必选项，下发完通路即已打开</summary>
         public Task SetRampOutputAsync(int channel, int voltageMilliVolts, int currentMilliAmps, int rampMilliSeconds, bool? fourWire = null, CancellationToken ct = default)
         {
             ValidateOutput(voltageMilliVolts, currentMilliAmps);
@@ -161,18 +149,12 @@ namespace TORNPISolution.Service.Devices
                 $"缓输出 {voltageMilliVolts}mV/{currentMilliAmps}mA {(wire ? "四线" : "二线")} 斜率{rampMilliSeconds}ms", ct);
         }
 
-        /// <summary>
-        /// 单独开/关输出通路（OUTPUT:STA）。指令表说明：没先下发 OUTPUT 时这条只是空开通路、没有实际输出；
-        /// 反过来，OUTPUT 或 OUTPUT:RAMP 里已经带了线制，通路就已经打开，不必再发这条。
-        /// </summary>
+        /// <summary>单独开/关输出通路（OUTPUT:STA）：未先下发 OUTPUT 时这条只空开通路、没有实际输出；OUTPUT / OUTPUT:RAMP 已带线制时通路已打开，不必再发</summary>
         public Task SetOutputEnabledAsync(int channel, bool enabled, CancellationToken ct = default)
             => WriteCheckedAsync(channel, $"OUTPUT:STA {channel},{(enabled ? 1 : 0)}",
                 enabled ? "打开输出通路" : "关闭输出通路", ct);
 
-        /// <summary>
-        /// 切换测量通路（FUNC:SWIT）。手册里只有 DVM 与 CH_PO 那两个电压测量明确要先切通路（4.2.1/4.2.2）；
-        /// 电流是把档位直接带在 MEAS:CURR 的参数里，手册的电流例子没先切通路（4.3.1）。
-        /// </summary>
+        /// <summary>切换测量通路（FUNC:SWIT）：手册只有 DVM 与 CH_PO 两个电压测量要求先切通路（4.2.1/4.2.2）；电流档位直接带在 MEAS:CURR 参数里，手册的电流例子没先切通路（4.3.1）</summary>
         public Task SwitchFunctionAsync(int channel, Cry5242Function function, CancellationToken ct = default)
             => WriteCheckedAsync(channel, $"FUNC:SWIT {channel},\"{FunctionToken(function)}\"",
                 $"切通路 {FunctionToken(function)}", ct);
@@ -193,10 +175,7 @@ namespace TORNPISolution.Service.Devices
             => ParseReading(channel, await QueryAsync(channel,
                 $"MEAS:CURR:METER {channel},\"{RangeToken(range)}\"", ct).ConfigureAwait(false));
 
-        /// <summary>
-        /// 读通道温度（GET_TEMP，手册 4.4）：手册只给了指令没给回执格式，所以只从整行里抠第一个数值。
-        /// 仪器自己按温度控风扇：55/60/75°C 分三档，超 80°C 过温报警（手册 4.4/4.5）。
-        /// </summary>
+        /// <summary>读通道温度（GET_TEMP，手册 4.4）：手册只给指令没给回执格式，只从整行里取第一个数值；仪器按温度自控风扇，55/60/75°C 分三档，超 80°C 过温报警（4.4/4.5）</summary>
         public async Task<double> GetTemperatureAsync(int channel, CancellationToken ct = default)
         {
             var reply = await QueryAsync(channel, $"GET_TEMP {channel}", ct).ConfigureAwait(false);
@@ -208,10 +187,7 @@ namespace TORNPISolution.Service.Devices
             return value;
         }
 
-        /// <summary>
-        /// 读全部 IO 状态（IO:STA?），原样返回文本。这条不带通道参数，回执如果不止一行，
-        /// 一问一答只能拿到第一行；固件 0.0.9 以上才支持。
-        /// </summary>
+        /// <summary>读全部 IO 状态（IO:STA?）并原样返回文本：这条不带通道参数，回执不止一行时一问一答只拿到第一行；需固件 0.0.9 以上</summary>
         public Task<string> ReadIoStatusAsync(int channel, CancellationToken ct = default)
             => QueryAsync(channel, "IO:STA?", ct);
 
@@ -260,10 +236,7 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"{_settings.Name} CH{channel} {what}");
         }
 
-        /// <summary>
-        /// 线制取值：调用方没指定就用这台仪器配置里的 FourWire（现场接的是二线还是四线只能配在那里）。
-        /// 指令表只认 2 和 4：手册 4.1.2 里那个表示二线的 ,1 是指令表没给的写法，不照它发。
-        /// </summary>
+        /// <summary>线制取值：调用方没指定就用配置里的 FourWire；指令表只认 2 和 4，手册 4.1.2 里表示二线的 ,1 是指令表没给的写法，不照它发</summary>
         private bool ResolveFourWire(bool? fourWire) => fourWire ?? _settings.FourWire;
 
         /// <summary>输出电压与保护电流按指令表的量程拦一道：0~6500mV、-2000~+2000mA</summary>

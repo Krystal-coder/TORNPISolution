@@ -12,7 +12,6 @@
 
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
 
-        <!-- ====== 串口参数编辑器（串口号 + 波特率 + 数据位 + 校验位 + 停止位） ====== -->
         <DataTemplate x:Key="Template.SerialEditor">
             <Grid Margin="12,8">
                 <Grid.ColumnDefinitions>
@@ -69,7 +68,6 @@
             </Grid>
         </DataTemplate>
 
-        <!-- ====== Modbus 串口编辑器（含从站地址） ====== -->
         <DataTemplate x:Key="Template.ModbusSerialEditor">
             <Grid Margin="12,8">
                 <Grid.ColumnDefinitions>
@@ -116,7 +114,7 @@
             </Grid>
         </DataTemplate>
 
-        <!-- ====== 网口（SCPI Raw Socket）编辑器：IP + 端口 ====== -->
+        <!-- 网口（SCPI Raw Socket）编辑器：IP + 端口 -->
         <DataTemplate x:Key="Template.LanEditor">
             <Grid Margin="12,8">
                 <Grid.ColumnDefinitions>
@@ -147,13 +145,12 @@
     </Window.Resources>
 
     <DockPanel>
-        <!-- ====== 底部按钮栏 ====== -->
+        <!-- 底部按钮栏 -->
         <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
             <Button Content="刷新串口" HorizontalAlignment="Left"
                     Style="{StaticResource Style.ToolButton}" Margin="0"
                     Command="{Binding RefreshPortsCommand}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- 锁定配置保存 -->
                 <TextBlock Text="测试运行中：配置保存已锁定" Foreground="{StaticResource Brush.Fail}"
                            VerticalAlignment="Center" Margin="0,0,12,0"
                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}"/>
@@ -163,14 +160,14 @@
             </StackPanel>
         </Grid>
 
-        <!-- ====== 主体：左侧设备导航 + 右侧详情 ====== -->
+        <!-- 主体：左侧设备导航 + 右侧详情 -->
         <Grid Grid.IsSharedSizeScope="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ========== 左侧：设备导航列表 ========== -->
+            <!-- 左侧：设备导航列表 -->
             <ListBox Grid.Column="0" Margin="16,12,8,0" Padding="0"
                      ItemsSource="{Binding DeviceNavView}"
                      SelectedItem="{Binding SelectedDevice}"
@@ -196,10 +193,10 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- ========== 右侧：详情面板 ========== -->
+            <!-- 右侧：详情面板 -->
             <Grid Grid.Column="1" Margin="8,12,16,0">
 
-                <!-- ====== 被测产品（DUT） ====== -->
+                <!-- 被测产品（DUT） -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -243,7 +240,7 @@
                     </Border>
                 </ScrollViewer>
 
-                <!-- ====== 压力变送器 ====== -->
+                <!-- 压力变送器 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -274,7 +271,7 @@
                     </Border>
                 </ScrollViewer>
 
-                <!-- ====== 质量流量控制器 ====== -->
+                <!-- 质量流量控制器 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -305,7 +302,7 @@
                     </Border>
                 </ScrollViewer>
 
-                <!-- ====== 血压模拟仪（康伟达 / BPA700 二选一） ====== -->
+                <!-- 血压模拟仪（康伟达 / BPA700 二选一） -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -462,7 +459,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ====== 鲸扬 AECG100 多功能综合性能测试仪 ====== -->
+                <!-- 鲸扬 AECG100 多功能综合性能测试仪 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -526,7 +523,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ====== NFC 读卡器 ====== -->
+                <!-- NFC 读卡器 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -557,7 +554,7 @@
                     </Border>
                 </ScrollViewer>
 
-                <!-- ====== IT6411 直流电源 ====== -->
+                <!-- IT6411 直流电源 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
@@ -588,7 +585,7 @@
                     </Border>
                 </ScrollViewer>
 
-                <!-- ====== 预留设备 ====== -->
+                <!-- 预留设备 -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,4">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">

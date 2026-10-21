@@ -116,10 +116,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>当前页签设备名（动态文案用）</summary>
         public string CurrentDeviceName => _selectedDeviceIndex == 1 ? "康伟达" : "BPA700";
 
-        /// <summary>
-        /// 当前页签是否康伟达（两设备页签共用参数编辑器模板，康伟达无效配置项按此隐藏：
-        /// 充气方式/量测时间/方法/类型/包络偏移等均属 BPA700 SDK 
-        /// </summary>
+        /// <summary>当前页签是否康伟达：两设备页签共用参数编辑器模板，康伟达无效配置项（充气方式/量测时间/方法/类型/包络偏移等均属 BPA700 SDK）按此隐藏</summary>
         public bool IsKangwenda => _selectedDeviceIndex == 1;
 
         /// <summary>充气方式开关文案（随页签设备变化）</summary>
@@ -127,10 +124,7 @@ namespace TORNPISolution.ViewModels
 
         // ==================== 当前生效设备（真正参与测试） ====================
 
-        /// <summary>
-        /// 生效设备名：与 <see cref="InstrumentConnectionConfig.ActiveBpTestParams"/> 同源，
-        /// 测试模块（A03/A04/A05/A06 等）只读这一台设备的 TestParams，另一份是换仪器时的备用配置。
-        /// </summary>
+        /// <summary>生效设备名：与 <see cref="InstrumentConnectionConfig.ActiveBpTestParams"/> 同源，测试模块（A03/A04/A05/A06 等）只读这一台设备的 TestParams，另一份是换仪器时的备用配置</summary>
         public string ActiveDeviceName
             => Config.ActiveSimulator switch
             {
@@ -183,7 +177,6 @@ namespace TORNPISolution.ViewModels
 
         // ==================== 静态压力 ====================
 
-        /// <summary>压力点数量上限</summary>
         public const int MaxPointCount = 10;
 
         /// <summary>静态压力点列表（界面可勾选/增删/改值）</summary>
@@ -192,7 +185,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>还能添加压力点（达到上限后“添加压力点”按钮禁用）</summary>
         public bool CanAddPoint => Points.Count < MaxPointCount;
 
-        /// <summary>压力点为空</summary>
         public bool PointsEmpty => Points.Count == 0;
 
         /// <summary>全选/全不选压力点</summary>
@@ -559,8 +551,7 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(SelectedBpPreset));
         }
 
-        /// <summary>初始/回退选中项：优先用当前设备已保存的预设，其次按收缩压/舒张压匹配，
-        /// 都匹配不到才取第一项（Default 方法血压以预设为准，同步填充；切换设备页签时避免误改已保存参数）</summary>
+        /// <summary>初始/回退选中项：已保存预设 → 收缩压/舒张压匹配 → 第一项；Default 方法血压以预设为准同步填充，切换设备页签时不误改已保存参数</summary>
         private string ResolveInitialPreset()
         {
             var presets = CurrentCategoryPresets();
@@ -733,13 +724,11 @@ namespace TORNPISolution.ViewModels
         public RelayCommand AddBpHeartRatePointCommand { get; }
         public RelayCommand<BpaHeartRatePoint> RemoveBpHeartRatePointCommand { get; }
 
-        /// <summary>从生效设备复制点位到本页签（换仪器时省得手抄）</summary>
         public RelayCommand CopyPointsFromActiveCommand { get; }
 
         /// <summary>
-        /// 把生效那台设备的静态压力点 + BP-004 压力组 + BP-005 心率点及其轮数/休息复制到当前页签。
-        /// 逐项新建实例而不是直接搬列表：两台设备若共享同一个点位对象，改一边另一边会跟着变。
-        /// 设备专属参数（充气方式/量测时间/方法/包络/JJG692）不复制，那些本来就不通用。
+        /// 复制生效设备的静态压力点 + BP-004 压力组 + BP-005 心率点及其轮数/休息到当前页签；逐项新建实例而非搬列表，两台设备共享同一个点位对象时改一边会连带另一边。
+        /// 设备专属参数（充气方式/量测时间/方法/包络/JJG692）不复制。
         /// </summary>
         private void CopyPointsFromActive()
         {
@@ -804,7 +793,6 @@ namespace TORNPISolution.ViewModels
 
         // ==================== 波形显示配置 ====================
 
-        /// <summary>X 轴模式下拉项</summary>
         public List<string> XAxisModes { get; } = new() { "Time", "SampleIndex" };
 
         /// <summary>带波形的血压测试项名称列表（与 Spec 中 showWaveform:true 的 BP- 项一致）</summary>
@@ -821,7 +809,6 @@ namespace TORNPISolution.ViewModels
 
         private string? _selectedWaveformItem;
 
-        /// <summary>当前选中的波形测试项</summary>
         public string SelectedWaveformItem
         {
             get => _selectedWaveformItem ?? WaveformItemNames[0];
@@ -836,7 +823,6 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>选中项的 X 轴模式</summary>
         public string SelectedXAxisMode
         {
             get => Params.WaveformDisplay.GetItemConfig(SelectedWaveformItem).XAxisMode;

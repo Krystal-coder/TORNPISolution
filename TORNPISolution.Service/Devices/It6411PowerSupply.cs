@@ -8,10 +8,8 @@ namespace TORNPISolution.Service.Devices
     /// <summary>
     /// 艾德克斯（ITECH）IT6411 双通道直流电源控制类。
     /// 通讯：网口 LAN，SCPI Raw Socket（默认端口 5025），命令/响应以 \n 结尾。
-    /// 通道规格（IT6411S，具体以仪器铭牌为准）：
-    ///   CH1：0~30V / 0~3A；CH2：0~5V / 0~1A。
-    /// IT6400 系列双通道机型通过 OUTPut:CHANnel 命令选择当前操作通道，
-    /// 本类所有带 channel 参数的方法均在设备锁内"先选通道再发命令"，保证原子性。
+    /// 通道规格（IT6411S，具体以仪器铭牌为准）：CH1：0~30V / 0~3A；CH2：0~5V / 0~1A。
+    /// IT6400 系列双通道机型通过 OUTPut:CHANnel 选择当前操作通道，本类所有带 channel 参数的方法均在设备锁内"先选通道再发命令"，保证原子性。
     /// </summary>
     public class It6411PowerSupply : IDisposable
     {
@@ -21,9 +19,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>"选择通道 + 下发命令"复合操作的原子性锁</summary>
         private readonly SemaphoreSlim _channelLock = new(1, 1);
 
-        /// <summary>
-        /// 按仪器链接配置创建（网口 SCPI）
-        /// </summary>
+        /// <summary>按仪器链接配置创建（网口 SCPI）</summary>
         public It6411PowerSupply(LanLinkSettings link, ILogService? log = null)
             : this(link.IpAddress, link.Port, log)
         {
@@ -37,9 +33,7 @@ namespace TORNPISolution.Service.Devices
 
         public bool IsOpen => _client.IsOpen;
 
-        /// <summary>
-        /// 初始化：建立 TCP 连接 → 切换远程模式 → 读取铭牌信息
-        /// </summary>
+        /// <summary>初始化：建立 TCP 连接 → 切换远程模式 → 读取铭牌信息</summary>
         public async Task OpenAsync(CancellationToken ct = default)
         {
             await _client.ConnectAsync(ct).ConfigureAwait(false);
@@ -48,9 +42,7 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"IT6411 初始化完成：{idn}");
         }
 
-        /// <summary>
-        /// 释放：返回本地模式（失败不阻断）→ 断开连接
-        /// </summary>
+        /// <summary>释放：返回本地模式（失败不阻断）→ 断开连接</summary>
         public async Task CloseAsync()
         {
             try

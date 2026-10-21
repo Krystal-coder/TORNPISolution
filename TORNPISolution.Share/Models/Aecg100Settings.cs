@@ -9,7 +9,6 @@ namespace TORNPISolution.Share.Models
     {
         // ==================== 连接参数 ====================
 
-        /// <summary>是否启用该仪器</summary>
         public bool Enabled { get; set; }
 
         /// <summary>串口号（如 COM5）；留空表示自动选择</summary>
@@ -59,10 +58,7 @@ namespace TORNPISolution.Share.Models
         // ==================== ECG-004 心率测试配置 ====================
 
         /// <summary>
-        /// ECG-004 心率检测精度测试点（BPM）。
-        /// 每个心率点仪器输出对应频率的 ECG 波形（频率 = BPM/60 Hz），
-        /// 每组重复 N 次取最大值与设定值比对，误差 ≤ 容差 为 PASS。
-        /// 默认 6 档：40/60/80/100/120/160。
+        /// ECG-004 心率检测精度测试点（BPM），仪器按 BPM/60 Hz 输出 ECG 波形；每组重复取最大值与设定值比对，误差 ≤ 容差为 PASS。
         /// </summary>
         public List<int> HeartRateTestPoints { get; set; } = new() { 40, 60, 80, 100, 120, 160 };
 
@@ -112,10 +108,8 @@ namespace TORNPISolution.Share.Models
         public int FrequencyScanDuration { get; set; } = 30;
 
         // ==================== ECG-009 动态范围和线性配置（A10 唯一实现项） ====================
-        // 一项一点，**幅度档为外层、DC 偏置档为内层**（需求给定的推进顺序）：
-        // 0.5mV → 偏置{0,300,-300} 为一轮，1mV、2mV、10mV 同理 → 默认 4 幅度 × 3 偏置 = 12 项。
-        // 项名见 SpecItems.Ecg009Point，Spec 目录与执行端同源生成；幅度档由小到大即“动态范围”，
-        // 同一偏置下各幅度偏差的分布即“线性”。
+        // 一项一点，幅度档为外层、DC 偏置档为内层（给定推进顺序）：默认 4 幅度 × 3 偏置 = 12 项。
+        // 项名见 SpecItems.Ecg009Point，Spec 目录与执行端同源生成。
 
         /// <summary>ECG-009 三角波幅度档 mV 波峰-波谷（法规值 0.5/1/2/10；≤0 的档在目录构建与执行端均被过滤）</summary>
         public List<double> Ecg009Amplitudes { get; set; } = new() { 0.5, 1, 2, 10 };
@@ -138,19 +132,13 @@ namespace TORNPISolution.Share.Models
         /// <summary>ECG-009 是否串入 620kΩ 输入阻抗（默认 false＝短路；勾选后本档波形经 620kΩ 输出）</summary>
         public bool Ecg009Impedance { get; set; }
 
-        /// <summary>
-        /// ECG-009 串口采集丢弃时长 s（仪器开始输出后，先把这么多秒的产品 0x8D 数据丢掉不记录，
-        /// 避开产品刚进入心电测量的起始瞬态；默认 20，即“从第 20 秒开始记”）。
-        /// </summary>
+        /// <summary>ECG-009 串口采集丢弃时长 s（开始输出后先丢弃 0x8D 数据这么多秒，避开产品进入心电测量的起始瞬态；默认 20）。</summary>
         public int Ecg009DiscardSeconds { get; set; } = 20;
 
-        /// <summary>
-        /// ECG-009 串口有效采集时长 s（丢弃之后连续记录这么多秒用于判定；默认 60，即有数据段 20s~80s）。
-        /// 单项耗时 = 丢弃 + 有效（+ 换档等待），到点即停仪器输出进下一档。
-        /// </summary>
+        /// <summary>ECG-009 串口有效采集时长 s（丢弃后连续记录判定，默认 60）；单项耗时 = 丢弃 + 有效 + 换档等待，到点即停输出进下一档。</summary>
         public int Ecg009RecordSeconds { get; set; } = 60;
 
-        /// <summary>ECG-009 换档等待 ms（停输出→下一档开始输出之间，默认 500；替掉原来硬编码的 300ms）</summary>
+        /// <summary>ECG-009 换档等待 ms（停输出→下一档开始输出之间，默认 500）</summary>
         public int Ecg009StepDelayMs { get; set; } = 500;
 
         /// <summary>ECG-009 允差分段分界幅度 mV（默认 2：≤本值用绝对允差，>本值用百分比允差）</summary>
@@ -233,7 +221,6 @@ namespace TORNPISolution.Share.Models
         // ==================== SpO2 血氧模拟测试配置（需 PPG-2R-940 红光+红外模块在位） ====================
         // SpO2 原理：产品按 R=(AC红/DC红)/(AC红外/DC红外) 经自身标定曲线换算 SpO2，
         // 模拟指定 SpO2% 即按产品标定曲线反解出 R，再换算红光通道 AC 幅度（红外 AC 固定）。
-        // 默认标定曲线 SpO2 = A - B×R（常见线性近似），系数可按产品实际标定曲线修改。
 
         /// <summary>SPO2-004 血氧饱和度精度测试点（%，默认 75/80/90/95/100）</summary>
         public List<int> Spo2TestPoints { get; set; } = new() { 75, 80, 90, 95, 100 };
@@ -275,9 +262,8 @@ namespace TORNPISolution.Share.Models
         public int Spo2CaptureTimeMs { get; set; } = 8000;
 
         /// <summary>
-        /// 按测试项名存放的波形配置，AECG100 输出的 ECG/PPG/SpO2 固定项名的项共用（如 "ECG-002导联脱落检测"、"SPO2-004血氧饱和度精度"）。
-        /// 界面按目录声明读 TimeScale 画横轴，执行端只有 ECG-001/002/004 读 Frequency/CaptureTimeMs。
-        /// 未配置的项使用代码内置默认值；A10 的 ECG-009 项名按档位动态生成，不走本字典，用上面的 Ecg009* 字段。
+        /// 按测试项名存放 ECG/PPG/SpO2 固定项的波形配置。
+        /// 界面读 TimeScale 画横轴，执行端仅 ECG-001/002/004 读 Frequency/CaptureTimeMs；未配置项用内置默认，ECG-009 按档位动态生成不走本字典。
         /// </summary>
         public Dictionary<string, EcgWaveformItemConfig> WaveformItemConfigs { get; set; } = new();
 

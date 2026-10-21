@@ -9,7 +9,7 @@ namespace TORNPISolution.Service.Communication
     /// 文本协议 TCP 客户端（Raw Socket 上的 ASCII 帧），供 SCPI / AT / 读码器一类一问一答或主动上报的仪器复用。
     /// 帧边界由调用方指定：SCPI 与 AT 指令按 \r\n 成帧，读码器结果按 ';' 结束。
     /// 同一时刻只放一个调用方进去读（_readLock 串行化），一次网络读切出的多帧先入队留给下次调用，
-    /// 粘包与半包都在 _partial 里消化，不会把上一条命令的尾巴串到下一条头上。
+    /// 粘包与半包都在 _partial 里消化，不会把上一条命令的残留串到下一条。
     /// 等数据只做一次非阻塞的 socket 探测再读，绝不取消在途的 ReadAsync：NetworkStream 的读被取消后流状态不可靠，
     /// 后续再读就会错位（表现为偶尔丢半行或读到上一条的回执）。
     /// </summary>
@@ -104,10 +104,7 @@ namespace TORNPISolution.Service.Communication
             _log.Debug($"→ {Remote} {text}");
         }
 
-        /// <summary>
-        /// 读一帧：读到 terminator 为止，返回值已去掉帧尾并 Trim；等不到返回 null（不抛，由调用方判超时）。
-        /// 半截内容留在缓冲区里等下一段，不会被丢掉。
-        /// </summary>
+        /// <summary>读一帧：读到 terminator 为止，去帧尾并 Trim；等不到返回 null（不抛，由调用方判超时），半截内容留在缓冲区等下一段。</summary>
         public async Task<string?> ReadFrameAsync(string terminator = NewLine, int timeoutMs = 3000, CancellationToken ct = default)
         {
             var stream = _stream ?? throw new InvalidOperationException($"未连接 {Remote}，请先调用 ConnectAsync");
@@ -183,7 +180,7 @@ namespace TORNPISolution.Service.Communication
             }
         }
 
-        /// <summary>丢掉收到的全部内容（含半截帧）：发触发命令前清一次，免得把上一次的尾巴当成本次结果</summary>
+        /// <summary>丢掉收到的全部内容（含半截帧）：发触发命令前清一次，免得把上一次的残留当成本次结果</summary>
         public void ClearReceived()
         {
             while (_frames.TryDequeue(out _)) { }
@@ -193,10 +190,7 @@ namespace TORNPISolution.Service.Communication
             }
         }
 
-        /// <summary>
-        /// 取走缓冲区里还没成帧的半截文本（取完即清）：对端发不带帧尾的短文本时只能这么收。
-        /// 调用方自己确定这一轮确实已经发完，否则会拿到断句。
-        /// </summary>
+        /// <summary>取走缓冲区里未成帧的半截文本（取完即清），用于对端发不带帧尾的短文本；调用方须确认本轮已发完，否则拿到断句。</summary>
         public string? TakePartial()
         {
             lock (_partialLock)

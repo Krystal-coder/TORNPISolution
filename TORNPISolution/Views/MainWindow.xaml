@@ -18,7 +18,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
 
-        <!-- 明细表分节头-->
+        <!-- 明细表 -->
         <Style x:Key="Style.DetailGroup" TargetType="GroupItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -68,11 +68,6 @@
             </Setter>
         </Style>
 
-        <!-- 明细表的单元格 / 表头 / 结果配色样式（Style.CellText、Style.GridColumnHeader、Style.ResultText）
-             已提到 App.xaml 的应用级资源：单板页要用同一套表格外观，而它是个 UserControl，
-             解析自己那份 BAML 时还没有宿主，拿不到写在窗口资源里的 key——放这里就只有一页能用 -->
-
-        <!-- 模块级结果徽章 -->
         <Style x:Key="Style.ModuleResultBadge" TargetType="Border">
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="8,2"/>
@@ -159,82 +154,77 @@
 
     <DockPanel>
 
-        <!-- 第一行：菜单（最右侧给返回键，不再单独占一行报“现在在哪个工位”） -->
-        <!-- 上下留一点内边距：菜单项只有 30 高，与按钮等高时按钮会顶到窗口边看上去像被标题栏切了 -->
         <Border DockPanel.Dock="Top" Background="{DynamicResource PrimaryHueMidBrush}"
                 Padding="10,5,14,5">
             <Grid>
-                <!-- 返回键走命令而不走 Click：任一边在跑时 CanExecute 直接把它灰掉，避开跑一半切页丢结果 -->
                 <Menu HorizontalAlignment="Left" VerticalAlignment="Center"
                       Style="{StaticResource MaterialDesignMenu}" Background="Transparent">
-            <Menu.ItemContainerStyle>
-                <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
-                    <Setter Property="Padding" Value="0,0,0,0"/>
-                </Style>
-            </Menu.ItemContainerStyle>
+                    <Menu.ItemContainerStyle>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
+                            <Setter Property="Padding" Value="0,0,0,0"/>
+                        </Style>
+                    </Menu.ItemContainerStyle>
 
             <!-- 文件菜单 -->
-            <MenuItem Header="文件" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
-                <MenuItem.Icon>
-                    <materialDesign:PackIcon Kind="FileDocumentOutline" Width="15" Height="15" Margin="0"/>
-                </MenuItem.Icon>
-                <MenuItem.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
-                    </DataTemplate>
-                </MenuItem.HeaderTemplate>
-                <MenuItem Header="保存方案" Click="MenuSavePlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="加载方案" Click="MenuLoadPlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <Separator/>
-                <MenuItem Header="退出" Click="MenuExit_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-            </MenuItem>
+                    <MenuItem Header="文件" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="FileDocumentOutline" Width="15" Height="15" Margin="0"/>
+                        </MenuItem.Icon>
+                        <MenuItem.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                            </DataTemplate>
+                        </MenuItem.HeaderTemplate>
+                        <MenuItem Header="保存方案" Click="MenuSavePlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="加载方案" Click="MenuLoadPlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <Separator/>
+                        <MenuItem Header="退出" Click="MenuExit_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                    </MenuItem>
 
             <!-- 配置菜单 -->
-            <MenuItem Header="配置" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
-                <MenuItem.Icon>
-                    <materialDesign:PackIcon Kind="CogOutline" Width="15" Height="15" Margin="0"/>
-                </MenuItem.Icon>
-                <MenuItem.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
-                    </DataTemplate>
-                </MenuItem.HeaderTemplate>
-                <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="单板配置" Click="MenuBoardConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
-                          ToolTip="八条路各自的位号与跑不跑，以及单板工位的综测仪/蓝牙网关/读码器；本轮跑哪几项在旁边的「测试项」里勾"/>
-                <MenuItem Header="烧录配置" Click="MenuFlashingConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
-                          ToolTip="SPI Flash 烧录器与富芮坤主控工具的参数（所有通道共用），以及八条通道各走哪个口"/>
-                <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-            </MenuItem>
+                    <MenuItem Header="配置" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="CogOutline" Width="15" Height="15" Margin="0"/>
+                        </MenuItem.Icon>
+                        <MenuItem.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                            </DataTemplate>
+                        </MenuItem.HeaderTemplate>
+                        <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="单板配置" Click="MenuBoardConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
+                                  ToolTip="八条路各自的位号与跑不跑，以及单板工位的综测仪/蓝牙网关/读码器；本轮跑哪几项在旁边的「测试项」里勾"/>
+                        <MenuItem Header="烧录配置" Click="MenuFlashingConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
+                                  ToolTip="SPI Flash 烧录器与富芮坤主控工具的参数（所有通道共用），以及八条通道各走哪个口"/>
+                        <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                    </MenuItem>
 
-            <!-- 通讯菜单 -->
-            <MenuItem Header="通讯协议" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
-                <MenuItem.Icon>
-                    <materialDesign:PackIcon Kind="Protocol" Width="15" Height="15" Margin="0"/>
-                </MenuItem.Icon>
-                <MenuItem.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
-                    </DataTemplate>
-                </MenuItem.HeaderTemplate>
-                <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-            </MenuItem>
-            
-            <!-- 单板要跑哪几项：单独一扇窗，不再挤在「单板配置」里当第三页——一个是作业定义，一个是工装配置
-                 项数会长到几十，所以下拉不候选，只能弹窗 -->
-            <MenuItem Header="测试项" Click="MenuBoardTestItems_Click"
-                      Style="{StaticResource MaterialDesignMenuItem}" Height="30"
-                      ToolTip="勾选单板工位本轮要跑的测试项（所有通道共用同一组，勾选项存在 board-test.json）">
-                <MenuItem.Icon>
-                    <materialDesign:PackIcon Kind="FormatListChecks" Width="15" Height="15" Margin="0"/>
-                </MenuItem.Icon>
-                <MenuItem.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
-                    </DataTemplate>
-                </MenuItem.HeaderTemplate>
-            </MenuItem>
+                     <!-- 通讯配置菜单 -->
+                    <MenuItem Header="通讯协议" Style="{StaticResource MaterialDesignMenuItem}" Height="30">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Protocol" Width="15" Height="15" Margin="0"/>
+                        </MenuItem.Icon>
+                        <MenuItem.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                            </DataTemplate>
+                        </MenuItem.HeaderTemplate>
+                        <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                    </MenuItem> 
+
+                    <MenuItem Header="测试项" Click="MenuBoardTestItems_Click"
+                          Style="{StaticResource MaterialDesignMenuItem}" Height="30"
+                          ToolTip="勾选单板工位本轮要跑的测试项（所有通道共用同一组，勾选项存在 board-test.json）">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="FormatListChecks" Width="15" Height="15" Margin="0"/>
+                        </MenuItem.Icon>
+                        <MenuItem.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
+                            </DataTemplate>
+                        </MenuItem.HeaderTemplate>
+                    </MenuItem>
                 </Menu>
 
                 <Button HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -258,7 +248,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ==================== 左栏：测试模块库（可收缩） ==================== -->
+        <!-- 左栏：测试模块库（可收缩） -->
         <Grid Grid.Column="0">
 
             <!-- 收起态：窄条，点击展开 -->
@@ -278,9 +268,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <!-- 收起态只留展开按钮：在哪一面由展开后的副标题说 -->
-                <TextBlock Text="»" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"
-                           VerticalAlignment="Center" Foreground="{StaticResource Brush.Primary}"/>
+                <TextBlock Text="»" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource Brush.Primary}"/>
             </Border>
 
             <!-- 展开完整模块库 -->
@@ -292,14 +280,13 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 面板标题 -->
                     <Grid Grid.Row="0" Margin="14,12,10,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- 面板标题：写清当前是哪类工位的模块库（工位由顶部页签定，不在这里翻面） -->
+                        <!-- 面板标题 -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding LibraryTitleText}" Style="{StaticResource Style.PanelTitle}"/>
                             <TextBlock Text="拖拽或双击模块"
@@ -368,7 +355,6 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <!-- 这一页没有目录项时的占位说明：不然看着像界面坏了 -->
                     <TextBlock Grid.Row="1" Text="该工位还没有测试模块&#10;在 Spec 目录里声明一项就会显示在这里"
                                Style="{StaticResource Style.SubText}" TextAlignment="Center" TextWrapping="Wrap"
                                VerticalAlignment="Center" Margin="16,0"
@@ -377,7 +363,7 @@
             </Border>
         </Grid>
 
-        <!-- ==================== 中栏：测试方案 ==================== -->
+        <!-- 中栏：测试方案 -->
         <Border Grid.Column="2" Style="{StaticResource Style.PanelCard}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -451,7 +437,6 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- 序号 -->
                                 <Border Grid.Column="0" Width="22" Height="22" CornerRadius="11"
                                         Background="{StaticResource Brush.Primary}" Margin="0,0,10,0"
                                         VerticalAlignment="Center">
@@ -474,7 +459,6 @@
                                                Style="{StaticResource Style.ModuleResultBadgeText}"/>
                                 </Border>
 
-                                <!-- 移除按钮 -->
                                 <Button Grid.Column="3" Content="✕" FontSize="11" Width="24" Height="24"
                                         Padding="0" Margin="4,0,0,0" Cursor="Hand"
                                         dd:DragDrop.DragSourceIgnore="True"
@@ -506,7 +490,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- 方案操作区 -->
+                    <!-- 方案操作区 -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
                             Margin="14,6,14,12">
                         <Button Style="{StaticResource Style.ToolButton}"
@@ -550,13 +534,11 @@
             </Grid>
         </Border>
 
-        <!-- ==================== 右栏：模块测试明细 ==================== -->
+        <!-- 右栏：模块测试明细 -->
         <Border Grid.Column="4" Style="{StaticResource Style.PanelCard}">
             <Grid>
                 <!-- 未选中模块时的占位提示 -->
-                <TextBlock Text="点击中间方案列表中的模块&#10;查看测试内容、规格与测试值"
-                           TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center"
-                           Foreground="{StaticResource Brush.Text.Sub}" FontSize="13" LineHeight="22">
+                <TextBlock Text="点击中间方案列表中的模块&#10;查看测试内容、规格与测试值" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource Brush.Text.Sub}" FontSize="13" LineHeight="22">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Visible"/>
@@ -726,7 +708,7 @@
                                         </ScrollViewer>
                                     </StackPanel>
                                 </Border>
-                                <!-- 波形：逐点共用一张压力曲线 -->
+                                <!-- 波形 -->
                                 <Border Margin="8,2,8,10" CornerRadius="6" Padding="0,6,0,0"
                                         Background="{StaticResource Brush.Panel.Background}"
                                         BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
@@ -776,7 +758,6 @@
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource Style.GridColumnHeader}"/>
                         </DataGrid.ColumnHeaderStyle>
-                        <!-- 单元格样式 -->
                         <DataGrid.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="BorderThickness" Value="0"/>

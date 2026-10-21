@@ -20,23 +20,18 @@ namespace TORNPISolution.Share.Models
         /// <summary>单位，如 V / A / Ω</summary>
         public string Unit { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 波形呈现模式（无 / 行内折叠 / ECG Signal）：
-        /// </summary>
+        /// <summary>波形呈现模式（无 / 行内折叠 / ECG Signal）</summary>
         public WaveformPresentation Waveform { get; set; } = WaveformPresentation.None;
 
         /// <summary>
-        /// 曲线纵轴单位（压力类为 mmHg，电位类为微伏/毫伏）：与规格单位 Unit 不同源，
-        /// 放气速率项规格是 mmHg/s、心率项规格是 BPM，曲线画的仍是压力；空 = 沿用 Unit
+        /// 曲线纵轴单位（压力类为 mmHg，电位类为微伏/毫伏）：与规格单位 Unit 不同源——放气速率项规格是 mmHg/s、心率项是 BPM，曲线画的仍是压力；空 = 沿用 Unit。
         /// </summary>
         public string WaveformUnit { get; set; } = string.Empty;
 
         /// <summary>曲线横轴倍率的配置来源（由目录声明，None = 用界面默认倍率）</summary>
         public WaveformConfigSource WaveformConfigSource { get; set; } = WaveformConfigSource.None;
 
-        /// <summary>
-        /// 明细表分节标题：同一模块内这个值相同的相邻项归到同一节（节头可折叠），由 Spec 目录声明
-        /// </summary>
+        /// <summary>明细表分节标题：同一模块内该值相同的相邻项归到同一节（节头可折叠），由 Spec 目录声明</summary>
         public string GroupLabel { get; set; } = string.Empty;
 
         /// <summary>
@@ -50,15 +45,11 @@ namespace TORNPISolution.Share.Models
         public string ValueSource { get; set; } = "Instrument";
 
         /// <summary>
-        /// 隐藏数值规格范围（产品信息获取/当前状态查询等通讯检查项）：
-        /// 判定规则是“有响应即通过”（内部仍按 1/0 项判定），不存在数值范围，
-        /// 规格列显示“有响应即通过”而非无意义的“1 ~ 1”。
+        /// 隐藏数值规格范围（产品信息获取/当前状态查询等通讯检查项）：不存在数值范围，判定规则是“有响应即通过”（内部仍按 1/0 项判定）。
+        /// 规格列显示“有响应即通过”，不显示“1 ~ 1”。
         /// </summary>
         public bool HideSpecRange { get; set; }
 
-        /// <summary>
-        /// 字符串规格
-        /// </summary>
         public string SpecText { get; set; } = string.Empty;
     }
 }

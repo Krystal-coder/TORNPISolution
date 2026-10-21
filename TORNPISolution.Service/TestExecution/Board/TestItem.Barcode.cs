@@ -6,11 +6,9 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// TestItem 分部：B02 产品条码获取（单板工位）。
-    /// 一台读码器收 SlotsPerReader 条：触发一次取第一条，接着不再触发、只等相机把同一次触发的后续条推来；
-    /// 没收够就重新触发补扫，补扫时跳过本轮已经见过的文本（还摆在视野里的那件会被再推一遍）。
-    /// 槽位号口径与目录构建同一个函数（<see cref="SpecItems.BoardBarcodeSlots"/>），两边不会对不上名。
-    /// 逐台并发采集（每台是独立的触发/结果两条连接），采集结果串行上报——结果字典不是线程安全的。
-    /// 某台连不上只判它自己那几个槽位 FAIL，不拦别的读码器。
+    /// 一台读码器收 SlotsPerReader 条：触发一次取第一条，接着不再触发、只等相机把同一次触发的后续条推来；没收够就重新触发补扫，补扫时跳过本轮已经见过的文本（还摆在视野里的那件会被再推一遍）。
+    /// 槽位号口径与目录构建同一个函数（<see cref="SpecItems.BoardBarcodeSlots"/>）。
+    /// 逐台并发采集（每台是独立的触发/结果两条连接），采集结果串行上报（结果字典不是线程安全的）；某台连不上只判它自己那几个槽位 FAIL，不拦别的读码器。
     /// </summary>
     public partial class TestItem
     {
@@ -54,14 +52,10 @@ namespace TORNPISolution.Service
                 _log.Info($"产品条码-{slot}：{(string.IsNullOrWhiteSpace(code) ? "未读到" : code)}");
             }
 
-            // 整批重码那一项已收掉（现阶段不管控），这里只报读到几条，不再拿码彼此比
             _log.Info($"产品条码获取完成：读到 {got}/{slots.Count} 条");
         }
 
-        /// <summary>
-        /// 一台读码器收到够数或跑满轮数为止：触发一次拿一条，同一次触发里接着读后续条。
-        /// 任何异常都在本方法内收住（本台负责的槽位拿不到码即 FAIL），不让整模块抛。
-        /// </summary>
+        /// <summary>一台读码器收到够数或跑满轮数为止：触发一次拿一条，同一次触发里接着读后续条；任何异常都在本方法内收住（本台负责的槽位拿不到码即 FAIL），不让整模块抛。</summary>
         private async Task<(int ReaderIndex, string?[] Codes)> ReadBarcodeGroupAsync(
             int readerIndex, HikBarcodeReaderSettings settings, int expected, CancellationToken token)
         {

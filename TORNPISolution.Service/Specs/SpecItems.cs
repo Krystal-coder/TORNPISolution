@@ -4,8 +4,7 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// 所有测试项名称的唯一来源：Spec 定义、TestItem/TestSteps/NfcFunctionTest 上报结果与上抛波形均引用此处，改一处两边同步。
-    /// 常量值 = 历史项名字符串，不得修改（UI 波形配置 WaveformDisplay.ItemConfigs 以项名为键）。
-    /// 按模块分区，一测试项一常量，命名与模块编号（Spec 注释的 ---Mxx---）对应。
+    /// 常量值 = 历史项名字符串，不得修改（UI 波形配置 WaveformDisplay.ItemConfigs 以项名为键）；按模块分区，一测试项一常量，命名与模块编号（Spec 注释的 ---Mxx---）对应。
     /// “目录与执行端必须算出同一份清单”的槽位分配（B02/B03）也放这里，两边同用一个函数才不会对不上名。
     /// </summary>
     public static class SpecItems
@@ -32,10 +31,7 @@ namespace TORNPISolution.Service
         public const string Bp002KeyStop = "BP-002物理按键停止测量";
 
         // -------- A05 血压静态压力精度测试（BP-003，一点一项：按勾选压力点动态生成） --------
-        /// <summary>
-        /// BP-003 压力点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数，
-        /// 保证项名一致；配置改点后项名自动跟随。
-        /// </summary>
+        /// <summary>BP-003 压力点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数保证项名一致，配置改点后项名自动跟随。</summary>
         public static string Bp003Point(double value) => $"BP-003静态压力-{value:0.##}mmHg";
 
         // -------- A17 产品静态压力校准 --------
@@ -52,8 +48,7 @@ namespace TORNPISolution.Service
 
         // -------- A06 血压动态压力精度测试（BP-004，一组压力一轮一项：按配置压力组与轮数动态生成，同 A05 机制）--------
         /// <summary>
-        /// BP-004 轮次项名（一个压力组一轮一项）：目录构建（Spec）与执行端上报（TestItem）同用本函数，
-        /// 配置改点位/轮数后项名自动跟随（不重启，由 MainViewModel 重建目录）。
+        /// BP-004 轮次项名（一个压力组一轮一项）：目录构建（Spec）与执行端上报（TestItem）同用本函数，配置改点位/轮数后项名自动跟随（不重启，由 MainViewModel 重建目录）。
         /// 心率全模块只一个值、不写进项名：改心率不会让已存方案的结果项名错位。
         /// </summary>
         public static string Bp004Round(int systolic, int diastolic, int round)
@@ -95,11 +90,7 @@ namespace TORNPISolution.Service
         public const string Ecg004HeartRateAccuracy = "ECG-004心率检测精度";
 
         // -------- A10 ECG动态范围和线性（ECG-009，一幅度档×一偏置档一项：按配置动态生成，同 A05/A06 机制） --------
-        // ECG-010 输入阻抗 / ECG-011 增益准确性 / ECG-012 频率响应 按需求暂不实现，已从 A10 目录移除。
-        /// <summary>
-        /// ECG-009 点项名（幅度档 × DC 偏置档）：目录构建（Spec）与执行端上报（TestItem）同用本函数，
-        /// 保证项名一致；配置改档后项名自动跟随（不重启，由 MainViewModel 重建目录）。
-        /// </summary>
+        /// <summary>ECG-009 点项名（幅度档 × DC 偏置档）：目录构建（Spec）与执行端上报（TestItem）同用本函数保证项名一致，配置改档后项名自动跟随（不重启，由 MainViewModel 重建目录）。</summary>
         public static string Ecg009Point(double amplitudeMv, double dcOffsetMv)
             => $"ECG-009动态范围-{amplitudeMv:0.##}mV/{dcOffsetMv:0.##}mV偏置";
 
@@ -131,8 +122,6 @@ namespace TORNPISolution.Service
         /// <summary>槽位条码项名（槽位号从 1 起）：目录构建与执行端上报同用本函数</summary>
         public static string BarcodeSlot(int slot) => $"产品条码-{slot}";
 
-        // 整批重码项（“产品条码不重复”）已收掉：现阶段不管控条码重不重。
-        // 要恢复时三处一起加回：本项名常量、Spec.Board 的 B02 目录项、TestItem.Barcode 里的判定与上报。
 
         // -------- B03 蓝牙功能测试（一台网关一个槽位，两项：广播地址与信号强度） --------
         /// <summary>槽位广播地址项名（槽位号从 1 起）</summary>
@@ -145,10 +134,7 @@ namespace TORNPISolution.Service
         /// <summary>通道供电电压项名（槽位号从 1 起，测试值 = 仪器回读的实测电压 mV）</summary>
         public static string PowerVoltage(int slot) => $"供电电压-{slot}";
 
-        /// <summary>
-        /// B02 槽位分配：只数已启用的读码器，按清单顺序一台接着占 SlotsPerReader 个槽位（槽位号从 1 起连号）。
-        /// 返回（槽位号, 读码器在清单里的下标, 是该读码器内的第几条）；下标供执行端回查参数，不参与命名。
-        /// </summary>
+        /// <summary>B02 槽位分配：只数已启用的读码器，按清单顺序一台接着占 SlotsPerReader 个槽位（槽位号从 1 起连号）；返回（槽位号, 读码器在清单里的下标, 是该读码器内的第几条），下标供执行端回查参数、不参与命名。</summary>
         public static IReadOnlyList<(int Slot, int ReaderIndex, int IndexInReader)> BoardBarcodeSlots(InstrumentConnectionConfig config)
         {
             var list = new List<(int Slot, int ReaderIndex, int IndexInReader)>();
@@ -176,10 +162,7 @@ namespace TORNPISolution.Service
             return list;
         }
 
-        /// <summary>
-        /// B04 槽位分配：只数已启用的综测仪，每台按硬件固定的四个通道连着占四个槽位（槽位号从 1 起连号）。
-        /// 返回（槽位号, 综测仪在清单里的下标, 通道号 1~4）；后两者供执行端回查参数与下发通道，不参与命名。
-        /// </summary>
+        /// <summary>B04 槽位分配：只数已启用的综测仪，每台按硬件固定的四个通道连着占四个槽位（槽位号从 1 起连号）；返回（槽位号, 综测仪在清单里的下标, 通道号 1~4），后两者供执行端回查参数与下发通道、不参与命名。</summary>
         public static IReadOnlyList<(int Slot, int TesterIndex, int Channel)> BoardPowerSlots(InstrumentConnectionConfig config)
         {
             var list = new List<(int Slot, int TesterIndex, int Channel)>();
@@ -194,10 +177,7 @@ namespace TORNPISolution.Service
         }
 
         // -------- A05 血压静态压力精度（点位清单：目录建项与逐点加压的单一来源）--------
-        /// <summary>
-        /// 当前配置勾选的静态压力点（保持配置顺序、去重）：目录建项与逐点加压的唯一口径。
-        /// 项名按点位现算，两边各算一份会对不上名。
-        /// </summary>
+        /// <summary>当前配置勾选的静态压力点（保持配置顺序、去重）：目录建项与逐点加压的唯一口径，项名按点位现算，两边各算一份会对不上名。</summary>
         public static List<double> StaticPressurePoints(InstrumentConnectionConfig config)
             => config.ActiveBpTestParams.StaticPressure.Points
                 .Where(p => p.Enabled).Select(p => p.Value).Distinct().ToList();

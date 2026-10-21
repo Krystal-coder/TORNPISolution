@@ -5,13 +5,10 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// 把工程数据下载进 WizPro 烧录器内部 Flash（脱机烧写用的数据）。
-    /// 这一步不走串口，而是调厂商上位机的命令行：APP路径 空格 工程文件路径 [空格 OFF]，
-    /// 它自己搜索设备、下载数据，退出时在自己所在目录生成一个结果文件。
-    /// 两条现场约束：
-    ///   一是调用前必须先把本通道的串口关掉——厂商 APP 下载时要用这些 COM 口，占着它会下载失败；
-    ///   二是结果文件的内部格式厂商没给，所以这里不猜内容：文件出现只当它干完活了，
-    ///       真正的成败交给随后的复位自检（回 WPGN 就是内部数据异常），内容原样留进明细供排查。
+    /// 把工程数据下载进 WizPro 烧录器内部 Flash（脱机烧写用的数据）。这一步不走串口，而是调厂商上位机的命令行：
+    /// APP路径 空格 工程文件路径 [空格 OFF]，它自己搜索设备、下载数据，退出时在自己所在目录生成一个结果文件。
+    /// 1. 调用前必须先把本通道的串口关掉——厂商 APP 下载时要用这些 COM 口，占着它会下载失败。
+    /// 2. 结果文件的内部格式厂商没给，不猜内容：文件出现只当作这一轮跑完了，真正的成败交给随后的复位自检（回 WPGN 就是内部数据异常），内容原样留进明细供排查。
     /// </summary>
     public static class WizProProjectDownloader
     {
@@ -32,10 +29,7 @@ namespace TORNPISolution.Service.Devices
             return null;
         }
 
-        /// <summary>
-        /// 下载工程数据到烧录器。调用方必须先关掉这一路的串口，并在成功后重新打开、再跑复位自检。
-        /// 失败不抛异常，用返回结果的 Success 与明细表达；取消时上位机进程会被结束并往上抛。
-        /// </summary>
+        /// <summary>下载工程数据到烧录器：调用方须先关掉这一路的串口，成功后重新打开、再跑复位自检；失败不抛异常，用返回结果的 Success 与明细表达，取消时上位机进程会被结束并往上抛。</summary>
         public static async Task<FlashResult> DownloadAsync(
             WizProFlashSettings settings, ILogService log, CancellationToken ct = default)
         {
@@ -146,10 +140,7 @@ namespace TORNPISolution.Service.Devices
             }
         }
 
-        /// <summary>
-        /// 读结果文件。内容格式厂商没给，所以只留原文不解析：成败由随后的复位自检判定，
-        /// 这里只负责把上位机留下的线索抓进日志，供自检报数据异常时对照。
-        /// </summary>
+        /// <summary>读结果文件：内容格式厂商没给，只留原文不解析，成败由随后的复位自检判定；这里只把上位机留下的线索抓进日志，供自检报数据异常时对照。</summary>
         private static FlashResult ReadResult(string resultFile, string appDirectory, ILogService log, List<string> trace)
         {
             string content;

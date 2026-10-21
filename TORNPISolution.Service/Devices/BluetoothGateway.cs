@@ -8,11 +8,9 @@ namespace TORNPISolution.Service.Devices
 {
     /// <summary>
     /// 研为 EW-DTU09 蓝牙网关控制类（网口 TCP 上的 AT 文本指令）。
-    /// 命令以 \r\n 结束，响应若干行数据后以 OK / ERROR 收尾；扫描结果不等查询，
-    /// 由网关以 +SC_NTF: 主动冒出来，所以建链后固定有一条后台读取泵在读。
-    /// 上报本身也按 AT 响应格式打包：每条 +SC_NTF 后面都还跟一行 OK。
-    /// 读取泵独占接收，收到的每一行按前缀分流：上报前缀进扫描收集器，其余行喂给当前挂起的那条命令。
-    /// 命令串行下发（_commandLock），保证一行 OK/ERROR 只对应它自己那条命令。
+    /// 命令以 \r\n 结束，响应若干行后以 OK / ERROR 收尾；扫描结果不等查询而由网关以 +SC_NTF: 主动上报，
+    /// 每条上报后仍跟一行 OK，故建链后固定有一条后台读取泵独占接收：上报前缀进扫描收集器，其余行喂给当前挂起的命令。
+    /// 命令经 _commandLock 串行下发，保证一行 OK/ERROR 只对应它自己那条命令。
     /// </summary>
     public class BluetoothGateway : IBluetoothGateway
     {
@@ -20,7 +18,7 @@ namespace TORNPISolution.Service.Devices
         private const string ScanPrefix = "+SC_NTF:";
 
         /// <summary>
-        /// 主动上报的前缀：这些行不属于任何命令的回执，绝不能当成 OK/ERROR 之外的响应喂给挂起命令。
+        /// 主动上报的前缀：这些行不属于任何命令的回执，绝不能当成 OK/ERROR 之外的响应给挂起命令。
         /// </summary>
         private static readonly string[] UnsolicitedPrefixes =
         {
@@ -42,10 +40,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>停扫描</summary>
         private const string StopScanCommand = "AT+SCAN=0";
 
-        /// <summary>
-        /// MAC 过滤占用哪个过滤槽：手册给的 MAC 过滤写法是 AT+FLT=14,3,9,{mac}，
-        /// 类型位 3 表示按地址过滤（支持只填地址前几个字节），标识符位按手册填 9。
-        /// </summary>
+        /// <summary>MAC 过滤槽写法（手册）：AT+FLT=14,3,9,{mac}，类型位 3 表示按地址过滤（支持只填地址前几个字节），标识符位按手册填 9</summary>
         private const string MacFilterFormat = "AT+FLT=14,3,9,{0}";
 
         /// <summary>关过滤：类型位填 255（不过滤），数据段是一个占位地址的 HEX 串（厂商给的固定写法）</summary>
@@ -54,10 +49,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>过滤参数下发到扫描启动之间留一点生效时间</summary>
         private const int FilterSettleDelayMs = 500;
 
-        /// <summary>
-        /// 停扫描后的静置时间：上报每一行后面都自带一行 OK，停的那一下里队列可能还压着几条，
-        /// 先等它们落完再发下一条指令，免得把上报带的 OK 当成下一条指令的回执消费掉。
-        /// </summary>
+        /// <summary>停扫描后的静置时间：每条上报自带一行 OK，停的那一下队列里可能还压着几条，不等完就会把上报的 OK 当成下一条指令的回执消费掉</summary>
         private const int StopSettleDelayMs = 300;
 
         /// <summary>复位后等上电信息的时长：模块要重启，比寻常指令慢得多</summary>
@@ -72,10 +64,7 @@ namespace TORNPISolution.Service.Devices
         /// <summary>复位用的指令（AT+REST=1）</summary>
         private const string RestartCommand = "AT+REST=1";
 
-        /// <summary>
-        /// 操作指令里的复位：AT+OP=0（1 是恢复出厂、2 是测试模式）。模块重启后重播上电信息，
-        /// 清的是运行状态不动配置，所以先前下发的过滤参数重启后仍然有效。
-        /// </summary>
+        /// <summary>操作指令里的复位 AT+OP=0（1 是恢复出厂、2 是测试模式）：只清运行状态不动配置，先前下发的过滤参数重启后仍然有效</summary>
         private const string ResetOperationCommand = "AT+OP=0";
 
         /// <summary>复位后重连的尝试间隔</summary>
@@ -106,8 +95,7 @@ namespace TORNPISolution.Service.Devices
         public bool IsOpen => _client is { IsOpen: true };
 
         /// <summary>
-        /// 建链 → 起读取泵 → 发 AT 确认模块在 AT 模式下应答。
-        /// AT 不应答后面每条指令都只会等超时，所以这里直接失败，现场看日志就知道去切模式。
+        /// 建链 → 起读取泵 → 发 AT 确认模块在 AT 模式下应答；AT 不应答时后面每条指令都只会等超时，故这里直接失败。
         /// </summary>
         public async Task OpenAsync(CancellationToken ct = default)
         {
@@ -144,10 +132,7 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"{_settings.Name} 连接已关闭");
         }
 
-        /// <summary>
-        /// 握手测试。已建链就直接发 AT 走现有会话；没建链则单独探一条连接（探完就断），
-        /// 免得占用网关上唯一的 AT 通道去影响正在跑的会话。
-        /// </summary>
+        /// <summary>握手测试：已建链走现有会话发 AT，未建链则单独探一条连接（探完就断），不占用网关上唯一的 AT 通道</summary>
         public async Task<bool> TestConnectionAsync(CancellationToken ct = default)
         {
             if (IsOpen)
@@ -193,11 +178,7 @@ namespace TORNPISolution.Service.Devices
             return string.Join(" | ", reply.Lines);
         }
 
-        /// <summary>
-        /// 读当前工作模式（AT+MODE?）：0=AT 指令模式，1=数据透传模式。
-        /// 回执字段数不固定：简格式只给一个模式值，透传设置那页会把角色、透传 UUID 等一并回上来，
-        /// 所以只取第一个逗号前的那一段。
-        /// </summary>
+        /// <summary>读当前工作模式（AT+MODE?）：0=AT 指令模式，1=数据透传模式；回执字段数不固定（简格式只给模式值，透传设置页会把角色、透传 UUID 一并回上来），只取第一个逗号前的一段</summary>
         public async Task<int> GetModeAsync(CancellationToken ct = default)
         {
             var reply = await TransceiveAsync("AT+MODE?", ct).ConfigureAwait(false);
@@ -210,17 +191,11 @@ namespace TORNPISolution.Service.Devices
             return mode;
         }
 
-        /// <summary>
-        /// 切工作模式（AT+MODE=n）：true=AT 指令模式，false=数据透传模式。
-        /// 只写 mode 一个参数是手册给的写法，其余透传参数维持网关里现有的配置。
-        /// </summary>
+        /// <summary>切工作模式（AT+MODE=n）：true=AT 指令模式，false=数据透传模式；只写 mode 一个参数是手册给的写法，其余透传参数维持网关现有配置</summary>
         public Task SetModeAsync(bool atMode, CancellationToken ct = default)
             => WriteCheckedAsync($"AT+MODE={(atMode ? 0 : 1)}", atMode ? "切到 AT 指令模式" : "切到数据透传模式", ct);
 
-        /// <summary>
-        /// 设置 MAC 过滤（AT+FLT=14,3,9,{mac}）；传空则关掉过滤（类型位 255），
-        /// 关过滤后上报的是视野内所有广播。地址里的分隔符会被去掉，只支持填地址前几个字节做部分匹配。
-        /// </summary>
+        /// <summary>设置 MAC 过滤（AT+FLT=14,3,9,{mac}）；传空则关掉过滤（类型位 255），此后上报的是视野内所有广播</summary>
         public async Task SetMacFilterAsync(string? mac, CancellationToken ct = default)
         {
             var normalized = NormalizeMac(mac);
@@ -237,10 +212,7 @@ namespace TORNPISolution.Service.Devices
         public Task StopScanAsync(CancellationToken ct = default)
             => WriteCheckedAsync(StopScanCommand, "停扫描", ct);
 
-        /// <summary>
-        /// 开扫描收一段时间再停：这段时间内的上报按 MAC 去重（同一 MAC 保留最后一条）。
-        /// mac 只在这里做软件筛选，不动网关上的过滤设置。
-        /// </summary>
+        /// <summary>开扫描收一段时间再停：同一广播地址会被反复上报，收到的上报按 MAC 去重保留最后一条；mac 只在这里做软件筛选，不动网关上的过滤设置</summary>
         public async Task<IReadOnlyList<BluetoothScanInfo>> ScanAsync(int durationMs, string? mac = null, CancellationToken ct = default)
         {
             if (durationMs <= 0)
@@ -270,7 +242,6 @@ namespace TORNPISolution.Service.Devices
                 received = received.Where(r => NormalizeMac(r.Mac) == target).ToList();
             }
 
-            // 同一广播地址会被反复上报，留最后一次的信号强度
             return received
                 .GroupBy(r => r.Mac, StringComparer.OrdinalIgnoreCase)
                 .Select(g => g.Last())
@@ -278,11 +249,11 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 采指定 MAC 的信号强度：停扫描 → 开 MAC 过滤 → 复位一次并接回链路 → 开扫描 → 攒够条数或到超时 → 停扫描 → 还原过滤。
-        /// 中间那次复位（AT+OP=0）是把上一轮扫描的残留清干净：过滤参数刚改完就开扫，收上来的可能还是旧队列里的广播，
-        /// 表现成「过滤没生效、还在收别的 MAC」。复位只清运行状态不动配置，所以过滤参数不用重发。
-        /// 到时间条数没攒够就按已采到的返回，一条没有返回空集合。
-        /// 上报的匹配交给网关的过滤去做，这里不再比 MAC，与厂商指令流程一致。
+        /// 采指定 MAC 的信号强度，时序固定：
+        /// 1. 停扫描 → 开 MAC 过滤 → 复位（AT+OP=0）并接回链路 → 开扫描 → 攒够条数或到超时 → 停扫描 → 还原过滤。
+        /// 2. 复位是把上一轮扫描的残留清干净：过滤参数刚改完就开扫，收上来的可能还是旧队列里的广播，表现成「过滤没生效、还在收别的 MAC」。
+        /// 3. 复位只清运行状态不动配置，过滤参数不用重发；上报的匹配交给网关的过滤去做，这里不再比 MAC，与厂商指令流程一致。
+        /// 4. 到时间条数没攒够就按已采到的返回，一条没有返回空集合。
         /// </summary>
         public async Task<IReadOnlyList<int>> ReadRssiAsync(string mac, int? sampleCount = null, int? timeoutMs = null, CancellationToken ct = default)
         {
@@ -297,7 +268,7 @@ namespace TORNPISolution.Service.Devices
             await StopScanAsync(ct).ConfigureAwait(false);
             await SetMacFilterAsync(mac, ct).ConfigureAwait(false);
 
-            // 连复位都没人认的话，接着扫只会扫到旧数据，宁可不采
+            // 复位都无响应时，接着扫只会扫到旧数据，宁可不采
             var outcome = await ObserveRebootAsync(ResetOperationCommand, ct).ConfigureAwait(false);
             if (outcome == RebootOutcome.NotSeen)
             {
@@ -330,9 +301,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 网关复位（AT+REST=1）。模块复位不一定回一行 OK，主要是重启后把上电信息（ATI 开头那几行）重新播一遍，
-        /// 所以这里等的是模块重启的动静。模块重启会把这个 TCP 会话一并带走，
-        /// 不管等到什么特征，返回前都会把会话关掉，调用方要重新 OpenAsync。
+        /// 网关复位（AT+REST=1）。模块复位不一定回一行 OK，主要是重启后重播上电信息（ATI 开头那几行），所以这里等的是模块重启的动静。
+        /// 模块重启会把这个 TCP 会话一并带走，不管等到什么特征，返回前都会关掉会话，调用方要重新 OpenAsync。
         /// </summary>
         public async Task ResetAsync(CancellationToken ct = default)
         {
@@ -357,15 +327,13 @@ namespace TORNPISolution.Service.Devices
             Booted,
             /// <summary>只等到这条指令自己的 OK，模块没重启的动静</summary>
             AckedOnly,
-            /// <summary>OK 与上电信息都没有，会话也没断：这条指令根本没人认</summary>
+            /// <summary>OK 与上电信息都没有，会话也没断：该指令无响应</summary>
             NotSeen,
         }
 
         /// <summary>
-        /// 下发一条会让模块重启的指令，然后在同一条会话上等模块的动静：上电信息（ATI 开头那几行）、
-        /// 这条指令自己的 OK、或者连接被模块重启带到断开，都是模块动了的证据。
-        /// 全程占着发送窗口并把这几行都收进同一个盒子：上电信息不属于任何指令，
-        /// 一松开挂起就会被当成「无人认领的行」丢掉，再想等就等不到了。
+        /// 下发一条会让模块重启的指令，在同一条会话上等模块动了的证据：上电信息（ATI 开头那几行）、本条指令自己的 OK、连接被重启带到断开。
+        /// 全程占着发送窗口并把这几行收进同一个收包盒：上电信息不属于任何指令，一松开挂起就按无人认领的行丢掉，再想等就等不到。
         /// </summary>
         private async Task<RebootOutcome> ObserveRebootAsync(string command, CancellationToken ct)
         {
@@ -403,10 +371,7 @@ namespace TORNPISolution.Service.Devices
             return outcome;
         }
 
-        /// <summary>
-        /// 复位之后把链路续上：模块起来要时间，连不上就隔一会儿再试，到点还没成就抛。
-        /// 会话还开着就什么也不用做：OpenAsync 会直接返回，而上电信息本身就是模块起来的凭据。
-        /// </summary>
+        /// <summary>复位后续上链路：模块起来要时间，隔 ReconnectProbeIntervalMs 重试 OpenAsync，到 RebootWaitMs 仍连不上就抛；会话还开着时 OpenAsync 直接返回即可</summary>
         private async Task ReopenAfterRebootAsync(CancellationToken ct)
         {
             var deadline = Environment.TickCount64 + RebootWaitMs;
@@ -502,10 +467,7 @@ namespace TORNPISolution.Service.Devices
             _pumpTask = Task.Run(() => PumpAsync(cts.Token), CancellationToken.None);
         }
 
-        /// <summary>
-        /// 读取泵：一行一行读，读到就分流。空转一轮（没数据）只是继续等，
-        /// 对端断开或流被Dispose 时才退出，退出时把原因写日志。
-        /// </summary>
+        /// <summary>读取泵：逐行读、读到就分流，没数据只是空转继续等；对端断开或流被 Dispose 时才退出，退出时把原因写日志</summary>
         private async Task PumpAsync(CancellationToken ct)
         {
             var client = _client;
@@ -560,7 +522,7 @@ namespace TORNPISolution.Service.Devices
             var box = _pending;
             if (box == null)
             {
-                // 没人在等这行：超时后的迟到回执，或模块自己冒的文本
+                // 这一行没有对应的挂起命令：超时后的迟到回执，或模块自己冒出的文本
                 _log.Debug($"{_settings.Name} 无人认领的行：{line}");
                 return;
             }
@@ -582,10 +544,7 @@ namespace TORNPISolution.Service.Devices
         private static bool IsUnsolicited(string line)
             => UnsolicitedPrefixes.Any(p => line.StartsWith(p, StringComparison.Ordinal));
 
-        /// <summary>
-        /// 下发一条指令并等它自己的 OK / ERROR：串行占用发送窗口，期间读取泵把回执塞进收包盒。
-        /// 等不到收口就抛超时并清掉本轮挂起，迟到的回执只会落成一行无人认领的日志，不会一直占着发送窗口。
-        /// </summary>
+        /// <summary>下发一条指令并等它自己的 OK / ERROR：串行占用发送窗口，期间读取泵把回执塞进收包盒；等不到收口就抛超时并清掉本轮挂起，迟到的回执只落成一行无人认领的日志，不会一直占着发送窗口</summary>
         private async Task<ReplyBox> TransceiveAsync(string command, CancellationToken ct)
         {
             var client = _client ?? throw new InvalidOperationException($"{_settings.Name} 未连接，请先调用 OpenAsync");
@@ -633,9 +592,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 解析 +SC_NTF 上报。基本格式十段；请求了回应包且数据段走 ASCII 时末尾多出 scan_data_len,scan_data 两段，
-        /// 所以第 11 段之后并到回应包数据里，广播数据段（第 10 段）不会被它污染。
-        /// 字段数不够或信号强度不是数字就当作没解出来（返回 null，只记日志）。
+        /// 解析 +SC_NTF 上报：基本格式十段，请求了回应包且数据段走 ASCII 时末尾多出 scan_data_len,scan_data 两段。
+        /// 第 11 段之后并入回应包数据，广播数据段（第 10 段）不会被它污染；字段数不够或信号强度不是数字就返回 null，只记日志。
         /// </summary>
         private BluetoothScanInfo? ParseScanNotification(string line)
         {
@@ -671,10 +629,7 @@ namespace TORNPISolution.Service.Devices
         private static bool TryParseInt(string text, out int value)
             => int.TryParse(text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
 
-        /// <summary>
-        /// MAC 归一：过滤指令里的地址写法与上报里的地址写法可能一个带分隔符一个不带，
-        /// 统一成大写无分隔符再比。
-        /// </summary>
+        /// <summary>MAC 归一：过滤指令里的地址写法与上报里的地址写法可能一个带分隔符一个不带，统一成大写无分隔符再比</summary>
         private static string? NormalizeMac(string? mac)
         {
             if (string.IsNullOrWhiteSpace(mac))

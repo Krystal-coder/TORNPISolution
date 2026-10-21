@@ -4,7 +4,6 @@ namespace TORNPISolution.Interface
 {
     /// <summary>
     /// 烧录工位配置服务：负责 flashing.json 的读取与保存。
-    /// 与仪器链接配置分开两套：烧录页改得频繁，且它跟测试工位的仪器清单没有任何关系。
     /// </summary>
     public interface IFlashingConfigService
     {

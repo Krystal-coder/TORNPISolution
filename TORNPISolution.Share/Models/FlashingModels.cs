@@ -1,9 +1,8 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 烧录动作（一颗芯片）。一块板上两颗芯片，顺序固定：先 SPI Flash 再富芮坤主控
-    /// （主控的 boot 程序要从 Flash 里加载，Flash 没烧好主控起不来）。
-    /// 这一层只说“烧哪一颗”，界面上“本轮做什么”的三档选择见 <see cref="FlashJob"/>。
+    /// 烧录动作（一颗芯片）。一块板上两颗芯片，顺序固定：先 SPI Flash 再富芮坤主控——主控的 boot 程序要从 Flash 里加载，Flash 没烧好主控起不来。
+    /// 界面上“本轮做什么”的三档选择见 <see cref="FlashJob"/>。
     /// </summary>
     public enum FlashAction
     {
@@ -14,12 +13,7 @@ namespace TORNPISolution.Share.Models
         FreqchipMcu,
     }
 
-    /// <summary>
-    /// 界面上“本轮做什么”的三档：单独烧 Flash、单独烧富芮坤、或 All 两步连着走。
-    /// 与 <see cref="FlashAction"/> 分开放是两个原因：
-    ///   编排服务一轮只做一颗芯片（工程数据下载、预检、串口都按芯片分支），All 是它上面的一层调度，不该渗到驱动口径里去；
-    ///   记录文件里每行要写清这一路当时烧的是哪一颗，拿 All 进去就没法对了。
-    /// </summary>
+    /// <summary>界面上“本轮做什么”的三档：单独烧 Flash、单独烧富芮坤、或 All 两步连着走。</summary>
     public enum FlashJob
     {
         /// <summary>只烧 SPI Flash</summary>
@@ -33,8 +27,7 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 一路一个动作的过程阶段。界面进度条文案与颜色都吃它，
-    /// 驱动只报到哪一步了，怎么显示由界面决定。
+    /// 一路一个动作的过程阶段：驱动只上报到哪一步，界面进度条的文案与颜色自行映射。
     /// </summary>
     public enum FlashStage
     {
@@ -72,10 +65,7 @@ namespace TORNPISolution.Share.Models
         Canceled,
     }
 
-    /// <summary>
-    /// 一次进度上报。Percent 为 -1 表示这一步设备没给可算的比例
-    /// （厂商的状态帧里擦除/写入/校验带的是当前页加总页数，能算出来才算）。
-    /// </summary>
+    /// <summary>一次进度上报；Percent 为 -1 表示这一步设备没给可算的比例（厂商状态帧里擦除/写入/校验带的是当前页加总页数，能算出来才算）。</summary>
     public readonly record struct FlashProgress(FlashStage Stage, int Percent, string Detail)
     {
         public override string ToString() => Percent >= 0 ? $"{Stage} {Percent}%" : $"{Stage}";
@@ -83,8 +73,7 @@ namespace TORNPISolution.Share.Models
 
     /// <summary>
     /// 一路一个动作的最终结果。
-    /// Trace 留着与设备的原始往来（烧录器是帧的十六进制、命令行工具是 stdout 原文），
-    /// 现场排查全靠它：错误码表厂商没给全，光看结论查不出真因。
+    /// Trace 留着与设备的原始往来（烧录器是帧的十六进制、命令行工具是 stdout 原文）：厂商没给全错误码表，现场排查只靠它，光看结论查不出真因。
     /// </summary>
     public sealed record FlashResult(
         bool Success,
@@ -107,9 +96,8 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// 烧录器自报的身份（RDMC 指令回读）。
-    /// 用途是把设备管理器里的 COM 号和第几通道对上：USB 枚举顺序不保证与接线一致，
-    /// 靠这个自报值建表比人工猜靠谱。
+    /// 烧录器自报的身份（RDMC 指令回读），用于把设备管理器里的 COM 号和第几通道对上。
+    /// USB 枚举顺序不保证与接线一致，建表以这个自报值为准。
     /// </summary>
     public sealed record WizProIdentity(int ChannelId, string ProductInfo, string RawFrame);
 
@@ -124,10 +112,7 @@ namespace TORNPISolution.Share.Models
             _ => job.ToString(),
         };
 
-        /// <summary>
-        /// 这一步跑完该进哪一步：All 就是“先 Flash 后富芮坤”两步，单独动作只一步。
-        /// 顺序在这里硬写而不是存配置：主控的 boot 要从 Flash 里加载，这个先后是物理约束，给成开关只会让人配错。
-        /// </summary>
+        /// <summary>这一步跑完该进哪一步：All 是“先 Flash 后富芮坤”两步，单独动作只一步。</summary>
         public static FlashAction[] ToPhases(this FlashJob job) => job switch
         {
             FlashJob.WizProFlash => new[] { FlashAction.WizProFlash },

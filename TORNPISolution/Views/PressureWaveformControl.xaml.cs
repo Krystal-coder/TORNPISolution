@@ -12,10 +12,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// 多点扫描项按测试点段号分色绘制，悬停提示附测试点序号。
-    /// 横轴两种定法：
-    /// <see cref="PixelsPerSecond"/> 固定像素倍率（行内小图）
-    /// <see cref="VisibleSeconds"/> 固定窗口秒数（ECG Signal：拉大窗口只是格子变宽，看到的时长不变）
+    /// 压力波形绘制控件：多点扫描项按测试点段号分色绘制，悬停提示附测试点序号。
+    /// 横轴两种定法：<see cref="PixelsPerSecond"/> 固定像素倍率（行内小图）、<see cref="VisibleSeconds"/> 固定窗口秒数（ECG Signal：拉大窗口只是格子变宽，看到的时长不变）。
     /// </summary>
     public partial class PressureWaveformControl : UserControl
     {
@@ -24,10 +22,7 @@ namespace TORNPISolution.Views
             nameof(PixelsPerSecond), typeof(double), typeof(PressureWaveformControl),
             new PropertyMetadata(24.0, OnPixelsPerSecondChanged));
 
-        /// <summary>
-        /// 横轴窗口宽度（秒）：给了这个值就按“图幅宽度 / 该值”换算像素每秒，
-        /// 窗口拉大拉小都还是显示这么长时间（ECG Signal窗口用）；NaN = 用 <see cref="PixelsPerSecond"/> 固定倍率。
-        /// </summary>
+        /// <summary>横轴窗口宽度（秒）：给了这个值就按“图幅宽度 / 该值”换算像素每秒，窗口拉大拉小都还是显示这么长时间（ECG Signal窗口用）；NaN = 用 <see cref="PixelsPerSecond"/> 固定倍率</summary>
         public static readonly DependencyProperty VisibleSecondsProperty = DependencyProperty.Register(
             nameof(VisibleSeconds), typeof(double), typeof(PressureWaveformControl),
             new PropertyMetadata(double.NaN, OnPixelsPerSecondChanged));
@@ -51,10 +46,7 @@ namespace TORNPISolution.Views
         private static readonly double[] StepCandidates =
             { 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000 };
 
-        /// <summary>
-        /// 格号迭代上限，兼作浮点格号强转前的夹取值：脏数据（NaN/无穷）会让“越过右边界”永远不成立，
-        /// 上下界又能溢出成 ±20 亿，两头都卡在 UI 线程上出不来。正常网格几十格，碰不到这道闸。
-        /// </summary>
+        /// <summary>格号迭代上限，兼作浮点格号强转前的夹取值：脏数据（NaN/无穷）会让“越过右边界”永远不成立，上下界又能溢出成 ±20 亿，两头都卡在 UI 线程上出不来；正常网格几十格，碰不到这道闸</summary>
         private const int GridIndexLimit = 2000;
 
         /// <summary>坐标纸细格（浅粉）/ 大格（深粉）/ 轴与边框（近黑）</summary>
@@ -206,10 +198,7 @@ namespace TORNPISolution.Views
             set => SetValue(EcgGridProperty, value);
         }
 
-        /// <summary>
-        /// 纵轴固定量程下限：NaN（默认）= 按数据自适应，血压等既有调用方行为不变；
-        /// 给值则 Y 轴钉住，ECG Signal窗口用它与 <see cref="YMax"/> 实现底栏 Y Min / Y Max。
-        /// </summary>
+        /// <summary>纵轴固定量程下限：NaN（默认）= 按数据自适应（血压等既有调用方行为不变），给值则 Y 轴钉住，ECG Signal窗口用它与 <see cref="YMax"/> 实现底栏 Y Min / Y Max</summary>
         public double YMin
         {
             get => (double)GetValue(YMinProperty);
@@ -230,10 +219,7 @@ namespace TORNPISolution.Views
             set => SetValue(SegmentLabelsProperty, value);
         }
 
-        /// <summary>
-        /// 多曲线标注（下标 = 采样点的 Series 值）：非空时按曲线号分色（同一条带上“仪器输出 + 产品回读”两条曲线）
-        /// 并在右上角画图例；为空时保持原行为（按测试点段号分色），ECG 波形弹窗用
-        /// </summary>
+        /// <summary>多曲线标注（下标 = 采样点的 Series 值）：非空时按曲线号分色（同一张带上“仪器输出 + 产品回读”两条曲线）并在右上角画图例；为空时按测试点段号分色，ECG 波形弹窗用</summary>
         public IReadOnlyList<string>? SeriesLabels
         {
             get => (IReadOnlyList<string>?)GetValue(SeriesLabelsProperty);
@@ -388,9 +374,7 @@ namespace TORNPISolution.Views
             DrawScrollbar(w, drawW, totalSpan, windowSpan, maxOffset);
         }
 
-        /// <summary>
-        /// 档位分隔标注：每段（按采样点 Segment 值）起点画一条虚竖线 + 段名， <see cref="SegmentLabels"/> 时生效。
-        /// </summary>
+        /// <summary>档位分隔标注：<see cref="SegmentLabels"/> 非空时，每段（按采样点 Segment 值）起点画一条虚竖线 + 段名</summary>
         private void DrawSegmentSeparators(IReadOnlyList<PressureSamplePoint> pts, double w, double drawH,
             double t0, double pps)
         {
@@ -514,10 +498,8 @@ namespace TORNPISolution.Views
         // ── ECG 坐标纸（ECG Signal窗口用）─────────────────────────────
 
         /// <summary>
-        /// 坐标纸网格：细格浅粉、大格深粉（一个大格 = 5 小格），外面一圈黑色边框 + 向外的刻度短线，
-        /// 左侧每个大格标数值、下方每个大格标秒数，再配竖排单位与 Time (s) 标题。
-        /// 大格间隔按“横轴约 12 格、纵轴约 10 格”从候选里取整，所以改 X Width 就是改每小格代表多少秒
-        /// （12s → 大格 1s、小格 0.2s；10mV → 大格 1mV、小格 0.2mV）。
+        /// 坐标纸网格：细格浅粉、大格深粉（一个大格 = 5 小格）+ 外圈黑色边框与向外的刻度短线，左侧每个大格标数值、下方每个大格标秒数，再配竖排单位与 Time (s) 标题。
+        /// 大格间隔按“横轴约 12 格、纵轴约 10 格”从候选里取整，所以改 X Width 就是改每小格代表多少秒（12s → 大格 1s、小格 0.2s；10mV → 大格 1mV、小格 0.2mV）。
         /// </summary>
         private void DrawEcgPaper(double w, double drawW, double drawH, double t0, double t1, double pps)
         {
@@ -536,7 +518,6 @@ namespace TORNPISolution.Views
             var major = new PathFigureCollection();
             var rel0 = t0 - _tMin;              // 窗口起点对应的“相对数据起点”时刻，刻度按它对齐，拖动时数字不会乱跳
 
-            // 轮数上限是硬闸：x 算成 NaN 时“越过右边界”不成立，只靠它出不去
             for (var k = ClampGridIndex(rel0 / (xMajor / 5)); k < GridIndexLimit; k++)
             {
                 var x = left + (k * xMajor / 5 - rel0) * pps;

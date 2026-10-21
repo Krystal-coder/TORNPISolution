@@ -5,9 +5,8 @@ namespace TORNPISolution.Service.Communication
 {
     /// <summary>
     /// 通用串口客户端：文本（AT 指令）、二进制（固定帧）、自行分帧（设备主动连发）三种通讯模式。
-    /// 现阶段唯一用户是 WizProProgrammer，只用自行分帧那一组（一个端口一个实例，写与读在它自己流程里串行）。
-    /// 自行分帧不持 _lock：主流程轮询 ReadRaw 期间还要 WriteRaw，加锁只是把两条命令交织换成必然等满超时。
-    /// 接第二个用户前先弄清会不会并发写同一端口：要么一端口一实例，要么把锁补上。
+    /// 自行分帧不持 _lock：ReadRaw 轮询期间还要 WriteRaw，加锁会必然等满超时。
+    /// 接第二个用户前先确认是否会并发写同一端口：一端口一实例或补锁。
     /// </summary>
     public class SerialClient : IDisposable
     {
@@ -63,13 +62,8 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== 文本协议（AT 指令等） ====================
 
-        /// <summary>
-        /// 发送文本指令（自动追加 \r\n），等待多行响应直到超时。
-        /// 适用于产品 AT#AI 等文本指令。
-        /// </summary>
+        /// <summary>发送文本指令（自动追加 \r\n），等待多行响应直到超时。</summary>
         /// <param name="command">指令文本（不含 \r\n）</param>
-        /// <param name="timeoutMs">等待响应超时（毫秒）</param>
-        /// <returns>响应文本（可能包含多行）</returns>
         public async Task<string> SendTextAsync(string command, int timeoutMs = 0, CancellationToken ct = default)
         {
             var timeout = timeoutMs > 0 ? timeoutMs : _defaultTimeoutMs;
@@ -122,14 +116,8 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== 二进制协议（固定帧） ====================
 
-        /// <summary>
-        /// 发送固定长度字节帧并接收指定长度的响应帧。
-        /// 适用于康伟达 16 字节帧协议。
-        /// </summary>
-        /// <param name="frame">发送的字节帧</param>
+        /// <summary>发送固定长度字节帧并接收指定长度的响应帧（帧格式由调用方决定，本方法不解析内容）。</summary>
         /// <param name="expectedLength">期望响应字节数（0 表示不等待响应）</param>
-        /// <param name="timeoutMs">超时（毫秒）</param>
-        /// <returns>响应字节数组</returns>
         public async Task<byte[]> SendFrameAsync(byte[] frame, int expectedLength = 0, int timeoutMs = 0, CancellationToken ct = default)
         {
             var timeout = timeoutMs > 0 ? timeoutMs : _defaultTimeoutMs;
@@ -178,11 +166,7 @@ namespace TORNPISolution.Service.Communication
             }
         }
 
-        /// <summary>
-        /// 持续监听串口，等待设备主动发送的数据（如心跳询问帧）。
-        /// 返回收到的字节数组；超时返回 null。
-        /// </summary>
-        /// <param name="timeoutMs">监听超时（毫秒）</param>
+        /// <summary>持续监听串口，等待设备主动发送的数据（如心跳询问帧）。</summary>
         /// <returns>收到的字节，超时返回 null</returns>
         public async Task<byte[]?> ListenAsync(int timeoutMs = 5000, CancellationToken ct = default)
         {
@@ -223,8 +207,8 @@ namespace TORNPISolution.Service.Communication
         // ==================== 自行分帧的协议（设备主动连发、帧长不固定） ====================
 
         /// <summary>
-        /// 直接写字节、不等应答：用于“发一条指令后设备连续主动上报”的协议（如启动烧写后一路推状态帧）。
-        /// 不持锁也不清接收缓冲，调用方自己保证串行；上一轮的残留要显式 <see cref="DiscardInBuffer"/> 丢掉。
+        /// 直接写字节、不等应答，用于设备连续主动上报的协议。
+        /// 不持锁也不清接收缓冲，调用方保证串行；残留需显式 <see cref="DiscardInBuffer"/> 丢弃。
         /// </summary>
         public void WriteRaw(byte[] data, CancellationToken ct = default)
         {
@@ -236,10 +220,7 @@ namespace TORNPISolution.Service.Communication
             _log.Debug($"TX Raw [{data.Length}]: {BitConverter.ToString(data)}");
         }
 
-        /// <summary>
-        /// 读一次可用字节：有数据就立即返回（不保证是一整帧，由调用方自己拼帧），窗口内一个字节也没有返回空数组。
-        /// 与 <see cref="ListenAsync"/> 的差别是不做“等一帧”的固定停顿，攒帧节奏完全交给调用方。
-        /// </summary>
+        /// <summary>读一次可用字节：有数据立即返回（不保证一整帧，由调用方拼帧），窗口内无字节返回空数组。</summary>
         public byte[] ReadRaw(int waitMs, CancellationToken ct = default)
         {
             if (!_port.IsOpen)

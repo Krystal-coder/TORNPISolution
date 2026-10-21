@@ -21,14 +21,13 @@
         <!-- 输入框 / 标签 / 分组标题规格统一用 App.xaml  -->
         <Style TargetType="TextBox" BasedOn="{StaticResource Style.CfgBox}"/>
 
-        <!-- ====== 参数编辑器模板：测试参数  ====== -->
+        <!-- 参数编辑器模板：测试参数 -->
         
         <DataTemplate x:Key="Tpl.ParamsEditor">
-        <!--  Header 竖排在左侧 -->
         <TabControl Style="{StaticResource Style.NavTabControl}" Background="Transparent" TabStripPlacement="Left"
                     ItemContainerStyle="{StaticResource Style.NavTabItem}">
 
-            <!-- ============ 充放气规格 ============ -->
+            <!-- 充放气规格 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -39,7 +38,6 @@
 
                 <StackPanel Margin="8,4">
 
-                    <!-- 超时保护 -->
                     <TextBlock Text="超时保护（超时自动停止本轮并判 FAIL，避免一直充气不停止）" Style="{StaticResource Style.GroupTitle}"/>
                     <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                             CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -59,12 +57,10 @@
                         </UniformGrid>
                     </Border>
 
-                    <!-- 放气规格 -->
-
                 </StackPanel>
             </TabItem>
 
-            <!-- ============ 静态压力 ============ -->
+            <!-- 静态压力 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -98,7 +94,6 @@
                             <TextBlock Text="秒（每个压力点的稳压保持时间，0~999）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
                         </StackPanel>
 
-                        <!-- 压力点列表 -->
                         <Grid Margin="0,14,0,8">
                             <TextBlock Text="压力点（勾选的点参与测试，逐点循环执行）" Style="{StaticResource Style.GroupTitle}" Margin="0"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -110,7 +105,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- 列表区不套内层 ScrollViewer：嵌套滚动会让内层吞掉滚轮事件，整页只留外层那一条滚动条 -->
+          
                         <!-- 列表区保持最小高度：删空压力点后仍保留表格框，中间显示占位提示 -->
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" MinHeight="76">
@@ -149,22 +144,21 @@
                                 </ItemsControl>
                             </Grid>
                         </Border>
-                        <!-- 点间泄压 -->
                         <TextBlock Text="点间泄压" Style="{StaticResource Style.GroupTitle}"/>
                         <StackPanel Orientation="Horizontal">
                             <RadioButton Content="泄压（每点测完先回零再升下一点）" GroupName="StaticVent" VerticalAlignment="Center"
                                          IsChecked="{Binding StaticVentDuringRest, Mode=TwoWay}" Margin="0,0,12,0"/>
-                            <RadioButton Content="不泄（只在模块结束泄一次）" GroupName="StaticVent" VerticalAlignment="Center"
+                            <RadioButton Content="不泄（点间不等归零，直接升下一点）" GroupName="StaticVent" VerticalAlignment="Center"
                                          IsChecked="{Binding StaticVentHold, Mode=TwoWay}"/>
                         </StackPanel>
 
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,6,0,0" TextWrapping="Wrap"
-                                   Text="说明：&#10;BPA700 SDK 一次调用只支持 1 个压力点（BPARunStaticPressure），由上位机按勾选的点循环调用；&#10;康伟达逐点压力源收敛，点间自动放气回零；最多 10 个压力点；&#10;每个压力点一条独立曲线，只绘制本点那一段。"/>
+                                   Text="说明：&#10;BPA700 SDK 一次调用只支持 1 个压力点（BPARunStaticPressure），由上位机按勾选的点循环调用；&#10;选「泄压」时每点测完等仪器恢复（0~10 秒，随上一点压力升高而变长）并回读确认归零后再升下一点，整轮耗时会增加；&#10;两台仪器点间都保不住压：BPA700 无泄压命令、残压自行回落，康伟达逐点压力源收敛、下一点开头的清场仪式泄残压，选「不泄」只是省掉等待与确认；&#10;最多 10 个压力点；每个压力点一条独立曲线，只绘制本点那一段。"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ 动态血压 ============ -->
+            <!-- 动态血压 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -430,7 +424,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ 超压测试 ============ -->
+            <!-- 超压测试 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -453,7 +447,6 @@
                         <TextBlock Text="关闭 = 外部设备充气" Style="{StaticResource Style.Hint}"/>
                     </StackPanel>
 
-                    <!-- 目标压力 / 阈值 -->
                     <TextBlock Text="超压参数（保留仪器过压测试）" Style="{StaticResource Style.GroupTitle}"/>
                     <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                             CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -479,7 +472,7 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- ============ 压力控制（BP-006~009 过程参数） ============ -->
+            <!-- 压力控制（BP-006~009 过程参数） -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -523,7 +516,6 @@
                             </UniformGrid>
                         </Border>
 
-                        <!-- BP-007 -->
                         <TextBlock Text="BP-007 匀速放气控制（与 BP-006 同一轮采集，取峰值后的匀速段算速率）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -561,7 +553,6 @@
                             </UniformGrid>
                         </Border>
 
-                        <!-- BP-008 -->
                         <TextBlock Text="BP-008 快速放气功能（充气中途发 0x79 status=1 触发快排）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -599,7 +590,6 @@
                             </UniformGrid>
                         </Border>
 
-                        <!-- BP-009 -->
                         <TextBlock Text="BP-009 过压保护（0x75 强制充气激励 + 只认 0x80 置位）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -637,7 +627,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ JJG692-2010 标准检测（仅康伟达 0x04 功能，BPA700 页签隐藏本页） ============ -->
+            <!-- JJG692-2010 标准检测（仅康伟达 0x04 功能，BPA700 页签隐藏本页） -->
             <TabItem Visibility="{Binding IsKangwenda, Converter={StaticResource KwVis}}">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -669,7 +659,6 @@
                             </UniformGrid>
                         </Border>
 
-                        <!-- 血压重复性：已归入 A06 的 BP-004（测试要求文档 BP-004 就是“精度及重复性”），本页只留说明 -->
                         <TextBlock Text="血压重复性（已归入 A06 的 BP-004）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -677,7 +666,6 @@
                                        Text="协议 0x11 设备自检帧只回“完成/失败”状态位、不带收缩/舒张数值，算不出极差，所以不单设重复性检测模块；&#10;测试要求文档的 BP-004 本就是“动态血压精度及重复性”，已归 A06：一轮一项算偏差、每压力组一项算极差；&#10;压力组与轮数在“动态血压”页配置，±2mmHg 判据按文档写死、不需配置。"/>
                         </Border>
 
-                        <!-- 0x12 -->
                         <TextBlock Text="放气速率（听诊）（上行 0x04 0x12）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -715,7 +703,6 @@
                             </UniformGrid>
                         </Border>
 
-                        <!-- 0x13 -->
                         <TextBlock Text="气密性（上行 0x04 0x13）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
@@ -747,7 +734,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ============ 波形显示配置 ============ -->
+            <!-- 波形显示配置 -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -760,7 +747,6 @@
 
                     <TextBlock Text="按测试项自定义波形显示（Y 轴固定 mmHg）" Style="{StaticResource Style.GroupTitle}"/>
 
-                    <!-- 测试项选择 -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                         <TextBlock Text="测试项" Style="{StaticResource Style.CfgLabel}"/>
                         <ComboBox Width="240" ItemsSource="{Binding WaveformItemNames}"
@@ -770,7 +756,6 @@
                     <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                             CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
                         <UniformGrid Columns="2">
-                            <!-- Y 轴单位（固定） -->
                             <StackPanel Margin="0,4,16,4">
                                 <TextBlock Text="Y 轴单位" Style="{StaticResource Style.FieldLabel}"/>
                                 <TextBox Style="{StaticResource Style.CfgBox}" Text="mmHg" IsReadOnly="True"
@@ -778,7 +763,6 @@
                                 <TextBlock Text="血压波形纵轴固定为压力单位 mmHg" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                             </StackPanel>
 
-                            <!-- X 轴模式 -->
                             <StackPanel Margin="0,4,0,4">
                                 <TextBlock Text="X 轴模式" Style="{StaticResource Style.FieldLabel}"/>
                                 <ComboBox Height="30" ItemsSource="{Binding XAxisModes}"
@@ -786,7 +770,6 @@
                                 <TextBlock Text="Time = 时间（秒），SampleIndex = 采样点序号" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                             </StackPanel>
 
-                            <!-- 时间刻度（仅 Time 模式可用） -->
                             <StackPanel Margin="0,4,16,4" IsEnabled="{Binding IsTimeXAxis}">
                                 <TextBlock Text="时间刻度" Style="{StaticResource Style.FieldLabel}"/>
                                 <TextBox Style="{StaticResource Style.CfgBox}"
@@ -807,7 +790,7 @@
 
     <DockPanel>
 
-        <!-- ====== 生效来源提示 ====== -->
+        <!-- 生效来源提示 -->
         <Border DockPanel.Dock="Top" Margin="12,10,12,0" Padding="10,6" CornerRadius="4"
                 Background="#FFF7E6" BorderBrush="#F0C36D" BorderThickness="1"
                 Visibility="{Binding IsViewingActiveDevice, Converter={StaticResource KwVis}, ConverterParameter=invert}">
@@ -823,7 +806,7 @@
             </StackPanel>
         </Border>
 
-        <!-- ====== 底部按钮栏 ====== -->
+        <!-- 底部按钮栏 -->
         <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="测试运行中：参数配置已锁定，停止测试后才能修改保存"
@@ -839,7 +822,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- ====== 外层设备页签：BPA700 / 康伟达 ====== -->
+        <!-- 外层设备页签：BPA700 / 康伟达 -->
         <TabControl Margin="12,10,12,0" Background="Transparent"
                     IsEnabled="{Binding CanEdit}"
                     SelectedIndex="{Binding SelectedDeviceIndex, Mode=TwoWay}"

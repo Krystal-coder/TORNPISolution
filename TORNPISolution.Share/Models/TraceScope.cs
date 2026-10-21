@@ -1,14 +1,11 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 日志追踪上下文（scope）：解决"串口日志找不到是哪个测试项哪个点位发的"。
-    /// 用 <see cref="AsyncLocal{T}"/> 存当前 scope 字符串，<c>LogService</c> 给每条日志自动加
+    /// 日志追踪上下文（scope）：<see cref="AsyncLocal{T}"/> 存当前 scope 字符串，<c>LogService</c> 给每条日志自动加
     /// <c>[scope]</c> 前缀，因此 TX / RX / 解析值 / 判定 这几行天然属于同一组，按前缀检索即可串起来。
-    ///
-    /// 粒度约定（与测试项子表一致）：
-    ///   模块级   —— <c>TestItem.RunModuleAsync</c> 进入模块时 Begin("A05静态压力精度")
-    ///   点位/轮次 —— 流程内 using (TraceScope.Push("BP-003@90mmHg")) 或 ("BP-004@120/80/80#R2")
-    /// Push 可嵌套（用 · 连接），Dispose 时还原上一层，异常/提前 return 
+    /// 粒度与测试项子表一致：模块级由 <c>TestItem.RunModuleAsync</c> 进入模块时 Begin("A05静态压力精度")；
+    /// 点位/轮次在流程内 using (TraceScope.Push("BP-003@90mmHg")) 或 ("BP-004@120/80/80#R2")。
+    /// Push 可嵌套（用 · 连接），Dispose 时还原上一层，异常或提前 return 时也还原。
     /// </summary>
     public static class TraceScope
     {

@@ -6,11 +6,9 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 基于 Serilog 的日志实现：
-    /// - 日志文件按天滚动（Logs\log-yyyyMMdd.txt）
-    /// - 单文件超过 10MB 自动生成新文件（log-yyyyMMdd_001.txt ...）
-    /// - 全局统一输出格式：[时间] [级别] [来源] 消息
-    /// 各层通过 ILogService 使用，不直接依赖 Serilog。
+    /// 基于 Serilog 的日志实现，各层通过 ILogService 使用、不直接依赖 Serilog。
+    /// 文件按天滚动（Logs\log-yyyyMMdd.txt），单文件超过 10MB 自动生成新文件（log-yyyyMMdd_001.txt ...）。
+    /// 全局统一输出格式：[时间] [级别] [来源] 消息（时间戳精度见 OutputTemplate）。
     /// </summary>
     public class LogService : ILogService
     {
@@ -25,19 +23,16 @@ namespace TORNPISolution.Service
                 .MinimumLevel.Debug()
                 .WriteTo.File(
                     path: Path.Combine(AppContext.BaseDirectory, "Logs", "log-.txt"),
-                    rollingInterval: RollingInterval.Day,          // 按天更新
-                    fileSizeLimitBytes: MaxFileSizeBytes,          // 单文件上限 10MB
-                    rollOnFileSizeLimit: true,                     // 超限自动生成新文件
-                    outputTemplate: OutputTemplate,                // 统一格式
+                    rollingInterval: RollingInterval.Day,
+                    fileSizeLimitBytes: MaxFileSizeBytes,
+                    rollOnFileSizeLimit: true,
+                    outputTemplate: OutputTemplate,
                     shared: true)
                 .CreateLogger());
 
         private readonly Serilog.ILogger _logger;
 
-        /// <summary>
-        /// 创建带来源标识的日志实例，source 一般传调用方类名，
-        /// 便于在统一格式中区分日志出自哪一层哪个类。
-        /// </summary>
+        /// <summary>创建带来源标识的日志实例，source 传调用方类名，用于在统一格式中区分日志出自哪一层哪个类</summary>
         public LogService(string source)
         {
             _logger = Root.Value.ForContext("Source", source);
@@ -51,10 +46,7 @@ namespace TORNPISolution.Service
 
         public void Error(string message, Exception? ex = null) => _logger.Error(ex, "{Message}", WithScope(message));
 
-        /// <summary>
-        /// 自动附加测试项追踪上下文前缀（见 <see cref="TraceScope"/>）：
-        /// 串口 TX/RX、解析值、判定这几行会带上 [A05静态压力精度·BP-003@90mmHg]，按前缀即可检索一整组。
-        /// </summary>
+        /// <summary>为消息自动附加测试项追踪上下文前缀（见 <see cref="TraceScope"/>）：串口 TX/RX、解析值、判定行会带上 [A05静态压力精度·BP-003@90mmHg]，按前缀可检索一整组</summary>
         private static string WithScope(string message)
             => TraceScope.IsActive ? $"[{TraceScope.Text}] {message}" : message;
 

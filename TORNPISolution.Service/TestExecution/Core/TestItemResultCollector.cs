@@ -4,8 +4,7 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// 测试结果收集器：封装结果字典 + 逐项完成回调。
-    /// 模块方法每写入一项结果，自动触发 onItemCompleted 回调，
-    /// UI 层收到回调即可立即回填显示，无需等整个模块跑完。
+    /// 模块每写入一项结果即触发 onItemCompleted 回调，UI 收到后立即回填，无需等整个模块跑完。
     /// </summary>
     public sealed class TestItemResultCollector
     {
@@ -22,9 +21,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 异步设置测试结果并触发逐项回调。
-        /// 模块方法中 await collector["项名"] = result
-        /// 区别在于此处会自动 await UI 层回调，确保 UI 更新完成后再继续下一项。
+        /// 异步写入结果并触发逐项回调：await UI 层回调完成后才继续下一项，保证逐项实时刷新。
         /// </summary>
         public async Task SetAsync(string key, TestItemResult value)
         {

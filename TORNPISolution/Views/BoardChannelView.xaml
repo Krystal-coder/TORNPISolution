@@ -14,7 +14,6 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
 
-        <!-- ============ 通道条里的一格：一行摆完「勾选框 + 通道号 + 结论角标」，颜色与角标讲结论（跑哪几项在下面的表里看） ============ -->
         <!-- Margin 四边各 3：横排八格要的是行列都留缝，原来那个「只留底部 5」是给竖排准备的 -->
         <Style x:Key="Style.BoardCard" TargetType="Border">
             <Setter Property="Background" Value="#F8FAFC"/>
@@ -44,8 +43,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- 通道卡右上角的角标：实心底 + 白字，只在落定后出现（吃 HasResult），所以底色必然命中下面某个触发器。
-             别把它搬到没 HasResult 兜着的地方用，Idle 时四个触发器一个都不中，白字压在默认浅底上等于没写 -->
+        <!-- 角标只在 HasResult 时出现，底色靠下面四个触发器命中；搬到无 HasResult 处会白字压浅底 -->
         <Style x:Key="Style.BoardBadge" TargetType="Border">
             <Setter Property="CornerRadius" Value="9"/>
             <Setter Property="Padding" Value="7,2"/>
@@ -152,8 +150,6 @@
                             </Style>
                         </CheckBox.Style>
                     </CheckBox>
-                    <!-- 卡片就一行：位号、"这一路有几项"、耗时都是重复信息——位号与耗时在下方详情头部本来就写着，
-                         项数在右边那一列行里。竖排时它们挤在两行里没人抱怨，横排一行摆不下，正好一起收掉 -->
                     <!-- 项名是固定格式“通道 N”，一般长不到需要截断；但 TextTrimming 得留着——
                          中间列是 Auto，一旦格子被压窄（通道数改多、或 Columns 改大）导致整组摆不下，
                          有它是个省略号，没它就是硬裁半个字 -->
@@ -171,7 +167,6 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <!-- 页头 / 通道条 / 明细 / 状态条四行：通道条只报一行文字那么高，剩下的整宽整高全给明细表 -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -179,7 +174,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ==================== 页头：本轮跑什么 + 整批开始/停止 ==================== -->
+        <!-- 页头：本轮跑什么 + 整批开始/停止 -->
         <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="14,10">
             <Grid>
                 <Grid.RowDefinitions>
@@ -215,9 +210,7 @@
             </Grid>
         </Border>
 
-        <!-- ==================== 主体：上=八条通道的通道条，下=选中通道的项与时间线 ==================== -->
-        <!-- 通道条以前是左侧 180 宽的竖排：八张卡两行高，在 720 高的窗口里刚好溢出出滚动条，底下还空一截，
-             而明细表被挤在右边那点宽度里。横过来占满整宽后这一条只占两行文字的高度，五列表格吃满整宽 -->
+        <!-- 主体：上=八条通道的通道条，下=选中通道的项与时间线 -->
         <Grid Grid.Row="1" Margin="0,10,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -227,7 +220,6 @@
 
             <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="12,8">
                 <StackPanel>
-                    <!-- 第一行：栏名、三个计数、整批级项、两个快捷勾法——一行就够，不再为它们留一块竖排位置 -->
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -326,7 +318,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- ==================== 下：这一路的各项结果 + 时间线 ==================== -->
+            <!-- 下：这一路的各项结果 + 时间线 -->
             <Border Grid.Row="2" Style="{StaticResource Style.PanelCard}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -506,7 +498,7 @@
             </Border>
         </Grid>
 
-        <!-- ==================== 状态条 ==================== -->
+        <!-- 状态条 -->
         <Border Grid.Row="2" Margin="0,10,0,0" Style="{StaticResource Style.PanelCard}" Padding="14,8">
             <Grid>
                 <Grid.ColumnDefinitions>

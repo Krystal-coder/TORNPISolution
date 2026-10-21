@@ -1,8 +1,6 @@
 namespace TORNPISolution.Interface
 {
-    /// <summary>
-    /// Alicat 质量流量控制器实时数据快照（对应统计寄存器 1203-1214）
-    /// </summary>
+    /// <summary>Alicat 质量流量控制器实时数据快照（对应统计寄存器 1203-1214）</summary>
     public class AlicatReading
     {
         /// <summary>压力（绝压/表压/差压，取决于设备配置）</summary>
@@ -21,10 +19,7 @@ namespace TORNPISolution.Interface
         public float MassFlowSetpoint { get; set; }
     }
 
-    /// <summary>
-    /// 质量流量控制器设备接口（Alicat，Modbus RTU / RS485）。
-    /// 485 通讯为慢速 IO
-    /// </summary>
+    /// <summary>质量流量控制器设备接口（Alicat，Modbus RTU / RS485）；485 通讯为慢速 IO</summary>
     public interface IMassFlowController : IDisposable
     {
         /// <summary>串口是否已打开</summary>

@@ -6,9 +6,8 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 烧录工位配置服务实现：保存在程序目录 Config\flashing.json。
-    /// 写入口只有烧录页一个，所以不做三方合并、不做内存缓存（手工改文件立即生效）。
-    /// 剔显式 null、.bak 兜底、临时文件+改名替换这三样照旧，做法同 InstrumentConfigService。
+    /// 烧录工位配置服务实现：保存在程序目录 Config\flashing.json。写入口只有烧录页一个，所以不做三方合并、不做内存缓存（手工改文件立即生效）。
+    /// 剔显式 null、.bak 兜底、临时文件+改名替换这三样做法同 InstrumentConfigService。
     /// </summary>
     public class FlashingConfigService : IFlashingConfigService
     {
@@ -106,10 +105,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// 递归剔掉显式 null：字段当缺失处理，反序列化时走属性初始化器里的默认值。
-        /// 数组里的 null 元素换成空对象，建出来就是该行的默认参数，界面枚举通道时不会碰到 null。
-        /// </summary>
+        /// <summary>递归剔掉显式 null：字段当缺失处理，反序列化时走属性初始化器里的默认值；数组里的 null 元素换成空对象（建出来即该行的默认参数），界面枚举通道时不会碰到 null。</summary>
         private static JsonNode StripNulls(JsonNode? node)
         {
             switch (node)
@@ -133,10 +129,7 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>
-        /// 临时文件 + 改名替换：不存在"已截断原文件、新内容还没写完"的中间状态；覆盖前把旧档存成 .bak。
-        /// 目标被其它进程占用时直接抛（保存失败），磁盘上原有的配置仍是完整可用的。
-        /// </summary>
+        /// <summary>临时文件 + 改名替换：不存在"已截断原文件、新内容还没写完"的中间状态，覆盖前把旧档存成 .bak；目标被其它进程占用时直接抛（保存失败），磁盘上原有的配置仍是完整可用的。</summary>
         private static void WriteAtomic(string json)
         {
             File.WriteAllText(TempPath, json);

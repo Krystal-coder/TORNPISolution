@@ -23,12 +23,10 @@
             <Setter Property="LineHeight" Value="16"/>
         </Style>
 
-        <!-- 卡片内的小节标题：一行只占一次，把"路径 / 行为开关 / 超时 / 串口"分开 -->
         <Style x:Key="Style.SectionTitle" TargetType="TextBlock" BasedOn="{StaticResource Style.GroupTitle}">
             <Setter Property="Margin" Value="0,16,0,8"/>
         </Style>
 
-        <!-- 标签在输入框上方的字段：整幅布局里每格都用它，节奏才一致 -->
         <Style x:Key="Style.CellLabel" TargetType="TextBlock" BasedOn="{StaticResource Style.FieldLabel}">
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
@@ -63,9 +61,6 @@
         </Style>
     </Window.Resources>
 
-    <!-- 三页签：全局参数、八条通道各自的口、串口探测各占一页，谁也不用从谁身上抢高度。
-         每页都按整幅宽度排（一行放 2 个或 4 个字段），因为窗口是扁的——
-         之前左右两栏各 500 宽，内容窄而高、右边那张卡片下半截全是空白 -->
     <Grid Margin="18,16,18,14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -83,12 +78,11 @@
         <TabControl Grid.Row="1" Style="{StaticResource Style.NavTabControl}" TabStripPlacement="Left"
                     ItemContainerStyle="{StaticResource Style.NavTabItem}">
 
-            <!-- ==================== 页签一：两颗芯片的全局参数 ==================== -->
+            <!-- 页签一：两颗芯片的全局参数 -->
             <TabItem Header="全局参数">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10,2,4,10">
 
-                        <!-- SPI Flash 烧录器 -->
                         <Border Style="{StaticResource Style.PanelCard}" Padding="22,16">
                             <StackPanel>
                                 <TextBlock Text="SPI Flash 烧录（迈斯威志 WizPro）"
@@ -189,7 +183,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 富芮坤主控 -->
                         <Border Style="{StaticResource Style.PanelCard}" Padding="22,16" Margin="0,16,0,0">
                             <StackPanel>
                                 <TextBlock Text="富芮坤主控烧录（命令行工具）"
@@ -262,7 +255,7 @@
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,18,0">
                                         <TextBlock Style="{StaticResource Style.HintWrap}" Margin="0,0,0,4"
-                                                   Text="握手超时就是留给操作员按复位键的窗口，逐路手按时别设太小；30xx 系列波特率上限 460800"/>
+                                                   Text="握手超时就是留给操作人员按复位键的窗口，逐路手按时别设太小；30xx 系列波特率上限 460800"/>
                                         <TextBlock Style="{StaticResource Style.HintWrap}"
                                                    Text="整轮超时是工具卡住不退出时的兜底：到点杀进程并按失败记这一路"/>
                                     </StackPanel>
@@ -273,7 +266,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ==================== 页签二：八条通道各自的配置 ==================== -->
+            <!-- 页签二：八条通道各自的配置 -->
             <TabItem Header="通道配置">
                 <Grid Margin="10,2,4,10">
                     <Grid.RowDefinitions>
@@ -281,8 +274,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 表格整块包进一张卡片：行数是固定的八行，卡片撑满可用高度，
-                         行没占满的那部分留在卡片内部，看上去是"表就这么高"而不是"页面空了一块" -->
+                    
                     <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="18,12">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -368,7 +360,7 @@
                 </Grid>
             </TabItem>
 
-            <!-- ==================== 页签三：本机串口与探测 ==================== -->
+            <!-- 页签三：本机串口与探测 -->
             <TabItem Header="串口与探测">
                 <Grid Margin="10,2,4,10">
                     <Grid.RowDefinitions>

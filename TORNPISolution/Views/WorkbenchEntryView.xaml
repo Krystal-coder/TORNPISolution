@@ -97,7 +97,7 @@
             </StackPanel>
         </StackPanel>
 
-        <!-- 上次停在哪个工位  -->
+        <!-- 上次选中工位  -->
         <TextBlock Grid.Row="2" Text="{Binding LastStationHintText}" Style="{StaticResource Style.SubText}"
                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,18,0,0"/>
     </Grid>

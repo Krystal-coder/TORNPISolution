@@ -6,14 +6,12 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// 迈斯威志 WizPro 系列烧录器控制类（一路一台烧录器、各占一个 COM，所以八个通道能真并发、互不影响）。
-    /// 串口参数厂商规定 1M 波特率、8 数据位、无校验、2 停止位；USB 转串口芯片不支持 1M 时的表现是一直收不到帧。
-    /// 帧以 0xC0 定界：0xC0 + 数据 + 0xC0；数据里出现 0xC0 写成 0xDB 0xDC、出现 0xDB 写成 0xDB 0xDD。
-    /// 去掉首尾定界符后的字节整段累加、模 256 为 0 即校验通过。
-    /// 三条下发指令连各自的校验字节一起按文档原样发，不要去推算——它们用的不是上面那个累加规则。
-    /// 过程状态是烧录器主动连发、不请自来的，所以启动烧写之后只能一直读、按帧分派，不能一问一答。
-    /// 校验不过、或遇到文档没列的状态码，都只记日志不判失败：厂商几版文档的字段口径对不齐，
-    /// 把没见过的东西当失败会让现场随机误判，原始帧一律留在 Trace 里供事后校准。
+    /// 迈斯威志 WizPro 系列烧录器控制类：一路一台烧录器、各占一个 COM，八个通道可真并发、互不影响。
+    /// 串口参数厂商规定 1M 波特率、8 数据位、无校验、2 停止位；USB 转串口芯片不支持 1M 时表现为一直收不到帧。
+    /// 帧以 0xC0 定界（0xC0 + 数据 + 0xC0）：数据里出现 0xC0 写成 0xDB 0xDC、出现 0xDB 写成 0xDB 0xDD；
+    /// 去掉首尾定界符后的字节整段累加、模 256 为 0 即校验通过。三条下发指令连各自的校验字节按文档原样发、不要推算，它们用的不是这个累加规则。
+    /// 过程状态由烧录器主动连发，启动烧写后只能一直读、按帧分派，不能一问一答。
+    /// 校验不过或遇到文档没列的状态码只记日志不判失败：厂商几版文档字段口径对不齐，把没见过的当失败会造成现场随机误判；原始帧一律留在 Trace 里供事后校准。
     /// </summary>
     public class WizProProgrammer : IWizProProgrammer
     {
@@ -101,10 +99,8 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 读设备自报的通道号与预置产品信息。
-        /// 文档说返回帧长度大于 80 走解析法1（偏移 8 是通道号）、否则走法2（偏移 9 是通道号），
-        /// 但没给完整示例帧，偏移到底是含定界符还是不含也说不清，所以两个位置都取一次、
-        /// 认落在 0~9 的那一个；解不出来返回 null（有些型号不支持这条指令），原始帧留在日志里供校准。
+        /// 读设备自报的通道号与预置产品信息。文档说返回帧长度大于 80 走解析法1（偏移 8 是通道号）、否则走法2（偏移 9 是通道号），
+        /// 但没给完整示例帧、偏移是否含定界符不确定，所以两个位置都取一次、认落在 0~9 的那一个；解不出来返回 null（有些型号不支持这条指令），原始帧留在日志里供校准。
         /// </summary>
         public Task<WizProIdentity?> QueryIdentityAsync(CancellationToken ct = default) => Task.Run<WizProIdentity?>(() =>
         {
@@ -136,10 +132,7 @@ namespace TORNPISolution.Service.Devices
             return null;
         }, ct);
 
-        /// <summary>
-        /// 发 REST 让烧录器复位并自检内部已下载的数据：回 WPKO 表示数据正常可烧，
-        /// 回 WPGN 表示它内部的数据有问题、必须重新下载工程（这时候直接开烧只会整批失败，且报错看不出真因）。
-        /// </summary>
+        /// <summary>发 REST 让烧录器复位并自检内部已下载的数据：回 WPKO 表示数据正常可烧，回 WPGN 表示内部数据有问题、必须重新下载工程（此时直接开烧只会整批失败，且报错看不出真因）。</summary>
         public Task<bool> SelfCheckAsync(CancellationToken ct = default) => Task.Run(() =>
         {
             var client = RequireClient();
@@ -172,11 +165,7 @@ namespace TORNPISolution.Service.Devices
                 $"{_tag} 等自检结果超时（{_settings.ResponseTimeoutMs}ms）：既没说可烧、也没说数据异常，先确认 {PortName} 是不是这台烧录器");
         }, ct);
 
-        /// <summary>
-        /// 启动一轮烧写并一直读到结束帧。烧录器会主动连发过程状态（查空/擦除/写入/校验/结束），
-        /// 每一步都经 onProgress 报出去，界面上的进度与文案就是这么来的。
-        /// 烧写失败不抛异常，统一用返回结果的 Success=false 加错误码表达；只有取消才往上抛。
-        /// </summary>
+        /// <summary>启动一轮烧写并一直读到结束帧，过程状态（查空/擦除/写入/校验/结束）每步经 onProgress 报出；烧写失败不抛异常，统一用返回结果的 Success=false 加错误码表达，只有取消才往上抛。</summary>
         public Task<FlashResult> ProgramAsync(IProgress<FlashProgress>? onProgress, CancellationToken ct = default)
             => Task.Run<FlashResult>(() =>
         {
@@ -215,7 +204,7 @@ namespace TORNPISolution.Service.Devices
                         return FlashResult.Fail("烧录器回 Command Error：这台设备的固件不认这条指令", 0xA3, FlashStage.Failed, trace);
                     }
 
-                    // 座子没芯片 / 芯片被拿走 / 座子锁定：不当失败处理，操作员补压之后设备还会继续往下走
+                    // 座子没芯片 / 芯片被拿走 / 座子锁定：不当失败处理，操作人员补压之后设备还会继续往下走
                     var notice = StatusNotice(data);
                     if (notice != null)
                     {
@@ -282,8 +271,7 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 攒出一帧完整数据（定界符到定界符）并还原转义，超时返回 null。
-        /// 相邻两帧之间可能连着两个定界符（前一帧尾兼后一帧头时只有一个），所以内容为空就接着攒。
+        /// 攒出一帧完整数据（定界符到定界符）并还原转义，超时返回 null；相邻两帧之间可能连着两个定界符（前一帧尾兼后一帧头时只有一个），内容为空就接着攒。
         /// 一帧攒到超过上限还没等到结束符，说明波特率或转义口径对不上，丢掉重来并留一条日志。
         /// </summary>
         private List<byte>? ReadFrame(SerialClient client, long deadlineMs, List<string> trace, CancellationToken ct)
@@ -300,7 +288,7 @@ namespace TORNPISolution.Service.Devices
                     if (b == Marker)
                     {
                         if (!inFrame) { inFrame = true; body.Clear(); continue; }
-                        if (body.Count == 0) continue;            // 连着两个定界符，中间没有内容
+                        if (body.Count == 0) continue;
                         return Unescape(body);
                     }
 
@@ -321,8 +309,7 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 认出一条过程状态帧并取出状态码1、状态码2、4 字节数据。
-        /// 帧里第一个字节是命令字（0xFD），后面依次是状态码1、状态码2、数据 4 字节、校验和。
+        /// 认出一条过程状态帧并取出状态码1、状态码2、4 字节数据：帧里第一个字节是命令字 0xFD，后面依次是状态码1、状态码2、数据 4 字节、校验和。
         /// 校验不过也照样返回内容——厂商文档的字节数与示例对不齐，宁可收下再记一条日志，不要在这里丢数据。
         /// </summary>
         private bool TryReadStatus(List<byte> frame, out byte state1, out byte state2, out byte[] data)
@@ -360,10 +347,7 @@ namespace TORNPISolution.Service.Devices
             _ => (FlashStage.Programming, $"烧录进行中（状态码 0x{state1:X2}，文档未列，按进行中处理）"),
         };
 
-        /// <summary>
-        /// 擦除/写入/校验这几步的数据是「当前页(2B) + 总页数(2B)」，能折成百分比。
-        /// 字节序厂商没写，按低位在前解；这个数只用于界面显示，不参与任何判定，解错了也不会把好的判成坏。
-        /// </summary>
+        /// <summary>擦除/写入/校验这几步的数据是「当前页(2B) + 总页数(2B)」，可折成百分比；该数只用于界面显示、不参与任何判定，字节序厂商没写就按低位在前解，解错也不会把好的判成坏。</summary>
         private int PagePercent(byte state1, byte[] data)
         {
             if (data.Length < 4) return -1;
@@ -376,7 +360,7 @@ namespace TORNPISolution.Service.Devices
             return (int)Math.Clamp(current * 100 / total, 0, 100);
         }
 
-        /// <summary>座子状态里的三种提示：不是错误，但操作员该知道（补压之后设备会自己往下走）</summary>
+        /// <summary>座子状态里的三种提示：不是错误，但操作人员该知道（补压之后设备会自己往下走）</summary>
         private static string? StatusNotice(byte[] data)
         {
             if (IsAscii(data, "PCNI")) return "座子里检测到芯片";

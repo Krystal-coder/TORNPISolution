@@ -5,12 +5,9 @@ using TORNPISolution.ViewModels;
 namespace TORNPISolution.Views
 {
     /// <summary>
-    /// 单板配置对话框（菜单：配置 → 单板配置）：通道信息与工位仪器两页在一扇窗里。
-    /// 通道那栏直接吃单板页那份活配置（不另建一份，两本迟早对不上），仪器那栏吃
-    /// InstrumentConfigViewModel 从盘上读的那份——它与「仪器链接配置」那扇窗各持一份快照不会互抹，
-    /// 落盘时按字段合并，只回写本窗口真改过的项。
-    /// 本轮跑哪几项（测试项）不在这里：那是作业定义，菜单「测试项」单独一扇窗。
-    /// 只有保存成功才算数：✕ / 关闭 / Alt+F4 这些关窗方式一律退回进来时的样子。
+    /// 单板配置对话框（菜单：配置 → 单板配置）：通道信息与工位仪器两页在同一扇窗，不另建配置副本。
+    /// 通道栏直接用单板页那份活配置，仪器栏用 InstrumentConfigViewModel 从盘上读的那份；与「仪器链接配置」窗口各持一份快照不会互抹，落盘按字段合并、只回写本窗口真改过的项。
+    /// 本轮跑哪几项属作业定义，在菜单「测试项」单独一扇窗；只有保存成功才算数，✕ / 关闭 / Alt+F4 这些关窗方式一律退回进来时的值。
     /// </summary>
     public partial class BoardConfigWindow : Window
     {
@@ -54,7 +51,6 @@ namespace TORNPISolution.Views
             if (!_board.SaveConfigFromDialog()) return;
 
             _saved = true;
-            // 保存即刷新单板页：设备落点与明细行都按新配置重建，不再留一个“要点一下才生效”的按钮
             _board.ApplySavedConfig();
             Close();
         }

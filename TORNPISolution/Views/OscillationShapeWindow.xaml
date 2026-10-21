@@ -40,7 +40,7 @@
 
     <DockPanel>
 
-        <!-- ====== 底部按钮栏 ====== -->
+        <!-- 底部按钮栏 -->
         <Grid DockPanel.Dock="Bottom" Margin="16,10,16,14">
             <TextBlock Text="确定后参数写回动态血压 Customized 配置，随血压仪参数配置页一起保存"
                        VerticalAlignment="Center" FontSize="11"
@@ -59,7 +59,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- ====== 包络曲线预览 + 右侧图例  ====== -->
+            <!-- 包络曲线预览 + 右侧图例 -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -98,7 +98,7 @@
                 </StackPanel>
             </Grid>
 
-            <!-- ====== 参数区：x 轴八点（左）+ y 轴五点比率（右） ====== -->
+            <!-- 参数区：x 轴八点（左）+ y 轴五点比率（右） -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,4,0,0">
                 <StackPanel>
 
@@ -231,7 +231,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Y 轴五点比率：行首色标与图上标记配色一致 -->
                         <Border Grid.Column="1" BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12,6">
                             <StackPanel>

@@ -6,9 +6,8 @@ namespace TORNPISolution.Service.Devices
 {
     /// <summary>
     /// THS_HF NFC 读卡器控制类（岩柱 YZ806/YZ906 高频读写器）。
-    /// 运行时反射加载厂商 Reader_DLLV1.dll（.NET Framework 托管库，已修补 PE 头为 AnyCPU 以在 x64/.NET 8 加载），
-    /// 调用其 Reader.ReaderMethod 完成串口连接与 NTAG 标签读写，无需自行拼协议帧。
-    /// 依赖：DLL 须在输出目录（csproj 已配自动复制）+ System.IO.Ports（Service 已引用）。
+    /// 运行时反射加载厂商 Reader_DLLV1.dll（已修补 PE 头为 AnyCPU 以在 x64/.NET 8 加载），调用 Reader.ReaderMethod 完成串口连接与 NTAG 读写，无需自行拼帧。
+    /// 依赖：DLL 须在输出目录（csproj 已配自动复制），并引用 System.IO.Ports。
     /// </summary>
     public class NfcReaderService : INfcReader
     {
@@ -212,8 +211,7 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 给厂商类的回调字段（AnalyCallback / ReceiveCallback）挂接处理函数。
-        /// 委托参数类型（MessageTran 等）编译期不可见，
-        /// 用表达式树构造与字段类型一致的委托，转发到 Action&lt;object?&gt;。
+        /// 委托参数类型（MessageTran）编译期不可见，用表达式树构造与字段类型一致的委托，转发到 Action&lt;object?&gt;。
         /// </summary>
         private void HookCallback(Type readerType, string fieldName, Action<object?> handler, out Delegate holder)
         {

@@ -7,13 +7,6 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Flashing
 {
     /// <summary>
-    /// 烧录编排：一轮只做一种动作，每路独立并发、互不牵连（通道 3 失败不影响其余七路继续）。
-    /// 两条动作的流程差别决定了写法：
-    ///   SPI Flash 要先调厂商上位机把工程数据下载进烧录器内部——厂商的 APP 一次会搜到所有烧录器、
-    ///     而且下载时要用那些 COM 口，所以这一步是全局一次而不是每路一次；本轮此时还没打开任何串口，
-    ///     不存在自己占住自己要的口。下载成功后才各通道并发烧写。
-    ///   主控是纯每路独立：各起一个命令行进程、各占一个串口。
-    /// 顺序固定先 Flash 后主控（主控的 boot 要从 Flash 里加载），所以这里不做成可配的开关。
     /// 状态回调在采集线程上直接调用，与测试执行那边同一套约定：界面自己 marshal 回 UI 线程。
     /// </summary>
     public class FlashingService : IFlashingService
@@ -21,8 +14,7 @@ namespace TORNPISolution.Service.Flashing
         private readonly IFlashingConfigService _configService;
         private readonly ILogService _log;
 
-        // 本轮的取消闸：调用方传进来的 ct 管整轮（页面上的“停止”），每路还各自挂一个 linked 的（卡片右键只停这一路）。
-        // 只在 RunRoundAsync 活着期间有值，收尾统一 Dispose；同一时刻只有一轮在跑（界面那边用 FlashRunState 挡着）
+        // 本轮的取消闸：调用方的 ct 管整轮（页面上的“停止”），每路再各挂一个 linked 的（卡片右键只停这一路）；只在 RunRoundAsync 活着期间有值、收尾统一 Dispose，同一时刻只有一轮在跑（界面用 FlashRunState 挡着）
         private CancellationTokenSource? _roundCts;
         private readonly ConcurrentDictionary<int, CancellationTokenSource> _channelCts = new();
 
@@ -32,10 +24,6 @@ namespace TORNPISolution.Service.Flashing
             _log = log ?? new LogService(nameof(FlashingService));
         }
 
-        /// <summary>
-        /// 只停某一路：其余路不受影响，这一路自己按“已取消”落定。
-        /// 正在等芯片复位的通道走这一条最有用：那一块板没摆好，不该让其余七路陪着等握手超时。
-        /// </summary>
         public void CancelChannel(int channel)
         {
             if (!_channelCts.TryGetValue(channel, out var source))
@@ -117,11 +105,7 @@ namespace TORNPISolution.Service.Flashing
 
         // ==================== 本轮范围与预检 ====================
 
-        /// <summary>
-        /// 按通道号取出这一路的参数：清单顺序就是通道号（第一行是通道 1）。
-        /// 没点名通道就取全部已启用的行；点名了但清单里没有的编号只记日志，不静默丢掉
-        /// （界面点的通道号跟清单行号对不上时，静默跳过会让人以为软件漏烧）。
-        /// </summary>
+        /// <summary>按通道号取这一路的参数：清单顺序就是通道号（第一行是通道 1），没点名通道就取全部已启用的行；点名了但清单里没有的编号只记日志、不静默丢掉（界面点的通道号与清单行号对不上时，静默跳过会让人以为软件漏烧）。</summary>
         private List<ChannelWork> PlanChannels(FlashingConfig config, FlashAction action, IReadOnlyList<int>? channels)
         {
             var wanted = channels is { Count: > 0 } ? channels.ToHashSet() : null;
@@ -147,8 +131,6 @@ namespace TORNPISolution.Service.Flashing
                 works.Add(work);
             }
 
-            // 点名了却没匹配上的编号（全部匹配上时这个集合已被 Remove 空）：只记日志不静默丢掉，
-            // 界面点的通道号跟清单行号对不上时，静默跳过会让人以为软件漏烧了
             if (wanted is { Count: > 0 })
                 foreach (var missing in wanted)
                     _log.Warn($"通道 {missing} 不在烧录清单里（清单只有 {config.Channels.Count} 行），本轮跳过它");
@@ -156,10 +138,7 @@ namespace TORNPISolution.Service.Flashing
             return works;
         }
 
-        /// <summary>
-        /// 开烧前逐路检查参数，不通过的直接标失败、不参与后面的下载与烧写。
-        /// 拦在这里是因为放过去只会得到一句握手超时或打不开串口，现场查半天发现是配置填错。
-        /// </summary>
+        /// <summary>开烧前逐路检查参数，不通过的直接标失败、不参与后面的下载与烧写：放过去只会得到一句握手超时或打不开串口，配置填错现场查半天。</summary>
         private List<ChannelWork> Precheck(
             FlashAction action, FlashingConfig config, IReadOnlyList<ChannelWork> works, Action<ChannelFlashReport>? notify)
         {

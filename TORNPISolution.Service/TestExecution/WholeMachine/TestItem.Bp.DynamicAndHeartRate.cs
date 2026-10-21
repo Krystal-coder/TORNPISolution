@@ -6,20 +6,15 @@ namespace TORNPISolution.Service
     /// <summary>
     /// TestItem 分部：血压 A06 动态压力精度（BP-004）/ A21 血压心率精度及重复性（BP-005），
     /// 含两项共用的逐轮采集（CollectBpReadingsAsync / PollBpResultAsync）与子表行工厂。
-    /// 模块执行包装与分派见 TestItem.cs 主文件，项名统一引用 <see cref="SpecItems"/>。
     /// </summary>
     public partial class TestItem
     {
         /// <summary>
         /// 血压动态压力精度测试（BP-004），产品通讯统一在 A16 初始化：
-        /// ① 压力组与轮数取 血压模拟仪测试配置→动态血压→BP-004 压力组（只跑勾选行），心率全模块一个值（作激励参数）；
-        ///    逐组逐轮经 CollectBpReadingsAsync 执行完整充放气周期（需储气瓶产生脉搏波），每轮之间按配置休息；
-        /// ② 一轮一项（项名 SpecItems.Bp004Round，与 Spec 目录同源，改点位/轮数自动跟随）：
-        ///    测试值 = max(|收缩压回读−设定|, |舒张压回读−设定|) 判 ≤±2mmHg；子表两行=收缩压/舒张压 各自 设定/回读/偏差/判定；
-        /// ③ 每组一项重复性（项名 SpecItems.Bp004Repeat）：测试值 = max(收缩压各轮极差, 舒张压各轮极差) 判 ≤±2mmHg；
-        ///    子表按测试要求文档第 3 条“每轮一行 + 统计行”展示（列=收缩压/舒张压，行=设定值/第N轮/均值/与设定偏差/极大/极小/极差）；
-        /// 心率判定在 A21 血压心率精度及重复性测试；某轮无有效回读 → 该项不报告，由收尾扫描按读回缺失判 FAIL；
-        /// 有效轮数 <2 的组其重复性项同理。
+        /// ① 压力组与轮数取 血压模拟仪测试配置→动态血压→BP-004 压力组（只跑勾选行），心率全模块一个值（作激励参数）；逐组逐轮经 CollectBpReadingsAsync 执行完整充放气周期（需储气瓶产生脉搏波），每轮之间按配置休息；
+        /// ② 一轮一项（项名 SpecItems.Bp004Round，与 Spec 目录同源，改点位/轮数自动跟随）：测试值 = max(|收缩压回读−设定|, |舒张压回读−设定|) 判 ≤±2mmHg；子表两行=收缩压/舒张压 各自 设定/回读/偏差/判定；
+        /// ③ 每组一项重复性（项名 SpecItems.Bp004Repeat）：测试值 = max(收缩压各轮极差, 舒张压各轮极差) 判 ≤±2mmHg；子表按测试要求文档第 3 条“每轮一行 + 统计行”展示（列=收缩压/舒张压，行=设定值/第N轮/均值/与设定偏差/极大/极小/极差）；
+        /// ④ 心率判定在 A21 血压心率精度及重复性测试；某轮无有效回读 → 该项不报告，由收尾扫描按读回缺失判 FAIL；有效轮数 <2 的组其重复性项同理。
         /// </summary>
         //测试项目**************************---A06---**************************血压动态压力精度测试（BP-004）
         public async Task BpDynamicAccuracyModule(TestItemResultCollector collector, CancellationToken token)
@@ -32,7 +27,6 @@ namespace TORNPISolution.Service
                 return;
             }
 
-            // BP-004 压力组/轮数/休息取配置（血压模拟仪测试配置 → 动态血压 → BP-004 压力组）
             var (groups, repeats, restSeconds, ventDuringRest) =
                 GetBpAccuracyGroups(config.ActiveBpTestParams.BpAccuracy, "血压动态压力精度测试");
             if (groups.Length == 0) return;
@@ -45,7 +39,6 @@ namespace TORNPISolution.Service
 
             using (var product = _productFactory())
             {
-                // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）
                 var productAvailable = GetProductAvailable(config.NoProductDemoMode);
 
                 // 经共享会话取模拟仪（接口调用：BPA700=SDK 回调状态机；康伟达=压力曲线判定）
@@ -60,13 +53,11 @@ namespace TORNPISolution.Service
                         return;
                     }
 
-                    // 无产品演示模式：逐组驱动模拟仪走一遍血压模拟流程（验证仪器侧指令与波形显示）；
-                    // 无产品对比值：结果项不报告，由收尾扫描按读回缺失统一判 FAIL
+                    // 无产品演示模式：只验证仪器侧指令与波形显示；结果项不报告，由收尾扫描按读回缺失统一判 FAIL
                     _log.Info("BP-004 无产品演示模式：逐组驱动模拟仪走血压模拟流程（短超时），结果项按产品读回缺失判 FAIL");
                     await simulator.StartSamplingAsync(token);
                     try
                     {
-                        // 演示轮：product 传 null 即只驱动模拟仪（短超时），不休息
                         await CollectBpReadingsAsync(simulator, null, groups, repeats, pulseVolume, RoundItem, 0, false, token);
                     }
                     catch (OperationCanceledException)
@@ -85,10 +76,8 @@ namespace TORNPISolution.Service
                     return;
                 }
 
-                // ② 设置血压测试模式（0x73 mode=2）
                 await product.SetTestModeAsync(2, ct: token);
 
-                // ③ 逐组逐轮执行：每组 repeats 次完整充放气周期，每轮读产品上报结果后休息
                 var readings = await CollectBpReadingsAsync(simulator, product, groups, repeats, pulseVolume,
                     RoundItem, restSeconds, ventDuringRest, token);
 
@@ -130,8 +119,7 @@ namespace TORNPISolution.Service
                         });
                     }
 
-                    // 每组一项重复性：子表按“每轮一行 + 统计行”给出（设定/各轮实测/均值/与设定偏差/极大/极小/极差），
-                    //   判据只落在极差行（收缩/舒张取大者 ≤±2mmHg），中间统计行不判定，避免整屏 PASS 误读
+                    // 每组一项重复性：判据只落在极差行（收缩/舒张取大者 ≤±2mmHg），中间统计行不判定，避免整屏 PASS 误读
                     if (valid.Count >= 2)
                     {
                         var sysVals = valid.Select(x => x.Systolic).ToList();
@@ -159,12 +147,10 @@ namespace TORNPISolution.Service
 
         //测试项目**************************---A21---**************************血压心率精度及重复性测试（BP-005）
         /// <summary>
-        /// 血压心率精度及重复性测试（BP-005）：压力固定一组、心率按配置逐点测，采集与 BP-004 同一套流程
-        /// （完整充放气周期 + 轮间休息 + 每轮独立曲线），只是判定看 0x7C 回读的心率：
+        /// 血压心率精度及重复性测试（BP-005）：压力固定一组、心率按配置逐点测，采集复用 BP-004 同一套流程（完整充放气周期 + 轮间休息 + 每轮独立曲线），判定看 0x7C 回读的心率；
         /// ① 一轮一项（SpecItems.Bp005Round）：测试值 = |本轮心率回读 − 设定|，判 ≤ max(5, 设定×5%)；
-        /// ② 每点一项平均值（SpecItems.Bp005Average）：测试值 = 各轮心率均值，只展示不判定（文档第 2 条只要求“取平均值”，判定已在逐轮上），
-        ///    子表给 均值/与设定偏差/极大/极小/极差；
-        /// 某轮无有效心率回读 → 该项不报告，由收尾扫描按读回缺失判 FAIL；有效轮数 <2 的点其平均值项同理。
+        /// ② 每点一项平均值（SpecItems.Bp005Average）：测试值 = 各轮心率均值，只展示不判定（文档第 2 条只要求“取平均值”，判定已在逐轮上），子表给 均值/与设定偏差/极大/极小/极差；
+        /// ③ 某轮无有效心率回读 → 该项不报告，由收尾扫描按读回缺失判 FAIL；有效轮数 <2 的点其平均值项同理。
         /// </summary>
         public async Task BpHeartRateAccuracyModule(TestItemResultCollector collector, CancellationToken token)
         {
@@ -278,15 +264,54 @@ namespace TORNPISolution.Service
             }
         }
 
+        /// <summary>BP-004 压力组取用（A06 项清单与执行轮次同一来源，与 Spec 目录构建同口径）：只取勾选行、取整后去重（两行完全相同时采集字典的键会互相覆盖）；心率全模块一个值；
+        /// 轮数少于 3 抬到 3（少于 3 轮取极差统计意义不足）；未勾选任何行时记日志返回空数组（调用方直接结束、不发仪器指令）</summary>
+        private ((int Systolic, int Diastolic, int HeartRate)[] Groups, int Repeats, int RestSeconds, bool VentDuringRest)
+            GetBpAccuracyGroups(BpaBpAccuracyParams cfg, string moduleName)
+        {
+            var groups = cfg.Groups.Where(g => g.Enabled)
+                .Select(g => (Systolic: (int)Math.Round(g.Systolic), Diastolic: (int)Math.Round(g.Diastolic), HeartRate: cfg.HeartRate))
+                .Distinct()
+                .ToArray();
+            if (groups.Length == 0)
+                _log.Warn($"{moduleName} 跳过：BP-004 压力组未勾选任何参与测试的行（血压模拟仪测试配置 → 动态血压 → BP-004 压力组）");
+            return (groups, Math.Max(3, cfg.Repeats), Math.Max(0, cfg.RestSeconds), cfg.VentDuringRest);
+        }
+
+        /// <summary>BP-005 心率点取用（A21 项清单与执行轮次同一来源，与 Spec 目录同口径）：压力固定一组，心率只取勾选行并去重（同一心率重复一行没意义）</summary>
+        private ((int Systolic, int Diastolic, int HeartRate)[] Groups, int Repeats, int RestSeconds, bool VentDuringRest)
+            GetBpHeartRateGroups(BpaHeartRateAccuracyParams cfg, string moduleName)
+        {
+            var sys = (int)Math.Round(cfg.Systolic);
+            var dia = (int)Math.Round(cfg.Diastolic);
+            var groups = cfg.HeartRates.Where(p => p.Enabled).Select(p => p.Value).Distinct()
+                .Select(hr => (Systolic: sys, Diastolic: dia, HeartRate: hr))
+                .ToArray();
+            if (groups.Length == 0)
+                _log.Warn($"{moduleName} 跳过：BP-005 心率点未勾选任何参与测试的行（血压模拟仪测试配置 → 动态血压 → BP-005 心率点）");
+            return (groups, Math.Max(3, cfg.Repeats), Math.Max(0, cfg.RestSeconds), cfg.VentDuringRest);
+        }
+
+        /// <summary>轮间休息（产品安全）：每轮测完休息 restSeconds 秒再开下一轮/下一组（含末轮收尾）；选「休息时泄压」先泄回零、选「不泄压」仪器保持待命；休息期间不绘波形，取消可立即打断</summary>
+        private async Task RestAfterRoundAsync(IBloodPressureSimulator simulator, int round, int repeats,
+            int restSeconds, bool ventDuringRest, CancellationToken token)
+        {
+            if (restSeconds <= 0) return;
+            if (ventDuringRest)
+            {
+                try { await simulator.VentToZeroAsync(ct: token); }
+                catch (OperationCanceledException) { throw; }
+                catch (Exception ex) { _log.Warn($"轮间泄压失败（继续休息）：{ex.Message}"); }
+            }
+            _log.Info($"第 {round}/{repeats} 轮测完，休息 {restSeconds}s…");
+            await Task.Delay(restSeconds * 1000, token);
+        }
+
         /// <summary>
-        /// 血压测量轮次采集（A06 的 BP-004 轮次/重复性与 BP-005 心率共用同一套流程）：逐点位逐轮执行
-        /// 产品 0x79 开始 → 模拟仪 RunBpMeasurementAsync（0x02 血压模拟帧带脉搏量，等完整充放气曲线）
-        /// → 轮询 0x7B 取收缩/舒张/平均压 + 0x7C 取心率 → 0x79 关闭。
+        /// 血压测量轮次采集（A06 的 BP-004 轮次/重复性与 BP-005 心率共用同一套流程）：逐点位逐轮执行 产品 0x79 开始 → 模拟仪 RunBpMeasurementAsync（0x02 血压模拟帧带脉搏量，等完整充放气曲线）→ 轮询 0x7B 取收缩/舒张/平均压 + 0x7C 取心率 → 0x79 关闭。
         /// product 为 null（无产品演示模式）时不发产品指令、用短超时只验证仪器侧流程，回读格全部为空，也不休息。
-        /// 波形按轮独立：每轮开始重开时间轴、只把本轮采样画给 waveItemName(g, r) 指定的那一项，
-        /// 轮一结束就退订，休息段（每轮后都等一次，含末轮）不进任何曲线。
-        /// 返回：各点位的产品回读列表（键为点位三元组，与入参 groups 逐项对应）；
-        /// 列表按轮次占格（下标 i = 第 i+1 轮，null = 该轮没取到有效回读），一轮一项时下标才能与“第 N 轮”严格对上。
+        /// 波形按轮独立：每轮开始重开时间轴、只把本轮采样画给 waveItemName(g, r) 指定的那一项，轮一结束就退订，休息段（每轮后都等一次，含末轮）不进任何曲线。
+        /// 返回：各点位的产品回读列表（键为点位三元组，与入参 groups 逐项对应）；列表按轮次占格（下标 i = 第 i+1 轮，null = 该轮没取到有效回读），一轮一项时下标才能与“第 N 轮”严格对上。
         /// </summary>
         private async Task<Dictionary<(int, int, int), List<ProductBpReading?>>> CollectBpReadingsAsync(
             IBloodPressureSimulator simulator, IProductController? product,
@@ -331,8 +356,7 @@ namespace TORNPISolution.Service
                         await product.StartBpMeasureAsync(true, token);
                         measureStarted = true;
                         await simulator.RunBpMeasurementAsync(g.Systolic, g.Diastolic, g.HeartRate, pulseVolume, ct: token);
-                        // 实测当前固件不主动推 0x7B（测量期间只周期推 0xCA，协议未定义），
-                        // 曲线结束后主动轮询 0x7B 拿收缩压/舒张压/平均压，心率由 0x7C 单独读回
+                        // 实测当前固件不主动推 0x7B（测量期间只周期推 0xCA，协议未定义），故曲线结束后主动轮询 0x7B 拿收缩压/舒张压/平均压，心率由 0x7C 单独读回
                         var reading = await PollBpResultAsync(product, token);
                         if (reading != null && reading.Systolic > 0)
                         {
@@ -353,8 +377,7 @@ namespace TORNPISolution.Service
                     }
                     catch
                     {
-                        // 取消或异常正好落在这一轮中间：开始测量发出去了却没走到关闭，补一次，
-                        // 否则产品挂着本次测量，后面每一轮/下一个模块的 0x79 开始都不被接受。
+                        // 取消或异常正好落在这一轮中间：开始测量发出去了却没走到关闭，补一次，否则产品挂着本次测量，后面每一轮/下一个模块的 0x79 开始都不被接受
                         // 都用 None 令牌：点“停止”时这一句恰恰最需要发得出去。
                         if (product != null && measureStarted && !measureClosed)
                         {
@@ -362,7 +385,7 @@ namespace TORNPISolution.Service
                             catch (Exception ex) { _log.Warn($"补发关闭测量（0x79 status=1）失败：{ex.Message}"); }
                         }
 
-                        // 本轮被打断时袖带可能还顶着压力：尽力泄回零，别让设备带压停到下一个模块
+                        // 本轮被打断时袖带可能仍带压：尽力泄回零，避免设备带压进入下一个模块
                         try { await simulator.VentToZeroAsync(ct: CancellationToken.None); }
                         catch (Exception ex) { _log.Warn($"轮次中断后泄压失败：{ex.Message}"); }
 
@@ -381,8 +404,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 轮询血压测量结果（0x7B）：产品不主动推送，测量曲线结束后每 500ms 轮询一次，
-        /// 收缩压 > 0 立即返回；10 次仍未取到有效结果返回最后一次响应（全零表示测量未完成，统计按 FAIL 判）。
+        /// 轮询血压测量结果（0x7B，产品不主动推送）：测量曲线结束后每 500ms 轮询一次，收缩压 > 0 立即返回；10 次仍未取到有效结果返回最后一次响应（全零表示测量未完成，统计按 FAIL 判）。
         /// </summary>
         private static async Task<ProductBpReading?> PollBpResultAsync(IProductController product, CancellationToken token)
         {
@@ -414,9 +436,8 @@ namespace TORNPISolution.Service
                 Remark = error <= tolerance ? string.Empty : $"偏差 {error:0.0} 超过 ±{tolerance:0.#}{unit}",
             };
 
-        /// <summary>BP-005 心率平均值子表行（测试要求文档第 2 条“每组测量3次取平均值”）：
-        /// 列=设定值 / 均值 / 与设定偏差 / 极大与极小 / 极差，整行只展示不判定（合格与否看各轮项）；
-        /// 极差超出容差时写进备注供人参考</summary>
+        /// <summary>BP-005 心率平均值子表行（测试要求文档第 2 条“每组测量3次取平均值”）：列=设定值 / 均值 / 与设定偏差 / 极大与极小 / 极差，整行只展示不判定（合格与否看各轮项）；
+        /// 极差超出容差时写进备注</summary>
         private static TestPointResult BpRepeatPoint(string name, double target, List<double> values, double tolerance)
         {
             var range = values.Max() - values.Min();
@@ -437,8 +458,7 @@ namespace TORNPISolution.Service
             };
         }
 
-        /// <summary>BP-004 重复性子表（每轮一行 + 统计行）：列=收缩压/舒张压，
-        /// 行=设定值 → 第1..N轮实测（按轮次占格，本轮没回读显 --，下标与“第 N 轮”严格对得上）→ 均值 → 与设定偏差 → 极大值 → 极小值 → 极差；
+        /// <summary>BP-004 重复性子表（每轮一行 + 统计行）：列=收缩压/舒张压，行=设定值 → 第1..N轮实测（按轮次占格，本轮没回读显 --，下标与“第 N 轮”严格对得上）→ 均值 → 与设定偏差 → 极大值 → 极小值 → 极差；
         /// 只极差行参与判定（判据同父项：收缩/舒张极差取大者 ≤±2），统计量只取有效轮</summary>
         private static List<TestPointResult> BuildBpRepeatRows((int Systolic, int Diastolic, int HeartRate) g,
             IReadOnlyList<ProductBpReading?> rounds, int repeats, IReadOnlyList<ProductBpReading> valid, double tolerance)

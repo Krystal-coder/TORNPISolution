@@ -61,9 +61,6 @@ namespace TORNPISolution.ViewModels
         /// <summary>测试项数量显示</summary>
         public string ItemCountText => $"{Items.Count} 项";
 
-        /// <summary>
-        /// 模块级判定
-        /// </summary>
         public TestResultStatus ModuleResult
         {
             get
@@ -82,7 +79,6 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>模块级判定显示文本</summary>
         public string ModuleResultText => ModuleResult switch
         {
             TestResultStatus.Pass => "PASS",
@@ -99,10 +95,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>
-        /// 基于同一模块定义创建新的实例（加入测试方案时使用，
-        /// 保证方案内模块与模块库模板互不影响）
-        /// </summary>
+        /// <summary>基于同一模块定义创建新实例（加入测试方案时使用，保证方案内模块与模块库模板互不影响）</summary>
         public TestModuleViewModel CreateInstance() => new(_model);
     }
 }

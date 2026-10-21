@@ -1,9 +1,8 @@
 namespace TORNPISolution.Share.Models
 {
     /// <summary>
-    /// 单个测试项的一次执行结果 
-    /// Spec 定义测试项清单与静态规格（项名/说明/单位/默认上下限）
-    /// 动态规格：部分测试项的规格要按仪器读回的标准值现算（如血压：SpecMin/SpecMax = 仪器读回值 ± 容差）
+    /// 单个测试项的一次执行结果。Spec 定义项清单与静态规格（项名/说明/单位/默认上下限）。
+    /// 动态规格经本结果回传 UI：按仪器读回的标准值现算（如血压 SpecMin/SpecMax = 仪器读回值 ± 容差）。
     /// </summary>
     public class TestItemResult
     {
@@ -35,8 +34,8 @@ namespace TORNPISolution.Share.Models
         public bool NotJudged { get; set; }
 
         /// <summary>
-        /// 只展示不判定标记（如 BP-005 的平均值项）：测试值与行详情子表照常回填，结果列显示“—”。
-        /// 与 <see cref="NotJudged"/> 的区别：那个会把双值列和子表一起清空，这个要保留统计量给人看。
+        /// 只展示不判定（如 BP-005 的平均值项）：测试值与行详情子表照常回填，结果列显示“—”。
+        /// 与 <see cref="NotJudged"/> 的区别：后者连双值列与子表一起清空，本标记保留统计量供查看。
         /// </summary>
         public bool DisplayOnly { get; set; }
 
@@ -59,10 +58,7 @@ namespace TORNPISolution.Share.Models
         public static TestItemResult WithDynamicSpec(double value, double specMin, double specMax)
             => new() { Value = value, SpecMin = specMin, SpecMax = specMax };
 
-        /// <summary>
-        /// 双值比对项便捷构造：主判定值 = 产品上报值，动态规格 = 仪器值 ± 容差
-        /// （如 ±2%/±2BPM 类精度项：产品上报值落在 [仪器值−容差, 仪器值+容差] 内为 PASS）。
-        /// </summary>
+        /// <summary>双值比对项便捷构造：主判定值 = 产品上报值，动态规格 = 仪器值 ± 容差（±2%/±2BPM 类精度项：产品上报值落在 [仪器值−容差, 仪器值+容差] 内为 PASS）</summary>
         public static TestItemResult WithDualValues(double instrumentValue, double productValue, double specMin, double specMax)
             => new()
             {

@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
 
-            <!-- ============ MaterialDesign 主题 ============ -->
+            <!-- MaterialDesign 主题 -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- HandyControl 主题（Growl 消息通知） -->
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
@@ -17,7 +17,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- ============ 全局配色 ============ -->
+            <!-- 全局配色 -->
             <SolidColorBrush x:Key="Brush.Window.Background" Color="#F3F5F8"/>
             <SolidColorBrush x:Key="Brush.Panel.Background" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="Brush.Panel.Border" Color="#E1E6EC"/>
@@ -37,7 +37,7 @@
             <SolidColorBrush x:Key="Brush.Pass.Light" Color="#E6F4EA"/>
             <SolidColorBrush x:Key="Brush.Fail.Light" Color="#FDECEC"/>
 
-            <!-- ============ 面板卡片样式 ============ -->
+            <!-- 面板卡片样式 -->
             <Style x:Key="Style.PanelCard" TargetType="Border">
                 <Setter Property="Background" Value="{StaticResource Brush.Panel.Background}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource Brush.Panel.Border}"/>
@@ -45,7 +45,7 @@
                 <Setter Property="CornerRadius" Value="8"/>
             </Style>
 
-            <!-- ============ 面板标题样式 ============ -->
+            <!-- 面板标题样式 -->
             <Style x:Key="Style.PanelTitle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="15"/>
                 <Setter Property="FontWeight" Value="Bold"/>
@@ -53,14 +53,14 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
 
-            <!-- ============ 副标题 / 说明文字 ============ -->
+            <!-- 副标题 / 说明文字 -->
             <Style x:Key="Style.SubText" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="11"/>
                 <Setter Property="Foreground" Value="{StaticResource Brush.Text.Sub}"/>
                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
             </Style>
 
-            <!-- ============ 工具栏按钮 ============ -->
+            <!-- 工具栏按钮 -->
             <Style x:Key="Style.ToolButton" TargetType="Button">
                 <Setter Property="Padding" Value="14,6"/>
                 <Setter Property="Margin" Value="6,0,0,0"/>
@@ -92,7 +92,7 @@
                 </Setter>
             </Style>
 
-            <!-- ============ 主操作按钮 ============ -->
+            <!-- 主操作按钮 -->
             <Style x:Key="Style.PrimaryButton" TargetType="Button" BasedOn="{StaticResource Style.ToolButton}">
                 <Setter Property="Background" Value="{StaticResource Brush.Primary}"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -118,7 +118,7 @@
                 </Setter>
             </Style>
 
-            <!-- ============ 工位选择页上的一张入口卡片 ============ -->
+            <!-- 工位选择页上的一张入口卡片 -->
             <!-- 不做成页签样式：三个入口不是并列的关系，而是“点哪个进哪个”的门；鼠标抬起来要看得出能点 -->
             <Style x:Key="Style.StationCard" TargetType="Border">
                 <Setter Property="Background" Value="{StaticResource Brush.Panel.Background}"/>
@@ -135,7 +135,7 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- ============ 竖向页签 ============ -->
+            <!-- 竖向页签 -->
             <Style x:Key="Style.NavTabItem" TargetType="TabItem">
                 <Setter Property="Width" Value="164"/>
                 <Setter Property="Height" Value="38"/>
@@ -167,7 +167,7 @@
                 </Setter>
             </Style>
 
-            <!-- ============ 竖向页签容器 ============ -->
+            <!-- 竖向页签容器 -->
             <Style x:Key="Style.NavTabControl" TargetType="TabControl">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
@@ -187,7 +187,7 @@
                 </Setter>
             </Style>
 
-            <!-- ============ 配置页控件统一规格 ============  -->
+            <!-- 配置页控件统一规格 -->
 
             <!-- 字段标签（贴在输入框左侧） -->
             <Style x:Key="Style.CfgLabel" TargetType="TextBlock">
@@ -197,7 +197,6 @@
                 <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>
             </Style>
 
-            <!-- 数值输入框：统一 30 高、内容垂直居中、零外边距 -->
             <Style x:Key="Style.CfgBox" TargetType="TextBox">
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="FontSize" Value="12"/>
@@ -228,24 +227,21 @@
                 <Setter Property="Margin" Value="0,0,0,3"/>
             </Style>
 
-            <!-- ============ 测试明细表：整机页与单板页共用同一套 ============
+            <!-- 测试明细表：整机页与单板页共用同一套
                  这几个样式提到应用级而不是留在各页里：原先它们定义在 MainWindow 的窗口资源内，
                  而单板页是个 UserControl——它解析自己那份 BAML 时还没有宿主，沿资源链拿不到窗口里的 key，
                  想用同一套表格外观只能回到应用级资源 -->
 
-            <!-- 单元格文字：垂直居中 + 左边距 8 -->
             <Style x:Key="Style.CellText" TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Padding" Value="8,0"/>
             </Style>
 
-            <!-- 短数值列（规格范围/测试值）：垂直 + 水平居中 -->
             <Style x:Key="Style.CellText.Center" TargetType="TextBlock" BasedOn="{StaticResource Style.CellText}">
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="Padding" Value="0"/>
             </Style>
 
-            <!-- 表头：浅底粗体、固定 34 高、底边一条分隔线 -->
             <Style x:Key="Style.GridColumnHeader" TargetType="DataGridColumnHeader">
                 <Setter Property="Background" Value="#F0F3F7"/>
                 <Setter Property="Foreground" Value="{StaticResource Brush.Text.Main}"/>

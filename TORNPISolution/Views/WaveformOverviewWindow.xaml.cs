@@ -69,9 +69,6 @@ namespace TORNPISolution.Views
         private static void OnYBoxEdited(DependencyObject d, DependencyPropertyChangedEventArgs e)
             => ((WaveformOverviewWindow)d).OnYRangeBoxesEdited();
 
-        /// <summary>
-        /// 弹出或复用该模块的总览窗口
-        /// </summary>
         public static WaveformOverviewWindow ShowOrRefresh(WaveformOverviewRequest request, Window? owner = null)
         {
             if (!_byModule.TryGetValue(request.ModuleId, out var window))
@@ -153,7 +150,6 @@ namespace TORNPISolution.Views
             ApplyYRange();
         }
 
-        /// <summary>换绑本轮的档位项集合</summary>
         private void AttachItems(IReadOnlyList<TestItemViewModel> items)
         {
             if (items.SequenceEqual(_items))
@@ -186,9 +182,6 @@ namespace TORNPISolution.Views
             _throttle.Start();
         }
 
-        /// <summary>
-        /// 长图重建
-        /// </summary>
         private void Rebuild()
         {
             var instrument = new List<PressureSamplePoint>();
@@ -208,8 +201,7 @@ namespace TORNPISolution.Views
                     prod.Count > 0 ? prod[prod.Count - 1].TimeSeconds : 0);
                 if (span <= 0) continue;
 
-                // 设定侧回调值可能含直流偏置（大偏置档会把小量程顶满屏），默认按段中点平移回零：
-                // 波形对称时 min/max 中点就是该段的直流偏置
+                // 设定侧回调值可能含直流偏置（大偏置档会把小量程顶满屏），波形对称时 min/max 中点就是该段的直流偏置，默认按它平移回零
                 var dcShift = StripDc.IsChecked == true ? InstrumentBaseline(inst) : 0.0;
 
                 labels.Add($"{segment + 1:00}  {SegmentLabel(item.Name)}  {item.ResultText}");
@@ -262,9 +254,6 @@ namespace TORNPISolution.Views
             return (lo + hi) / 2.0;
         }
 
-        /// <summary>
-        /// 段标注文字
-        /// </summary>
         private string SegmentLabel(string name)
         {
             var marker = _profile.SegmentLabelAfter;
@@ -273,10 +262,7 @@ namespace TORNPISolution.Views
             return at >= 0 ? name.Substring(at + marker.Length) : name;
         }
 
-        /// <summary>
-        /// 量程应用：底栏 Y Min / Y Max 就是纵轴上下限（坐标纸按这个值画大格）；
-        /// 勾了自适应、或填出上限≤下限，就退回按数据幅度自动取量程。
-        /// </summary>
+        /// <summary>量程应用：底栏 Y Min / Y Max 就是纵轴上下限（坐标纸按这个值画大格）；勾了自适应、或填出上限≤下限时退回按数据幅度自动取量程</summary>
         private void ApplyYRange()
         {
             if (Chart == null) return;
@@ -285,7 +271,7 @@ namespace TORNPISolution.Views
             Chart.YMax = pinned ? YMaxValue : double.NaN;
         }
 
-        /// <summary>手改 Y Min / Y Max：以输入框为准，顺手取消自适应（不然“勾着自适应、框里的数字却没用”）</summary>
+        /// <summary>手改 Y Min / Y Max：以输入框为准，同时取消自适应，否则勾着自适应时框里的数字不生效</summary>
         private void OnYRangeBoxesEdited()
         {
             if (AutoY?.IsChecked == true) AutoY.IsChecked = false;

@@ -37,7 +37,6 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
-        <!-- 一台网口仪器一行：启用 + 位号 + IP + 端口 -->
         <DataTemplate x:Key="Template.BoardLanRow">
             <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="0,0,0,1">
                 <Grid Margin="12,5">
@@ -111,7 +110,7 @@
         <TabControl Grid.Row="1" Style="{StaticResource Style.NavTabControl}" TabStripPlacement="Left"
                     ItemContainerStyle="{StaticResource Style.NavTabItem}">
 
-            <!-- ==================== 页签一：八条通道各自的信息 ==================== -->
+            <!-- 页签一：八条通道各自的信息 -->
             <TabItem Header="通道配置">
                 <Grid Margin="10,2,4,10">
                     <Grid.RowDefinitions>
@@ -188,7 +187,7 @@
                 </Grid>
             </TabItem>
 
-            <!-- ==================== 页签二：单板工位的三台仪器 ==================== -->
+            <!-- 页签二：单板工位的三台仪器 -->
             <TabItem Header="工位仪器">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10,2,4,10"
                               DataContext="{Binding Instruments, RelativeSource={RelativeSource AncestorType=Window}}">

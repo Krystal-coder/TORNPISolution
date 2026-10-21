@@ -11,7 +11,6 @@ namespace TORNPISolution.Views
     {
         public Aecg100ParamConfigWindow(Aecg100ParamConfigViewModel viewModel)
         {
-            // DataContext 先于 InitializeComponent 
             DataContext = viewModel;
             InitializeComponent();
 
