@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2024.7.3" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TORNPISolution.Data\TORNPISolution.Data.csproj" />
     <ProjectReference Include="..\TORNPISolution.GoogolEtherCAT\TORNPISolution.GoogolEtherCAT.csproj" />
     <ProjectReference Include="..\TORNPISolution.Interface\TORNPISolution.Interface.csproj" />
     <ProjectReference Include="..\TORNPISolution.Share\TORNPISolution.Share.csproj" />

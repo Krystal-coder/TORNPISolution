@@ -50,6 +50,16 @@ namespace TORNPISolution.ViewModels
         private TaskCompletionSource? _runDone;
         // 关窗口时已在等收尾：避免重复点关闭叠多层消息泵
         private bool _awaitingWrapUp;
+        // 自动入库：测试完整跑完即写库（单事务 3 张表）；入库失败时快照留内存，等「重试保存」
+        private readonly ITestDataService _testDataService;
+        // 报告导出：数据已自动入库，「导出报告」只负责按编号出 PDF（QuestPDF）
+        private readonly ITestReportService _testReportService;
+        // 一轮方案的开始时刻（入库快照的 StartedAt）
+        private DateTime _runStartedAt;
+        // 入库失败滞留的快照：数据还在内存，用户点「重试保存」可重放；下一轮开跑时被覆盖（先记日志）
+        private TestRunSnapshot? _pendingSaveSnapshot;
+        // 最近一次成功入库的报告编号：「导出报告」按钮据此判断可否导出（null=本轮还没存上）
+        private string? _lastSavedReportNo;
 
         /// <summary>血压模拟仪方案级共享会话（单例）：RunPlan 开始建立、结束关闭，模块间不复关复开串口</summary>
         private readonly BloodPressureSimulatorSession _simSession;
@@ -57,7 +67,8 @@ namespace TORNPISolution.ViewModels
         public MainViewModel(ITestModuleService moduleService, ITestItemService testItemService,
                              ITestPlanService testPlanService, IAppStateService appState,
                              FlashingViewModel flashing, BoardChannelViewModel board,
-                             BloodPressureSimulatorSession simSession)
+                             BloodPressureSimulatorSession simSession, ITestDataService testDataService,
+                             ITestReportService testReportService)
         {
             _testItemService = testItemService;
             _moduleService = moduleService;
@@ -66,6 +77,8 @@ namespace TORNPISolution.ViewModels
             _flashing = flashing;
             _board = board;
             _simSession = simSession;
+            _testDataService = testDataService;
+            _testReportService = testReportService;
 
             // 启动一律先回工位选择页；上一次在哪个工位只当一句提示，不再直接把人带进那一页
             _lastStation = appState.LoadLastPage();
@@ -86,6 +99,10 @@ namespace TORNPISolution.ViewModels
             BackToEntryCommand = new RelayCommand(BackToEntry, CanSwitchPage);
             SavePlanCommand = new RelayCommand(SavePlan, () => PlanModules.Count > 0 && !IsRunning);
             LoadPlanCommand = new RelayCommand(LoadPlan, () => !IsRunning);
+            // 入库失败后的重试：快照留内存，CanExecute 由 _pendingSaveSnapshot 是否有值决定（WPF 空闲自动刷新）
+            RetrySaveCommand = new RelayCommand(RetrySave, () => _pendingSaveSnapshot != null);
+            // 「导出报告」：数据已自动入库，这颗按钮只负责导 PDF；没存上（入库失败/全未测）时置灰
+            SaveReportCommand = new RelayCommand(SaveReport, () => _lastSavedReportNo != null && !IsRunning);
 
             // 方案增删/移动时统一刷新执行序号，保证序号始终跟随数据顺序
             PlanModules.CollectionChanged += (_, _) =>
@@ -233,6 +250,12 @@ namespace TORNPISolution.ViewModels
 
         /// <summary>设备连接失败的气泡留几秒：够读完两行字，又不至于跑几轮就攒一屏要点关闭的框（HandyControl 内部最低 2 秒）</summary>
         private const int DeviceFailGrowlSeconds = 5;
+
+        /// <summary>入库成功/滞留提示气泡留几秒</summary>
+        private const int SaveGrowlSeconds = 6;
+
+        /// <summary>入库失败滞留提示留几秒：这条要人去点「重试保存」，比成功提示给更长的停留</summary>
+        private const int PendingSaveGrowlSeconds = 20;
 
         /// <summary>设备连接失败通知：Growl 错误气泡，几秒后自己收，鼠标停在气泡上 HandyControl 会把计时清零。Error 档在 !IsCustom 时硬置 StaysOpen=true（就是不自动关，8 路一起报错就得挨个点关闭）；走 IsCustom=true 才会上启动关闭的计时器，而图标与红色仍按 Error 默认给（源码那边是 ??= 兜底），外观不变；同一份内容在页底状态条、明细表与日志里都还在。</summary>
         private void OnDeviceConnectionFailed(string moduleName, string message)
@@ -502,6 +525,13 @@ namespace TORNPISolution.ViewModels
         public ICommand BackToEntryCommand { get; }
         public ICommand SavePlanCommand { get; }
         public ICommand LoadPlanCommand { get; }
+        public ICommand SaveReportCommand { get; }
+
+        /// <summary>入库失败重试命令（快照在内存里重放；没有滞留快照时不可用）</summary>
+        public ICommand RetrySaveCommand { get; }
+
+        /// <summary>是否有滞留的未入库快照（入库失败过）：界面上「重试保存」按钮的可见性绑它</summary>
+        public bool HasPendingSave => _pendingSaveSnapshot != null;
 
         /// <summary>当前加载的方案名称</summary>
         public string CurrentPlanName
@@ -704,6 +734,11 @@ namespace TORNPISolution.ViewModels
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.RunPlan() method . {Environment.NewLine}");
             IsRunning = true;
             TestRunState.SetRunning(true);
+            _runStartedAt = DateTime.Now;   // 入库快照的 StartedAt
+            // 上一轮入库失败滞留的快照会被本轮快照覆盖：先记一笔，别让数据无声消失
+            if (_pendingSaveSnapshot != null)
+                _log.Warn($"开新一轮将覆盖上一轮未入库的快照（{_pendingSaveSnapshot.Items.Count} 项）——需要留档请先点「重试保存」");
+            SetLastSavedReportNo(null);     // 开跑即作废上一轮编号：本轮没入库前「导出报告」必须是灰的，否则导的是上一轮
             _runCts = new CancellationTokenSource();
             _runDone = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -774,6 +809,9 @@ namespace TORNPISolution.ViewModels
 
                 NotifyPlanResultChanged();
                 _log.Info($"===== 方案执行完成，整体判定：{PlanResultText} =====");
+
+                // 完整跑完才自动入库：中止（OperationCanceledException）与半路异常都走另一个分支，不写库，避免半份数据
+                await AutoSaveRunAsync();
             }
             catch (OperationCanceledException)
             {
@@ -808,6 +846,196 @@ namespace TORNPISolution.ViewModels
                 // 收尾全部做完才放行关窗口的等待（前面任何一步抛异常也不能漏这一句）
                 _runDone?.TrySetResult();
             }
+        }
+
+        // ==================== 测试数据自动入库 ====================
+
+        /// <summary>方案完整跑完后自动入库：采快照 → 单事务写 3 张表；全未测不入库，失败则快照留内存待「重试保存」。</summary>
+        private async Task AutoSaveRunAsync()
+        {
+            try
+            {
+                var snapshot = BuildRunSnapshot();
+
+                // 整轮没有已测项就不入库：历史列表与区间统计不该出现空轮次
+                if (!snapshot.Items.Any(i => !i.NotJudged && !i.DisplayOnly && i.Result != TestResultStatus.NotTested))
+                {
+                    _log.Warn("本轮没有任何已测项（全部未测试/跳过），不入库");
+                    return;
+                }
+
+                try
+                {
+                    // SQLite 没有真异步，整段写库是同步 I/O：不挪出 UI 线程，收尾这几秒整个窗口点不动
+                    var result = await Task.Run(() => _testDataService.SaveRunAsync(snapshot));
+                    ClearPendingSave();
+                    SetLastSavedReportNo(result.ReportNo);
+                    Growl.SuccessGlobal(new GrowlInfo
+                    {
+                        Message = $"已自动保存 {result.PassCount + result.FailCount + result.NotTestedCount} 个测试项，编号 {result.ReportNo}",
+                        WaitTime = SaveGrowlSeconds,
+                        IsCustom = true,
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // 这里在收尾链上：弹模态框会把会话释放与 IsRunning 复位一起卡在操作员那一指上，所以只留气泡
+                    // ——快照已经留在内存里，操作员什么时候点「重试保存」都行
+                    _log.Error($"测试数据入库失败（快照留内存，可点「重试保存」补存）：{ex.Message}", ex);
+                    _pendingSaveSnapshot = snapshot;
+                    OnPropertyChanged(nameof(HasPendingSave));
+                    Growl.ErrorGlobal(new GrowlInfo
+                    {
+                        Message = $"测试数据入库失败：{ex.Message}\n本轮数据留在内存，点「重试保存」补存（开新一轮会被覆盖）。",
+                        WaitTime = PendingSaveGrowlSeconds,
+                        IsCustom = true,
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                // 采快照阶段出错：只记日志，不再弹框打断收尾流程
+                _log.Error($"自动入库采快照异常：{ex.Message}", ex);
+            }
+        }
+
+        /// <summary>「重试保存」命令：把滞留的快照重新写库，成功即清除滞留态；仍失败则气泡报错、快照继续留着</summary>
+        private async void RetrySave()
+        {
+            var snapshot = _pendingSaveSnapshot;
+            if (snapshot == null) return;
+            try
+            {
+                var result = await Task.Run(() => _testDataService.SaveRunAsync(snapshot));
+                ClearPendingSave();
+                SetLastSavedReportNo(result.ReportNo);
+                Growl.SuccessGlobal(new GrowlInfo
+                {
+                    Message = $"补存成功：编号 {result.ReportNo}，{result.PassCount + result.FailCount + result.NotTestedCount} 个测试项",
+                    WaitTime = SaveGrowlSeconds,
+                    IsCustom = true,
+                });
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"补存失败（快照仍留内存）：{ex.Message}", ex);
+                Growl.ErrorGlobal(new GrowlInfo
+                {
+                    Message = $"补存失败：{ex.Message}（可再点「重试保存」）",
+                    WaitTime = SaveGrowlSeconds,
+                    IsCustom = true,
+                });
+            }
+        }
+
+        private void ClearPendingSave()
+        {
+            _pendingSaveSnapshot = null;
+            OnPropertyChanged(nameof(HasPendingSave));
+        }
+
+        /// <summary>最近一次成功入库的报告编号：「导出报告」按钮的可用条件（null=本轮还没存上，按钮置灰）</summary>
+        public string? LastSavedReportNo => _lastSavedReportNo;
+
+        /// <summary>按钮文案带上轮次编号：只写"导出报告"容易把上一轮的 PDF 当本轮交出去</summary>
+        public string SaveReportText => _lastSavedReportNo == null ? "导出报告" : $"导出报告 {_lastSavedReportNo}";
+
+        /// <summary>入库编号的唯一写入口：编号一变，按钮文案与可用性同时跟上</summary>
+        private void SetLastSavedReportNo(string? reportNo)
+        {
+            _lastSavedReportNo = reportNo;
+            OnPropertyChanged(nameof(LastSavedReportNo));
+            OnPropertyChanged(nameof(SaveReportText));
+            RequeryCommands();
+        }
+
+        /// <summary>「导出报告」：按最近一次入库的编号导 PDF（数据已在库里，这里只产文档）</summary>
+        private async void SaveReport()
+        {
+            if (_lastSavedReportNo == null) return;
+            try
+            {
+                // 取数段（本轮 + 环比共三次查询）也是同步 SQLite I/O，整段挪出 UI 线程
+                var path = await Task.Run(() => _testReportService.ExportRunReportAsync(_lastSavedReportNo));
+                Growl.SuccessGlobal(new GrowlInfo
+                {
+                    Message = $"报告已导出：{path}",
+                    WaitTime = SaveGrowlSeconds,
+                    IsCustom = true,
+                });
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"导出测试报告失败（编号 {_lastSavedReportNo}）：{ex.Message}", ex);
+                Growl.ErrorGlobal(new GrowlInfo
+                {
+                    Message = $"报告导出失败：{ex.Message}",
+                    WaitTime = SaveGrowlSeconds,
+                    IsCustom = true,
+                });
+            }
+        }
+
+        /// <summary>从方案模块树采入库快照：模块/项名/判定/双值/原始文本/规格快照/逐点子表全带上（含未测项）；
+        /// 保存服务只认快照，不认识 ViewModel。</summary>
+        private TestRunSnapshot BuildRunSnapshot()
+        {
+            var snapshot = new TestRunSnapshot
+            {
+                Station = "整机",
+                PlanName = string.IsNullOrEmpty(CurrentPlanName) ? "未命名方案" : CurrentPlanName,
+                ModuleIds = PlanModules.Select(m => m.Id).ToList(),
+                StartedAt = _runStartedAt,
+                FinishedAt = DateTime.Now,
+            };
+
+            foreach (var module in PlanModules)
+            {
+                foreach (var item in module.Items)
+                {
+                    snapshot.Items.Add(new TestItemSnapshot
+                    {
+                        ModuleId = module.Id,
+                        ModuleName = module.Name,
+                        Sequence = module.Sequence,
+                        ItemName = item.Name,
+                        Unit = item.Unit,
+                        ValueSource = item.Model.ValueSource,
+                        Value = item.MeasuredValue,
+                        InstrumentValue = item.InstrumentValue,
+                        ProductValue = item.ProductValue,
+                        InstrumentText = item.InstrumentRawText,
+                        ProductText = item.ProductRawText,
+                        // 规格快照：动态规格已解析进上下限（血压类按仪器读回现算），配置变了历史数据仍对得上
+                        SpecMin = item.LowerLimit,
+                        SpecMax = item.UpperLimit,
+                        SpecText = item.SpecText,
+                        Result = item.Result,
+                        DisplayOnly = item.IsDisplayOnly,
+                        NotJudged = item.IsReportedNotJudged,
+                        Points = item.PointResults.Select(p => new TestPointSnapshot
+                        {
+                            Name = p.Name,
+                            Schema = p.Schema,
+                            Unit = p.Unit,
+                            TargetPressure = p.TargetPressure,
+                            InstrumentValue = p.InstrumentValue,
+                            ProductValue = p.ProductValue,
+                            Error = p.Error,
+                            Pass = p.Pass,
+                            Remark = p.Remark,
+                            Average = p.Average,
+                            Max = p.Max,
+                            Min = p.Min,
+                            Range = p.Range,
+                            Cells = p.Cells,
+                            ShowVerdict = p.ShowVerdict,
+                        }).ToList(),
+                    });
+                }
+            }
+
+            return snapshot;
         }
 
         /// <summary>关窗口前调用：运行中先请求停止</summary>

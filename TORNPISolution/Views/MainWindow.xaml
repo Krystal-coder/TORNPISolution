@@ -177,6 +177,7 @@
                         </MenuItem.HeaderTemplate>
                         <MenuItem Header="保存方案" Click="MenuSavePlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                         <MenuItem Header="加载方案" Click="MenuLoadPlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="历史数据" Click="MenuHistory_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                         <Separator/>
                         <MenuItem Header="退出" Click="MenuExit_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
                     </MenuItem>
@@ -227,11 +228,23 @@
                     </MenuItem>
                 </Menu>
 
-                <Button HorizontalAlignment="Right" VerticalAlignment="Center"
-                        Content="← 返回工位选择" Command="{Binding BackToEntryCommand}"
-                        Style="{StaticResource Style.ToolButton}"
-                        Visibility="{Binding ShowBackButton, Converter={StaticResource BoolToVisibility}}"
-                        ToolTip="回到工位选择页（任一工位正在跑时不可点）"/>
+                <!-- 顶栏右侧操作：加载方案（仅整机页显示）+ 返回工位选择 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Command="{Binding LoadPlanCommand}" Margin="0,0,8,0"
+                            Visibility="{Binding IsWholeMachinePage, Converter={StaticResource BoolToVisibility}}"
+                            ToolTip="从磁盘加载已保存的测试方案（文件菜单里也有）"
+                            Style="{StaticResource Style.ToolButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FolderOpenOutline" Width="14" Height="14"
+                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="加载方案" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Content="← 返回工位选择" Command="{Binding BackToEntryCommand}"
+                            Style="{StaticResource Style.ToolButton}"
+                            Visibility="{Binding ShowBackButton, Converter={StaticResource BoolToVisibility}}"
+                            ToolTip="回到工位选择页（任一工位正在跑时不可点）"/>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -490,29 +503,40 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                    <!-- 方案操作区 -->
+                    <!-- 方案操作区：重试保存（仅入库失败时出现）/ 导出报告（导PDF，数据已自动入库）/ 复位结果 / 运行方案；保存与加载方案只在文件菜单 -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
                             Margin="14,6,14,12">
+                        <!-- 只在入库失败滞留时出现：把仍留在内存里的本轮数据补存进库 -->
+                        <Button Command="{Binding RetrySaveCommand}" Margin="0,0,8,0"
+                            ToolTip="上一轮入库失败后出现：把仍留在内存里的这轮数据补存进库（开新一轮会被覆盖）">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource Style.ToolButton}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasPendingSave}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ContentSave" Width="14" Height="14"
+                                                         VerticalAlignment="Center" Margin="0,0,6,0"
+                                                         Foreground="#FFEF5350"/>
+                                <TextBlock Text="重试保存" VerticalAlignment="Center" Foreground="#FFEF5350"/>
+                            </StackPanel>
+                        </Button>
                         <Button Style="{StaticResource Style.ToolButton}"
-                            Command="{Binding SavePlanCommand}" Margin="0,0,8,0"
-                            ToolTip="将当前测试方案保存到磁盘">
+                            Command="{Binding SaveReportCommand}" Margin="0,0,8,0"
+                            ToolTip="导出按钮上这个编号那一轮的测试报告（PDF）——方案跑完自动入库后才可点">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ContentSave" Width="14" Height="14"
+                            <materialDesign:PackIcon Kind="FilePdfBox" Width="14" Height="14"
                                                      VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="保存方案" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{StaticResource Style.ToolButton}"
-                            Command="{Binding LoadPlanCommand}" Margin="0,0,8,0"
-                            ToolTip="从磁盘加载已保存的测试方案">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FolderOpenOutline" Width="14" Height="14"
-                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="加载方案" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SaveReportText}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Content="复位结果" Style="{StaticResource Style.ToolButton}"
-                            Command="{Binding ResetPlanCommand}"/>
+                            Command="{Binding ResetPlanCommand}" Margin="0,0,8,0"/>
                     <Button Style="{StaticResource Style.PrimaryButton}"
                             Command="{Binding RunOrStopCommand}">
                         <!-- 空闲时"运行方案"，运行中变"停止" -->

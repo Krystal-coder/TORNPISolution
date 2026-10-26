@@ -135,7 +135,14 @@ namespace TORNPISolution.Service
                             Value = Math.Round(Math.Max(gSysRange, gDiaRange), 2),
                             InstrumentText = $"收缩压极差 {gSysRange:0.0}",
                             ProductText = $"舒张压极差 {gDiaRange:0.0}",
-                            Points = BuildBpRepeatRows(g, list, repeats, valid, BpTolerance),
+                            // 文本统计行（界面子表按 RepeatMatrix 口径显示）+ 数值统计行（RepeatStats：只入库/出报表，
+                            // 保存服务与报表图表直接读数值列，不解析文本行）
+                            Points = BuildBpRepeatRows(g, list, repeats, valid, BpTolerance)
+                                .Concat(new[]
+                                {
+                                    BpRepeatStatsRow("收缩压", g.Systolic, sysVals),
+                                    BpRepeatStatsRow("舒张压", g.Diastolic, diaVals),
+                                }).ToList(),
                         });
                     }
                     else
@@ -446,6 +453,7 @@ namespace TORNPISolution.Service
             return new TestPointResult
             {
                 Schema = TestPointSchemas.Repeat,
+                Unit = "BPM",
                 Name = name,
                 TargetPressure = target,
                 Average = Math.Round(avg, 2),
@@ -512,6 +520,24 @@ namespace TORNPISolution.Service
             };
 
         private static string NumOr(double value) => value.ToString("0.0");
+
+        /// <summary>BP-004 重复性数值统计行（收缩/舒张各一行）：把文本统计行里的统计量落成数值列
+        /// （Average/Max/Min/Range/Error），Schema=RepeatStats——入库与报表图表（折线图/统计卡）直接读列、
+        /// 不解析文本；界面子表渲染时跳过本口径（见 TestItemViewModel.BuildSubTable）</summary>
+        private static TestPointResult BpRepeatStatsRow(string channel, double target, List<double> values)
+            => new()
+            {
+                Schema = TestPointSchemas.RepeatStats,
+                Name = $"{channel}统计",
+                Unit = "mmHg",
+                TargetPressure = target,
+                Average = Math.Round(values.Average(), 2),
+                Max = Math.Round(values.Max(), 2),
+                Min = Math.Round(values.Min(), 2),
+                Range = Math.Round(values.Max() - values.Min(), 2),
+                Error = Math.Round(Math.Abs(values.Average() - target), 2),
+                ShowVerdict = false,
+            };
 
     }
 }

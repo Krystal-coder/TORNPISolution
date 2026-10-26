@@ -300,6 +300,12 @@ namespace TORNPISolution.Views
             ViewModel_LoadPlanRequested(sender, e);
         }
 
+        /// <summary>文件 → 历史数据：回看已入库的轮次，选中旧轮次可补导 PDF（数据自动入库，这里只回看不重测）</summary>
+        private void MenuHistory_Click(object sender, RoutedEventArgs e)
+        {
+            new HistoryWindow(App.Services.GetRequiredService<HistoryViewModel>()) { Owner = this }.ShowDialog();
+        }
+
         /// <summary>文件 → 退出：关闭主窗口退出程序</summary>
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {

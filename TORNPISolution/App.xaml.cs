@@ -18,9 +18,6 @@ namespace TORNPISolution
     {
         private readonly ILogService _log = new LogService(nameof(App));
 
-        /// <summary>
-        /// 全局服务容器：服务注册集中在 ConfigureServices
-        /// </summary>
         public static IServiceProvider Services { get; private set; } = null!;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -46,18 +43,28 @@ namespace TORNPISolution
                 _log.Error("后台线程未捕获异常（进程即将终止）", args.ExceptionObject as Exception);
             };
 
-            // ViewModel 从容器解析构造函数注入
             MainWindow = new MainWindow(Services.GetRequiredService<MainViewModel>());
             MainWindow.Show();
+
+            // 首次碰数据库要付模型构建 + e_sqlite3 加载 + 建表，SQLite 无真异步会同步冻住调用线程：
+            // 窗口出来后台先跑掉，不等第一次入库或开历史页时才卡
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Services.GetRequiredService<ITestDataService>().PrepareStorageAsync();
+                }
+                catch (Exception ex)
+                {
+                    _log.Error("测试数据预热失败：入库与历史数据页可能不可用", ex);
+                }
+            });
         }
 
         /// <summary>
-        /// 服务注册：设备、配置与执行链都是单例，ViewModel 一律 Transient；有生命周期讲究的是下面几条。
-        /// — InstrumentConfigService：Save 后同步刷新缓存，执行链路读到的就是最新值
-        /// — HardwareManager：注册为与静态 Instance 同一实例（固高/AECG100 全局共享连接）
-        /// — TestItem：PressureSampled/DeviceConnectionFailed 事件要求主 ViewModel 与执行方订阅同一实例
-        /// — ProductController 走工厂委托而不是单例：产品串口按模块用完即关，多个模块各自开关同一个口
-        /// — FlashingViewModel / BoardChannelViewModel 归 MainViewModel 持有：切页、返入口页、关窗收尾都要当闸门使
+        /// 服务注册：设备、配置与执行链单例，ViewModel 一律 Transient。
+        /// ProductController 用工厂委托而不是单例——产品串口按模块用完即关，各模块要自己开关同一个口；
+        /// TestItem 必须单例——PressureSampled/DeviceConnectionFailed 事件要求主 ViewModel 与执行方订阅同一实例。
         /// </summary>
         private static IServiceProvider ConfigureServices()
         {
@@ -78,6 +85,9 @@ namespace TORNPISolution
             services.AddSingleton<BloodPressureSimulatorSession>();
             services.AddSingleton<ITestItemService, TestItem>();
             services.AddSingleton<ITestPlanService, TestPlanService>();
+            // 测试数据入库：单例只持日志，每轮快照在方法内自写（单事务 3 张表），不跨轮残留
+            services.AddSingleton<ITestDataService, TestDataService>();
+            services.AddSingleton<ITestReportService, TestReportService>();
             services.AddSingleton<IAppStateService, AppStateService>();
             services.AddSingleton<Func<IProductController>>(sp =>
             {
@@ -92,6 +102,7 @@ namespace TORNPISolution
             services.AddTransient<BpaParamConfigViewModel>();
             services.AddTransient<Aecg100ParamConfigViewModel>();
             services.AddTransient<ProtocolCommandConfigViewModel>();
+            services.AddTransient<HistoryViewModel>();
 
             return services.BuildServiceProvider();
         }

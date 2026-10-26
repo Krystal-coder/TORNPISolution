@@ -189,6 +189,16 @@ namespace TORNPISolution.ViewModels
         public string ProductValueText =>
             _productText ?? (_productValue.HasValue ? $"{_productValue.Value.ToString(ValueFormat)} {Unit}" : "--");
 
+        // 入库快照用的原始值与原始文本（InstrumentValue 由 ApplyResult 回填）：显示仍走上面的 *Text；
+        // 数值项的 RawText 为 null，文本项的数值为 null
+        public double? InstrumentValue => _instrumentValue;
+
+        public double? ProductValue => _productValue;
+
+        public string? InstrumentRawText => _instrumentText;
+
+        public string? ProductRawText => _productText;
+
         /// <summary>判定结果</summary>
         public TestResultStatus Result
         {
@@ -360,6 +370,14 @@ namespace TORNPISolution.ViewModels
             SubTableRows.Clear();
             PointTableTitle = string.Empty;
             if (points == null || points.Count == 0)
+            {
+                OnPropertyChanged(nameof(PointTableTitle));
+                return;
+            }
+
+            // RepeatStats 数值统计行只供入库/报表图表读取，不在界面子表显示
+            points = points.Where(p => p.Schema != TestPointSchemas.RepeatStats).ToList();
+            if (points.Count == 0)
             {
                 OnPropertyChanged(nameof(PointTableTitle));
                 return;
