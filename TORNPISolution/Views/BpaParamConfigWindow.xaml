@@ -258,7 +258,7 @@
                                    Visibility="{Binding IsKangwenda, Converter={StaticResource KwVis}, ConverterParameter=invert}"
                                    Text="说明：选 Customized 方法后，点“方法”右侧的包络曲线图标进入 Oscillation Shape 页配置包络参数；&#10;x 轴八点须满足 SP2 &gt; PS &gt; SYS &gt; MAP2 &gt; MAP1 &gt; DIAS &gt; PD &gt; SP1（mmHg 0~299），y 轴五点百分比 0~100。"/>
 
-                        <!-- 血压测试点位：BP-004 压力组（心率全模块一个值） -->
+                        <!-- 血压测试点位：BP-004 压力组（每组一个心率） -->
                         <Grid Margin="0,20,0,8">
                             <TextBlock Text="BP-004 压力组（勾选行参与测试，逐组逐轮血压模拟）" Style="{StaticResource Style.GroupTitle}" Margin="0"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -271,15 +271,10 @@
                         </Grid>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="心率" Style="{StaticResource Style.CfgLabel}"/>
-                            <TextBox Style="{StaticResource Style.CfgBox}" Width="70"
-                                     ToolTip="BPM，所有压力组共用，设置到仪器驱动脉搏波"
-                                     Text="{Binding BpAccuracyHeartRate, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
-                            <TextBlock Text="BPM（所有压力组共用）" Style="{StaticResource Style.Hint}" Margin="8,0,16,0"/>
                             <TextBlock Text="每组轮数" Style="{StaticResource Style.CfgLabel}"/>
                             <TextBox Style="{StaticResource Style.CfgBox}" Width="70"
                                      Text="{Binding BpAccuracyRepeats, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
-                            <TextBlock Text="轮（少于 3 自动抬到 3）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
+                            <TextBlock Text="轮（1 轮不测组内极差，2 轮起判极差）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -292,6 +287,11 @@
                                          IsChecked="{Binding BpAccuracyVentDuringRest, Mode=TwoWay}" Margin="0,0,12,0"/>
                             <RadioButton Content="不泄" GroupName="BpAccuracyVent" VerticalAlignment="Center"
                                          IsChecked="{Binding BpAccuracyVentHold, Mode=TwoWay}"/>
+                            <TextBlock Text="单次测量超时" Style="{StaticResource Style.CfgLabel}" Margin="16,0,8,0"/>
+                            <TextBox Style="{StaticResource Style.CfgBox}" Width="70"
+                                     ToolTip="秒：超过该时长仍未收到产品血压结果帧，即结束本轮并停止本模块"
+                                     Text="{Binding BpAccuracySingleMeasureTimeoutSeconds, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
+                            <TextBlock Text="秒" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
                         </StackPanel>
 
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
@@ -309,6 +309,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="86"/>
                                                         <ColumnDefinition Width="86"/>
+                                                        <ColumnDefinition Width="86"/>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
@@ -320,10 +321,13 @@
                                                     <TextBox Grid.Column="2" Style="{StaticResource Style.CfgBox}"
                                                              ToolTip="舒张压（mmHg）"
                                                              Text="{Binding Diastolic, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
-                                                    <TextBlock Grid.Column="3" Style="{StaticResource Style.Hint}"
-                                                               Text="依次：收缩压 / 舒张压"
+                                                    <TextBox Grid.Column="3" Style="{StaticResource Style.CfgBox}"
+                                                             ToolTip="心率（BPM，本组激励参数，不参与判定）"
+                                                             Text="{Binding HeartRate, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
+                                                    <TextBlock Grid.Column="4" Style="{StaticResource Style.Hint}"
+                                                               Text="依次：收缩压 / 舒张压 / 心率"
                                                                Margin="10,0,0,0"/>
-                                                    <Button Grid.Column="4" Width="24" Height="24" Padding="0"
+                                                    <Button Grid.Column="5" Width="24" Height="24" Padding="0"
                                                             ToolTip="删除该压力组"
                                                             Command="{Binding DataContext.RemoveBpAccuracyGroupCommand,
                                                                       RelativeSource={RelativeSource AncestorType=Window}}"
@@ -337,7 +341,7 @@
                             </Grid>
                         </Border>
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,6,0,0" TextWrapping="Wrap"
-                                   Text="说明：“血压动态压力精度测试”（BP-004）按这份压力组、轮数与休息参数生成测试项；&#10;每轮一条独立曲线，休息段不绘制；偏差与极差均判 ≤±2mmHg，需连接储气瓶产生脉搏波。"/>
+                                   Text="说明：“血压动态压力精度测试”（BP-004）按这份压力组（每组一个心率）、轮数与休息参数生成测试项；&#10;每轮一条独立曲线，休息段不绘制；偏差与极差均判 ≤±2mmHg，需连接储气瓶产生脉搏波。"/>
 
                         <!-- 血压心率点位：BP-005 心率点（血压只用一组，心率可多点） -->
                         <Grid Margin="0,20,0,8">
@@ -365,7 +369,7 @@
                             <TextBlock Text="每点轮数" Style="{StaticResource Style.CfgLabel}"/>
                             <TextBox Style="{StaticResource Style.CfgBox}" Width="70"
                                      Text="{Binding BpHeartRateRepeats, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
-                            <TextBlock Text="轮（少于 3 自动抬到 3）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
+                            <TextBlock Text="轮（1 轮时平均值即该轮）" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -378,6 +382,11 @@
                                          IsChecked="{Binding BpHeartRateVentDuringRest, Mode=TwoWay}" Margin="0,0,12,0"/>
                             <RadioButton Content="不泄" GroupName="BpHeartRateVent" VerticalAlignment="Center"
                                          IsChecked="{Binding BpHeartRateVentHold, Mode=TwoWay}"/>
+                            <TextBlock Text="单次测量超时" Style="{StaticResource Style.CfgLabel}" Margin="16,0,8,0"/>
+                            <TextBox Style="{StaticResource Style.CfgBox}" Width="70"
+                                     ToolTip="秒：超过该时长仍未收到产品血压结果帧，即结束本轮并停止本模块"
+                                     Text="{Binding BpHeartRateSingleMeasureTimeoutSeconds, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
+                            <TextBlock Text="秒" Style="{StaticResource Style.Hint}" Margin="8,0,0,0"/>
                         </StackPanel>
 
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
@@ -623,6 +632,86 @@
 
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
                                    Text="说明：BP-006~009 四项均以产品串口回读压力（0x76）判定产品自己的充放气/保护行为，未接产品直接判 FAIL；&#10;充气主体是产品气泵（BP-006/007/008 走 0x79 测量、BP-009 走 0x75 强制充气），模拟仪只当手臂提供脉搏波、不碰它的气源和阀；&#10;规格上下限（≤300mmHg、2~6mmHg/s、≤10s、≤15s、≤3s）由测试要求文档固定，不在此配置；本页只配激励档与计时/定区间参数。"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 气路类两项判定区间（A18 放气速率 / A22 气路泄露，走 BPA700 静态压力序列，康伟达页签隐藏本页） -->
+            <TabItem Visibility="{Binding IsKangwenda, Converter={StaticResource KwVis}, ConverterParameter=invert}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="WeatherWindy" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="气路测试" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="8,4">
+
+                        <TextBlock Text="放气速率测试（A18 / BP-007）" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                            <UniformGrid Columns="2">
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="加压时间 t1 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathInflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="加压时间 t1 上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathInflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（留空按 30 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="泄压时间 t2 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathDeflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="泄压时间 t2 上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathDeflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（留空按 60 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </Border>
+
+                        <TextBlock Text="气路泄露测试（A22 / BP-010）" Style="{StaticResource Style.GroupTitle}"/>
+                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
+                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
+                            <UniformGrid Columns="2">
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="高压泄气值 ΔP_H 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathHighLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（留空=不限下限：终点高于起点时差值为负）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="高压泄气值 ΔP_H 上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathHighLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（留空按 2 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="低压泄气值 ΔP_L 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathLowLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="低压泄气值 ΔP_L 上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding AirPathLowLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（留空按 2 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
+                                   Text="说明：两项的判定区间写进 TestParams.AirPath 节点，保存即生效（测试项上的规格范围在每次执行时按本配置现算回填，不必重新拖模块）；&#10;泄气量两项以产品上报值（0x76 采样压力差）判定，仪器侧差值同列展示；加压/泄压时间两列为同一实测时长，产品列文本附该点 0x76 采样压力；&#10;上下限都留空时该项不判 PASS/FAIL，只报实测值。"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

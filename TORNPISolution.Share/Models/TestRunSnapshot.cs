@@ -14,6 +14,12 @@ namespace TORNPISolution.Share.Models
         /// <summary>本轮模块 ID 列表（如 A07/A17/A04），存为 ModulesJson 快照</summary>
         public List<string> ModuleIds { get; set; } = new();
 
+        /// <summary>各模块（大项）本轮用时，按执行序号对齐测试项的 Sequence</summary>
+        public List<TestModuleTiming> ModuleTimings { get; set; } = new();
+
+        /// <summary>本轮血压量测时间（仪器链接配置里的稳压保持秒数快照，null = 未采集）</summary>
+        public int? MeasureSeconds { get; set; }
+
         public DateTime StartedAt { get; set; }
 
         /// <summary>方案收口时间（报告编号按这一天的序号排）</summary>
@@ -73,8 +79,20 @@ namespace TORNPISolution.Share.Models
         /// <summary>演示不判定（无产品演示模式）：保持未测试</summary>
         public bool NotJudged { get; set; }
 
+        /// <summary>本项耗时（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟；null = 本轮没跑到这项</summary>
+        public double? DurationSeconds { get; set; }
+
         /// <summary>逐点子表（RepeatStats 行只入库/出报表，UI 子表不显示）</summary>
         public List<TestPointSnapshot> Points { get; set; } = new();
+    }
+
+    /// <summary>一个模块（大项）的本轮用时：模块从派发到收尾的实际墙钟秒数</summary>
+    public class TestModuleTiming
+    {
+        /// <summary>模块在方案内的执行序号（与 TestItemSnapshot.Sequence 对齐）</summary>
+        public int Sequence { get; set; }
+
+        public double Seconds { get; set; }
     }
 
     /// <summary>一个逐点子表行的入库快照</summary>

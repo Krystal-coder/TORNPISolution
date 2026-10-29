@@ -4,7 +4,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：血压计量检定——A19 JJG692 放气速率（听诊）/ A20 JJG692 气密性，含康伟达能力守卫与检定结果构造。
+    /// TestItem 分部：血压计量检定——A19 JJG692 放气速率（听诊）/ A20 JJG692 气密性，含康伟达
     /// </summary>
     public partial class TestItem
     {

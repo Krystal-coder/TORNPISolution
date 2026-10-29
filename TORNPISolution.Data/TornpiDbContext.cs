@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 namespace TORNPISolution.Data
 {
     /// <summary>
-    /// 数据库上下文（EF Core + SQLite）：轮次(TestRun) → 测试项(TestItemResult) → 逐点(TestPointResult) 三张表。
-    /// 表结构按数据形态建、不按模块/工位建：未来单板/烧录复用同一套表，用 TestRun.Station 区分来源。
-    /// 绿场用 EnsureCreated 建库（库文件位置见 <see cref="TestDataPaths"/>），以后加列改迁移或提升 PRAGMA user_version。
+    /// 数据库上下文（EF Core + SQLite）：轮次(TestRun) → 测试项(TestItemResult) → 逐点(TestPointResult) 三张表
+    /// 表结构按数据形态建、不按模块/工位建：单板/烧录复用同一套表，用 TestRun.Station 区分来源
     /// </summary>
     public class TornpiDbContext : DbContext
     {

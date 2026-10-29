@@ -5,8 +5,6 @@ namespace TORNPISolution.Service.Communication
 {
     /// <summary>
     /// 通用串口客户端：文本（AT 指令）、二进制（固定帧）、自行分帧（设备主动连发）三种通讯模式。
-    /// 自行分帧不持 _lock：ReadRaw 轮询期间还要 WriteRaw，加锁会必然等满超时。
-    /// 接第二个用户前先确认是否会并发写同一端口：一端口一实例或补锁。
     /// </summary>
     public class SerialClient : IDisposable
     {

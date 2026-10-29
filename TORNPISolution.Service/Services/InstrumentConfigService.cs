@@ -6,11 +6,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 仪器链接配置服务：配置以 JSON 存于程序目录 Config\instruments.json，读取失败时回退默认配置并记录日志，不影响程序启动。
-    /// 带文件时间戳的内存缓存：文件未变时直接从缓存反序列化（不读盘、不记日志），启动只真正加载一次；Save 或外部修改文件后下次 Load 自动重读。
-    /// 多个配置窗口各持一份整档快照，Save 必须先重读磁盘、只回写本次改过的字段，整档覆盖会丢失其它窗口或手工修改的内容（见 MergeChangedFields）。
-    /// 写盘用临时文件+改名替换，中途断电不会留下半截 JSON；覆盖前把旧档留成 .bak，主文件不可用时 Load 退回上一份（见 WriteAtomic）。
-    /// 反序列化前一律剔除显式 null：属性初始化器只在"缺字段"时生效，显式 null 会原样赋进去，执行端 config.X.Y 直取即 NRE（见 StripNulls）。
+    /// 仪器链接配置服务：配置以 JSON 存于程序目录 Config\instruments.json，读取失败时回退默认配置并记录日志，不影响程序启动
     /// </summary>
     public class InstrumentConfigService : IInstrumentConfigService
     {

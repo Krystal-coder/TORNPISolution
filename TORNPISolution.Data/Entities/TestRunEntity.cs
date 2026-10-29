@@ -20,6 +20,12 @@ namespace TORNPISolution.Data
         /// <summary>本轮模块 ID 快照（JSON 数组，如 ["A07","A17","A04"]）：方案内模块可增删，快照保证老轮次能还原当时的组合</summary>
         public string ModulesJson { get; set; } = string.Empty;
 
+        /// <summary>本轮各模块（大项）用时快照（JSON 数组，如 [{"Sequence":3,"Seconds":93.0}]）：模块跑完即测得，与逐项无关；null = 该轮未采集</summary>
+        public string? ModuleTimingsJson { get; set; }
+
+        /// <summary>本轮血压量测时间快照（秒，仪器链接配置里的稳压保持时长）：配置后续改动不改历史轮次；null = 该轮未采集</summary>
+        public int? MeasureSeconds { get; set; }
+
         public DateTime StartedAt { get; set; }
 
         /// <summary>收口时刻：列表排序、区间统计筛选、报告编号都按它算（<see cref="CreatedAt"/> 是写库时刻，差几秒但语义不同）</summary>

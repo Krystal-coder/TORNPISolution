@@ -5,11 +5,7 @@ using TORNPISolution.Service.Communication;
 namespace TORNPISolution.Service.Devices
 {
     /// <summary>
-    /// Alicat 质量流量控制器控制类（Modbus RTU / RS485），协议要点见 Alicat Modbus 通讯协议手册：
-    /// - 采用 PLC 编号约定，手册寄存器号从 1 开始，报文地址需减 1；
-    /// - 32 位值大端字序：高字在低地址寄存器（与美仪相反）；
-    /// - 设定点必须用 0x10 写多寄存器一次写入两个寄存器；
-    /// - 命令通过寄存器 1000（命令 ID）+ 1001（命令参数）下发，写完后读回 1001 取执行状态（0x8001~0x8006 为错误）。
+    /// Alicat 质量流量控制器控制类（Modbus RTU / RS485），协议要点见 Alicat Modbus 通讯协议手册
     /// </summary>
     public class AlicatMassFlowController : IMassFlowController
     {

@@ -46,6 +46,9 @@ namespace TORNPISolution.Interface
         /// <summary>关闭压力传感器（0x07 0x67）：校准模块全部测试项结束后发送，归还产品常态</summary>
         Task ClosePressureSensorAsync(CancellationToken ct = default);
 
+        /// <summary>开/关泄气阀（0x07 0x6A 开 / 0x6B 关）：气路类测试前置关阀使产品侧封闭，模块结束开阀归还常态</summary>
+        Task SetVentValveAsync(bool open, CancellationToken ct = default);
+
         /// <summary>读取产品当前静态压力值（0x76 读产品压力值）：BP-003 用，产品传感器检测到的 BPA700 施加稳压值（mmHg）</summary>
         Task<double> ReadProductPressureAsync(CancellationToken ct = default);
 
@@ -53,9 +56,21 @@ namespace TORNPISolution.Interface
         Task<ProductBpReading?> ReadBpResultAsync(CancellationToken ct = default);
 
         /// <summary>
-        /// 等待产品主动推送的血压测量结果（控制码 0x7B，超时 60s）：实测当前固件不主动推 0x7B（测量期间只周期推 0xCA，协议未定义），属预留接口，BP-004/005 走主动轮询。
+        /// 产测态开始一次完整血压测量（0x07/0xCA 无参帧 EF 02 07 CA 17 57 FE）：产品自行充放气，结果帧由 <see cref="WaitFullBpResultAsync"/> 收。
+        /// 与 0x73 血压测试模式无关——本流程不进测试模式，A16 进产测模式后即可用。
         /// </summary>
-        Task<ProductBpReading?> WaitForBpPushResultAsync(int timeoutMs = 60000, CancellationToken ct = default);
+        Task StartFullBpMeasureAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 产测态结束一次完整血压测量（0x07/0xCC 无参帧 EF 02 07 CC 97 55 FE）：每轮测完（含超时、停止）都必须发一次，否则下一次开始不被接受。
+        /// </summary>
+        Task StopFullBpMeasureAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// 等待本轮 0xCA 结果帧（状态码/收缩压/舒张压/平均压/心率各 uint16 LE）：期间独占产品串口，测量中的 0xCA 进程帧跳过继续等。
+        /// TimedOut=true 表示超时未收到结果帧（调用方须补发结束并停仪器输出）；等到但状态码非 0 时 TimedOut=false、Reading=null。
+        /// </summary>
+        Task<(bool TimedOut, ProductBpReading? Reading)> WaitFullBpResultAsync(int timeoutMs = 120_000, CancellationToken ct = default);
 
         /// <summary>开始/关闭一次完整血压测量（0x79，参数 0=开始 1=关闭；协议要求测完后发一次关闭才能再次开始）</summary>
         Task StartBpMeasureAsync(bool start = true, CancellationToken ct = default);
@@ -83,11 +98,12 @@ namespace TORNPISolution.Interface
 
         /// <summary>
         /// 采集产品主动推送的心电波形（Func=0x05 / Ctrl=0x8D，每帧 75 点 = 300ms @ 250SPS）：整段窗口（skipMs + durationMs）独占串口，期间不得并发收发其他命令。
-        /// </summary>
         /// <param name="durationMs">有效记录时长（毫秒）</param>
         /// <param name="skipMs">先丢弃不记录的时长（毫秒）：避开刚进入心电测量的起始瞬态，回调里的帧时刻已含本偏移量</param>
         /// <param name="onFrame">每解出一帧回调（帧首点绝对时刻 秒（含 skipMs 偏移），该帧电压数组 mV）；后台线程调用</param>
         /// <returns>实际记录到的采样点数（不含丢弃段）；0 = 未收到任何波形帧</returns>
+        /// </summary>
+
         Task<int> CaptureEcgWaveAsync(int durationMs, int skipMs = 0, Action<double, double[]>? onFrame = null, CancellationToken ct = default);
 
         /// <summary>读取心率测量值（0x7C）</summary>
@@ -105,11 +121,13 @@ namespace TORNPISolution.Interface
         /// <summary>读取充电状态（0x6D）：返回是否正在充电（1=充电中，0=未充电）</summary>
         Task<byte> ReadChargingStatusAsync(CancellationToken ct = default);
 
-        /// <summary>通用命令发送：按协议命令配置（protocol_commands.json）里的功能码/控制码下发任意命令，供未封装成专用方法的命令使用</summary>
+        /// <summary>
+        /// 通用命令发送：按协议命令配置（protocol_commands.json）里的功能码/控制码下发任意命令，供未封装成专用方法的命令使用
         /// <param name="cmd">命令标识（功能码 + 控制码）</param>
         /// <param name="data">参数数据（可为 null）</param>
         /// <param name="timeoutMs">超时（毫秒，0 表示用默认）</param>
         /// <returns>响应帧 payload；无响应返回 null</returns>
+        /// </summary>
         Task<byte[]?> SendRawCommandAsync(ProductCmd cmd, byte[]? data = null, int timeoutMs = 0, CancellationToken ct = default);
     }
 }

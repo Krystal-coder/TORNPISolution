@@ -4,9 +4,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// Spec：单板工位（Category=Board）。
-    /// B01 不依赖仪器配置所以是静态方法；B02/B03/B04 的项清单按仪器配置里启用的台数生成，所以这些 Build 方法与槽位读取辅助都是实例方法（要读 _configService），口径与执行端同用一个函数。
-    /// 书写约定与整机那份一致：#region 模块清单 里一个模块一段（//======Bxx====== 开头），段与段之间不夹辅助方法；读配置与算槽位的辅助统一放文件末尾的 #region 取配置与槽位辅助。
+    /// Spec：单板工位（Category=Board）
     /// </summary>
     public partial class Spec
     {

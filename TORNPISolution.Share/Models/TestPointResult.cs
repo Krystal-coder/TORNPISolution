@@ -55,7 +55,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>误差 |产品上报值 − 仪器测试值|（任一值缺失为 null）</summary>
         public double? Error { get; set; }
 
-        /// <summary>该点判定（阈值随口径：BP-003 逐点 ±3、BP-004 通道 ±2、BP-005 逐轮 max(5, 设定×5%)）</summary>
+        /// <summary>该点判定（阈值随口径：BP-003 逐点 ±0.5、BP-004 通道 ±2、BP-005 逐轮 max(5, 设定×5%)）</summary>
         public bool Pass { get; set; }
 
         /// <summary>失败原因（PASS 时为空），如 "无产品上报值（产品未连接或无响应）"</summary>

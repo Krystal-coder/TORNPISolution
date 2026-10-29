@@ -11,7 +11,6 @@ namespace TORNPISolution.Interface
         Task PrepareStorageAsync(CancellationToken ct = default);
 
         /// <summary>保存一轮测试结果并生成报告编号（中止、全部项未测试的轮次不入库）</summary>
-        /// <exception cref="InvalidOperationException">编号撞唯一索引等入库异常，由 UI 捕获后弹「重试保存」</exception>
         Task<TestRunSaveResult> SaveRunAsync(TestRunSnapshot snapshot, CancellationToken ct = default);
 
         /// <summary>历史轮次列表（收口时间倒序，默认最近 300 条）</summary>

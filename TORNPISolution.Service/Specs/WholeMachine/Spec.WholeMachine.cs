@@ -5,8 +5,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// Spec 分部：整机工位（Category=WholeMachine）。
-    /// 书写约定：#region 模块清单 里一个模块一段（//======Axx====== 开头），段与段之间不夹辅助方法；读配置与拼展示文本的辅助统一放文件末尾的 #region 取配置与展示辅助。
+    /// Spec 分部：整机工位（Category=WholeMachine）
     /// </summary>
     public partial class Spec
     {
@@ -31,7 +30,9 @@ namespace TORNPISolution.Service
             BuildSpo2AccuracyTest(),         // A13 SpO2精度检测（SPO2-004~006）
             BuildSpo2PerfusionTest(),        // A14 SpO2灌注与抗干扰测试（SPO2-008~010）
             BuildChargingTest(),             // A15 充电测试
-            BuildProductStaticPressureCalibration(),   // A17 产品静态压力校准（60/120/180/240 逐点校准）
+            BuildProductStaticPressureCalibration(),   // A17 产品静态压力校准（50/150/250 逐点校准）
+            BuildDeflateRateTest(),            // A18 放气速率测试（BP-007：加压 t1 / 泄压 t2）
+            BuildAirPathLeakTest(),            // A22 气路泄露测试（BP-010：高低压段起止压差）
             BuildJjg692DeflationRateTest(),  // A19 JJG692 放气速率（听诊）（康伟达 0x04/0x12）
             BuildJjg692AirtightnessTest(),   // A20 JJG692 气密性（康伟达 0x04/0x13）
         };
@@ -150,7 +151,7 @@ namespace TORNPISolution.Service
         }
 
         //======================================A17-----------产品静态压力校准
-        // 流程：启动压力传感器（0x65）-> 逐点 60/120/180/240：模拟仪稳压 -> 发校准（0x66 + uint16 LE）-> 等 2s -> 下一点
+        // 流程：启动压力传感器（0x65）-> 逐点 50/150/250：模拟仪稳压 -> 发校准（0x66 + uint16 LE）-> 等 2s -> 下一点
         //       -> 全部测试项结束后关闭压力传感器（0x67）。逐点判定：|稳压值-校准点| ≤3mmHg 且校准有 ACK。
         private TestModuleModel BuildProductStaticPressureCalibration()
         {
@@ -171,6 +172,67 @@ namespace TORNPISolution.Service
             AddResult(ti, name: SpecItems.PcalCloseSensor,
                 description: "关闭压力传感器（0x07 0x67），有响应即通过",
                 specMin: 1, specMax: 1, unit: "", hideSpecRange: true);
+
+            return ti;
+        }
+
+        //======================================A18-----------放气速率测试（BP-007）
+        // 流程：关闭泄气阀（0x6B）-> 进静态压力模式（0x73 mode=3）-> 仪器跑一轮"充气到 230 后转入缓降、降到 40 即停"，t1/t2 取仪器上报的充气段与泄气段时长，两段各回读一次产品采样压力（0x76）
+        //       -> 退出静态压力模式 + 再发一次打开泄气阀（兜住停止/异常路径）+ 仪器泄放回零
+        // 这一轮流程用正式版 SDK 的过压测试（BPARunOverpressureTest）：缓降通路就是仪器自己的放气阀，所以本项不碰仪器阀，也不走 1.0.4.0-BETA 的静态压力序列
+        // 两项规格文档标注“待定”，判定区间改由配置页（血压模拟仪配置 → 气路测试）填写；这里的上下限只是目录展示值，执行时按配置现算回传
+        private TestModuleModel BuildDeflateRateTest()
+        {
+            var ap = GetAirPathParams();
+            var ti = AddTI(TestModuleIds.DeflateRateTest, ModuleCategory.WholeMachine, "放气速率测试",
+                "仪器充气到 230 记 t1、缓降到 40 记 t2，两段时长由仪器上报，仅 BPA700 模拟仪");
+
+            // 两项的实测值是同一时长（单位 s），测试值与仪器列同值；该点 0x76 采样压力与仪器均值读回落在子表行（测试值列文本优先，写成项文本会顶掉判定用的时长）
+            AddResult(ti, name: SpecItems.Deflate007InflateTime,
+                description: $"仪器从起压充到峰值的耗时（判定区间取配置（当前 {FormatRange(ap.InflateTimeMin, ap.InflateTimeMax, "s")}）；测试值与仪器列同为 t1，单位 s；子表行给 {SpecItems.DeflateInflatePressure:0}mmHg 点的仪器均值与 0x76 采样压力）",
+                specMin: ap.InflateTimeMin ?? 0, specMax: ap.InflateTimeMax ?? 30, unit: "s", waveform: WaveformPresentation.Inline,
+                waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
+            AddResult(ti, name: SpecItems.Deflate007DeflateTime,
+                description: $"仪器从峰值缓降到 {SpecItems.DeflateEndPressure:0}mmHg 的耗时，缓降走仪器自己的放气阀、到点即停（判定区间取配置（当前 {FormatRange(ap.DeflateTimeMin, ap.DeflateTimeMax, "s")}）；测试值与仪器列同为 t2，单位 s；子表行给该点仪器均值与 0x76 采样压力）",
+                specMin: ap.DeflateTimeMin ?? 0, specMax: ap.DeflateTimeMax ?? 60, unit: "s", waveform: WaveformPresentation.Inline,
+                waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
+
+            return ti;
+        }
+
+        //======================================A22-----------气路泄露测试（BP-010）
+        // 流程：提示测试员封堵泄气阀毛细气孔 -> 关闭泄气阀（0x6B）-> 进静态压力模式（0x73 mode=3）-> 仪器用静态压力序列一次下发 [50, 250]（低压段在前，两段都由仪器升压到位）
+        //       -> 低压段：压力升到 50mmHg 稳压 3s 读 P_L_start，再保压 5s 读 P_L_end，差值即低压泄气量
+        //       -> 高压段：50 这点回读稳压后保持设定时长，设备直接升到 250mmHg（点之间不泄回零），稳压 3s 读 P_H_start，再保压 5s 读 P_H_end，差值即高压泄气量
+        //       -> 结束本轮 + 退出静态压力模式 + 打开泄气阀（0x6A）+ 仪器泄放回零。读静态压力值与校准、静态压力精度检测同一条指令（0x76）。
+        // 两项泄气量规格文档标注“待定”，判定区间改由配置页（血压模拟仪配置 → 气路测试）填写；判定值取产品上报差值，仪器侧差值同列展示
+        private TestModuleModel BuildAirPathLeakTest()
+        {
+            var ap = GetAirPathParams();
+            var ti = AddTI(TestModuleIds.AirPathLeakTest, ModuleCategory.WholeMachine, "气路泄露测试",
+                "封堵气孔后低压 50、高压 250 两段各读起止压力，起止差值判气路泄露，仅 BPA700 模拟仪");
+
+            AddResult(ti, name: SpecItems.Leak010LowStart,
+                description: $"加压 {SpecItems.LeakLowPressure:0}mmHg 稳压 3s 时的起点压力（仪器列=稳压读回，产品列=采样压力，只展示不判定）",
+                specMin: 0, specMax: 0, unit: "mmHg", valueSource: "Both", waveform: WaveformPresentation.Inline,
+                waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
+            AddResult(ti, name: SpecItems.Leak010LowEnd,
+                description: "低压保压 5s 结束时的终点压力（仪器列=稳压读回，产品列=采样压力，只展示不判定）",
+                specMin: 0, specMax: 0, unit: "mmHg", valueSource: "Both");
+            AddResult(ti, name: SpecItems.Leak010LowLoss,
+                description: $"低压段起止压力差（判定值=产品侧差值，仪器列=仪器侧差值；判定区间取配置（当前 {FormatRange(ap.LowLossMin, ap.LowLossMax)}））",
+                specMin: ap.LowLossMin ?? 0, specMax: ap.LowLossMax ?? 2, unit: "mmHg", valueSource: "Both");
+
+            AddResult(ti, name: SpecItems.Leak010HighStart,
+                description: $"从低压段直接升压到 {SpecItems.LeakHighPressure:0}mmHg 稳压 3s 时的起点压力（仪器列=稳压读回，产品列=采样压力，只展示不判定）",
+                specMin: 0, specMax: 0, unit: "mmHg", valueSource: "Both", waveform: WaveformPresentation.Inline,
+                waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
+            AddResult(ti, name: SpecItems.Leak010HighEnd,
+                description: "高压保压 5s 结束时的终点压力（仪器列=稳压读回，产品列=采样压力，只展示不判定）",
+                specMin: 0, specMax: 0, unit: "mmHg", valueSource: "Both");
+            AddResult(ti, name: SpecItems.Leak010HighLoss,
+                description: $"高压段起止压力差（判定值=产品侧差值，仪器列=仪器侧差值；判定区间取配置（当前 {FormatRange(ap.HighLossMin, ap.HighLossMax)}））",
+                specMin: ap.HighLossMin ?? 0, specMax: ap.HighLossMax ?? 2, unit: "mmHg", valueSource: "Both");
 
             return ti;
         }
@@ -205,19 +267,19 @@ namespace TORNPISolution.Service
 
         //======================================A05-----------血压静态压力精度测试（BP-003）
         // 流程：逐点 BPARunStaticPressure（配置勾选的压力点） -> 稳压保持 ->
-        //       读产品上报压力值（0x76） -> 产品值−标准值 落在 ±3mmHg 内（上报带符号，正=产品偏高）
+        //       读产品上报压力值（0x76） -> 产品值−标准值 落在 ±0.5mmHg 内（上报带符号，正=产品偏高）
         // 一点一项：项清单按当前配置勾选的静态压力点动态生成（项名见 SpecItems.Bp003Point），
         // 加载方案/打开模块库/点运行时 MainViewModel 会重建目录，改点无需重启。
         private TestModuleModel BuildBpStaticAccuracyTest()
         {
             var ti = AddTI(TestModuleIds.BpStaticAccuracyTest, ModuleCategory.WholeMachine, "血压静态压力精度测试",
-                "逐点静态加压，一点一项，产品上报值与仪器稳压值的误差落在 ±3mmHg 内");
+                "逐点静态加压，一点一项，产品上报值与仪器稳压值的误差落在 ±0.5mmHg 内");
 
             foreach (var value in GetStaticPressurePoints())
             {
                 AddResult(ti, name: SpecItems.Bp003Point(value),
-                    description: $"静态加压 {value:0.##}mmHg，测试值=产品上报值−仪器稳压值（正=偏高），落在 ±3mmHg 判 PASS（仪器列=稳压值，产品列=上报值）",
-                    specMin: -3, specMax: 3, unit: "mmHg", waveform: WaveformPresentation.Inline, valueSource: "Error",
+                    description: $"静态加压 {value:0.##}mmHg，测试值=产品上报值−仪器稳压值（正=偏高），落在 ±0.5mmHg 判 PASS（仪器列=稳压值，产品列=上报值）",
+                    specMin: -0.5, specMax: 0.5, unit: "mmHg", waveform: WaveformPresentation.Inline, valueSource: "Error",
                     waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
             }
 
@@ -228,48 +290,51 @@ namespace TORNPISolution.Service
         // 流程：按配置压力组逐轮血压模拟（需储气瓶产生脉搏波）→ 产品 0x7B 回读收缩压/舒张压；
         // 项清单一个压力组一轮一项 + 每组一项重复性（项名 SpecItems.Bp004Round / Bp004Repeat，目录与执行端同源，改点位不重启）：
         //   轮次项  测试值 = max(|收缩压回读−设定|, |舒张压回读−设定|)；
-        //   重复性项 测试值 = max(收缩压各轮极差, 舒张压各轮极差)，子表每轮一行 + 统计行；
-        // 心率全模块只一个值（作模拟仪激励参数，不参与判定），不进项名也不分节。
+        //   重复性项 测试值 = max(收缩压各轮极差, 舒张压各轮极差)，子表每轮一行 + 统计行；轮数按配置现算（1 轮起），1 轮时极差无意义、不建本项；
+        // 心率按组设置（作模拟仪激励参数，不参与判定），不进项名也不分节。
         private TestModuleModel BuildBpDynamicAccuracyTest()
         {
             var cfg = GetBpAccuracyParams();
-            // 与执行端同口径：只取勾选行、取整后去重（两行完全相同时项名会重名）
+            // 与执行端同口径：只取勾选行、血压取整后按收缩/舒张去重（项名只带血压，同血压多行会撞名，心率取先出现的一行）
             var groups = cfg.Groups.Where(g => g.Enabled)
-                .Select(g => ((int)Math.Round(g.Systolic), (int)Math.Round(g.Diastolic)))
-                .Distinct().ToList();
-            var repeats = Math.Max(3, cfg.Repeats);
+                .GroupBy(g => ((int)Math.Round(g.Systolic), (int)Math.Round(g.Diastolic)))
+                .Select(g => (g.Key.Item1, g.Key.Item2, HeartRate: g.First().HeartRate))
+                .ToList();
+            var repeats = SpecItems.EffectiveRepeats(cfg.Repeats);
             if (groups.Count == 0)
                 _log.Warn("A06 目录构建：血压压力组未勾选任何行，BP-004 项清单为空（配置→动态血压→BP-004 压力组）");
 
             var ti = AddTI(TestModuleIds.BpDynamicAccuracyTest, ModuleCategory.WholeMachine, "血压动态压力精度测试",
-                "多组压力各重复几轮，偏差与极差均 ≤2mmHg");
+                "多组压力各重复设定轮数，逐轮偏差 ≤2mmHg；2 轮起加一项组内极差");
 
-            foreach (var (sys, dia) in groups)
+            foreach (var (sys, dia, hr) in groups)
             {
                 for (var r = 1; r <= repeats; r++)
                 {
                     AddResult(ti, name: SpecItems.Bp004Round(sys, dia, r),
-                        description: $"第 {r}/{repeats} 轮回读偏差",
+                        description: $"设定 {sys}/{dia}（心率 {hr}），第 {r}/{repeats} 轮回读偏差",
                         specMin: 0, specMax: 2, unit: "mmHg", waveform: WaveformPresentation.Inline, valueSource: "Error",
                         waveformUnit: "mmHg", waveformConfigSource: WaveformConfigSource.BloodPressureSimulator);
                 }
 
-                AddResult(ti, name: SpecItems.Bp004Repeat(sys, dia),
-                    description: $"{repeats} 轮极差",
-                    specMin: 0, specMax: 2, unit: "mmHg");
+                // 单轮没有极差可算，这项连项都不建（建了不报会被收尾判 FAIL）
+                if (repeats >= 2)
+                    AddResult(ti, name: SpecItems.Bp004Repeat(sys, dia),
+                        description: $"{repeats} 轮极差",
+                        specMin: 0, specMax: 2, unit: "mmHg");
             }
 
             return ti;
         }
 
         //======================================A21-----------血压心率精度及重复性测试（BP-005）
-        // 压力只用一组（收缩/舒张），心率按配置勾选的档逐档测；一个心率点一轮一项 + 每点一项平均值统计（只展示不判定）；
+        // 压力只用一组（收缩/舒张），心率按配置勾选的档逐档测；一个心率点一轮一项 + 每点一项平均值统计（只展示不判定，轮数按配置现算，1 轮的均值即该轮）；
         // 轮次项规格按该心率点现算 max(5, 设定×5%)（文档：±5 次/分 或 ±5% 取较大值）。
         private TestModuleModel BuildBpHeartRateAccuracyTest()
         {
             var cfg = GetBpHeartRateParams();
             var heartRates = cfg.HeartRates.Where(p => p.Enabled).Select(p => p.Value).Distinct().ToList();
-            var repeats = Math.Max(3, cfg.Repeats);
+            var repeats = SpecItems.EffectiveRepeats(cfg.Repeats);
             if (heartRates.Count == 0)
                 _log.Warn("A21 目录构建：心率点未勾选任何行，BP-005 项清单为空（配置→动态血压→BP-005 心率点）");
 
@@ -562,6 +627,13 @@ namespace TORNPISolution.Service
             catch (Exception ex) { _log.Warn($"读取 JJG692 气密性配置失败，用默认参数：{ex.Message}"); return new Jjg692AirtightnessParams(); }
         }
 
+        /// <summary>配置页的气路类两项判定区间（固定读 BPA700 那份：这两项只在 BPA700 上跑，与当前生效设备无关；读不到时回退默认对象）</summary>
+        private BpaAirPathParams GetAirPathParams()
+        {
+            try { return _configService.Load().BPA700Simulator.TestParams.AirPath; }
+            catch (Exception ex) { _log.Warn($"读取气路测试判定区间配置失败，用默认参数：{ex.Message}"); return new BpaAirPathParams(); }
+        }
+
         /// <summary>AECG100 测试参数（A09/A11/A13 那三项容差的唯一来源）：读不到配置时回退默认对象，保证目录构建不抛</summary>
         private Aecg100Settings GetAecgParams()
         {
@@ -592,10 +664,10 @@ namespace TORNPISolution.Service
             => amplitudes?.Where(a => a > 0).Distinct().ToList() ?? new List<double>();
 
         /// <summary>判定区间展示文本：null 端显示“不限”（提醒用户规格值还需在配置页填写）</summary>
-        private static string FormatRange(double? min, double? max)
+        private static string FormatRange(double? min, double? max, string unit = "mmHg/s")
             => min == null && max == null
                 ? "未填写，仅报实测值不判定"
-                : $"{min?.ToString("0.###") ?? "不限"} ~ {max?.ToString("0.###") ?? "不限"} mmHg/s";
+                : $"{min?.ToString("0.###") ?? "不限"} ~ {max?.ToString("0.###") ?? "不限"} {unit}";
 
         #endregion
     }

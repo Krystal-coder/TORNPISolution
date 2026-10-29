@@ -18,7 +18,6 @@ namespace TORNPISolution.Interface
         Task CloseAsync();
 
         /// <summary>软触发一次并等结果：向触发端口发触发文本，从结果端口读一条条码</summary>
-        /// <param name="timeoutMs">等待结果的超时，留空取配置值；没读到返回 null</param>
         Task<string?> ScanAsync(int? timeoutMs = null, CancellationToken ct = default);
 
         /// <summary>不触发，只等相机主动推来的下一条结果（自由运行或由 IO 触发时用）</summary>

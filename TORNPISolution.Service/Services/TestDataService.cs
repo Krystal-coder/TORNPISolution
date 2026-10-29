@@ -19,6 +19,14 @@ namespace TORNPISolution.Service
         private static readonly SemaphoreSlim WarmGate = new(1, 1);
         private static bool _warmed;
 
+        // 老库需要补的列（表, 列, 类型）：加字段时在这里登记一条，预热时缺哪列补哪列
+        private static readonly (string Table, string Column, string Type)[] AddedColumns =
+        {
+            ("TestRun", "ModuleTimingsJson", "TEXT"),
+            ("TestRun", "MeasureSeconds", "INTEGER"),
+            ("TestItemResult", "DurationSeconds", "REAL"),
+        };
+
         /// <inheritdoc/>
         public Task PrepareStorageAsync(CancellationToken ct = default) => WarmAsync(ct);
 
@@ -32,12 +40,39 @@ namespace TORNPISolution.Service
                 if (_warmed) return;
                 await using var db = new TornpiDbContext();
                 await db.Database.EnsureCreatedAsync(ct);
+                await EnsureAddedColumnsAsync(db, ct);
                 await db.TestRuns.AnyAsync(ct);
                 _warmed = true;
             }
             finally
             {
                 WarmGate.Release();
+            }
+        }
+
+        /// <summary>
+        /// EnsureCreated 只建绿场库、不给已存在的库补列，老库缺列时插入会直接失败：这里按 <see cref="AddedColumns"/> 逐列一次性 ALTER（新库由 EnsureCreated 自带，本方法空转）。
+        /// </summary>
+        private static async Task EnsureAddedColumnsAsync(TornpiDbContext db, CancellationToken ct)
+        {
+            var conn = db.Database.GetDbConnection();
+            await conn.OpenAsync(ct);
+            try
+            {
+                foreach (var (table, column, type) in AddedColumns)
+                {
+                    await using var check = conn.CreateCommand();
+                    check.CommandText = $"SELECT COUNT(*) FROM pragma_table_info('{table}') WHERE name = '{column}'";
+                    if (Convert.ToInt64(await check.ExecuteScalarAsync(ct) ?? 0L) > 0) continue;
+
+                    await using var alter = conn.CreateCommand();
+                    alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {type}";
+                    await alter.ExecuteNonQueryAsync(ct);
+                }
+            }
+            finally
+            {
+                await conn.CloseAsync();
             }
         }
 
@@ -67,6 +102,8 @@ namespace TORNPISolution.Service
                 Station = snapshot.Station,
                 PlanName = snapshot.PlanName,
                 ModulesJson = JsonSerializer.Serialize(snapshot.ModuleIds),
+                ModuleTimingsJson = snapshot.ModuleTimings.Count > 0 ? JsonSerializer.Serialize(snapshot.ModuleTimings) : null,
+                MeasureSeconds = snapshot.MeasureSeconds,
                 StartedAt = snapshot.StartedAt,
                 FinishedAt = snapshot.FinishedAt,
                 OverallResult = overall,
@@ -105,6 +142,7 @@ namespace TORNPISolution.Service
                     Result = item.Result.ToString(),
                     DisplayOnly = item.DisplayOnly,
                     NotJudged = item.NotJudged,
+                    DurationSeconds = item.DurationSeconds,
                     SortOrder = itemSort++,
                 };
                 db.TestItemResults.Add(entity);

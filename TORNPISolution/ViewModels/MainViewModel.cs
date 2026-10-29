@@ -28,6 +28,8 @@ namespace TORNPISolution.ViewModels
         private readonly ITestPlanService _testPlanService;
         private readonly ITestModuleService _moduleService;
         private readonly IAppStateService _appState;
+        // 仪器链接配置：入库快照要带本轮量测时间（配置改了不改历史轮次对账）
+        private readonly IInstrumentConfigService _configService;
         // 烧录工位的界面数据：与测试方案共用一个窗口但各跑各的一轮，切页与开方案时互当闸门
         private readonly FlashingViewModel _flashing;
         // 单板工位的界面数据：按通道跑固定几项，不走模块库与方案
@@ -56,6 +58,10 @@ namespace TORNPISolution.ViewModels
         private readonly ITestReportService _testReportService;
         // 一轮方案的开始时刻（入库快照的 StartedAt）
         private DateTime _runStartedAt;
+        // 大项用时起点（派发前）与逐项耗时锚点：测试线程算、UI 线程在人工提示返回时前移，两边都要拿到完整值，读写统一在 _clockLock 下
+        private DateTime _moduleClockStart;
+        private DateTime _itemClockAnchor;
+        private readonly object _clockLock = new();
         // 入库失败滞留的快照：数据还在内存，用户点「重试保存」可重放；下一轮开跑时被覆盖（先记日志）
         private TestRunSnapshot? _pendingSaveSnapshot;
         // 最近一次成功入库的报告编号：「导出报告」按钮据此判断可否导出（null=本轮还没存上）
@@ -68,12 +74,13 @@ namespace TORNPISolution.ViewModels
                              ITestPlanService testPlanService, IAppStateService appState,
                              FlashingViewModel flashing, BoardChannelViewModel board,
                              BloodPressureSimulatorSession simSession, ITestDataService testDataService,
-                             ITestReportService testReportService)
+                             ITestReportService testReportService, IInstrumentConfigService configService)
         {
             _testItemService = testItemService;
             _moduleService = moduleService;
             _testPlanService = testPlanService;
             _appState = appState;
+            _configService = configService;
             _flashing = flashing;
             _board = board;
             _simSession = simSession;
@@ -271,22 +278,38 @@ namespace TORNPISolution.ViewModels
             });
         }
 
-        /// <summary>人工操作提示：弹模态框告知测试员该按哪个键，用户点确定前测试线程挂在这里等。MessageBox 自己的模态消息循环会继续泵消息，UI 线程不会冻住；点确定后 InvokeAsync 的 Task 完成。模态框期间主窗口不可操作，“停止”按钮要等点完确定才点得到。</summary>
-        private Task OnOperatorPromptRequested(string moduleName, string message)
+        /// <summary>人工操作提示：弹模态框告知测试员该按哪个键，用户点确定前测试线程挂在这里等。MessageBox 自己的模态消息循环会继续泵消息，UI 线程不会冻住；点确定后 InvokeAsync 的 Task 完成。模态框期间主窗口不可操作，“停止”按钮要等点完确定才点得到。框存活多久就是测试员动手多久，这段从用时里扣掉。</summary>
+        private async Task OnOperatorPromptRequested(string moduleName, string message)
         {
             var dispatcher = Application.Current?.Dispatcher;
-            if (dispatcher == null) return Task.CompletedTask;
+            if (dispatcher == null) return;
 
-            return dispatcher.InvokeAsync(() =>
+            var waited = await dispatcher.InvokeAsync(() =>
             {
                 const string caption = "测试操作提示";
                 var text = $"【{moduleName}】\n\n{message}";
                 var owner = Application.Current?.MainWindow;
+                var shownAt = DateTime.Now;
                 if (owner != null && owner.IsLoaded)
                     System.Windows.MessageBox.Show(owner, text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
                 else
                     System.Windows.MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+                return DateTime.Now - shownAt;
             }).Task;
+
+            ShiftClockForHumanWait(waited);
+            _log.Info($"{moduleName}：人工操作等待 {waited.TotalSeconds:0.0}s，不计入大项与逐项用时");
+        }
+
+        /// <summary>把大项起点与逐项锚点整体前移人工等待时长：换塞子、封堵毛细孔这类动手操作不该算进测试用时</summary>
+        private void ShiftClockForHumanWait(TimeSpan waited)
+        {
+            if (waited <= TimeSpan.Zero) return;
+            lock (_clockLock)
+            {
+                _moduleClockStart += waited;
+                _itemClockAnchor += waited;
+            }
         }
 
         // ==================== gong-wpf-dragdrop 落点处理 ====================
@@ -772,15 +795,36 @@ namespace TORNPISolution.ViewModels
                     module.Sequence = i + 1;   // 执行前再次确认序号 = 实际执行顺序（TestItemxx 的 xx）
                     SelectedPlanModule = module;
 
+                    // 大项用时起点（派发前，含上一项之后的所有动作）；_itemClockAnchor 是逐项耗时锚点，本项耗时 = 本项上报 − 上一项上报（首项即派发）
+                    // 人工操作提示的等待时长不算进用时：OnOperatorPromptRequested 返回时把这两个基准一起前移
+                    // 批量上报的模块（采完全部轮次再逐项上报）时刻差不可用，由执行器填 TestItemResult.MeasuredSeconds
+                    lock (_clockLock)
+                    {
+                        _moduleClockStart = DateTime.Now;
+                        _itemClockAnchor = _moduleClockStart;
+                    }
+
                     async Task OnItemCompleted(string itemName, TestItemResult result)
                     {
+                        var reportedAt = DateTime.Now;
+                        double seconds;
+                        lock (_clockLock)
+                        {
+                            seconds = (reportedAt - _itemClockAnchor).TotalSeconds;
+                            _itemClockAnchor = reportedAt;
+                        }
                         var item = module.Items.FirstOrDefault(it => it.Name == itemName);
                         if (item == null) return;
                         // 用可等的 InvokeAsync，不用阻塞式 Invoke：UI 线程忙（正画波形）时会把上报线程硬按住且取消不下来
-                        await Application.Current.Dispatcher.InvokeAsync(() => item.ApplyResult(result));
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            item.ApplyResult(result);
+                            item.RunSeconds = result.MeasuredSeconds ?? seconds;
+                        });
                         if (item.Result == TestResultStatus.Fail)
                             _log.Warn($"[TestItem{module.Sequence} {module.Name}] {item.Name} = {item.MeasuredValueText} 超规格 {item.SpecText} -> FAIL");
-                        await Task.Delay(300, token);
+                        // 逐项之间留一拍：让测试员看得见结果是一条条刷出来的，也压住高频上报对 UI 队列的冲击
+                        await Task.Delay(100, token);
                     }
 
                     // 在后台线程执行整个测试模块，UI 线程完全空闲处理渲染
@@ -804,7 +848,10 @@ namespace TORNPISolution.ViewModels
                         }
                     });
 
-                    _log.Info($"[TestItem{module.Sequence} {module.Name}] 模块结果：{module.ModuleResultText}");
+                    double duration;
+                    lock (_clockLock) duration = (DateTime.Now - _moduleClockStart).TotalSeconds;
+                    module.RunDurationSeconds = duration;
+                    _log.Info($"[TestItem{module.Sequence} {module.Name}] 模块结果：{module.ModuleResultText}（用时 {module.RunDurationSeconds:0.0}s）");
                 }
 
                 NotifyPlanResultChanged();
@@ -937,15 +984,11 @@ namespace TORNPISolution.ViewModels
         /// <summary>最近一次成功入库的报告编号：「导出报告」按钮的可用条件（null=本轮还没存上，按钮置灰）</summary>
         public string? LastSavedReportNo => _lastSavedReportNo;
 
-        /// <summary>按钮文案带上轮次编号：只写"导出报告"容易把上一轮的 PDF 当本轮交出去</summary>
-        public string SaveReportText => _lastSavedReportNo == null ? "导出报告" : $"导出报告 {_lastSavedReportNo}";
-
-        /// <summary>入库编号的唯一写入口：编号一变，按钮文案与可用性同时跟上</summary>
+        /// <summary>入库编号的唯一写入口：编号一变，按钮可用性跟着变（按钮文案固定，不带编号）</summary>
         private void SetLastSavedReportNo(string? reportNo)
         {
             _lastSavedReportNo = reportNo;
             OnPropertyChanged(nameof(LastSavedReportNo));
-            OnPropertyChanged(nameof(SaveReportText));
             RequeryCommands();
         }
 
@@ -976,7 +1019,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>从方案模块树采入库快照：模块/项名/判定/双值/原始文本/规格快照/逐点子表全带上（含未测项）；
+        /// <summary>从方案模块树采入库快照：模块/项名/判定/双值/原始文本/规格快照/逐点子表/大项用时全带上（含未测项）；
         /// 保存服务只认快照，不认识 ViewModel。</summary>
         private TestRunSnapshot BuildRunSnapshot()
         {
@@ -985,6 +1028,10 @@ namespace TORNPISolution.ViewModels
                 Station = "整机",
                 PlanName = string.IsNullOrEmpty(CurrentPlanName) ? "未命名方案" : CurrentPlanName,
                 ModuleIds = PlanModules.Select(m => m.Id).ToList(),
+                ModuleTimings = PlanModules.Where(m => m.RunDurationSeconds.HasValue)
+                    .Select(m => new TestModuleTiming { Sequence = m.Sequence, Seconds = m.RunDurationSeconds!.Value })
+                    .ToList(),
+                MeasureSeconds = ResolveMeasureSeconds(),
                 StartedAt = _runStartedAt,
                 FinishedAt = DateTime.Now,
             };
@@ -1013,6 +1060,7 @@ namespace TORNPISolution.ViewModels
                         Result = item.Result,
                         DisplayOnly = item.IsDisplayOnly,
                         NotJudged = item.IsReportedNotJudged,
+                        DurationSeconds = item.RunSeconds,
                         Points = item.PointResults.Select(p => new TestPointSnapshot
                         {
                             Name = p.Name,
@@ -1036,6 +1084,16 @@ namespace TORNPISolution.ViewModels
             }
 
             return snapshot;
+        }
+
+        /// <summary>量测时间快照：只有 BPA700 且本轮排了血压静态压力精度测试才有效（康伟达按收敛判据稳压、不读该参数）</summary>
+        private int? ResolveMeasureSeconds()
+        {
+            if (!PlanModules.Any(m => m.Id == TestModuleIds.BpStaticAccuracyTest)) return null;
+            var config = _configService.Load();
+            return config.ActiveSimulator == SimulatorType.BPA700
+                ? config.ActiveBpTestParams.StaticPressure.MeasureSeconds
+                : null;
         }
 
         /// <summary>关窗口前调用：运行中先请求停止</summary>

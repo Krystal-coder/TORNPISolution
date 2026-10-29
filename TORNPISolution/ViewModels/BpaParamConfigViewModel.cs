@@ -92,14 +92,15 @@ namespace TORNPISolution.ViewModels
                 OnPropertyChanged(nameof(CanAddBpAccuracyGroup));
                 OnPropertyChanged(nameof(BpAccuracyGroupsEmpty));
                 OnPropertyChanged(nameof(BpAccuracyRepeats));
-                OnPropertyChanged(nameof(BpAccuracyHeartRate));
                 OnPropertyChanged(nameof(BpAccuracyRestSeconds));
+                OnPropertyChanged(nameof(BpAccuracySingleMeasureTimeoutSeconds));
                 OnPropertyChanged(nameof(BpAccuracyVentDuringRest));
                 OnPropertyChanged(nameof(SelectAllBpHeartRatePoints));
                 OnPropertyChanged(nameof(CanAddBpHeartRatePoint));
                 OnPropertyChanged(nameof(BpHeartRatePointsEmpty));
                 OnPropertyChanged(nameof(BpHeartRateRepeats));
                 OnPropertyChanged(nameof(BpHeartRateRestSeconds));
+                OnPropertyChanged(nameof(BpHeartRateSingleMeasureTimeoutSeconds));
                 OnPropertyChanged(nameof(BpHeartRateVentDuringRest));
                 OnPropertyChanged(nameof(StaticVentDuringRest));
                 OnPropertyChanged(nameof(StaticVentHold));
@@ -280,25 +281,14 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>BP-004 心率（全模块一个值，发给模拟仪驱动脉搏波）</summary>
-        public int BpAccuracyHeartRate
-        {
-            get => Params.BpAccuracy.HeartRate;
-            set
-            {
-                Params.BpAccuracy.HeartRate = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>BP-004 每压力组轮数（少于 3 抬到 3，执行端取极差至少三轮）</summary>
+        /// <summary>BP-004 每压力组轮数（最少 1 轮；1 轮时执行端不出组内极差项，2 轮起判极差）</summary>
         public int BpAccuracyRepeats
         {
             get => Params.BpAccuracy.Repeats;
             set
             {
-                Params.BpAccuracy.Repeats = value < 3 ? 3 : value;
-               
+                Params.BpAccuracy.Repeats = value < 1 ? 1 : value;
+
                 OnPropertyChanged();
             }
         }
@@ -310,6 +300,17 @@ namespace TORNPISolution.ViewModels
             set
             {
                 Params.BpAccuracy.RestSeconds = value < 0 ? 0 : value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>BP-004 单次完整血压测量超时（秒，最少 1）</summary>
+        public int BpAccuracySingleMeasureTimeoutSeconds
+        {
+            get => Params.BpAccuracy.SingleMeasureTimeoutSeconds;
+            set
+            {
+                Params.BpAccuracy.SingleMeasureTimeoutSeconds = value < 1 ? 1 : value;
                 OnPropertyChanged();
             }
         }
@@ -338,7 +339,7 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>新增 BP-004 压力组（沿用上一行的血压，方便连续加相近点位）</summary>
+        /// <summary>新增 BP-004 压力组（沿用上一行的血压与心率，方便连续加相近点位）</summary>
         private void AddBpAccuracyGroup()
         {
             if (BpAccuracyGroups.Count >= MaxPointCount)
@@ -348,7 +349,7 @@ namespace TORNPISolution.ViewModels
             }
 
             var last = BpAccuracyGroups.Count > 0 ? BpAccuracyGroups[^1] : new BpaBpPressureGroup();
-            BpAccuracyGroups.Add(new BpaBpPressureGroup { Systolic = last.Systolic, Diastolic = last.Diastolic });
+            BpAccuracyGroups.Add(new BpaBpPressureGroup { Systolic = last.Systolic, Diastolic = last.Diastolic, HeartRate = last.HeartRate });
             OnPropertyChanged(nameof(SelectAllBpAccuracyGroups));
             OnPropertyChanged(nameof(CanAddBpAccuracyGroup));
             OnPropertyChanged(nameof(BpAccuracyGroupsEmpty));
@@ -414,13 +415,13 @@ namespace TORNPISolution.ViewModels
             }
         }
 
-        /// <summary>BP-005 每心率点轮数（少于 3 抬到 3）</summary>
+        /// <summary>BP-005 每心率点轮数（最少 1 轮；1 轮时平均值即该轮）</summary>
         public int BpHeartRateRepeats
         {
             get => Params.BpHeartRate.Repeats;
             set
             {
-                Params.BpHeartRate.Repeats = value < 3 ? 3 : value;
+                Params.BpHeartRate.Repeats = value < 1 ? 1 : value;
                 OnPropertyChanged();
             }
         }
@@ -432,6 +433,17 @@ namespace TORNPISolution.ViewModels
             set
             {
                 Params.BpHeartRate.RestSeconds = value < 0 ? 0 : value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>BP-005 单次完整血压测量超时（秒，最少 1）</summary>
+        public int BpHeartRateSingleMeasureTimeoutSeconds
+        {
+            get => Params.BpHeartRate.SingleMeasureTimeoutSeconds;
+            set
+            {
+                Params.BpHeartRate.SingleMeasureTimeoutSeconds = value < 1 ? 1 : value;
                 OnPropertyChanged();
             }
         }
@@ -610,6 +622,64 @@ namespace TORNPISolution.ViewModels
         /// <summary>Customized 包络参数区可用</summary>
         public bool IsCustomizedMethod => DynamicMethod == "Customized";
 
+        // ==================== 气路类两项判定区间（A18 放气速率 / A22 气路泄露，仅 BPA700 静态压力序列流程） ====================
+
+        /// <summary>加压时间 t1 合格下限文本（s，留空=不限下）</summary>
+        public string AirPathInflateTimeMinText
+        {
+            get => FormatOptionalNumber(Params.AirPath.InflateTimeMin);
+            set => Params.AirPath.InflateTimeMin = ParseOptionalNumber(value);
+        }
+
+        /// <summary>加压时间 t1 合格上限文本（s，留空兜底 30）</summary>
+        public string AirPathInflateTimeMaxText
+        {
+            get => FormatOptionalNumber(Params.AirPath.InflateTimeMax);
+            set => Params.AirPath.InflateTimeMax = ParseOptionalNumber(value);
+        }
+
+        /// <summary>泄压时间 t2 合格下限文本（s，留空=不限下）</summary>
+        public string AirPathDeflateTimeMinText
+        {
+            get => FormatOptionalNumber(Params.AirPath.DeflateTimeMin);
+            set => Params.AirPath.DeflateTimeMin = ParseOptionalNumber(value);
+        }
+
+        /// <summary>泄压时间 t2 合格上限文本（s，留空兜底 60）</summary>
+        public string AirPathDeflateTimeMaxText
+        {
+            get => FormatOptionalNumber(Params.AirPath.DeflateTimeMax);
+            set => Params.AirPath.DeflateTimeMax = ParseOptionalNumber(value);
+        }
+
+        /// <summary>高压段泄气量 ΔP_H 合格下限文本（mmHg，留空=不限下：终点高于起点时差值为负）</summary>
+        public string AirPathHighLossMinText
+        {
+            get => FormatOptionalNumber(Params.AirPath.HighLossMin);
+            set => Params.AirPath.HighLossMin = ParseOptionalNumber(value);
+        }
+
+        /// <summary>高压段泄气量 ΔP_H 合格上限文本（mmHg，留空兜底 2）</summary>
+        public string AirPathHighLossMaxText
+        {
+            get => FormatOptionalNumber(Params.AirPath.HighLossMax);
+            set => Params.AirPath.HighLossMax = ParseOptionalNumber(value);
+        }
+
+        /// <summary>低压段泄气量 ΔP_L 合格下限文本（mmHg，留空=不限下）</summary>
+        public string AirPathLowLossMinText
+        {
+            get => FormatOptionalNumber(Params.AirPath.LowLossMin);
+            set => Params.AirPath.LowLossMin = ParseOptionalNumber(value);
+        }
+
+        /// <summary>低压段泄气量 ΔP_L 合格上限文本（mmHg，留空兜底 2）</summary>
+        public string AirPathLowLossMaxText
+        {
+            get => FormatOptionalNumber(Params.AirPath.LowLossMax);
+            set => Params.AirPath.LowLossMax = ParseOptionalNumber(value);
+        }
+
         // ==================== JJG692-2010 标准检测（仅康伟达 0x04 功能的放气速率 / 气密性两项） ====================
 
         /// <summary>袖带类型下拉项（帧低 4 位，下标即协议值；0x12/0x13 使用）</summary>
@@ -740,13 +810,12 @@ namespace TORNPISolution.ViewModels
 
             BpAccuracyGroups.Clear();
             foreach (var p in source.BpAccuracy.Groups.Take(MaxPointCount))
-                BpAccuracyGroups.Add(new BpaBpPressureGroup { Enabled = p.Enabled, Systolic = p.Systolic, Diastolic = p.Diastolic });
+                BpAccuracyGroups.Add(new BpaBpPressureGroup { Enabled = p.Enabled, Systolic = p.Systolic, Diastolic = p.Diastolic, HeartRate = p.HeartRate });
 
             BpHeartRatePoints.Clear();
             foreach (var p in source.BpHeartRate.HeartRates.Take(MaxPointCount))
                 BpHeartRatePoints.Add(new BpaHeartRatePoint { Enabled = p.Enabled, Value = p.Value });
 
-            Params.BpAccuracy.HeartRate = source.BpAccuracy.HeartRate;
             Params.BpAccuracy.Repeats = source.BpAccuracy.Repeats;
             Params.BpAccuracy.RestSeconds = source.BpAccuracy.RestSeconds;
             Params.BpAccuracy.VentDuringRest = source.BpAccuracy.VentDuringRest;
@@ -764,13 +833,14 @@ namespace TORNPISolution.ViewModels
 
             OnPropertyChanged(nameof(Params));
             OnPropertyChanged(nameof(BpAccuracyRepeats));
-            OnPropertyChanged(nameof(BpAccuracyHeartRate));
             OnPropertyChanged(nameof(BpAccuracyRestSeconds));
+            OnPropertyChanged(nameof(BpAccuracySingleMeasureTimeoutSeconds));
             OnPropertyChanged(nameof(BpAccuracyVentDuringRest));
             OnPropertyChanged(nameof(BpHeartRateSystolic));
             OnPropertyChanged(nameof(BpHeartRateDiastolic));
             OnPropertyChanged(nameof(BpHeartRateRepeats));
             OnPropertyChanged(nameof(BpHeartRateRestSeconds));
+            OnPropertyChanged(nameof(BpHeartRateSingleMeasureTimeoutSeconds));
             OnPropertyChanged(nameof(BpHeartRateVentDuringRest));
             OnPropertyChanged(nameof(BpHeartRateVentHold));
             OnPropertyChanged(nameof(StaticVentDuringRest));
@@ -892,13 +962,13 @@ namespace TORNPISolution.ViewModels
                     _log.Warn($"血压模拟仪测试配置：{CurrentDeviceName} BP-005 心率点未勾选任何行，已自动勾选第一行");
                     Params.BpHeartRate.HeartRates[0].Enabled = true;
                 }
-                if (Params.BpAccuracy.Repeats < 3)
+                if (Params.BpAccuracy.Repeats < 1)
                 {
-                    Params.BpAccuracy.Repeats = 3;
+                    Params.BpAccuracy.Repeats = 1;
                 }
-                if (Params.BpHeartRate.Repeats < 3)
+                if (Params.BpHeartRate.Repeats < 1)
                 {
-                    Params.BpHeartRate.Repeats = 3;
+                    Params.BpHeartRate.Repeats = 1;
                 }
 
                 _configService.Save(Config);

@@ -3,9 +3,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 所有测试项名称的唯一来源：Spec 定义、TestItem/TestSteps/NfcFunctionTest 上报结果与上抛波形均引用此处，改一处两边同步。
-    /// 常量值 = 历史项名字符串，不得修改（UI 波形配置 WaveformDisplay.ItemConfigs 以项名为键）；按模块分区，一测试项一常量，命名与模块编号（Spec 注释的 ---Mxx---）对应。
-    /// “目录与执行端必须算出同一份清单”的槽位分配（B02/B03）也放这里，两边同用一个函数才不会对不上名。
+    /// 所有测试项名称的唯一来源：Spec 定义、TestItem/TestSteps/NfcFunctionTest 上报结果与上抛波形均引用此处，改一处两边同步
     /// </summary>
     public static class SpecItems
     {
@@ -35,12 +33,30 @@ namespace TORNPISolution.Service
         public static string Bp003Point(double value) => $"BP-003静态压力-{value:0.##}mmHg";
 
         // -------- A17 产品静态压力校准 --------
-        /// <summary>校准压力点（固定四点，Spec 目录与执行端同用）</summary>
-        public static readonly double[] PcalPoints = { 60, 120, 180, 240 };
+        /// <summary>校准压力点（固定三点，Spec 目录与执行端同用）</summary>
+        public static readonly double[] PcalPoints = { 50, 150, 250 };
         public const string PcalStartSensor = "启动压力传感器";
         public const string PcalCloseSensor = "关闭压力传感器";
         /// <summary>校准点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数</summary>
         public static string PcalPoint(double value) => $"设置{value:0.##}mmHg压力校准";
+
+        // -------- A18 放气速率测试（产品关泄气阀封闭气路，仪器充气/缓降两段各一项：测试值=该段时长，双值列=该点采样压力）--------
+        /// <summary>充气目标（mmHg）与缓降终点（mmHg）：Spec 说明与执行端流程同用</summary>
+        public const double DeflateInflatePressure = 230;
+        public const double DeflateEndPressure = 40;
+        public const string Deflate007InflateTime = "BP-007加压时间t1";
+        public const string Deflate007DeflateTime = "BP-007放气时间t2";
+
+        // -------- A22 气路泄露测试（封堵毛细气孔后高低压各读起止两点，差值即泄气量；读取用指令与校准/BP-003 同款）--------
+        /// <summary>高压段与低压段压力点（mmHg）：Spec 说明与执行端流程同用</summary>
+        public const double LeakHighPressure = 250;
+        public const double LeakLowPressure = 50;
+        public const string Leak010HighStart = "BP-010高压起点P_H_start";
+        public const string Leak010HighEnd = "BP-010高压终点P_H_end";
+        public const string Leak010HighLoss = "BP-010高压泄气值ΔP_H";
+        public const string Leak010LowStart = "BP-010低压起点P_L_start";
+        public const string Leak010LowEnd = "BP-010低压终点P_L_end";
+        public const string Leak010LowLoss = "BP-010低压泄气值ΔP_L";
 
         // -------- A19/A20 JJG692-2010 标准检测（康伟达 0x04 功能，参数取康伟达配置页→JJG692 段）--------
         public const string Jjg692DeflationRate = "JJG692放气速率(听诊)";
@@ -54,16 +70,19 @@ namespace TORNPISolution.Service
         public static string Bp004Round(int systolic, int diastolic, int round)
             => $"BP-004精度测试 {systolic}/{diastolic} 第{round}轮";
 
-        /// <summary>BP-004 压力组重复性项名（同组各轮的极差与 平均值/极大值/极小值/与设定偏差 统计）</summary>
+        /// <summary>BP-004 压力组重复性项名（同组各轮的极差与 平均值/与设定偏差 统计；单轮配置不建本项）</summary>
         public static string Bp004Repeat(int systolic, int diastolic)
             => $"BP-004重复性测试 {systolic}/{diastolic}";
+
+        /// <summary>BP-004/BP-005 生效轮数（Spec 建项与执行端轮次同用一份，各算一份会对不上项数）：最少 1 轮，配置几轮就跑几轮。</summary>
+        public static int EffectiveRepeats(int configured) => Math.Max(1, configured);
 
         // -------- A21 血压心率精度及重复性测试（BP-005，一个心率点一轮一项：按配置心率点与轮数动态生成）--------
         /// <summary>BP-005 心率轮次项名（一个心率点一轮一项，测试值=本轮回读心率与设定的偏差）</summary>
         public static string Bp005Round(int heartRate, int round)
             => $"BP-005心率精度测试 {heartRate} 第{round}轮";
 
-        /// <summary>BP-005 心率点平均值项名（同一点各轮心率的 均值/与设定偏差/极大值/极小值/极差 统计，只展示不判定）</summary>
+        /// <summary>BP-005 心率点平均值项名（同一点各轮心率的 均值/与设定偏差 统计，只展示不判定；单轮时均值即该轮，极大/极小/极差不出值）</summary>
         public static string Bp005Average(int heartRate)
             => $"BP-005心率精度测试 {heartRate} 平均值";
 

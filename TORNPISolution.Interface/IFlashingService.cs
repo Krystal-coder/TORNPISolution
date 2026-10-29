@@ -7,10 +7,12 @@ namespace TORNPISolution.Interface
     /// </summary>
     public interface IFlashingService
     {
-        /// <summary>跑一轮烧录，返回本轮每条路的最终状态；SPI Flash 要先调厂商上位机把工程数据下载进烧录器（一次覆盖所有烧录器）、成功后才各通道并发烧写，主控是纯每路独立、各起一个命令行进程。</summary>
+        /// <summary>
+        /// 跑一轮烧录，返回本轮每条路的最终状态；SPI Flash 要先调厂商上位机把工程数据下载进烧录器（一次覆盖所有烧录器）、成功后才各通道并发烧写，主控是纯每路独立、各起一个命令行进程。
         /// <param name="action">本轮烧哪一颗</param>
         /// <param name="channels">要烧的通道号；为空表示配置里全部已启用的通道</param>
         /// <param name="onChannelUpdate">任一路状态变化时的回调，在采集线程上直接调用（界面自己回 UI 线程）</param>
+        /// </summary>
         Task<IReadOnlyList<ChannelFlashReport>> RunRoundAsync(
             FlashAction action,
             IReadOnlyList<int>? channels,
@@ -27,10 +29,12 @@ namespace TORNPISolution.Interface
         /// <summary>记录所在目录（界面留一个打开文件夹的入口）</summary>
         string StorageDirectory { get; }
 
-        /// <summary>追加一轮的记录。写失败只记日志、绝不抛到界面上</summary>
+        /// <summary>
+        /// 追加一轮的记录。写失败只记日志、绝不抛到界面上
         /// <param name="roundId">轮次号，把同一轮的几行关联起来</param>
         /// <param name="reports">本轮各路结果</param>
         /// <param name="barcodes">通道号到条码的映射，没扫码就传 null</param>
+        /// </summary>
         void AppendRound(string roundId, IReadOnlyList<ChannelFlashReport> reports, IReadOnlyDictionary<int, string>? barcodes = null);
     }
 }

@@ -7,7 +7,7 @@ namespace TORNPISolution.Service.Communication
     /// <summary>
     /// SCPI Raw Socket 客户端（LAN 网口，默认端口 5025）。
     /// 命令以 \n 结尾，响应以 \n 终止。
-    /// 所有请求经 SemaphoreSlim 串行化（SCPI 一问一答，避免多命令交叉串扰）
+    /// 所有请求经 SemaphoreSlim 串行化（SCPI 一问一答）
     /// </summary>
     public class ScpiTcpClient : IDisposable
     {

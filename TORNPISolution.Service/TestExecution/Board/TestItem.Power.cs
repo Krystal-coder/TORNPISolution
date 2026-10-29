@@ -20,7 +20,7 @@ namespace TORNPISolution.Service
             if (NoInstrumentDemo("综测仪上电")) return;
 
             var config = _configService.Load();
-            // 按本轮范围筛槽位：单板页右键“只跑通道 3”时，其余七路既不下发输出也不上报，免得拿旧值充本轮结果
+            // 按本轮范围筛槽位：单板页右键“只跑通道 3”时，其余七路既不下发输出也不上报，避免拿旧值充本轮结果
             var slots = WithinSlotScope(SpecItems.BoardPowerSlots(config), s => s.Slot);
             if (slots.Count == 0)
             {
@@ -34,7 +34,7 @@ namespace TORNPISolution.Service
                     slots.Where(s => s.TesterIndex == tester).ToList(), token))).ConfigureAwait(false);
             var bySlot = probed.SelectMany(list => list).ToDictionary(r => r.Slot);
 
-            // 上报串行：各台并发采集，写结果字典必须一个一个来（Dictionary 并发写会炸，逐项回调也要按目录顺序回填）
+            // 上报串行：各台并发采集
             var failed = 0;
             string? firstFailure = null;
             foreach (var (slot, testerIndex, channel) in slots)

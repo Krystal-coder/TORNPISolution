@@ -54,6 +54,8 @@ namespace TORNPISolution.Share.Models
         public string ItemName { get; set; } = string.Empty;
         public string SpecText { get; set; } = string.Empty;
         public string ValueText { get; set; } = string.Empty;
+        /// <summary>本项耗时文本（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟；老轮次没这一列显示 —</summary>
+        public string DurationText { get; set; } = "—";
         /// <summary>判定文本：PASS / FAIL / 未测 / 统计（只展示项）</summary>
         public string ResultText { get; set; } = "未测";
         /// <summary>子表行文本（Channel/Repeat/RepeatMatrix/Event/Slice 口径的项才有；缩进展示）</summary>

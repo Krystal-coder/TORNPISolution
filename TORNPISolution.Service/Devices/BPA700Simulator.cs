@@ -102,8 +102,10 @@ namespace TORNPISolution.Service.Devices
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool BPAIs500mlMode();
 
-        // 静态压力测试：pressure 20~400mmHg，time 稳压保持 0~999 秒，inflation=true 由 BPA700 自行充气，
-        // false=由外部设备充气（无"放气模式"，放气靠 SlowValve/FastValve 气阀，见 BPAEnableAirPort）
+        // 静态压力测试：pressure 20~400mmHg，time 稳压保持 0~999 秒，inflation 选的是压力源（true=BPA700 自己打气，false=由外部设备打气）而非升降方向：
+        // 实测设定点低于当前残压时本轮不会停在部分压力：先泄回 0 再充气升到新设定点（整机 A18 曲线 230→0→40），本轮自然 Finish 或主动 BPAStopTest 时同样泄回 0；
+        // 到 Stable 即返回，但设备在保持窗内仍按设定点边漏边补压（实测产品开泄气阀只掉到 87 就被泵顶住，2026-10-26 19:55 台架），所以正式版做不出受控的高→低降压过程；
+        // 需要降压过程的 A18/A22 改用 1.0.4.0-BETA 的静态压力序列（BPA700BetaSimulator），正式版只保留单点稳压
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool BPARunStaticPressure(double pressure, int time, StaticPressureExCallbackDelegate cb, [MarshalAs(UnmanagedType.I1)] bool inflation);
@@ -454,6 +456,10 @@ namespace TORNPISolution.Service.Devices
                 }
 
                 _log.Info($"BPA700：血压测试待测中 SYS={systolic} DIA={diastolic} HR={heartRate}，等待产品启动测量...");
+                // 起测参数原文与本次下发档位（档位读回校验在应用设置时已做过）：本方法首个 await 之前的代码同步占着测试线程，这里再发 SDK 查询会推迟 0xCA
+                _log.Info($"BPA700：本次下发 MethodType={bpParams.MethodType} PulseVolume={bpParams.PulseVolume}ml " +
+                          $"包络偏移 收缩={bpParams.EnvelopSystolic}/舒张={bpParams.EnvelopDiastolic}，" +
+                          $"档位 袖带容量={AirReservoir} 压力单位={PressureUnit}");
 
                 // 阶段 1：等 status 离开 Wait（测试员按产品按键）
                 if (await Task.WhenAny(startedTcs.Task, Task.Delay(waitStartTimeoutMs, ct)).ConfigureAwait(false) != startedTcs.Task)
@@ -508,7 +514,8 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>
         /// 静态压力测试：设置恒定标准压力并等待稳定（BPARunStaticPressure）。
-        /// 官方语义无"放气模式"：inflation=false 为由外部设备充气，放气用 SetSlowValve/SetFastValve 开气阀。
+        /// 官方语义里 inflation 选的是压力源而非升降方向；实测设定点低于当前残压时，本轮会先把压力泄回零再升到新设定点（不会停在部分压力），
+        /// 且上一轮自然 Finish 时设备也已自行泄回零（整机 A18 台架实测），所以两轮之间拿不到"从高压受控降到某个低压"的过程，要测降压只能由被测产品自己的泄气阀放气。
         /// 回调到 Stable(3) 即返回，但设备上本轮仍在激活态（稳压保持）：做完本点操作必须调 WaitStaticPressureFinishAsync 等 Finish(4)，
         /// 否则下一次 BPARunStaticPressure 会被设备拒绝（返回 false）。
         /// 实际稳压值取采样回调的近期均值（回调的 waitTime 参数不是压力），记在 LastStaticPressure，未开采样时为 NaN（无回读不充实测值）；
@@ -638,6 +645,12 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
+        /// 接口成员：正式版没有一次下发多点、点间直切的序列 API（实测低设定点会先把气路泄回零再升压），需要受控降压的测试项走 Beta 句柄版实现。
+        /// </summary>
+        public Task StartStaticPressureSequenceAsync(double[] points, int holdSeconds, bool inflation, CancellationToken ct = default)
+            => throw new NotSupportedException("BPA700 正式版 SDK 无静态压力序列模式，请用 BPA700 Beta 句柄版（A18/A22 已按此路由）");
+
+        /// <summary>
         /// 等待当前静态压力测试完成（回调 status=Finish）：逐点循环时每个压力点读值后必须调用，否则下一轮 BPARunStaticPressure 会被设备拒绝。
         /// 超时未收到 Finish 则主动 BPAStopTest 强制结束，保证后续调用可用。
         /// </summary>
@@ -702,44 +715,44 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 接口成员：泄放回零。SDK 无泄压 API，残压只在两次独立测试调用之间自行回落，此处按仪器自报的恢复时长（BPAGetWaitStableTime，0~10s）等待后再用采样判零；
+        /// 接口成员：泄放回零。SDK 无泄压 API，残压只在两次独立测试调用之间自行回落，此处用采样实测判零（仪器自报的恢复时长 BPAGetWaitStableTime 只并入归零上限，不再盲等）；
         /// 不碰气阀——阀态要下一次测试调用才生效，在这里开阀只会在下一点开始充气时才动作、反而干扰该点加压。
-        /// 采样未运行时只等恢复时长并按已泄压返回 true；false 只用于有回读且确认未归零（调用方据此补泄）。
+        /// 采样未运行时只等恢复时长并按已泄压返回 true（无回读时提前返回会让下一轮被未结束的上一轮拒掉）；false 只用于有回读且确认未归零（调用方据此补泄）。
         /// </summary>
         public async Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default)
         {
             if (!_connected)
                 throw new InvalidOperationException("BPA700 未连接");
 
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             // 头文件给的恢复时长为 0~10 秒，再夹一层上限，避免异常返回值把收尾拖死
             var recoverSeconds = await Task.Run(() => BPAGetWaitStableTime(), ct).ConfigureAwait(false);
             recoverSeconds = Math.Clamp(recoverSeconds, 0, Math.Min(15, timeoutSeconds));
-            _log.Info($"BPA700：等待仪器放气恢复 {recoverSeconds}s");
-            if (recoverSeconds > 0)
-                await Task.Delay(recoverSeconds * 1000, ct).ConfigureAwait(false);
 
-            // 清窗后看是否有新采样进来，以此判断采样是否在跑（不额外维护采样状态位）
+            // 判零取最近 20 点均值（200Hz 下 100ms），等 0.6s 已够填满窗口；实测在降压途中，轮询比盲等更早拿到归零时刻
             lock (_sampleLock) _recentSamples.Clear();
-            await Task.Delay(1500, ct).ConfigureAwait(false);
+            await Task.Delay(600, ct).ConfigureAwait(false);
             var residual = ReadTailAveragePressure();
             if (double.IsNaN(residual))
             {
+                if (recoverSeconds > 0)
+                    await Task.Delay(recoverSeconds * 1000, ct).ConfigureAwait(false);
                 _log.Info("BPA700：压力采样未运行，残压无回读，按已泄压处理");
                 return true;
             }
 
-            // 归零等待上限按残压估算并夹在 [10s, timeoutSeconds]：残压高时给足时间，已归零时不空等
-            var deadline = DateTime.UtcNow.AddSeconds(Math.Min(timeoutSeconds, Math.Max(10, residual / 10 + 5)));
+            // 归零等待上限按残压估算并夹在 [10s, timeoutSeconds]：残压高时给足时间，已归零时不空等；仪器自报的恢复时长作为额外宽限
+            var deadline = DateTime.UtcNow.AddSeconds(Math.Min(timeoutSeconds, recoverSeconds + Math.Max(10, residual / 10 + 5)));
             while (true)
             {
                 if (residual < 5)
                 {
-                    _log.Info($"BPA700：已泄压回零（回读 {residual:0.0}{PressureUnit}）");
+                    _log.Info($"BPA700：已泄压回零（回读 {residual:0.0}{PressureUnit}，用时 {sw.Elapsed.TotalSeconds:0.0}s）");
                     return true;
                 }
                 if (DateTime.UtcNow >= deadline)
                 {
-                    _log.Warn($"BPA700：泄压回零超时，残压 {residual:0.0}{PressureUnit}");
+                    _log.Warn($"BPA700：泄压回零超时（用时 {sw.Elapsed.TotalSeconds:0.0}s），残压 {residual:0.0}{PressureUnit}");
                     return false;
                 }
 
@@ -757,16 +770,15 @@ namespace TORNPISolution.Service.Devices
         public double LastStaticPressure { get; private set; }
 
         /// <summary>
-        /// 仪器过压保护测试（保留本能力，官方 BPA700.h）：BPARunOverpressureTest(inflation, pressure, threshold1, threshold2, cb)，BPA700 充气至超过阈值触发保护放气。
-        /// 回调 Finish(4) 时直接回传结果：peakPressure=触发保护时的峰值压力（测试值），另有充气/放气/总时长及 overTime/over10Time。
-        /// 产品需在充气全程实时上报压力（协议预留），若产品未先触发保护则由 BPA700 兜底。
+        /// 仪器充气—缓降一轮（官方 BPA700.h 的过压测试）：BPARunOverpressureTest(inflation, pressure, threshold1, threshold2, cb)，充气至超过 threshold2 后转入缓降，降到 threshold1 即结束本轮。
+        /// 只在回调 Finish(4) 时收尾：峰值压力与充气/泄气两段时长随结果回传（A18 用它作 t1/t2），总时长及 overTime/over10Time 只进日志。
         /// </summary>
-        /// <param name="pressure">目标充气压力（如 350）</param>
-        /// <param name="threshold1">保护阈值 1（如 300）</param>
-        /// <param name="threshold2">保护阈值 2，超过即触发快速放气（如 320）</param>
+        /// <param name="pressure">充气目标压力（如 230）</param>
+        /// <param name="threshold1">缓降终点（如 40），本轮降到该压力即结束</param>
+        /// <param name="threshold2">缓降起始线（如 210），充过该压力即转入缓降</param>
         /// <param name="inflation">true=BPA700 自行充气；false=外部设备充气</param>
-        /// <param name="timeoutMs">整轮超时兜底（过压测试物理上不应超过 2 分钟）</param>
-        public async Task<double> RunOverpressureTestAsync(
+        /// <param name="timeoutMs">整轮（充气 + 缓降）超时兜底</param>
+        public async Task<OverpressureRunResult> RunOverpressureTestAsync(
             double pressure, double threshold1, double threshold2,
             bool inflation = true, int timeoutMs = 120_000, CancellationToken ct = default)
         {
@@ -796,8 +808,8 @@ namespace TORNPISolution.Service.Devices
                 {
                     _log.Debug($"BPA700 过压测试回调：status={status} wait={waitTime:0.0} peak={peak:0.0}");
                 }
-                if (status == 4 || (status == 0 && peakPressure > threshold1))
-                    doneTcs.TrySetResult(true);
+                // 只认 Finish：本函数的 threshold1 是缓降终点，峰值必然高于它，任何中途的空闲回调都不能当作本轮结束
+                if (status == 4) doneTcs.TrySetResult(true);
             };
 
             var success = await Task.Run(
@@ -806,21 +818,21 @@ namespace TORNPISolution.Service.Devices
             if (!success)
             {
                 _log.Error($"BPA700：BPARunOverpressureTest(inflation={inflation}, {pressure}/{threshold1}/{threshold2}) 调用失败");
-                throw new IOException("BPA700 过压保护测试启动失败");
+                throw new IOException("BPA700 充气—缓降测试启动失败");
             }
 
-            _log.Info($"BPA700：过压保护测试充气中（目标 {pressure}{PressureUnit}，阈值 {threshold1}/{threshold2}）...");
+            _log.Info($"BPA700：充气—缓降测试进行中（充气目标 {pressure}{PressureUnit}，缓降起始线 {threshold2}，缓降终点 {threshold1}）...");
 
             if (await Task.WhenAny(doneTcs.Task, Task.Delay(timeoutMs, ct)).ConfigureAwait(false) != doneTcs.Task)
             {
                 await Task.Run(() => BPAStopTest()).ConfigureAwait(false);
-                _log.Error($"BPA700：过压保护测试 {timeoutMs / 1000}s 未完成（peak={peakPressure:0.0}），已 BPAStopTest 强制结束，请检查回调日志");
-                throw new TimeoutException($"BPA700 过压保护测试超时（{timeoutMs / 1000}s）");
+                _log.Error($"BPA700：充气—缓降测试 {timeoutMs / 1000}s 未收到 Finish（peak={peakPressure:0.0}），已 BPAStopTest 强制结束，请检查回调日志");
+                throw new TimeoutException($"BPA700 充气—缓降测试超时（{timeoutMs / 1000}s）");
             }
 
-            _log.Info($"BPA700：过压保护已触发，峰值压力 {peakPressure:0.0}{PressureUnit}，" +
+            _log.Info($"BPA700：充气—缓降测试本轮结束，峰值压力 {peakPressure:0.0}{PressureUnit}，" +
                       $"充气 {inflateTime:0.0}s 放气 {deflateTime:0.0}s 总 {totalTime:0.0}s，overTime={overTime:0.0} over10Time={over10Time:0.0}");
-            return peakPressure;
+            return new OverpressureRunResult { PeakPressure = peakPressure, InflateSeconds = inflateTime, DeflateSeconds = deflateTime };
         }
 
         /// <summary>稳压值取自 SDK 采样回调的近期均值，不开采样就没有回读</summary>

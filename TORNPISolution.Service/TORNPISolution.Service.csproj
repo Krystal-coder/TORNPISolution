@@ -27,6 +27,11 @@
       <Link>BPA700x64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- BPA700 Beta SDK 1.0.4.0（句柄版，唯一提供静态压力序列直切的实现）：只给气路类两项用，改名后与正式版同目录共存 -->
+    <Content Include="Libs\BPA700\Beta\BPA700x64.dll">
+      <Link>BPA700x64Beta.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <!-- AECG100 鲸扬多功能综合性能测试仪 SDK DLL -->
     <Content Include="Libs\AECG100x64.dll">
       <Link>AECG100x64.dll</Link>

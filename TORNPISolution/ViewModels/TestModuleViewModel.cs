@@ -12,6 +12,7 @@ namespace TORNPISolution.ViewModels
     {
         private readonly TestModuleModel _model;
         private int _sequence;
+        private double? _runDurationSeconds;
 
         public TestModuleViewModel(TestModuleModel model)
         {
@@ -47,6 +48,13 @@ namespace TORNPISolution.ViewModels
         {
             get => _sequence;
             set => SetProperty(ref _sequence, value);
+        }
+
+        /// <summary>本轮大项用时（秒）：模块派发到收尾回填的实测墙钟，由 MainViewModel 在模块跑完后写入；null = 本轮没跑到</summary>
+        public double? RunDurationSeconds
+        {
+            get => _runDurationSeconds;
+            set => SetProperty(ref _runDurationSeconds, value);
         }
 
         /// <summary>模块名称</summary>
@@ -89,6 +97,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>清除本模块所有测试项的测试值</summary>
         public void Reset()
         {
+            RunDurationSeconds = null;
             foreach (var item in Items)
             {
                 item.Reset();

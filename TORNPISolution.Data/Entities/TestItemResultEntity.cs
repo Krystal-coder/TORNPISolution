@@ -1,8 +1,7 @@
 namespace TORNPISolution.Data
 {
     /// <summary>
-    /// 测试项结果表：一行一项。项名与行数随方案动态变（A05 按压力点、A06 按压力组×轮次、A21 按心率点×轮次），
-    /// 配置改只改行数不改表；规格列存本次运行快照（血压类规格按仪器读回值现算），历史数据仍对得上。
+    /// 测试项结果表：一行一项。项名与行数随方案动态变（A05 按压力点、A06 按压力组×轮次、A21 按心率点×轮次）
     /// </summary>
     public class TestItemResultEntity
     {
@@ -58,6 +57,9 @@ namespace TORNPISolution.Data
 
         /// <summary>演示不判定（无产品演示模式）：保持未测试</summary>
         public bool NotJudged { get; set; }
+
+        /// <summary>本项耗时（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟；null = 该轮未采集</summary>
+        public double? DurationSeconds { get; set; }
 
         /// <summary>模块内排序：报表按它还原章节顺序</summary>
         public int SortOrder { get; set; }

@@ -6,7 +6,8 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// 测试项目类：每个模块方法 = 该模块完整测试流程（自包含），一次执行返回全部测试项实测值。
-    /// 结果字典由入口按 Spec 项名初始化，未测到默认 0 = FAIL；新增测试项只改 Spec，需现算规格的项用 WithDynamicSpec/WithDualValues。
+    /// 结果字典由入口按 Spec 项名初始化，未测到默认 0 = FAIL
+    /// 新增测试项只改 Spec，需现算规格的项用 WithDynamicSpec/WithDualValues。
     /// </summary>
     public partial class TestItem : ITestItemService
     {
@@ -143,6 +144,8 @@ namespace TORNPISolution.Service
             TestModuleIds.PressureControlTest => (nameof(PressureControlModule), () => PressureControlModule(collector, token), null),
             TestModuleIds.BpStaticAccuracyTest => (nameof(BpStaticAccuracyModule), () => BpStaticAccuracyModule(collector, token), null),
             TestModuleIds.ProductStaticPressureCalibration => (nameof(ProductStaticPressureCalibrationModule), () => ProductStaticPressureCalibrationModule(collector, token), null),
+            TestModuleIds.DeflateRateTest => (nameof(DeflateRateModule), () => DeflateRateModule(collector, token), null),
+            TestModuleIds.AirPathLeakTest => (nameof(AirPathLeakModule), () => AirPathLeakModule(collector, token), null),
             TestModuleIds.Jjg692DeflationRateTest => (nameof(Jjg692DeflationRateModule), () => Jjg692DeflationRateModule(collector, token), null),
             TestModuleIds.Jjg692AirtightnessTest => (nameof(Jjg692AirtightnessModule), () => Jjg692AirtightnessModule(collector, token), null),
             TestModuleIds.BpDynamicAccuracyTest => (nameof(BpDynamicAccuracyModule), () => BpDynamicAccuracyModule(collector, token), null),
@@ -169,7 +172,7 @@ namespace TORNPISolution.Service
             catch (NotSupportedException) { return false; }
         }
 
-        /// <summary>A01 血压仪初始化异常钩子：写 0 并通知 UI 设备连接失败（异常本身已由 RunModuleAsync 记 Error）</summary>
+        /// <summary>A01 血压仪初始化异常钩子：写 0 并通知 UI 设备连接失败</summary>
         private async Task BpDeviceInitFailedAsync(TestItemResultCollector collector)
         {
             await collector.SetAsync(SpecItems.BpSimulatorInit, TestItemResult.Of(0));

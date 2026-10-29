@@ -39,6 +39,12 @@ namespace TORNPISolution.Share.Models
         /// </summary>
         public bool DisplayOnly { get; set; }
 
+        /// <summary>
+        /// 本项实测用时（秒）：先采完全部轮次、再批量上报结果的模块必须填这里，否则 UI 只能按上报时刻差算耗时。
+        /// null = 由上报时刻差推导（逐项即时上报的模块不用填）。
+        /// </summary>
+        public double? MeasuredSeconds { get; set; }
+
         /// <summary>普通项便捷构造：只有测试值，按 Spec 静态规格判定</summary>
         public static TestItemResult Of(double value) => new() { Value = value };
 

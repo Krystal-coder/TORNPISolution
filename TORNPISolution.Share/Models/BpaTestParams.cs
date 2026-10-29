@@ -11,7 +11,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>动态血压参数（BPARunBPTest，Default/Customized 两种方法）</summary>
         public BpaDynamicBpParams DynamicBloodPressure { get; set; } = new();
 
-        /// <summary>BP-004 血压精度/重复性参数（A06）：压力组可勾选增删，心率全模块一个值</summary>
+        /// <summary>BP-004 血压精度/重复性参数（A06）：压力组可勾选增删，每组一个心率</summary>
         public BpaBpAccuracyParams BpAccuracy { get; set; } = new();
 
         /// <summary>BP-005 心率精度/重复性参数（A21）：压力一组，心率可勾选增删多个点</summary>
@@ -25,6 +25,9 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>压力控制功能测试（BP-006~008）过程参数</summary>
         public BpaPressureControlParams PressureControl { get; set; } = new();
+
+        /// <summary>气路类两项（A18 放气速率 BP-007 / A22 气路泄露 BP-010）的判定区间</summary>
+        public BpaAirPathParams AirPath { get; set; } = new();
 
         /// <summary>波形显示配置（按测试项自定义 X 轴模式与时间刻度，Y 轴固定 mmHg）</summary>
         public BpaWaveformDisplayConfig WaveformDisplay { get; set; } = new();
@@ -57,32 +60,32 @@ namespace TORNPISolution.Share.Models
     }
 
     /// <summary>
-    /// BP-004 血压精度/重复性参数（A06）：一行一组收缩压/舒张压，心率全模块只设一个（发给模拟仪驱动脉搏波，不参与判定）。
+    /// BP-004 血压精度/重复性参数（A06）：一行一组收缩压/舒张压/心率，心率按组设置（发给模拟仪驱动脉搏波，不参与判定）。
     /// </summary>
     public class BpaBpAccuracyParams
     {
         /// <summary>压力组清单（勾选的行参与测试，顺序即执行顺序）</summary>
         public List<BpaBpPressureGroup> Groups { get; set; } = new()
         {
-            new() { Systolic = 120, Diastolic = 80 },
-            new() { Systolic = 150, Diastolic = 100 },
-            new() { Systolic = 200, Diastolic = 150 },
+            new() { Systolic = 120, Diastolic = 80, HeartRate = 80 },
+            new() { Systolic = 150, Diastolic = 100, HeartRate = 100 },
+            new() { Systolic = 200, Diastolic = 150, HeartRate = 120 },
         };
 
-        /// <summary>心率（BPM，所有压力组共用）</summary>
-        public int HeartRate { get; set; } = 80;
-
-        /// <summary>每个压力组重复的轮数（少于 3 抬到 3，否则极差无统计意义）</summary>
+        /// <summary>每个压力组重复的轮数（最少 1 轮；1 轮时组内没有极差可算，执行端与目录都不出重复性项）</summary>
         public int Repeats { get; set; } = 3;
 
         /// <summary>每轮测完让产品休息的秒数（含换组之间与最后一轮收尾）</summary>
         public int RestSeconds { get; set; } = 60;
 
+        /// <summary>单次完整血压测量超时（秒）：从发出开始测量指令算起，超过该时长没收到产品结果帧即结束本轮并中止本模块</summary>
+        public int SingleMeasureTimeoutSeconds { get; set; } = 120;
+
         /// <summary>休息期间泄压回零（false=仪器保持待命、袖带残压不动）</summary>
         public bool VentDuringRest { get; set; } = true;
     }
 
-    /// <summary>一组血压压力设定（一次 0x02 血压模拟帧的两路压力）</summary>
+    /// <summary>一组血压设定（一次血压模拟的收缩/舒张目标与驱动脉搏波的心率）</summary>
     public class BpaBpPressureGroup
     {
         /// <summary>是否参与测试</summary>
@@ -93,6 +96,9 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>舒张压（mmHg）</summary>
         public double Diastolic { get; set; } = 80;
+
+        /// <summary>心率（BPM，本组激励参数，不参与判定）</summary>
+        public int HeartRate { get; set; } = 80;
     }
 
     /// <summary>
@@ -112,11 +118,14 @@ namespace TORNPISolution.Share.Models
             new() { Value = 60 }, new() { Value = 80 }, new() { Value = 100 }, new() { Value = 120 },
         };
 
-        /// <summary>每个心率点重复的轮数（少于 3 抬到 3）</summary>
+        /// <summary>每个心率点重复的轮数（最少 1 轮；平均值项 1 轮即取该轮）</summary>
         public int Repeats { get; set; } = 3;
 
         /// <summary>每轮测完让产品休息的秒数（含换点之间与最后一轮收尾）</summary>
         public int RestSeconds { get; set; } = 60;
+
+        /// <summary>单次完整血压测量超时（秒）：从发出开始测量指令算起，超过该时长没收到产品结果帧即结束本轮并中止本模块</summary>
+        public int SingleMeasureTimeoutSeconds { get; set; } = 120;
 
         /// <summary>休息期间泄压回零（false=仪器保持待命、袖带残压不动）</summary>
         public bool VentDuringRest { get; set; } = true;
@@ -150,6 +159,37 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>漏气率合格上限（mmHg/s，null=不判）</summary>
         public double? MaxRate { get; set; }
+    }
+
+    /// <summary>
+    /// 气路类两项的判定区间（A18 放气速率 BP-007 的加压/泄压时长、A22 气路泄露 BP-010 的高低压制气量），只走 BPA700 静态压力序列流程。
+    /// 任一端留空按不判该端处理（下限空=不限下、上限空用测试要求文档暂定的兜底值），两端都留空则该项不判 PASS/FAIL、只报实测值。
+    /// </summary>
+    public class BpaAirPathParams
+    {
+        /// <summary>加压时间 t1 合格下限（s）</summary>
+        public double? InflateTimeMin { get; set; }
+
+        /// <summary>加压时间 t1 合格上限（s，留空兜底 30）</summary>
+        public double? InflateTimeMax { get; set; }
+
+        /// <summary>泄压时间 t2 合格下限（s）</summary>
+        public double? DeflateTimeMin { get; set; }
+
+        /// <summary>泄压时间 t2 合格上限（s，留空兜底 60）</summary>
+        public double? DeflateTimeMax { get; set; }
+
+        /// <summary>高压段泄气量 ΔP_H 合格下限（mmHg，留空=不限下）：终点高于起点时差值为负</summary>
+        public double? HighLossMin { get; set; }
+
+        /// <summary>高压段泄气量 ΔP_H 合格上限（mmHg，留空兜底 2）</summary>
+        public double? HighLossMax { get; set; }
+
+        /// <summary>低压段泄气量 ΔP_L 合格下限（mmHg，留空=不限下）</summary>
+        public double? LowLossMin { get; set; }
+
+        /// <summary>低压段泄气量 ΔP_L 合格上限（mmHg，留空兜底 2）</summary>
+        public double? LowLossMax { get; set; }
     }
 
     /// <summary>0x13 气密性：帧 = [04, 13, 袖带, 设定压力2, 稳压时间1]；
@@ -189,8 +229,9 @@ namespace TORNPISolution.Share.Models
         /// <summary>BPA 充气：true=BPA700 自行充气，false=外部设备充气</summary>
         public bool BpaInflation { get; set; } = true;
 
-        /// <summary>量测时间（每个压力点的稳压保持秒数，0~999；仅 BPA700 序列有效，康伟达按收敛判据 2.5s 稳压窗取均值、不额外保持）</summary>
-        public int MeasureSeconds { get; set; } = 10;
+        /// <summary>量测时间（每个压力点的稳压保持秒数，0~999；仅 BPA700 序列有效，康伟达按收敛判据 2.5s 稳压窗取均值、不额外保持）。
+        /// 保持窗只需盖住 Stable 事件里发起的 0x76 回读（约 0.2s）：2s 已在台架验证过（100/200mmHg 两点产品上报值正常回读），配大了只是多等仪器补压</summary>
+        public int MeasureSeconds { get; set; } = 2;
 
         /// <summary>点间泄压：每个压力点测完先等归零并回读确认再升下一点（false=不等不确认。两台仪器点间都保不住压：BPA700 无泄压命令、残压自行回落，康伟达下一点开头的清场仪式会泄残压）</summary>
         public bool VentBetweenPoints { get; set; } = false;

@@ -3,8 +3,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 测试结果收集器：封装结果字典 + 逐项完成回调。
-    /// 模块每写入一项结果即触发 onItemCompleted 回调，UI 收到后立即回填，无需等整个模块跑完。
+    /// 测试结果收集器：封装结果字典 + 逐项完成回调
     /// </summary>
     public sealed class TestItemResultCollector
     {

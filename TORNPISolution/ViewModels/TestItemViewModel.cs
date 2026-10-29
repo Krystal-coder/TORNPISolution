@@ -199,6 +199,21 @@ namespace TORNPISolution.ViewModels
 
         public string? ProductRawText => _productText;
 
+        /// <summary>本项耗时（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟，由 MainViewModel 在逐项回调里写入；null = 本轮没跑到这项</summary>
+        public double? RunSeconds
+        {
+            get => _runSeconds;
+            set
+            {
+                if (SetProperty(ref _runSeconds, value))
+                    OnPropertyChanged(nameof(RunSecondsText));
+            }
+        }
+        private double? _runSeconds;
+
+        /// <summary>耗时列文本：秒数保留一位小数，没跑到显示 --</summary>
+        public string RunSecondsText => _runSeconds is double s ? $"{s:0.0}" : "--";
+
         /// <summary>判定结果</summary>
         public TestResultStatus Result
         {
@@ -383,7 +398,9 @@ namespace TORNPISolution.ViewModels
                 return;
             }
 
-            var (rowHeader, headers, widths, title) = ResolveSubTableShape(points[0].Schema, Unit);
+            // 列头单位跟着子表行的值走：时长类项目（A18 的 t1/t2）行里装的是压力，用大项单位会把 mmHg 标成 s
+            var valueUnit = points.Select(p => p.Unit).FirstOrDefault(u => !string.IsNullOrEmpty(u)) ?? Unit;
+            var (rowHeader, headers, widths, title) = ResolveSubTableShape(points[0].Schema, valueUnit);
             var cellLists = points.Select(CellsOf).ToArray();
             var columnCount = Math.Max(headers.Length, cellLists.Max(c => c.Length));
             const double rowHeaderWidth = 118;
@@ -453,16 +470,18 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(HasRowDetails));
             OnPropertyChanged(nameof(PointSummaryText));
             MeasuredValue = null;
+            RunSeconds = null;
             OnPropertyChanged(nameof(ResultText));
         }
 
+        /// <summary>执行端没报告该项：判定不合格，三个值列保持空（显示 --，入库 null），不把 0 当实测值写进记录</summary>
         public void MarkNotReportedAsFail()
         {
-            _measuredValue = 0;
+            _measuredValue = null;
             _instrumentText = null;
             _productText = null;
-            _instrumentValue = 0;
-            _productValue = 0;
+            _instrumentValue = null;
+            _productValue = null;
             OnPropertyChanged(nameof(InstrumentValueText));
             OnPropertyChanged(nameof(ProductValueText));
             OnPropertyChanged(nameof(MeasuredValue));

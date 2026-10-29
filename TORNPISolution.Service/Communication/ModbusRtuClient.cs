@@ -6,7 +6,7 @@ namespace TORNPISolution.Service.Communication
     /// <summary>
     /// Modbus RTU 主站客户端（RS485 串口）。
     /// 功能码：0x03 读保持寄存器、0x04 读输入寄存器、0x06 写单寄存器、0x10 写多寄存器。
-    /// 所有请求经 SemaphoreSlim 串行化（485 半双工总线一问一答）
+    /// 所有请求经 SemaphoreSlim 串行化
     /// </summary>
     public class ModbusRtuClient : IDisposable
     {

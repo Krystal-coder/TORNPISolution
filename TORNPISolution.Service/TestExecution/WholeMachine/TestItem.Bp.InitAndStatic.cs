@@ -135,9 +135,12 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 血压静态压力精度测试（BP-003），产品通讯统一在 A16 初始化：
-        /// ① 逐点加压（压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力，仅勾选点参与），经 RunStaticPressureSequenceAsync 执行（BPA700=SDK 序列；康伟达=逐点压力源+AA 回读收敛）；
-        ///    每点到稳压保持（PressurePointStable 事件）时并发回读产品压力（0x76），保证与仪器稳定值同时刻口径；
-        /// ② 逐点判定 |产品−仪器| ≤3mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：测试值=误差（规格 -3~3），仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；
+        /// ① 压力点/稳压时长/充气方式取血压模拟仪测试配置→当前启用设备→静态压力（仅勾选点参与），按仪器分两条驱动路径：
+        ///    BPA700=静态压力序列一次下发全部点位（点之间直接切压不泄回零，省掉每轮约 10s 的设备恢复等待与从零重新充气）；
+        ///    康伟达（或勾了「点间泄压」的 BPA700）=逐点单轮，每点经 RunStaticPressureSequenceAsync 执行（到位后本轮自带泄压收尾）。
+        /// ② 每点到稳压后取窗口末端均值作仪器标准值，并在同一保持窗内回读产品压力（0x76），保证与仪器稳定值同时刻口径；
+        /// ③ 逐点判定 产品−仪器 按静态规格 -0.5~0.5mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：测试值=带符号偏差（正=产品偏高），
+        ///    仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；
         ///    全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）；无仪器演示分支见 DemoStaticAccuracyAsync。
         /// </summary>
         //测试项目**************************---A05---**************************血压静态压力精度测试（BP-003）
@@ -166,6 +169,9 @@ namespace TORNPISolution.Service
                 return;
             }
 
+            // 序列模式点之间直接切压、不泄回零，做不出「点间泄压」这项配置；勾选它时 BPA700 也走逐点单轮
+            var useSequenceSdk = config.ActiveSimulator == SimulatorType.BPA700 && !sp.VentBetweenPoints;
+
             using (var product = _productFactory())
             {
                 // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）；本模块自建的 product 实例仍需打开产品串口，才能设置测试模式（0x73）并回读产品压力（0x76）
@@ -188,7 +194,9 @@ namespace TORNPISolution.Service
                 }
 
                 // 经共享会话取模拟仪（接口调用：只用接口成员）
-                await using var lease = await _simSession.RentAsync(token);
+                await using var lease = useSequenceSdk
+                    ? await _simSession.RentSequenceSdkAsync(token)
+                    : await _simSession.RentAsync(token);
                 var simulator = lease.Simulator;
 
                 var pointNames = points.Select(SpecItems.Bp003Point).ToArray();
@@ -198,6 +206,9 @@ namespace TORNPISolution.Service
                 var waveWatch = System.Diagnostics.Stopwatch.StartNew();
                 var readTasks = new List<Task>();
                 var readTasksLock = new object();
+
+                // 序列路径用采样旁路（每点一条独立时间轴 + 窗口末端均值），单轮路径用下面这套逐点回调
+                var rig = useSequenceSdk ? new AirPathRig(simulator, _log, PressureSampled) : null;
 
                 void OnSample(double pressure)
                 {
@@ -236,9 +247,16 @@ namespace TORNPISolution.Service
                 var staticModeEntered = false;
                 try
                 {
-                    simulator.PressureSampled += OnSample;
-                    simulator.PressurePointStable += OnPointStable;
-                    await simulator.StartSamplingAsync(token);
+                    if (rig != null)
+                    {
+                        await rig.StartAsync(token);
+                    }
+                    else
+                    {
+                        simulator.PressureSampled += OnSample;
+                        simulator.PressurePointStable += OnPointStable;
+                        await simulator.StartSamplingAsync(token);
+                    }
 
                     // 产品可用时才设置产品测试模式（0x73 mode=3）并读取产品上压力值；设置失败不中止仪器序列：各点产品上报值按缺失处理（产品列判 FAIL），仪器稳压值照常上报
                     if (productAvailable)
@@ -263,33 +281,55 @@ namespace TORNPISolution.Service
                         _log.Warn("BP-003：产品未连接或握手失败，各压力点将按“无产品上报值”判 FAIL");
                     }
 
-                    // 逐点单点调用（BPA700 SDK 一次只支持一个压力点，多点由上位机循环）；每点保持窗内发起的产品回读在下一点开始前收干净
-                    var stablePressures = new double[pointValues.Length];
-                    for (var i = 0; i < pointValues.Length; i++)
+                    if (rig != null)
                     {
-                        currentPoint = i;
-                        waveWatch = System.Diagnostics.Stopwatch.StartNew();   // 本点独立时间轴
-                        stablePressures[i] = (await simulator.RunStaticPressureSequenceAsync(
-                            new[] { pointValues[i] }, sp.MeasureSeconds, sp.BpaInflation, token))[0];
-
-                        Task[] pending;
-                        lock (readTasksLock) { pending = readTasks.ToArray(); readTasks.Clear(); }
-                        await Task.WhenAll(pending);
-
-                        // 点间泄压（配置选「点间泄压」时）：本点测完泄回零再升下一点，末点留给模块结束统一泄
-                        if (sp.VentBetweenPoints && i < pointValues.Length - 1)
-                        {
-                            try { await simulator.VentToZeroAsync(ct: token); }
-                            catch (OperationCanceledException) { throw; }
-                            catch (Exception ex) { _log.Warn($"BP-003 点间泄压失败（下一点清场会补偿）：{ex.Message}"); }
-                        }
+                        // 序列路径：全部点位一次下发，逐点 Stable 后在本点保持窗内取稳压值并回读产品
+                        await BpStaticAccuracyBySequenceAsync(product, simulator, rig, collector, pointValues,
+                            productAvailable, sp.BpaInflation, Math.Max(sp.MeasureSeconds, 2), token);
                     }
-                    currentPoint = -1;   // 收尾段（泄气/退模式）不再画进任何点的曲线
+                    else
+                    {
+                        // 逐点单点调用（SDK 一次只支持一个压力点，多点由上位机循环）；每点保持窗内发起的产品回读在下一点开始前收干净
+                        var stablePressures = new double[pointValues.Length];
+                        for (var i = 0; i < pointValues.Length; i++)
+                        {
+                            currentPoint = i;
+                            waveWatch = System.Diagnostics.Stopwatch.StartNew();   // 本点独立时间轴
+                            stablePressures[i] = (await simulator.RunStaticPressureSequenceAsync(
+                                new[] { pointValues[i] }, sp.MeasureSeconds, sp.BpaInflation, token))[0];
 
-                    await ReportStaticAccuracyAsync(collector, pointValues, stablePressures, productValues);
+                            Task[] pending;
+                            lock (readTasksLock) { pending = readTasks.ToArray(); readTasks.Clear(); }
+                            await Task.WhenAll(pending);
+
+                            // 点间泄压（配置选「点间泄压」时）：本点测完泄回零再升下一点，末点留给模块结束统一泄
+                            if (sp.VentBetweenPoints && i < pointValues.Length - 1)
+                            {
+                                try { await simulator.VentToZeroAsync(ct: token); }
+                                catch (OperationCanceledException) { throw; }
+                                catch (Exception ex) { _log.Warn($"BP-003 点间泄压失败（下一点清场会补偿）：{ex.Message}"); }
+                            }
+                        }
+                        currentPoint = -1;   // 收尾段（泄气/退模式）不再画进任何点的曲线
+
+                        await ReportStaticAccuracyAsync(collector, pointValues, stablePressures, productValues);
+                    }
                 }
                 finally
                 {
+                    // 序列路径的末点可能还停在保持窗里：先结束本轮稳压，否则仪器一边补压一边泄，回零判不到
+                    if (rig != null)
+                    {
+                        try
+                        {
+                            await simulator.StopSimulationAsync(CancellationToken.None);
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Warn($"BP-003：结束静态压力序列失败：{ex.Message}");
+                        }
+                    }
+
                     // 模块结束泄气：接大容积容器时避免残压憋到下一模块；停/异常路径也尽力泄。
                     // 排在停采样之前：BPA700 要靠采样回读判断是否已归零
                     try
@@ -301,9 +341,16 @@ namespace TORNPISolution.Service
                         _log.Warn($"BP-003：模块结束泄气失败：{ex.Message}");
                     }
 
-                    await simulator.StopSamplingAsync();
-                    simulator.PressureSampled -= OnSample;
-                    simulator.PressurePointStable -= OnPointStable;
+                    if (rig != null)
+                    {
+                        await rig.StopAsync();
+                    }
+                    else
+                    {
+                        await simulator.StopSamplingAsync();
+                        simulator.PressureSampled -= OnSample;
+                        simulator.PressurePointStable -= OnPointStable;
+                    }
 
                     // 测试完退出静态压力模式（0x73 mode=3 status=1）：用 None 令牌保证停止/异常路径也执行，避免产品遗留在静态压力模式影响后续模块
                     if (staticModeEntered)
@@ -325,7 +372,7 @@ namespace TORNPISolution.Service
         /// <summary>BP-003 无仪器演示分支：不驱动模拟仪（无仪器参考值），进静态压力模式（0x73 mode=3）后逐点回读产品上报压力（0x76），实测值填产品列</summary>
         private async Task DemoStaticAccuracyAsync(TestItemResultCollector collector, List<double> points, CancellationToken token)
         {
-            const double Tolerance = 3;   // mmHg，与正式流程同规格
+            const double Tolerance = 0.5;   // mmHg，与正式流程同规格
 
             using var product = _productFactory();
             var opened = false;
@@ -349,8 +396,8 @@ namespace TORNPISolution.Service
             try
             {
                 // 探活：产品无响应就不逐点空等 3s 超时
-                var probe = opened ? await TryReadProductPressureAsync(product, token) : null;
-                if (probe == null)
+                var probe = opened ? await ReadProductPressureAsync(product, "BP-003 演示探活", token) : double.NaN;
+                if (double.IsNaN(probe))
                 {
                     _log.Warn("BP-003 演示：产品无响应（0x76 读回缺失），各压力点按读回缺失判 FAIL");
                     foreach (var value in points)
@@ -361,15 +408,15 @@ namespace TORNPISolution.Service
                 foreach (var value in points)
                 {
                     token.ThrowIfCancellationRequested();
-                    var read = await TryReadProductPressureAsync(product, token);
                     var itemName = SpecItems.Bp003Point(value);
-                    _log.Info($"BP-003 演示 {itemName}：产品上报={(read?.ToString("0.0") ?? "--")}（无仪器参考值，不判合格）");
+                    var read = await ReadProductPressureAsync(product, $"{itemName} 产品上报", token);
+                    _log.Info($"BP-003 演示 {itemName}：产品上报={(double.IsNaN(read) ? "--" : read.ToString("0.0"))}（无仪器参考值，不判合格）");
 
                     // 无仪器参考值算不出误差：测试值落规格外保证 FAIL，产品列照常显示读回值
                     await collector.SetAsync(itemName, new TestItemResult
                     {
                         Value = Tolerance + 1,
-                        ProductValue = read
+                        ProductValue = double.IsNaN(read) ? null : read
                     });
                 }
             }
@@ -391,55 +438,80 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>读一次产品静态压力（0x76）：NaN/异常统一返回 null，不向上抛（演示分支容错用）</summary>
-        private async Task<double?> TryReadProductPressureAsync(IProductController product, CancellationToken token)
-        {
-            try
-            {
-                var p = await product.ReadProductPressureAsync(token);
-                return double.IsNaN(p) ? null : p;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _log.Warn($"BP-003 演示：产品静态压力读失败：{ex.Message}");
-                return null;
-            }
-        }
-
-        /// <summary>BP-003 逐点判定与上报（一点一项）：每点 产品上报值 − 仪器稳压值 按静态规格 -3~3mmHg 判定；无产品上报/仪器未稳压的点误差落到规格外保证 FAIL，缺值列显示 --。</summary>
+        /// <summary>BP-003 逐点判定与上报（一点一项）：每点 产品上报值 − 仪器稳压值 按静态规格 -0.5~0.5mmHg 判定；无产品上报/仪器未稳压的点误差落到规格外保证 FAIL，缺值列显示 --。</summary>
         private async Task ReportStaticAccuracyAsync(TestItemResultCollector collector,
             double[] pointValues, double[] stablePressures, double?[] productValues)
         {
-            const double Tolerance = 3;   // mmHg，测试要求文档固定
-
             for (var i = 0; i < pointValues.Length; i++)
+                await ReportStaticAccuracyPointAsync(collector, pointValues[i], stablePressures[i], productValues[i]);
+        }
+
+        /// <summary>BP-003 单点判定与上报（两条驱动路径共用）：产品/仪器任一缺值时误差算不出，测试值落到规格外保证 FAIL。</summary>
+        private async Task ReportStaticAccuracyPointAsync(TestItemResultCollector collector,
+            double target, double standard, double? productValue)
+        {
+            const double Tolerance = 0.5;   // mmHg，测试要求文档固定
+
+            var hasInstrument = !double.IsNaN(standard);
+            var hasProduct = productValue.HasValue && !double.IsNaN(productValue.Value);
+            // 带符号上报：取绝对值的话规格下界 -0.5 永远用不上，也看不出产品偏高还是偏低
+            var err = hasInstrument && hasProduct ? productValue!.Value - standard : (double?)null;
+            var pass = err.HasValue && Math.Abs(err.Value) <= Tolerance;
+            var remark = pass
+                ? string.Empty
+                : !hasProduct ? "无产品上报值（产品未连接或无响应）"
+                : !hasInstrument ? "仪器未稳压到位"
+                // 备注只写未通过原因，具体偏差数值看测试值列与下一行日志
+                : $"误差超过 ±{Tolerance:0.##}mmHg（测试值为带符号偏差：正=产品偏高）";
+
+            var itemName = SpecItems.Bp003Point(target);
+            _log.Info($"BP-003 {itemName}：目标={target:0.#} 仪器稳压={(hasInstrument ? standard.ToString("0.0") : "--")} 产品上报={(hasProduct ? productValue!.Value.ToString("0.0") : "--")} 误差={(err?.ToString("0.0") ?? "--")} → {(pass ? "PASS" : "FAIL（" + remark + "）")}");
+
+            await collector.SetAsync(itemName, new TestItemResult
             {
-                var standard = stablePressures[i];
-                var hasInstrument = !double.IsNaN(standard);
-                var hasProduct = productValues[i].HasValue && !double.IsNaN(productValues[i]!.Value);
-                // 带符号上报：取绝对值的话规格下界 -3 永远用不上，也看不出产品偏高还是偏低
-                var err = hasInstrument && hasProduct ? productValues[i]!.Value - standard : (double?)null;
-                var pass = err.HasValue && Math.Abs(err.Value) <= Tolerance;
-                var remark = pass
-                    ? string.Empty
-                    : !hasProduct ? "无产品上报值（产品未连接或无响应）"
-                    : !hasInstrument ? "仪器未稳压到位"
-                    // 备注只写未通过原因，具体偏差数值看测试值列与下一行日志
-                    : $"误差超过 ±{Tolerance:0}mmHg（测试值为带符号偏差：正=产品偏高）";
+                Value = err ?? Tolerance + 1,
+                InstrumentValue = hasInstrument ? standard : null,
+                ProductValue = hasProduct ? productValue : null
+            });
+        }
 
-                var itemName = SpecItems.Bp003Point(pointValues[i]);
-                _log.Info($"BP-003 {itemName}：目标={pointValues[i]:0.#} 仪器稳压={(hasInstrument ? standard.ToString("0.0") : "--")} 产品上报={(hasProduct ? productValues[i]!.Value.ToString("0.0") : "--")} 误差={(err?.ToString("0.0") ?? "--")} → {(pass ? "PASS" : "FAIL（" + remark + "）")}");
+        /// <summary>
+        /// BP-003 序列路径（BPA700 句柄版 SDK）：全部压力点一次下发，点之间直接切压不泄回零，省掉每轮约 10s 的设备恢复等待与从零重新充气。
+        /// 每点 Stable 后先等采样铺平再取窗口末端均值作仪器标准值，并在同一保持窗内回读产品 0x76；某点到压超时后续点测不到，剩余项由收尾判 FAIL。
+        /// </summary>
+        private async Task BpStaticAccuracyBySequenceAsync(IProductController product, IBloodPressureSimulator simulator,
+            AirPathRig rig, TestItemResultCollector collector, double[] pointValues, bool productAvailable,
+            bool inflation, int holdSeconds, CancellationToken token)
+        {
+            const int SettleMs = 800;
+            const int PointArriveSeconds = 60;
 
-                await collector.SetAsync(itemName, new TestItemResult
-                {
-                    Value = err ?? Tolerance + 1,
-                    InstrumentValue = hasInstrument ? standard : null,
-                    ProductValue = hasProduct ? productValues[i] : null
-                });
+            try
+            {
+                await RunStaticPressureSequenceByPointsAsync(simulator, pointValues, holdSeconds, inflation,
+                    PointArriveSeconds,
+                    i =>
+                    {
+                        rig.BeginPhase(SpecItems.Bp003Point(pointValues[i]));   // 本点独立时间轴
+                        return Task.CompletedTask;
+                    },
+                    async i =>
+                    {
+                        await Task.Delay(SettleMs, token);
+                        var standard = rig.WindowAverage();
+                        double? productValue = null;
+                        if (productAvailable)
+                        {
+                            var read = await ReadProductPressureAsync(product, $"{pointValues[i]:0.#}mmHg 上报", token);
+                            if (!double.IsNaN(read)) productValue = read;
+                        }
+                        await ReportStaticAccuracyPointAsync(collector, pointValues[i], standard, productValue);
+                    },
+                    token);
+            }
+            catch (TimeoutException ex)
+            {
+                _log.Warn($"BP-003：{ex.Message}（未报告的点由收尾判 FAIL）");
             }
         }
 

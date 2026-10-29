@@ -6,8 +6,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 烧录工位配置服务实现：保存在程序目录 Config\flashing.json。写入口只有烧录页一个，所以不做三方合并、不做内存缓存（手工改文件立即生效）。
-    /// 剔显式 null、.bak 兜底、临时文件+改名替换这三样做法同 InstrumentConfigService。
+    /// 烧录工位配置服务实现：保存在程序目录 Config\flashing.json。写入口只有烧录页一个
     /// </summary>
     public class FlashingConfigService : IFlashingConfigService
     {

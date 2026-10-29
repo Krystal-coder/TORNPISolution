@@ -276,12 +276,14 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 等待产品主动推送的血压结果（Ctrl=0x7B，功能码不限）：期间持 <see cref="_portGate"/> 独占串口，调用方不得并发发其他命令。
+        /// 等待产测态一轮完整血压测量的 0xCA 结果帧（参数区 10 字节：状态码/收缩压/舒张压/平均压/心率各 uint16 LE）：
+        /// 期间持 <see cref="_portGate"/> 独占串口（调用方不得并发发其他命令），测量中的 0xCA 进程帧跳过继续等。
+        /// TimedOut=true 表示超时没等到结果帧（调用方须补发结束指令 0xCC 并停仪器输出）；等到但状态码非 0 或长度不足时 TimedOut=false、Reading=null（本轮按无有效回读处理，不算超时）。
         /// </summary>
-        public async Task<ProductBpReading?> WaitForBpPushResultAsync(
-            int timeoutMs = 60000, CancellationToken ct = default)
+        public async Task<(bool TimedOut, ProductBpReading? Reading)> WaitFullBpResultAsync(
+            int timeoutMs = 120_000, CancellationToken ct = default)
         {
-            _log.Info($"等待产品推送血压结果（超时 {timeoutMs}ms）...");
+            _log.Info($"{DateTime.Now} 等待产品血压测量结果帧（0xCA，超时 {timeoutMs / 1000}s）...");
 
             await _portGate.WaitAsync(ct).ConfigureAwait(false);
             try
@@ -290,7 +292,12 @@ namespace TORNPISolution.Service.Devices
             {
                 var buffer = new List<byte>();
                 var deadline = Environment.TickCount64 + timeoutMs;
-                var targetCode = ProductProtocol.GetBpResult.Code;     // 0x7B
+                var targetCode = ProductProtocol.StartFullBpMeasure.Code;     // 0xCA：开始指令与结果推送同码，靠参数区长度区分
+                var progress = new List<double>();                            // 本轮 0xCA 进程帧的压力序列（汇总成一行，与上位机抓包比对充气/放气速率）
+
+                string DescribeProgress() => progress.Count == 0
+                    ? "未收到 0xCA 进程帧"
+                    : $"进程帧 {progress.Count} 帧：起 {progress[0]:0} → 峰 {progress.Max():0} → 末 {progress[^1]:0} mmHg";
 
                 while (Environment.TickCount64 < deadline)
                 {
@@ -307,26 +314,29 @@ namespace TORNPISolution.Service.Devices
                         Thread.Sleep(10);
                     }
 
-                    // 持续提取缓冲区中的完整帧，直到取到目标 0x7B 或暂无完整帧
+                    // 持续提取缓冲区中的完整帧，直到取到结果帧或暂无完整帧
                     while (true)
                     {
                         var parsed = TryExtractFrame(buffer);
                         if (parsed == null)
                             break;   // 暂无更多完整帧，回去继续读串口
 
-                        if (parsed.ControlCode == targetCode)
+                        if (parsed.ControlCode == targetCode && parsed.Payload.Length >= ProductProtocol.BpResultPayloadBytes)
                         {
-                            _log.Debug($"产品推送血压结果: [{BitConverter.ToString(parsed.Payload)}]");
-                            return ParseBpReading(parsed.Payload);
+                            // 结果帧原文单独记一行（与串口抓包逐字节比对）；进程帧一轮上百条只汇总不逐帧记
+                            _log.Info($"产品 RX [血压结果帧]: {BitConverter.ToString(parsed.RawFrame ?? parsed.Payload).Replace('-', ' ')}（{DescribeProgress()}）");
+                            return (false, ParseFullBpResult(parsed.Payload));
                         }
 
-                        // 非目标帧（如 0xCA 周期推送、心率/血氧推送），消费后继续等
-                        _log.Debug($"产品推送非目标帧 Func=0x{parsed.FunctionCode:X2} Ctrl=0x{parsed.ControlCode:X2}，继续等待");
+                        if (parsed.ControlCode == targetCode && parsed.Payload.Length >= 2)
+                            progress.Add(ProductProtocol.ReadUInt16LE(parsed.Payload, 0));
+
+                        // 心率/血氧/心电等其他推送一律消费后继续等
                     }
                 }
 
-                _log.Warn($"产品血压结果推送超时（{timeoutMs}ms）");
-                return null;
+                _log.Warn($"产品血压测量结果帧超时（{timeoutMs}ms 内未收到 0xCA 结果帧，{DescribeProgress()}）");
+                return (true, null);
                 }, ct).ConfigureAwait(false);
             }
             finally
@@ -351,6 +361,33 @@ namespace TORNPISolution.Service.Devices
             // 解析值已拼在 RX 行末（见 DescribeBpResult），这里只留调试级明细
             _log.Debug($"血压解析：收缩压={systolic} 舒张压={diastolic} 平均压={meanPress}");
             return new ProductBpReading(systolic, diastolic, meanPress);
+        }
+
+        /// <summary>
+        /// 解析 0xCA 结果帧参数区（实机抓包：EF 0C 07 CA 00 00 74 00 52 00 63 00 50 00 55 D3 FE）：
+        /// 状态码 / 收缩压 / 舒张压 / 平均压 / 心率 各 uint16 LE，压力 mmHg、心率 BPM；状态码非 0 表示本轮测量未正常完成（按无有效回读处理）。
+        /// </summary>
+        private ProductBpReading? ParseFullBpResult(byte[] payload)
+        {
+            if (payload.Length < ProductProtocol.BpResultPayloadBytes)
+            {
+                _log.Warn($"血压结果帧参数区长度不足（{payload.Length} 字节，需 ≥{ProductProtocol.BpResultPayloadBytes}）：[{BitConverter.ToString(payload)}]");
+                return null;
+            }
+
+            var status = ProductProtocol.ReadUInt16LE(payload, 0);
+            if (status != 0)
+            {
+                _log.Warn($"血压测量结果帧状态码非 0（0x{status:X4}），本轮测量未正常完成，按无有效回读处理：[{BitConverter.ToString(payload)}]");
+                return null;
+            }
+
+            var systolic  = ProductProtocol.ReadUInt16LE(payload, 2);
+            var diastolic = ProductProtocol.ReadUInt16LE(payload, 4);
+            var meanPress = ProductProtocol.ReadUInt16LE(payload, 6);
+            var heartRate = ProductProtocol.ReadUInt16LE(payload, 8);
+            _log.Info($"产品血压测量结果（0xCA）：收 {systolic} / 舒 {diastolic} / 平 {meanPress} mmHg，心率 {heartRate} BPM");
+            return new ProductBpReading(systolic, diastolic, meanPress, heartRate);
         }
 
         // ==================== 响应解析文本（拼在“产品 RX”行末，一行看全收到什么 = 多少）====================
@@ -473,6 +510,14 @@ namespace TORNPISolution.Service.Devices
             await SendCommandAsync(ProductProtocol.ClosePressureSensor, "ClosePressureSensor", ct: ct).ConfigureAwait(false);
         }
 
+        /// <summary>开/关泄气阀（0x07 0x6A 开、0x6B 关，无参帧样例 EF 02 07 6A 17 2F FE / EF 02 07 6B D6 EF FE）：气路类测试前置关阀让产品侧封闭，模块结束开阀归还常态</summary>
+        public async Task SetVentValveAsync(bool open, CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送{(open ? "打开" : "关闭")}泄气阀（{(open ? "0x6A" : "0x6B")}）");
+            await SendCommandAsync(open ? ProductProtocol.OpenValveTest : ProductProtocol.CloseValveTest,
+                open ? "OpenVentValve" : "CloseVentValve", ct: ct).ConfigureAwait(false);
+        }
+
         /// <summary>读取产品当前静态压力值（0x76 读产品压力值，实测帧 EF 02 05 76 17 86 FE）：BP-003 静态压力精度测试取产品传感器检测到的模拟仪施加稳压值（mmHg）；字节数自适应见 <see cref="ParsePressureMmHg"/></summary>
         public async Task<double> ReadProductPressureAsync(CancellationToken ct = default)
         {
@@ -494,6 +539,20 @@ namespace TORNPISolution.Service.Devices
                 decode: DescribeBpResult, ct: ct).ConfigureAwait(false);
             if (resp == null) return null;
             return ParseBpReading(resp.Payload);
+        }
+
+        /// <summary>产测态开始一次完整血压测量（0x07/0xCA 无参帧 EF 02 07 CA 17 57 FE）：产品收到后自行充放气，测量期间周期推 0xCA 进程帧、测完推 0xCA 结果帧（本方法只发开始，结果由 <see cref="WaitFullBpResultAsync"/> 收）</summary>
+        public async Task StartFullBpMeasureAsync(CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送开始完整血压测量（0xCA）");
+            await SendCommandAsync(ProductProtocol.StartFullBpMeasure, "StartFullBpMeasure", ct: ct).ConfigureAwait(false);
+        }
+
+        /// <summary>产测态结束一次完整血压测量（0x07/0xCC 无参帧 EF 02 07 CC 97 55 FE）：每轮测完（含超时、停止）都必须发一次，否则下一次 0xCA 开始不被接受</summary>
+        public async Task StopFullBpMeasureAsync(CancellationToken ct = default)
+        {
+            _log.Info($"{DateTime.Now} 发送结束完整血压测量（0xCC）");
+            await SendCommandAsync(ProductProtocol.StopFullBpMeasure, "StopFullBpMeasure", ct: ct).ConfigureAwait(false);
         }
 
         /// <summary>开始/关闭一次完整血压测量（0x79，参数 uint8 status：0=开始 1=关闭）；协议要求测量完成后须下发一次关闭，才能再次开始测量</summary>

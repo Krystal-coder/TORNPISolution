@@ -7,8 +7,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：AECG100 心电/血氧类测试模块 A07 初始化连接 / A08 ECG采集与启动 /
-    /// A09 ECG心率监测 / A10 ECG动态范围和线性 / A11 PPG脉搏率 / A12~A14 SpO2。
+    /// TestItem 分部：AECG100 心电/血氧类测试模块 A07 初始化连接 / A08 ECG采集与启动 / A09 ECG心率监测 / A10 ECG动态范围和线性 / A11 PPG脉搏率 / A12~A14 SpO2。
     /// 波形构建与采集辅助见 TestItem.Helpers.cs，项名统一引用 <see cref="SpecItems"/>。
     /// </summary>
     public partial class TestItem

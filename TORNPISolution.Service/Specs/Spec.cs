@@ -5,9 +5,7 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 规格类：每模块一个 Build 方法，GetAllModules 是模块目录（建好后与执行端对账有无实现）；模块清单按工位在分部文件里，本文件只留目录入口与两工位共用的书写辅助。
-    /// 项名统一引用 <see cref="SpecItems"/> 常量。这里写的 SpecMin/SpecMax 只是静态规格（默认/兜底）：需按仪器读回值现算规格的项（如血压：仪器值±容差）不改这里，由 TestItem 运行时把动态规格随 TestItemResult 带回，UI 判定优先用动态规格，未测到才用这里的静态值。
-    /// 分部文件书写约定：#region 模块清单 里一个模块一段、段与段之间不夹辅助方法（夹一行取配置的辅助会把清单断开），辅助统一放文件末尾的 region，新模块照此加。
+    /// 规格类
     /// </summary>
     public partial class Spec : ITestModuleService
     {
@@ -24,7 +22,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>嵌软版本管控规格（A16“产品信息获取(嵌软版本)”项的规格与判定唯一来源）：产品读回版本与它不一致判 FAIL（防烧录老版本）；版本升级时只改这一处，规格列显示与判定同步生效。</summary>
-        public const string ExpectedFirmwareVersion = "V0.1.POR264002";
+        public const string ExpectedFirmwareVersion = "V0.1.0.TOR.P264401";
 
         public const string FirmwareStatus = "03-00";
         /// <summary>模块目录：先整机工位、后单板工位，各自按书写顺序（顺序即新建方案时的默认顺序，可拖拽调整）；页面按模块自己的 Category 过滤，所以返回全量不影响左右两栏各只显示本类。新增模块在对应工位分部文件里写 Build 方法并加进那一份清单，别改本方法。</summary>

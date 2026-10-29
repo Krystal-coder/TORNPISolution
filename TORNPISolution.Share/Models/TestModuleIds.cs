@@ -22,7 +22,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>压力控制功能测试（BP-006~008：匀速放气控制/快速放气控制/过压保护，均以产品串口回读压力判定）</summary>
         public const string PressureControlTest = "A04";
 
-        /// <summary>血压静态压力精度测试（BP-003：多点静态压 vs 产品上报值，误差 ≤3mmHg）</summary>
+        /// <summary>血压静态压力精度测试（BP-003：多点静态压 vs 产品上报值，误差 ≤0.5mmHg）</summary>
         public const string BpStaticAccuracyTest = "A05";
 
         /// <summary>血压动态压力精度测试（BP-004 血压精度/重复性，多组压力 + 单一心率）</summary>
@@ -58,8 +58,11 @@ namespace TORNPISolution.Share.Models
         /// <summary>产品通讯初始化（进入产测模式 + 0x72 产品信息获取（MAC/嵌软版本）+ 0x74 状态查询，全方案唯一执行产品通讯判定的模块）</summary>
         public const string ProductCommInit = "A16";
 
-        /// <summary>产品静态压力校准（模拟仪逐点稳压 60/120/180/240mmHg 后发 0x66 校准，结束关闭压力传感器）</summary>
+        /// <summary>产品静态压力校准（模拟仪逐点稳压 50/150/250mmHg 后发 0x66 校准，结束关闭压力传感器）</summary>
         public const string ProductStaticPressureCalibration = "A17";
+
+        /// <summary>放气速率测试（BP-007：产品关泄气阀封闭气路，仪器加压 230mmHg 记 t1、泄压至 40mmHg 记 t2，两段各回读一次产品采样压力）</summary>
+        public const string DeflateRateTest = "A18";
 
         /// <summary>JJG692-2010 放气速率检测（听诊，康伟达 0x04/0x12，测试值=设备回传漏气率 mmHg/s）</summary>
         public const string Jjg692DeflationRateTest = "A19";
@@ -69,6 +72,9 @@ namespace TORNPISolution.Share.Models
 
         /// <summary>血压心率精度及重复性测试（BP-005：一组压力 + 多档心率，一点一轮一项，偏差与极差按 max(5, 设定×5%) 判）</summary>
         public const string BpHeartRateAccuracyTest = "A21";
+
+        /// <summary>气路泄露测试（BP-010：封堵毛细气孔后低压 50/高压 250 各稳压 3s 读起点、再保压 5s 读终点，起止差即泄气量）</summary>
+        public const string AirPathLeakTest = "A22";
 
         // ==================== 单板工位模块（B 前缀，自己连号） ====================
 

@@ -116,7 +116,8 @@ namespace TORNPISolution.Service
                 var ty = Y(s.Target);
                 sb.Append($"<line x1=\"{PlotLeft}\" y1=\"{F(ty)}\" x2=\"{PlotRight}\" y2=\"{F(ty)}\" " +
                           $"stroke=\"{s.Color}\" stroke-width=\"1.2\" stroke-dasharray=\"6,4\"/>");
-                sb.Append($"<text x=\"{PlotRight - 2}\" y=\"{F(ty - 4)}\" font-size=\"8\" fill=\"{s.Color}\" " +
+                // 设定线贴着视野上沿时，标在线上方会压到图例行：夹进绘图区内
+                sb.Append($"<text x=\"{PlotRight - 2}\" y=\"{F(Math.Clamp(ty - 4, PlotTop + 7f, PlotBottom - 3f))}\" font-size=\"8\" fill=\"{s.Color}\" " +
                           $"text-anchor=\"end\">设定 {V(s.Target)}</text>");
             }
 
@@ -142,10 +143,17 @@ namespace TORNPISolution.Service
                     var pass = s.Pass.Count > i && s.Pass[i];
                     sb.Append($"<circle cx=\"{F(X(i))}\" cy=\"{F(Y(v))}\" r=\"3.2\" " +
                               $"fill=\"{(pass ? "#FFFFFF" : "#E53935")}\" stroke=\"{s.Color}\" stroke-width=\"1.6\"/>");
-                    // 数值标注：第一系列标点上、其余标点下，避免两系列贴太近时重叠
-                    var dy = si == 0 ? -7 : 12;
-                    sb.Append($"<text x=\"{F(X(i))}\" y=\"{F(Y(v) + dy)}\" font-size=\"7.5\" fill=\"#444444\" " +
-                              $"text-anchor=\"middle\">{v.ToString("0.0", CultureInfo.InvariantCulture)}</text>");
+                    // 数值标注：第一系列标点上、其余标点下，避免两系列贴太近时重叠；压到视野上下沿时翻到另一侧，别盖住轮次标签与图例
+                    var pointY = Y(v);
+                    var labelY = pointY + (si == 0 ? -7 : 12);
+                    if (labelY > PlotBottom - 3) labelY = pointY - 7;
+                    else if (labelY < PlotTop + 6) labelY = pointY + 12;
+                    // 首末点的标注居中会压住 Y 轴刻度、甚至超出视野右边，改成朝图内侧对齐
+                    var (anchor, labelX) = i == 0 ? ("start", X(i) - 2)
+                        : i == s.Values.Count - 1 && s.Values.Count > 1 ? ("end", X(i) + 2)
+                        : ("middle", X(i));
+                    sb.Append($"<text x=\"{F(labelX)}\" y=\"{F(labelY)}\" font-size=\"7.5\" fill=\"#444444\" " +
+                              $"text-anchor=\"{anchor}\">{v.ToString("0.0", CultureInfo.InvariantCulture)}</text>");
                 }
 
                 // 图例：左上角横排，每系列固定槽位（中文按全角估算宽度）
@@ -162,9 +170,9 @@ namespace TORNPISolution.Service
         /// <summary>判定构成环形图：PASS/FAIL 轮次占比</summary>
         public static string BuildVerdictDoughnut(int pass, int fail)
         {
-            const int w = 118;
+            const int w = 150;
             const int h = 140;
-            const int cx = 59;
+            const int cx = 75;
             const int cy = 54;
             const int r = 40;
             const int sw = 14;
@@ -188,10 +196,11 @@ namespace TORNPISolution.Service
             sb.Append($"<text x=\"{cx}\" y=\"{cy + 1}\" font-size=\"19\" font-weight=\"bold\" fill=\"#333333\" " +
                       $"text-anchor=\"middle\">{pass}/{total}</text>");
             sb.Append($"<text x=\"{cx}\" y=\"{cy + 15}\" font-size=\"8\" fill=\"#999999\" text-anchor=\"middle\">PASS 轮次</text>");
-            sb.Append($"<rect x=\"16\" y=\"{h - 24}\" width=\"9\" height=\"9\" fill=\"#4CAF50\"/>");
-            sb.Append($"<text x=\"29\" y=\"{h - 16}\" font-size=\"8.5\" fill=\"#444444\">PASS {pass} 轮</text>");
-            sb.Append($"<rect x=\"68\" y=\"{h - 24}\" width=\"9\" height=\"9\" fill=\"#E53935\"/>");
-            sb.Append($"<text x=\"81\" y=\"{h - 16}\" font-size=\"8.5\" fill=\"#444444\">FAIL {fail} 轮</text>");
+            // 两条图例各占固定 75pt 槽位：中文"轮"按全角 8.5pt 估宽，槽位窄于文字就会互相压字
+            sb.Append($"<rect x=\"8\" y=\"{h - 24}\" width=\"9\" height=\"9\" fill=\"#4CAF50\"/>");
+            sb.Append($"<text x=\"21\" y=\"{h - 16}\" font-size=\"8.5\" fill=\"#444444\">PASS {pass} 轮</text>");
+            sb.Append($"<rect x=\"78\" y=\"{h - 24}\" width=\"9\" height=\"9\" fill=\"#E53935\"/>");
+            sb.Append($"<text x=\"91\" y=\"{h - 16}\" font-size=\"8.5\" fill=\"#444444\">FAIL {fail} 轮</text>");
             sb.Append("</svg>");
             return sb.ToString();
         }

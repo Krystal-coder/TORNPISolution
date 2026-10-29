@@ -286,6 +286,16 @@
     "FuncCode": 7,
     "Description": "获取ECG/PPG测量结果"
   },
+  "CtrlStartFullBpMeasure": {
+    "Code": 202,
+    "FuncCode": 7,
+    "Description": "产测态开始一次完整血压测量（无参帧 EF 02 07 CA 17 57 FE；产品自行充放气，期间周期推 0xCA 进程帧带 2 字节当前压力，测完推 10 字节结果帧：状态码/收缩压/舒张压/平均压/心率各 uint16 LE）"
+  },
+  "CtrlStopFullBpMeasure": {
+    "Code": 204,
+    "FuncCode": 7,
+    "Description": "产测态结束一次完整血压测量（无参帧 EF 02 07 CC 97 55 FE；每轮测完或超时中止都必须发一次，否则下一次开始不被接受）"
+  },
   "CtrlFactoryReset": {
     "Code": 176,
     "FuncCode": 7,

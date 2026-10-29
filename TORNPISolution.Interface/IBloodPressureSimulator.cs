@@ -22,49 +22,58 @@ namespace TORNPISolution.Interface
         /// <summary>下发仪器初始化设置（患者类型/压力单位/袖带容量）：BPA700 必须显式下发，康伟达无此类下发项（空操作）。</summary>
         Task ApplySettingsAsync(string category, string pressureUnit, string airReservoir, CancellationToken ct = default);
 
-        /// <summary>开始血压模拟（康伟达：发送功能 ID 0x02 帧，包含模式与参数）</summary>
+        /// <summary>
+        /// 开始血压模拟（康伟达：发送功能 ID 0x02 帧，包含模式与参数）
         /// <param name="systolic">目标收缩压 mmHg</param>
         /// <param name="diastolic">目标舒张压 mmHg</param>
         /// <param name="heartRate">心率 bpm</param>
         /// <param name="pulseVolume">脉搏量 ml（0=用设备默认值；康伟达入 0x02 帧 ×100，BPA700 SDK 无此参数忽略）</param>
+        /// </summary>
         Task StartSimulationAsync(int systolic, int diastolic, int heartRate, double pulseVolume = 0, CancellationToken ct = default);
 
         /// <summary>
         /// 静态压力测试：设置恒定标准压力并保持稳定（用于静态压力精度测试）。
         /// BPA700：调用 BPARunStaticPressure，等待压力稳定后返回；康伟达：发送压力源帧（0x03 功能 3）并等待 AA 回读收敛。
-        /// </summary>
         /// <param name="pressure">标准压力值。BPA700 单位跟随仪器当前压力单位设置（mmHg 20~400 / kPa 2.7~53.3）；康伟达固定 mmHg</param>
         /// <param name="stableSeconds">稳压保持时间（秒）</param>
+        /// </summary>
         Task SetStaticPressureAsync(double pressure, int stableSeconds = 5, CancellationToken ct = default);
 
         /// <summary>
         /// 逐点执行静态压力序列（BP-003 静态压力精度测试用）。
-        /// BPA700：SDK 一次调用只支持一个压力点，多点由本方法内部逐点循环；康伟达：逐点压力源+AA 回读收敛，点间自动放气回零。
-        /// </summary>
+        /// BPA700 正式版：SDK 一次调用只支持一个压力点，多点由本方法内部逐点循环，点间会泄回零；康伟达：逐点压力源+AA 回读收敛，点间自动放气回零。
+        /// BPA700 Beta 不实现本方法（它的多点一次下发用 <see cref="StartStaticPressureSequenceAsync"/>）。
         /// <param name="points">启用且已排序的压力点（mmHg）</param>
         /// <param name="stableSeconds">每点稳压时长（秒）</param>
         /// <param name="inflation">是否由模拟仪充气（false=依赖外部气源）</param>
         /// <returns>每个压力点稳压后的实测均值（mmHg），未到达的点为 NaN</returns>
+        /// </summary>
         Task<double[]> RunStaticPressureSequenceAsync(double[] points, int stableSeconds, bool inflation, CancellationToken ct = default);
 
         /// <summary>
         /// 一轮完整血压测量（BP-001/002/004/005）：下发模拟参数后等待被测产品完成充放气周期，返回统一的状态序列与时间参数。
         /// BPA700：BPARunBPTest 回调状态机（Wait→Busy→Stable→Finish）；
-        /// 康伟达：AA 压力曲线判定等价映射（充气上升=Busy、脉搏波平台=Stable、泄压归零=Finish、充气中骤降=Idle）。
-        /// </summary>
+        /// 康伟达：AA 压力曲线判定等价映射（充气上升=Busy、脉搏波平台=Stable、泄压归零=Finish、充气中骤降=Idle）
         /// <param name="waitStartTimeoutMs">等待产品启动充气（离开 Wait）的超时</param>
         /// <param name="totalTimeoutMs">整轮测量总超时</param>
         /// <param name="pulseVolume">脉搏量 ml（0=用设备默认值；康伟达入 0x02 帧，取血压模拟仪配置→动态血压→脉搏量）</param>
-        Task<BpTestRunResult> RunBpMeasurementAsync(
-            int systolic, int diastolic, int heartRate, double pulseVolume = 0,
-            int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
-            CancellationToken ct = default);
+        /// </summary>
+        Task<BpTestRunResult> RunBpMeasurementAsync(int systolic, int diastolic, int heartRate, double pulseVolume = 0,int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000, CancellationToken ct = default);
 
         /// <summary>静态压力测试（带充气方式与超时，BP-006~008 步骤用）：设定压力并等待到位；康伟达 inflation 参数无意义（气路始终由设备自身打气）</summary>
         Task SetStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct, int timeoutSeconds = 180);
 
         /// <summary>只发起静态压力测试不等稳压完成（使阀状态生效用，BP-007/008）；康伟达 inflation=false 时为空操作（泄放由阀控方法的后台回路执行）</summary>
         Task StartStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct = default);
+
+        /// <summary>
+        /// 只发起一轮静态压力序列（多点一次下发、点之间直接切压不泄回零），不等完成：到压与切压过程经 PressureSampled 上抛。
+        /// BPA700=1.0.4.0-BETA 句柄版 SDK 的 BPARunStaticPressureSequence；正式版与康伟达没有该模式，抛 NotSupportedException（调用方按 BPA700 专属项门控）。
+        /// <param name="points">压力点，单位跟随仪器当前压力单位设置（BPA700：mmHg 20~400 / kPa 2.7~53.3，超出范围的点由设备跳过）</param>
+        /// <param name="holdSeconds">每个压力点的稳压保持秒数（0~999）：上层要在这段窗口内完成回读</param>
+        /// <param name="inflation">true=模拟仪自行充气；false=由外部设备充气</param>
+        /// </summary>
+        Task StartStaticPressureSequenceAsync(double[] points, int holdSeconds, bool inflation, CancellationToken ct = default);
 
         /// <summary>等待静态压力测试 Finish 信号（康伟达无异步测试态，空操作）</summary>
         Task WaitStaticPressureFinishAsync(int timeoutMs = 60_000, CancellationToken ct = default);
@@ -91,8 +100,11 @@ namespace TORNPISolution.Interface
         /// </summary>
         Task<bool> VentToZeroAsync(int timeoutSeconds = 60, CancellationToken ct = default);
 
-        /// <summary>仪器过压保护测试：持续充气至触发保护泄压，返回触发时峰值压力（康伟达：压力源充向目标压力，AA 监测峰值后的骤降）</summary>
-        Task<double> RunOverpressureTestAsync(
+        /// <summary>
+        /// 仪器过压/缓降测试：仪器充气到目标压后转入缓降，降到泄压终点阈值即停（康伟达：压力源充向目标压力，AA 监测峰值后的骤降，只回峰值）。
+        /// pressure=充气目标压、threshold1=泄压终点、threshold2=充过该线即转缓降；inflation=true 由仪器自己充气。
+        /// </summary>
+        Task<OverpressureRunResult> RunOverpressureTestAsync(
             double pressure, double threshold1, double threshold2,
             bool inflation = true, int timeoutMs = 120_000, CancellationToken ct = default);
 

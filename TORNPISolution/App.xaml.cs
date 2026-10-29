@@ -119,10 +119,11 @@ namespace TORNPISolution
                 _log.Error("退出时关闭硬件失败", ex);
             }
 
-            // 释放 BPA700：程序关闭即断开对仪器的控制，仪器回到可手动操作状态
+            // 释放 BPA700：程序关闭即断开对仪器的控制，仪器回到可手动操作状态（正式版与 Beta 序列版各管自己占的句柄）
             try
             {
                 BPA700Simulator.ReleaseDeviceControl();
+                BPA700BetaSimulator.ReleaseDeviceControl();
             }
             catch (Exception ex)
             {

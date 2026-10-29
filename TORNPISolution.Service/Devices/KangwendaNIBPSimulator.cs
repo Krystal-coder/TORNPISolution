@@ -68,6 +68,10 @@ namespace TORNPISolution.Service.Devices
         private byte _expectAck;
         private bool _disposed;
 
+        // 设备是否处于模拟输出态（0x02 血压模拟进行中）：复位/清场即回待命。协议无专用停止命令，停模拟靠发复位，
+        // 已在待命时再发一次复位没有意义（执行端每轮结束都会显式停一次，与周期末尾的自停重叠）
+        private bool _simulating;
+
         // 后台泄放回路（慢释/快释阀脉宽调制，单放气阀合成双路阀行为）
         private CancellationTokenSource? _deflateCts;
         private Task? _deflateTask;
@@ -267,6 +271,7 @@ namespace TORNPISolution.Service.Devices
         public Task ResetAsync(CancellationToken ct = default)
         {
             WriteRaw([CmdReset]);
+            _simulating = false;
             _log.Info("康伟达模拟仪：已发送复位指令");
             return Task.CompletedTask;
         }
@@ -296,11 +301,17 @@ namespace TORNPISolution.Service.Devices
                 (byte)(hr >> 8), (byte)hr, pulse };
             _log.Info($"康伟达模拟仪：血压模拟 SYS={systolic} DIA={diastolic} HR={heartRate} 脉搏量={PulseAmplitude:0.0}");
             await SendWithRetryAsync(frame, FuncBpSimulation, ct).ConfigureAwait(false);
+            _simulating = true;
         }
 
-        /// <summary>停止模拟（协议无专用停止命令，发送复位使设备回到待命）</summary>
+        /// <summary>停止模拟（协议无专用停止命令，发送复位使设备回到待命）；设备已在待命时不重发复位</summary>
         public Task StopSimulationAsync(CancellationToken ct = default)
         {
+            if (!_simulating)
+            {
+                _log.Debug("康伟达模拟仪：设备已处于待命，跳过重复复位");
+                return Task.CompletedTask;
+            }
             _log.Info("康伟达模拟仪：停止模拟（复位）");
             return ResetAsync(ct);
         }
@@ -425,6 +436,10 @@ namespace TORNPISolution.Service.Devices
             _log.Info($"康伟达模拟仪：发起压力源 {pressure:0.#} mmHg（不等稳压）");
             await SendWithRetryAsync(frame, FuncPressureTest, ct).ConfigureAwait(false);
         }
+
+        /// <summary>静态压力序列（点间直切不泄回零）：康伟达每次设定压力前都先泄残压归零，没有该模式，A18/A22 因此只支持鲸扬 BPA700</summary>
+        public Task StartStaticPressureSequenceAsync(double[] points, int holdSeconds, bool inflation, CancellationToken ct = default)
+            => throw new NotSupportedException("康伟达模拟仪无压力点直切的静态压力序列模式，气路类两项只支持鲸扬 BPA700");
 
         /// <summary>接口成员：康伟达无异步测试态，SetStaticPressureAsync 返回即已到位，空操作</summary>
         public Task WaitStaticPressureFinishAsync(int timeoutMs = 60_000, CancellationToken ct = default)
@@ -614,6 +629,7 @@ namespace TORNPISolution.Service.Devices
             if (LastPressure < 5)
             {
                 WriteRaw([CmdReset]);
+                _simulating = false;
                 await Task.Delay(300, ct).ConfigureAwait(false);
                 WriteRaw([CmdZero]);
                 await Task.Delay(300, ct).ConfigureAwait(false);
@@ -906,7 +922,7 @@ namespace TORNPISolution.Service.Devices
         /// 仪器过压保护测试：压力源充向目标压力（高于 threshold2），产品触发保护自行泄压后 AA 曲线表现为峰值后骤降（降 ≥15mmHg 且 300ms 内不回弹），触发压力 = 峰值；
         /// 超时未触发返回最高峰值（超出 threshold2 自然判 FAIL）。
         /// </summary>
-        public async Task<double> RunOverpressureTestAsync(
+        public async Task<OverpressureRunResult> RunOverpressureTestAsync(
             double pressure, double threshold1, double threshold2,
             bool inflation = true, int timeoutMs = 120_000, CancellationToken ct = default)
         {
@@ -934,12 +950,12 @@ namespace TORNPISolution.Service.Devices
                     if (LastPressure < peak - 10)
                     {
                         _log.Info($"康伟达模拟仪：过压触发确认，触发压力（峰值）= {peak:0.0} mmHg");
-                        return peak;
+                        return new OverpressureRunResult { PeakPressure = peak };
                     }
                 }
             }
             _log.Warn($"康伟达模拟仪：过压测试超时（{timeoutMs / 1000}s）未监测到产品保护泄压，返回最高峰值 {peak:0.0} mmHg");
-            return peak;
+            return new OverpressureRunResult { PeakPressure = peak };
         }
 
         /// <summary>

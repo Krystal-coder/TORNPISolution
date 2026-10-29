@@ -16,8 +16,7 @@ namespace TORNPISolution.Service.Communication
         public static void Open(SerialPort port, int timeoutMs = DefaultTimeoutMs)
         {
             Exception? error = null;
-            // 不能用 using：超时时这里的 Dispose 会和弃管线程的 done.Set() 抢时间，
-            // 句柄已释放再 Set 会抛 ObjectDisposedException，而它出现在后台线程的 finally 里
+         
             var done = new ManualResetEventSlim(false);
             var thread = new Thread(() =>
             {
@@ -30,8 +29,7 @@ namespace TORNPISolution.Service.Communication
 
             if (!done.Wait(timeoutMs))
             {
-                // Open 仍未返回：该线程与端口对象在主流程里不能再碰（Close 同样会挂起），
-                // 只能另起后台线程尝试回收；回收失败最多漏一个句柄，好过整个软件卡死。
+                // Open 仍未返回方法阻塞，无法取消，只能另开线程回收
                 var abandoned = port;
                 new Thread(() =>
                 {

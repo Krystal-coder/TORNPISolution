@@ -71,6 +71,8 @@ namespace TORNPISolution.Service
         public string ModuleId { get; set; } = string.Empty;
         public string ModuleName { get; set; } = string.Empty;
         public string Verdict { get; set; } = "未完成";
+        /// <summary>大项用时（秒）：本轮该模块派发到收尾的实测墙钟；null = 该轮未采集</summary>
+        public double? DurationSeconds { get; set; }
         public int PassCount { get; set; }
         public int FailCount { get; set; }
         public int NotTestedCount { get; set; }
@@ -205,6 +207,7 @@ namespace TORNPISolution.Service
             var model = new ReportModel { Run = run, Items = items, PreviousRun = prevRun };
 
             // 模块章节：按执行序号归组（方案里可能只有一个模块，也可能多个——章节数随方案变）
+            var timings = ParseModuleTimings(run.ModuleTimingsJson);
             model.Modules = items
                 .GroupBy(i => (i.Sequence, i.ModuleId, i.ModuleName))
                 .OrderBy(g => g.Key.Sequence)
@@ -214,6 +217,7 @@ namespace TORNPISolution.Service
                     {
                         ModuleId = g.Key.ModuleId,
                         ModuleName = g.Key.ModuleName,
+                        DurationSeconds = timings.TryGetValue(g.Key.Sequence, out var sec) ? sec : null,
                         Items = g.ToList(),
                     };
                     var judged = section.Items.Where(i => !i.DisplayOnly && !i.NotJudged).ToList();
@@ -243,6 +247,22 @@ namespace TORNPISolution.Service
 
             if (prevRun != null) model.CompareRows = BuildCompareRows(run, items, prevRun, prevItems);
             return model;
+        }
+
+        /// <summary>解析模块用时快照（执行序号 → 秒）：老轮次没这一列，空表即报表显示"—"</summary>
+        private static Dictionary<int, double> ParseModuleTimings(string? json)
+        {
+            if (string.IsNullOrEmpty(json)) return new Dictionary<int, double>();
+            try
+            {
+                return JsonSerializer.Deserialize<List<TestModuleTiming>>(json)?.ToDictionary(t => t.Sequence, t => t.Seconds)
+                       ?? new Dictionary<int, double>();
+            }
+            catch (Exception ex)
+            {
+                _log.Warn($"模块用时快照解析失败（章节头用时显示—）：{ex.Message}");
+                return new Dictionary<int, double>();
+            }
         }
 
         /// <summary>历史页明细：与 PDF 同一份数据、同一套分组与口径（规格快照/测试值/子表行），映射成界面 DTO</summary>
@@ -281,6 +301,7 @@ namespace TORNPISolution.Service
                         ItemName = item.ItemName,
                         SpecText = SpecText(item),
                         ValueText = ValueText(item),
+                        DurationText = item.DurationSeconds is double dur ? $"{dur:0.0}s" : "—",
                         ResultText = item.DisplayOnly ? "统计"
                             : item.Result == "Pass" ? "PASS"
                             : item.Result == "Fail" ? "FAIL" : "未测",
@@ -617,7 +638,9 @@ namespace TORNPISolution.Service
                         Cell2("工位", run.Station);
                         Cell2("测试方案", run.PlanName);
                         Cell2("产品 MAC", string.IsNullOrEmpty(run.ProductMAC) ? "—" : run.ProductMAC);
-                        Cell2("起止时间", $"{run.StartedAt:MM-dd HH:mm} ~ {run.FinishedAt:HH:mm}");
+                        Cell2("起止时间", $"{run.StartedAt:MM-dd HH:mm:ss} ~ {run.FinishedAt:HH:mm:ss}");
+                        Cell2("总用时", ElapsedText(run.StartedAt, run.FinishedAt));
+                        Cell2("量测时间", run.MeasureSeconds is int s ? $"每点 {s}s" : "—");
                         Cell2("通过项", run.PassCount.ToString());
                         Cell2("失败项", run.FailCount.ToString());
                         Cell2("未测项", run.NotTestedCount.ToString());
@@ -677,14 +700,16 @@ namespace TORNPISolution.Service
             {
                 container.Column(col =>
                 {
-                    // 章节头：序号 + 模块名 + 判定徽章 + 计数
+                    // 章节头：序号 + 模块名 + 判定徽章 + 大项用时 + 计数
                     col.Item().PaddingTop(10).PaddingBottom(4).Row(row =>
                     {
                         row.Spacing(4);
                         PutText(row.ConstantItem(24).AlignMiddle(), $"#{index + 1}", 11f, "#90A4AE", bold: true);
                         PutText(row.RelativeItem().AlignMiddle(), module.ModuleName, 11f, "#263238", bold: true);
-                        row.ConstantItem(180).AlignRight().AlignMiddle().Row(r =>
+                        row.ConstantItem(250).AlignRight().AlignMiddle().Row(r =>
                         {
+                            PutText(r.AutoItem().PaddingRight(8).AlignMiddle(), $"用时 {DurationText(module.DurationSeconds)}",
+                                8f, "#90A4AE");
                             var countsCell = r.AutoItem().PaddingRight(8).AlignMiddle();
                             PutText(countsCell, $"通过 {module.PassCount} · 失败 {module.FailCount} · 未测 {module.NotTestedCount}",
                                 8f, "#90A4AE");
@@ -702,6 +727,7 @@ namespace TORNPISolution.Service
                             c.RelativeColumn(3f);
                             c.RelativeColumn(1.5f);
                             c.RelativeColumn(2.1f);
+                            c.ConstantColumn(42);
                             c.ConstantColumn(44);
                         });
                         table.Header(h =>
@@ -710,6 +736,7 @@ namespace TORNPISolution.Service
                             HeadCell(h, "测试项");
                             HeadCell(h, "规格（本次快照）");
                             HeadCell(h, "测试值");
+                            HeadCell(h, "耗时(s)", right: true);
                             HeadCell(h, "结果", right: true);
                         });
 
@@ -721,6 +748,8 @@ namespace TORNPISolution.Service
                             PutText(NewCell(table, middle: true), item.ItemName, 8.5f);
                             PutText(NewCell(table, middle: true), SpecText(item), 8f, "#757575");
                             PutText(NewCell(table, middle: true), ValueText(item), 8.5f);
+                            PutText(NewCell(table, right: true, middle: true),
+                                item.DurationSeconds is double dur ? $"{dur:0.0}" : "—", 8f, "#757575");
                             ItemVerdictChip(table.Cell(), item);
 
                             // 子表行：跨列缩进展示（RepeatStats 数值行只进图表，不在这里重复）
@@ -728,7 +757,7 @@ namespace TORNPISolution.Service
                             {
                                 var text = PointRowText(p);
                                 if (text == null) continue;
-                                PutText(NewCell(table, sub: true, span: 5), text, 7.5f, "#555555");
+                                PutText(NewCell(table, sub: true, span: 6), text, 7.5f, "#555555");
                             }
                         }
                     });
@@ -800,11 +829,11 @@ namespace TORNPISolution.Service
                                     StatRow(table, "均值对设定偏差", N(ch.ErrorToTarget));
                                     StatRow(table, "逐轮平均偏差", N(ch.RoundAvgError));
                                     var ok = ch.Range.HasValue && ch.Range.Value <= Bp004Tolerance + 1e-9;
-                                    PutText(NewCell(table, sub: true), "判定", 7.5f, "#757575");
+                                    PutText(NewCell(table, sub: true), "判定", 8f, "#757575");
                                     // 没有统计行（有效轮 <2）就不能说"超差"：零次测量不出 NG 结论，与 BP-005 分支同口径
                                     PutText(NewCell(table, sub: true, right: true),
                                         ch.Range.HasValue ? (ok ? "合格" : "超差") : "—",
-                                        7.5f, !ch.Range.HasValue ? "#9E9E9E" : ok ? "#2E7D32" : "#C62828", bold: true);
+                                        8f, !ch.Range.HasValue ? "#9E9E9E" : ok ? "#2E7D32" : "#C62828", bold: true);
                                 }
                             });
                         });
@@ -866,10 +895,10 @@ namespace TORNPISolution.Service
                                 StatRow(table, "极差", N(ch.Range));
                                 StatRow(table, "均值对设定偏差", N(ch.ErrorToTarget));
                                 StatRow(table, "逐轮平均偏差", N(ch.RoundAvgError));
-                                PutText(NewCell(table, sub: true), "判定", 7.5f, "#757575");
+                                PutText(NewCell(table, sub: true), "判定", 8f, "#757575");
                                 PutText(NewCell(table, sub: true, right: true),
                                     ch.Range.HasValue ? (ok ? "极差合格（仅统计）" : "极差超差（仅统计）") : "—",
-                                    7.5f, !ch.Range.HasValue ? "#9E9E9E" : ok ? "#2E7D32" : "#C62828", bold: true);
+                                    8f, !ch.Range.HasValue ? "#9E9E9E" : ok ? "#2E7D32" : "#C62828", bold: true);
                             });
                         });
                     });
@@ -879,8 +908,8 @@ namespace TORNPISolution.Service
 
         private static void StatRow(TableDescriptor table, string label, string value)
         {
-            PutText(NewCell(table, sub: true), label, 7.5f, "#757575");
-            PutText(NewCell(table, sub: true, right: true), value, 7.5f, "#37474F");
+            PutText(NewCell(table, sub: true), label, 8f, "#757575");
+            PutText(NewCell(table, sub: true, right: true), value, 8f, "#37474F");
         }
 
         private static List<double?> SeriesValues(List<RepeatSeries> series, string name, int count)
@@ -1221,8 +1250,20 @@ namespace TORNPISolution.Service
             var c = (IContainer)cell;
             c = sub ? SubCellStyle(c) : BodyCellStyle(c);
             if (right) c = c.AlignRight();
-            else if (middle) c = c.AlignMiddle();
+            if (middle) c = c.AlignMiddle();
             return c;
+        }
+
+        /// <summary>大项用时文本：秒保留一位、满 1 分钟转"X分Y秒"；null（老轮次未采集）显"—"</summary>
+        private static string DurationText(double? seconds)
+            => seconds is not double s ? "—"
+                : s >= 60 ? $"{(int)(s / 60)}分{s % 60:0.0}秒" : $"{s:0.0}秒";
+
+        /// <summary>轮次总用时（与历史列表 TestRunSummary.ElapsedText 同口径）</summary>
+        private static string ElapsedText(DateTime startedAt, DateTime finishedAt)
+        {
+            var span = finishedAt - startedAt;
+            return span.TotalMinutes >= 1 ? $"{(int)span.TotalMinutes}分{span.Seconds}秒" : $"{(int)span.TotalSeconds}秒";
         }
 
         /// <summary>总判定/模块判定徽章</summary>

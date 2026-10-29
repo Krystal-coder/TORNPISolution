@@ -528,11 +528,11 @@
                         </Button>
                         <Button Style="{StaticResource Style.ToolButton}"
                             Command="{Binding SaveReportCommand}" Margin="0,0,8,0"
-                            ToolTip="导出按钮上这个编号那一轮的测试报告（PDF）——方案跑完自动入库后才可点">
+                            ToolTip="导出本轮测试报告（PDF）——方案跑完自动入库后才可点">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="FilePdfBox" Width="14" Height="14"
                                                      VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding SaveReportText}" VerticalAlignment="Center"/>
+                            <TextBlock Text="导出报告" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Content="复位结果" Style="{StaticResource Style.ToolButton}"

@@ -7,7 +7,7 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// 应用工位状态服务：程序目录 Config\app_state.json 存"上次停留的页面"与"模块库上次的工位类别"两个字段。
-    /// 文件只读一次进内存，之后重复读不再开文件；写盘走临时文件 + 改名替换，文件不可用时按默认值（整机测试）启动、不抛。
+    /// 文件只读一次进内存，之后重复读不再开文件；写盘走临时文件 + 改名替换
     /// </summary>
     public class AppStateService : IAppStateService
     {

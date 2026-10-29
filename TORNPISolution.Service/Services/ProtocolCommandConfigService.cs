@@ -5,8 +5,9 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// 产品协议命令码配置服务：以 JSON 保存在程序目录 Config\protocol_commands.json，仅在该文件不存在时自动生成默认配置。
-    /// Load 以 Defaults 为底、用文件里的同名键覆盖（运行时改过的命令码重启后仍在）；文件缺 key 回退默认值并记录日志，未知键忽略。
+    /// 产品协议命令码配置服务：以 JSON 保存在程序目录 Config\protocol_commands.json，仅在该文件不存在时自动生成默认配置
+    /// Load 以 Defaults 为底、用文件里的同名键覆盖（运行时改过的命令码重启后仍在）
+    ///文件缺 key 回退默认值并记录日志，未知键忽略。
     /// </summary>
     public class ProtocolCommandConfigService : IProtocolCommandConfigService
     {
@@ -91,6 +92,8 @@ namespace TORNPISolution.Service
             ["CtrlStartEcgPpgMeasure"]      = new() { Code = 0x80, FuncCode = 0x07, Description = "启动ECG+PPG测量（持续30秒）" },
             ["CtrlStopEcgPpgMeasure"]       = new() { Code = 0x81, FuncCode = 0x07, Description = "停止ECG+PPG测量" },
             ["CtrlGetEcgPpgResult"]         = new() { Code = 0x82, FuncCode = 0x07, Description = "获取ECG/PPG测量结果" },
+            ["CtrlStartFullBpMeasure"]      = new() { Code = 0xCA, FuncCode = 0x07, Description = "产测态开始一次完整血压测量（无参帧 EF 02 07 CA 17 57 FE；产品自行充放气，期间周期推 0xCA 进程帧带 2 字节当前压力，测完推 10 字节结果帧：状态码/收缩压/舒张压/平均压/心率各 uint16 LE）" },
+            ["CtrlStopFullBpMeasure"]       = new() { Code = 0xCC, FuncCode = 0x07, Description = "产测态结束一次完整血压测量（无参帧 EF 02 07 CC 97 55 FE；每轮测完或超时中止都必须发一次，否则下一次开始不被接受）" },
             ["CtrlFactoryReset"]            = new() { Code = 0xB0, FuncCode = 0x07, Description = "恢复出厂设置" },
         };
 

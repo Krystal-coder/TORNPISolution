@@ -6,7 +6,6 @@ namespace TORNPISolution.Service
 {
     /// <summary>
     /// TestItem 分部：跨模块共用辅助（PPG 在位检测、心率回读、导联脱落判定、SpO2 精度扫描、波形构建与采集，
-    /// 以及 NoInstrumentDemo / GetProductAvailable / PromptOperatorAsync 这些每个模块开头都要调的）。模块本体不放这里。
     /// </summary>
     public partial class TestItem
     {

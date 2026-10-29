@@ -4,13 +4,13 @@ using TORNPISolution.Share.Models;
 namespace TORNPISolution.Service.Communication
 {
     /// <summary>
-    /// 新产品串口通讯协议（二进制帧）：
+    /// 串口通讯协议（二进制帧）：
     ///   帧结构 = [Head 0xEF] [Len] [Payload...] [CRC16-MODBUS 2字节] [Tail 0xFE]
     ///   Payload = [功能码] [控制码 1字节] [参数 N字节]
     ///   Len     = Payload 长度（不含 CRC / Tail）
     ///   CRC     = CRC-16/MODBUS，计算范围 = Head + Len + Payload（从帧头到载荷末尾）
     ///   总帧长  = Payload.Length + 5（Head 1 + Len 1 + CRC 2 + Tail 1）
-    /// 本类只做帧编解码、不控制串口；串口号与通讯参数取仪器配置 Product 段（SerialLinkSettings），收发在 ProductController。
+    /// ProductProtocol只做帧编解码、不控制串口；串口号与通讯参数取仪器配置 Product 段（SerialLinkSettings），收发在 ProductController。
     /// 功能码按命令区分：0x02 产品信息查询 / 0x05 测量控制 / 0x06 主动推送 / 0x07 硬件控制与产测。
     /// 控制码与功能码均从 Config\protocol_commands.json 加载，支持运行时修改后热重载。
     /// </summary>
@@ -18,10 +18,10 @@ namespace TORNPISolution.Service.Communication
     {
         // ==================== 命令码运行时字典 ====================
 
-        /// <summary>命令名 → (FuncCode, Code)。键为命令名，天然避免同 Code 不同 Func 的冲突。</summary>
+        /// <summary>命令名 → (FuncCode, Code)。键为命令名，避免同 Code 不同 Func 的冲突。</summary>
         private static readonly Dictionary<string, ProductCmd> _commands = new();
 
-        /// <summary>命令名 → 默认参数字节（取配置项 Data）；只给同 Func+Ctrl 靠参数区分语义的命令登记，无参命令不入表。</summary>
+        /// <summary>命令名 → 默认参数字节（取配置项 Data）；只给同 Func+Ctrl 靠参数区分语义的命令，无参命令不入表。</summary>
         private static readonly Dictionary<string, byte[]> _commandData = new();
         private static readonly object _lock = new();
 
@@ -122,7 +122,7 @@ namespace TORNPISolution.Service.Communication
 
         // ==================== 命令（从 JSON 加载，每项含 Func + Code） ====================
 
-        // ---- 进入产测模式（Func=0x07/Code=0x01）：打开串口后立即发送防产品休眠，须在 0x72/0x74 之前 ----
+        // ---- 进入产测模式（Func=0x07/Code=0x01）：打开串口后立即发送防产品休眠 ----
         // 配置键 CtrlKeepAlive 不得改名：改名会让现场已保存的自定义码变成未知键被忽略。
         public static ProductCmd EnterProductionTestMode => GetCmd("CtrlKeepAlive");
 
@@ -195,7 +195,14 @@ namespace TORNPISolution.Service.Communication
         public static ProductCmd StartEcgPpgMeasure     => GetCmd("CtrlStartEcgPpgMeasure");
         public static ProductCmd StopEcgPpgMeasure      => GetCmd("CtrlStopEcgPpgMeasure");
         public static ProductCmd GetEcgPpgResult        => GetCmd("CtrlGetEcgPpgResult");
+        // 产测态完整血压测量（实机抓包证实走 0x07，不是 0x05/0x79）：开始=0xCA、结束=0xCC；
+        // 测量期间产品还以同一 Ctrl=0xCA 周期推进程帧（2 字节当前压力），测完推 10 字节结果帧，收帧按参数区长度区分
+        public static ProductCmd StartFullBpMeasure     => GetCmd("CtrlStartFullBpMeasure");
+        public static ProductCmd StopFullBpMeasure      => GetCmd("CtrlStopFullBpMeasure");
         public static ProductCmd FactoryReset           => GetCmd("CtrlFactoryReset");
+
+        /// <summary>0xCA 结果帧参数区长度（字节）：状态码/收缩压/舒张压/平均压/心率 各 uint16 LE；进程推送帧参数区只有 2 字节压力，按长度区分</summary>
+        public const int BpResultPayloadBytes = 10;
 
         // ==================== 测试模式枚举（0x73 参数） ====================
 
@@ -295,11 +302,11 @@ namespace TORNPISolution.Service.Communication
             var actualCrc = (ushort)(frame[len + 2] | (frame[len + 3] << 8));
             if (expectedCrc != actualCrc) return null;
 
-            return new ParsedFrame(funcCode, ctrlCode, payload);
+            return new ParsedFrame(funcCode, ctrlCode, payload, frame);
         }
 
-        /// <summary>解析后的协议帧</summary>
-        public record ParsedFrame(byte FunctionCode, byte ControlCode, byte[] Payload);
+        /// <summary>解析后的协议帧；RawFrame 为收到的完整原始帧（含头尾与 CRC），供与抓包逐字节比对</summary>
+        public record ParsedFrame(byte FunctionCode, byte ControlCode, byte[] Payload, byte[]? RawFrame = null);
 
         // ==================== CRC-16/MODBUS ====================
 

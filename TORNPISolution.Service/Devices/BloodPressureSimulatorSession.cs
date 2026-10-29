@@ -14,7 +14,6 @@ namespace TORNPISolution.Service.Devices
         private readonly ILogService _log = new LogService(nameof(BloodPressureSimulatorSession));
         private readonly IInstrumentConfigService _configService;
         private IBloodPressureSimulator? _shared;
-        private int _leaseCount;
 
         public BloodPressureSimulatorSession(IInstrumentConfigService configService)
         {
@@ -24,20 +23,40 @@ namespace TORNPISolution.Service.Devices
         /// <summary>康伟达共享会话是否已建立（BPA700 逐模块临时连接，永远为 false）</summary>
         public bool IsOpen => _shared is { IsOpen: true };
 
-        /// <summary>借用模拟仪：康伟达→懒建立共享实例（Dispose 仅归还计数不关连接）；BPA700→新建并已打开的临时实例（Dispose 时真正关闭）；未选择模拟仪抛异常</summary>
+        /// <summary>借用模拟仪：康伟达→懒建立共享实例（Dispose 不关连接，方案内各模块复用）；BPA700→新建并已打开的临时实例（Dispose 时真正关闭）；未选择模拟仪抛异常</summary>
         public async Task<SimulatorLease> RentAsync(CancellationToken ct = default)
         {
             var config = _configService.Load();
             if (config.ActiveSimulator == SimulatorType.Kangwenda)
             {
                 await EnsureOpenAsync(config, ct).ConfigureAwait(false);
-                _leaseCount++;
-                return new SimulatorLease(_shared!, onDispose: ReleaseLease);
+                return new SimulatorLease(_shared!, onDispose: static () => Task.CompletedTask);
             }
 
             var temp = CreateSimulator(config);
             await temp.OpenAsync(ct).ConfigureAwait(false);
             _log.Info($"血压模拟仪（{config.ActiveSimulator}）：本模块使用独立连接（结束即关闭，保持原有逐模块生命周期）。");
+            return new SimulatorLease(temp, onDispose: async () =>
+            {
+                try { await temp.CloseAsync().ConfigureAwait(false); }
+                catch { /* 释放路径忽略 */ }
+                finally { temp.Dispose(); }
+            });
+        }
+
+        /// <summary>
+        /// 借用支持静态压力序列（点间直切不泄回零）的模拟仪：A18/A22 这类要测受控降压过程的气路类测试专用，
+        /// 该能力只有 BPA700 的 1.0.4.0-BETA 句柄版 SDK 提供，所以固定新建 Beta 实例、逐模块自建自关；配置里选的不是 BPA700 时抛 NotSupportedException。
+        /// </summary>
+        public async Task<SimulatorLease> RentSequenceSdkAsync(CancellationToken ct = default)
+        {
+            var config = _configService.Load();
+            if (config.ActiveSimulator != SimulatorType.BPA700)
+                throw new NotSupportedException("静态压力序列只支持鲸扬 BPA700（1.0.4.0-BETA 句柄版 SDK）");
+
+            var temp = new BPA700BetaSimulator(config.BPA700Simulator.PortName, _log);
+            await temp.OpenAsync(ct).ConfigureAwait(false);
+            _log.Info("血压模拟仪（BPA700 Beta）：本模块使用独立连接（结束即关闭，其余模块仍用正式版）。");
             return new SimulatorLease(temp, onDispose: async () =>
             {
                 try { await temp.CloseAsync().ConfigureAwait(false); }
@@ -95,12 +114,6 @@ namespace TORNPISolution.Service.Devices
                 SimulatorType.BPA700 => new BPA700Simulator(config.BPA700Simulator.PortName, _log),
                 _ => throw new InvalidOperationException("未选择血压模拟仪（仪器链接配置 → 模拟仪类型）")
             };
-
-        private Task ReleaseLease()
-        {
-            if (_leaseCount > 0) _leaseCount--;
-            return Task.CompletedTask;
-        }
     }
 
     /// <summary>模拟仪租约：using 结束时按来源决定归还（共享实例空操作 / 临时实例真关闭）。</summary>
