@@ -22,7 +22,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A00---**************************初始化仪器
         public async Task InitInstrumentsModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("初始化仪器")) return;
             // GTN_Open 内部阻塞轮询，用 Task.Run 包裹避免卡 UI
             var rtn = await Task.Run(() => _hw.GenControl.GTN_Open(token), token);
             if (rtn != 0)
@@ -41,7 +40,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A02---**************************NFC功能测试
         public async Task NfcFunctionModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("NFC 功能测试")) return;
             var config = _configService.Load();
             using var reader = new NfcReaderService(_log);
             await reader.OpenAsync(config.NfcReader.PortName, config.NfcReader.BaudRate, token);
@@ -61,12 +59,11 @@ namespace TORNPISolution.Service
         //测试项目**************************---A15---**************************充电测试
         public async Task ChargingTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            // 纯产品模块（0x6D/0x6C，不依赖任何仪器）：无仪器演示模式也照常回读产品
-            var config = _configService.Load();
+            // 纯产品模块（0x6D/0x6C），不依赖任何仪器
             using var product = _productFactory();
 
             // 产品可用性以本轮 A16 产品通讯初始化记录为准（进入产测模式/0x72/0x74 均不再重发）；本模块仍需打开产品串口读充电状态 0x6D / 电池信息 0x6C
-            if (!GetProductAvailable(config.NoProductDemoMode))
+            if (!GetProductAvailable())
                 _log.Warn("产品不可用（以 A16 产品通讯初始化记录为准）：充电测试项可能读回失败判 FAIL");
             try
             {

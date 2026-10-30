@@ -1,11 +1,12 @@
+using System.Diagnostics;
+
 using TORNPISolution.Interface;
-using TORNPISolution.Service.Devices;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
 {
     /// <summary>
-    /// TestItem 分部：血压 A01 初始化连接 / A03 测试启动与停止（BP-001~002）/ A05 静态压力精度（BP-003），含演示分支、产品压力回读、逐项上报等辅助。
+    /// TestItem 分部：血压 A01 初始化连接 / A03 测试启动与停止（BP-001~002）/ A05 静态压力精度（BP-003），含产品压力回读、逐项上报等辅助。
     /// </summary>
     public partial class TestItem
     {
@@ -15,7 +16,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A01---**************************血压仪初始化连接
         public async Task BpDeviceInitModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血压模拟仪初始化连接")) return;
             var config = _configService.Load();
             if (config.ActiveSimulator == SimulatorType.None)
             {
@@ -46,7 +46,7 @@ namespace TORNPISolution.Service
         /// <summary>
         /// 测试启动与停止功能（BP-001 短按启动键 / BP-002 短按停止键）：整机自带气源，按了键自己充放气，只看产品设备端状态（0x74）；产品通讯初始化仍集中在 A16（0x74 需产品处于产测模式）。
         /// ① BP-001：弹提示让测试员短按[测量启动]键 → 等 5s → 读设备端状态，回读 03 01（测量中）为 PASS；② BP-002：弹提示让测试员短按[测量停止]键 → 等 5s → 读设备端状态，回读 03 00（待机）为 PASS。
-        /// 两项测试值均为 1/0（规格 1~1），实际回读字节显示在产品列；无产品演示模式下两项不判定（本模块没有仪器侧内容可演示）。
+        /// 两项测试值均为 1/0（规格 1~1），实际回读字节显示在产品列。
         /// </summary>
         //测试项目**************************---A03---**************************测试启动与停止功能（BP-001/BP-002）
         public async Task BpAccuracyTestModule(TestItemResultCollector collector, CancellationToken token)
@@ -56,18 +56,9 @@ namespace TORNPISolution.Service
             var measuring = (Mode: (byte)0x03, State: (byte)0x01);    // 启动键期望：测量中
             var standby = (Mode: (byte)0x03, State: (byte)0x00);      // 停止键期望：待机
 
-            var config = _configService.Load();
-
             // 两项均以产品设备端状态判定，产品不可用时不弹按键提示。
-            if (!GetProductAvailable(config.NoProductDemoMode))
+            if (!GetProductAvailable())
             {
-                if (config.NoProductDemoMode)
-                {
-                    _log.Info($"{ModuleName}：无产品演示模式，两项均以产品设备端状态判定，报不判定");
-                    await collector.SetAsync(SpecItems.Bp001KeyStart, TestItemResult.Demo("产品未连接，不判定"));
-                    await collector.SetAsync(SpecItems.Bp002KeyStop, TestItemResult.Demo("产品未连接，不判定"));
-                    return;
-                }
                 _log.Error($"{ModuleName} 判 FAIL：产品不可用（串口未连接或 A16 握手失败），两项均以产品设备端状态（0x74）判定");
                 await collector.SetAsync(SpecItems.Bp001KeyStart, TestItemResult.OfProductText(0, "产品未连接"));
                 await collector.SetAsync(SpecItems.Bp002KeyStop, TestItemResult.OfProductText(0, "产品未连接"));
@@ -80,11 +71,7 @@ namespace TORNPISolution.Service
                 {
                     await product.OpenAsync(token);
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
                     _log.Error($"{ModuleName} 判 FAIL：产品串口打开失败：{ex.Message}");
                     await collector.SetAsync(SpecItems.Bp001KeyStart, TestItemResult.OfProductText(0, "产品串口未连接"));
@@ -103,11 +90,7 @@ namespace TORNPISolution.Service
                     {
                         state = await product.ReadDeviceStateAsync(token);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         _log.Warn($"{itemName} FAIL：读设备端状态（0x74）异常：{ex.Message}");
                         await collector.SetAsync(itemName, TestItemResult.OfProductText(0, "读取异常"));
@@ -141,7 +124,7 @@ namespace TORNPISolution.Service
         /// ② 每点到稳压后取窗口末端均值作仪器标准值，并在同一保持窗内回读产品压力（0x76），保证与仪器稳定值同时刻口径；
         /// ③ 逐点判定 产品−仪器 按静态规格 -0.5~0.5mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：测试值=带符号偏差（正=产品偏高），
         ///    仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；
-        ///    全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）；无仪器演示分支见 DemoStaticAccuracyAsync。
+        ///    全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）。
         /// </summary>
         //测试项目**************************---A05---**************************血压静态压力精度测试（BP-003）
         public async Task BpStaticAccuracyModule(TestItemResultCollector collector, CancellationToken token)
@@ -157,12 +140,6 @@ namespace TORNPISolution.Service
                 return;
             }
 
-            if (NoInstrumentDemo("血压静态压力精度测试"))
-            {
-                await DemoStaticAccuracyAsync(collector, points, token);
-                return;
-            }
-
             if (config.ActiveSimulator is not (SimulatorType.BPA700 or SimulatorType.Kangwenda))
             {
                 _log.Error("血压静态压力精度测试跳过：未选择血压模拟仪（仪器链接配置 → 模拟仪类型）");
@@ -175,18 +152,14 @@ namespace TORNPISolution.Service
             using (var product = _productFactory())
             {
                 // 产品可用性以本轮 A16 产品通讯初始化记录为准（此处不再重复 0x72/0x74 问询）；本模块自建的 product 实例仍需打开产品串口，才能设置测试模式（0x73）并回读产品压力（0x76）
-                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                var productAvailable = GetProductAvailable();
                 if (productAvailable)
                 {
                     try
                     {
                         await product.OpenAsync(token);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         productAvailable = false;
                         _log.Warn($"BP-003：产品串口打开失败，本模块按“无产品上报值”继续（仪器侧照常逐点稳压并上报）：{ex.Message}");
@@ -203,7 +176,7 @@ namespace TORNPISolution.Service
                 var pointValues = points.ToArray();
                 var productValues = new double?[pointValues.Length];
                 var currentPoint = -1;                                  // 正在测的点下标（-1 = 不在任何点的窗口内）
-                var waveWatch = System.Diagnostics.Stopwatch.StartNew();
+                var waveWatch = Stopwatch.StartNew();
                 var readTasks = new List<Task>();
                 var readTasksLock = new object();
 
@@ -231,11 +204,7 @@ namespace TORNPISolution.Service
                             {
                                 productValues[i] = await product.ReadProductPressureAsync(token);
                             }
-                            catch (OperationCanceledException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
+                            catch (Exception ex) when (ex is not OperationCanceledException)
                             {
                                 _log.Warn($"BP-003 测试点{i + 1} 产品上报值读失败：{ex.Message}");
                             }
@@ -266,11 +235,7 @@ namespace TORNPISolution.Service
                             await product.SetTestModeAsync(3, ct: token);
                             staticModeEntered = true;
                         }
-                        catch (OperationCanceledException)
-                        {
-                            throw;
-                        }
-                        catch (Exception ex)
+                        catch (Exception ex) when (ex is not OperationCanceledException)
                         {
                             productAvailable = false;
                             _log.Warn($"BP-003：产品测试模式设置失败，各点按“无产品上报值”判 FAIL：{ex.Message}");
@@ -294,7 +259,7 @@ namespace TORNPISolution.Service
                         for (var i = 0; i < pointValues.Length; i++)
                         {
                             currentPoint = i;
-                            waveWatch = System.Diagnostics.Stopwatch.StartNew();   // 本点独立时间轴
+                            waveWatch = Stopwatch.StartNew();   // 本点独立时间轴
                             stablePressures[i] = (await simulator.RunStaticPressureSequenceAsync(
                                 new[] { pointValues[i] }, sp.MeasureSeconds, sp.BpaInflation, token))[0];
 
@@ -306,8 +271,7 @@ namespace TORNPISolution.Service
                             if (sp.VentBetweenPoints && i < pointValues.Length - 1)
                             {
                                 try { await simulator.VentToZeroAsync(ct: token); }
-                                catch (OperationCanceledException) { throw; }
-                                catch (Exception ex) { _log.Warn($"BP-003 点间泄压失败（下一点清场会补偿）：{ex.Message}"); }
+                                catch (Exception ex) when (ex is not OperationCanceledException) { _log.Warn($"BP-003 点间泄压失败（下一点清场会补偿）：{ex.Message}"); }
                             }
                         }
                         currentPoint = -1;   // 收尾段（泄气/退模式）不再画进任何点的曲线
@@ -364,75 +328,6 @@ namespace TORNPISolution.Service
                         {
                             _log.Warn($"BP-003：退出静态压力模式（0x73 mode=3 status=1）失败：{ex.Message}");
                         }
-                    }
-                }
-            }
-        }
-
-        /// <summary>BP-003 无仪器演示分支：不驱动模拟仪（无仪器参考值），进静态压力模式（0x73 mode=3）后逐点回读产品上报压力（0x76），实测值填产品列</summary>
-        private async Task DemoStaticAccuracyAsync(TestItemResultCollector collector, List<double> points, CancellationToken token)
-        {
-            const double Tolerance = 0.5;   // mmHg，与正式流程同规格
-
-            using var product = _productFactory();
-            var opened = false;
-            var staticModeEntered = false;
-            try
-            {
-                await product.OpenAsync(token);
-                opened = true;
-                await product.SetTestModeAsync(3, ct: token);   // 进静态压力模式，产品在该模式下才上报静态压力
-                staticModeEntered = true;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _log.Warn($"BP-003 演示：产品串口打开/设置模式失败，各点产品列显示 --：{ex.Message}");
-            }
-
-            try
-            {
-                // 探活：产品无响应就不逐点空等 3s 超时
-                var probe = opened ? await ReadProductPressureAsync(product, "BP-003 演示探活", token) : double.NaN;
-                if (double.IsNaN(probe))
-                {
-                    _log.Warn("BP-003 演示：产品无响应（0x76 读回缺失），各压力点按读回缺失判 FAIL");
-                    foreach (var value in points)
-                        await collector.SetAsync(SpecItems.Bp003Point(value), TestItemResult.Of(Tolerance + 1));
-                    return;
-                }
-
-                foreach (var value in points)
-                {
-                    token.ThrowIfCancellationRequested();
-                    var itemName = SpecItems.Bp003Point(value);
-                    var read = await ReadProductPressureAsync(product, $"{itemName} 产品上报", token);
-                    _log.Info($"BP-003 演示 {itemName}：产品上报={(double.IsNaN(read) ? "--" : read.ToString("0.0"))}（无仪器参考值，不判合格）");
-
-                    // 无仪器参考值算不出误差：测试值落规格外保证 FAIL，产品列照常显示读回值
-                    await collector.SetAsync(itemName, new TestItemResult
-                    {
-                        Value = Tolerance + 1,
-                        ProductValue = double.IsNaN(read) ? null : read
-                    });
-                }
-            }
-            finally
-            {
-                // 测试完退出静态压力模式（0x73 mode=3 status=1），避免产品遗留在静态压力模式
-                if (staticModeEntered)
-                {
-                    try
-                    {
-                        await product.SetTestModeAsync(3, 1, CancellationToken.None);
-                        _log.Info("BP-003 演示：已退出静态压力模式（0x73 mode=3 status=1）");
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Warn($"BP-003 演示：退出静态压力模式失败：{ex.Message}");
                     }
                 }
             }

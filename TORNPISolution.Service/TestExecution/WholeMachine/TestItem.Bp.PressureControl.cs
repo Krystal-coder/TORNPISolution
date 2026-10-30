@@ -17,7 +17,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A04---**************************压力控制功能测试（BP-006~009）
         public async Task PressureControlModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("压力控制功能测试")) return;
             var config = _configService.Load();
             if (config.ActiveSimulator == SimulatorType.None)
             {
@@ -30,7 +29,7 @@ namespace TORNPISolution.Service
                 var testParams = config.ActiveBpTestParams;
 
                 // 产品不可用时四项结果一律不报告、由收尾判 FAIL：报 0 对“≤300mmHg”“≤10s”这类上限规格会误判成 PASS。
-                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                var productAvailable = GetProductAvailable();
 
                 // 经共享会话取模拟仪（接口调用：步骤只用接口成员，本模块只让它跑血压模拟）
                 await using var lease = await _simSession.RentAsync(token);
@@ -38,41 +37,7 @@ namespace TORNPISolution.Service
 
                 if (!productAvailable)
                 {
-                    var pc0 = testParams.PressureControl;
-                    if (!config.NoProductDemoMode)
-                    {
-                        _log.Error($"BP-006~009 判 FAIL：产品不可用（串口未连接或握手失败），四项均以产品回读压力判定，无法空跑；本轮不驱动模拟仪，仪器不进入血压模拟页面属预期");
-                        return;
-                    }
-
-                    // 无产品演示模式：模拟仪只当手臂、不加压，没有充气方就无法复现充放气，只跑一轮血压模拟验证仪器侧能被驱动；四项结果均不报告，由收尾按读回缺失判 FAIL
-                    _log.Info("BP-006~009 无产品演示模式：驱动模拟仪跑一轮血压模拟验证仪器侧，四项结果均不报告、由收尾判 FAIL");
-
-                    var demoWatch = System.Diagnostics.Stopwatch.StartNew();
-                    void OnDemoSample(double pressure) =>
-                        PressureSampled?.Invoke(SpecItems.Bp006MaxInflatePressure, new PressureSamplePoint(demoWatch.Elapsed.TotalSeconds, pressure));
-
-                    await simulator.StartSamplingAsync(token);
-                    simulator.PressureSampled += OnDemoSample;
-                    try
-                    {
-                        await simulator.RunBpMeasurementAsync((int)pc0.InflateSystolic, (int)pc0.InflateDiastolic,
-                            (int)pc0.InflateHeartRate, pc0.InflatePulseVolume,
-                            waitStartTimeoutMs: 8_000, totalTimeoutMs: 15_000, ct: token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Warn($"演示步骤异常（不影响收尾判定）：{ex.Message}");
-                    }
-                    finally
-                    {
-                        simulator.PressureSampled -= OnDemoSample;
-                        await simulator.StopSamplingAsync();
-                    }
+                    _log.Error("BP-006~009 判 FAIL：产品不可用（串口未连接或握手失败），四项均以产品回读压力判定，无法空跑；本轮不驱动模拟仪，仪器不进入血压模拟页面属预期");
                     return;
                 }
 

@@ -32,12 +32,6 @@ namespace TORNPISolution.Share.Models
         /// <summary>被测产品（DUT，串口 232，默认 921600bps）</summary>
         public SerialLinkSettings Product { get; set; } = new() { BaudRate = 921600 };
 
-        /// <summary>无产品演示模式：产品串口未接时，血压相关模块（A04 压力控制 / A06 动态压力精度）仅驱动模拟仪完成充放气流程，验证仪器侧行为；依赖产品读回的结果项由收尾扫描按读回缺失判 FAIL，接上产品后须取消勾选恢复</summary>
-        public bool NoProductDemoMode { get; set; }
-
-        /// <summary>无仪器演示模式：只读产品串口数据（进入产测模式 → 0x72 → 0x74），各模块执行完产品通讯即返回</summary>
-        public bool NoInstrumentDemoMode { get; set; }
-
         /// <summary>美仪压力/差压变送器（默认 9600bps）</summary>
         public SerialLinkSettings PressureTransmitter { get; set; } = new();
 

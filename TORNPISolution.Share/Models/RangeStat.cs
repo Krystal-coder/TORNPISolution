@@ -19,7 +19,7 @@ namespace TORNPISolution.Share.Models
 
     /// <summary>
     /// 区间统计结果：汇总 + 模块通过率 + NG 原因汇总 + 按天趋势。
-    /// 计数口径与单轮报表一致：只统计参与判定的项（只展示/演示项不计）。
+    /// 计数口径与单轮报表一致：只统计参与判定的项（只展示/不判定项不计）。
     /// </summary>
     public class RangeStatResult
     {

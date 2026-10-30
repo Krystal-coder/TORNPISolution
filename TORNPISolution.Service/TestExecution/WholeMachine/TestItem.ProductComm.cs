@@ -1,18 +1,18 @@
+using System.IO.Ports;
+
 using TORNPISolution.Interface;
-using TORNPISolution.Service.Devices;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
 {
     /// <summary>
     /// TestItem 分部：A16 产品通讯初始化（整机工位）。
-    /// 全方案唯一执行产品通讯判定的模块；握手结果记在 _productCommOk，供后续模块走快速跳过或演示分支。
+    /// 全方案唯一执行产品通讯判定的模块；握手结果记在 _productCommOk
     /// </summary>
     public partial class TestItem
     {
         /// <summary>
         /// A16 产品通讯初始化：打开产品串口 → 进入产测模式（防休眠，产品断电前不再休眠）→ 0x72 → 0x74；后续模块不再重发进入产测模式与 0x72/0x74。
-        /// 无仪器演示模式下本模块即“只读产品串口”的主体，照常执行。
         /// </summary>
         //测试项目**************************---A16---**************************产品通讯初始化
         public async Task ProductCommInitModule(TestItemResultCollector collector, CancellationToken token)
@@ -50,12 +50,16 @@ namespace TORNPISolution.Service
 
                 var (mac, version) = await product.QueryProductInfoAsync(token);
 
+                // 三项问询的无响应文案只差项名，而项名常量本身就是文案主语
+                async Task ReportNoReplyAsync(string itemName)
+                {
+                    await collector.SetAsync(itemName, TestItemResult.OfProductText(0, "无响应"));
+                    _log.Warn($"{itemName}无响应（串口已打开但产品无返回），判 FAIL");
+                }
+
                 // MAC 地址：读回不为空即合格
                 if (mac.Length == 0)
-                {
-                    await collector.SetAsync(SpecItems.ProductMacAddress, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品信息获取(MAC地址)无响应（串口已打开但产品无返回），判 FAIL");
-                }
+                    await ReportNoReplyAsync(SpecItems.ProductMacAddress);
                 else
                 {
                     await collector.SetAsync(SpecItems.ProductMacAddress, TestItemResult.OfProductText(1, mac));
@@ -65,10 +69,7 @@ namespace TORNPISolution.Service
                 // 嵌软版本：与管控规格比对（版本升级改 Spec.ExpectedFirmwareVersion 一处）
                 var expected = Spec.ExpectedFirmwareVersion;
                 if (version.Length == 0)
-                {
-                    await collector.SetAsync(SpecItems.ProductFirmwareVersion, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品信息获取(嵌软版本)无响应（串口已打开但产品无返回），判 FAIL");
-                }
+                    await ReportNoReplyAsync(SpecItems.ProductFirmwareVersion);
                 else
                 {
                     var match = string.Equals(version, expected, StringComparison.OrdinalIgnoreCase);
@@ -81,15 +82,10 @@ namespace TORNPISolution.Service
 
                 // 产品当前状态查询（返回内容预留待定：有返回即通过，读回内容原样显示在产品列）
                 var status = await product.QueryProductStatusAsync(token);
-                if (!string.IsNullOrWhiteSpace(status))
-                {
-                    await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(1, status));
-                }
+                if (string.IsNullOrWhiteSpace(status))
+                    await ReportNoReplyAsync(SpecItems.ProductStatusQuery);
                 else
-                {
-                    await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(0, "无响应"));
-                    _log.Warn("产品当前状态查询无响应（串口已打开但产品无返回），判 FAIL");
-                }
+                    await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(1, status));
                 // TODO: 状态返回格式确定后，改为按状态内容判定
 
                 // 三项里读到任何一项真实响应才算通讯可用：串口开着但产品全程无响应时不能报“可用”，
@@ -99,19 +95,14 @@ namespace TORNPISolution.Service
                     _log.Warn("产品串口已打开但 0x72/0x74 全程无响应，本轮按“产品通讯不可用”记录，后续模块产品依赖项快速跳过");
                 return commAlive;
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 // 产品串口不存在（如 Could not find file 'COM16'）是最常见根因，故日志附上系统当前实际存在的串口清单，便于直接核对仪器链接配置里的产品端口
-                var existPorts = string.Join(", ", System.IO.Ports.SerialPort.GetPortNames());
+                var existPorts = string.Join(", ", SerialPort.GetPortNames());
                 _log.Warn($"产品通讯不可用（打开/问询/状态查询失败），[产品信息获取(MAC地址)]/[产品信息获取(嵌软版本)]/[产品当前状态查询] 判 FAIL，继续仪器控制流程：{ex.Message}；系统当前存在串口：[{existPorts}]，请核对仪器链接配置的产品串口号与物理接线");
-                var failResult = TestItemResult.OfProductText(0, "通讯失败");
-                await collector.SetAsync(SpecItems.ProductMacAddress, failResult);
-                await collector.SetAsync(SpecItems.ProductFirmwareVersion, failResult);
-                await collector.SetAsync(SpecItems.ProductStatusQuery, failResult);
+                await collector.SetAsync(SpecItems.ProductMacAddress, TestItemResult.OfProductText(0, "通讯失败"));
+                await collector.SetAsync(SpecItems.ProductFirmwareVersion, TestItemResult.OfProductText(0, "通讯失败"));
+                await collector.SetAsync(SpecItems.ProductStatusQuery, TestItemResult.OfProductText(0, "通讯失败"));
                 return false;
             }
         }

@@ -17,7 +17,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---B04---**************************综测仪上电（单板）
         public async Task BoardPowerOnModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("综测仪上电")) return;
 
             var config = _configService.Load();
             // 按本轮范围筛槽位：单板页右键“只跑通道 3”时，其余七路既不下发输出也不上报，避免拿旧值充本轮结果

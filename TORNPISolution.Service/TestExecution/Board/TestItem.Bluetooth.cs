@@ -19,7 +19,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---B03---**************************蓝牙功能测试（单板）
         public async Task BoardBluetoothModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("蓝牙功能测试")) return;
 
             var config = _configService.Load();
             // 按本轮范围筛槽位：单板页右键“只跑通道 3”时只连那一台网关，其余网关不建链也不扫

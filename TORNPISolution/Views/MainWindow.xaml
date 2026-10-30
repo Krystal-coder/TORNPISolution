@@ -159,6 +159,11 @@
             <Grid>
                 <Menu HorizontalAlignment="Left" VerticalAlignment="Center"
                       Style="{StaticResource MaterialDesignMenu}" Background="Transparent">
+                    <Menu.Resources>
+                        <!-- 子菜单面板底色：MD 模板的 SubMenuBorder 用 MaterialDesign.Brush.Background，浅色主题下实测是 #F1F1F1 灰底；
+                             只在这个 Menu 作用域内覆盖成纯白，不动全局主题 -->
+                        <SolidColorBrush x:Key="MaterialDesign.Brush.Background" Color="#FFFFFF"/>
+                    </Menu.Resources>
                     <Menu.ItemContainerStyle>
                         <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
                             <Setter Property="Padding" Value="0,0,0,0"/>
@@ -175,11 +180,27 @@
                                 <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
                             </DataTemplate>
                         </MenuItem.HeaderTemplate>
-                        <MenuItem Header="保存方案" Click="MenuSavePlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                        <MenuItem Header="加载方案" Click="MenuLoadPlan_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                        <MenuItem Header="历史数据" Click="MenuHistory_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                        <Separator/>
-                        <MenuItem Header="退出" Click="MenuExit_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="保存方案" Click="MenuSavePlan_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ContentSave" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="加载方案" Click="MenuLoadPlan_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="FolderOpen" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="历史数据" Click="MenuHistory_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="History" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator Style="{StaticResource Style.Menu.Separator}"/>
+                        <MenuItem Header="退出" Click="MenuExit_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ExitToApp" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem>
 
             <!-- 配置菜单 -->
@@ -192,13 +213,33 @@
                                 <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
                             </DataTemplate>
                         </MenuItem.HeaderTemplate>
-                        <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                        <MenuItem Header="单板配置" Click="MenuBoardConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
-                                  ToolTip="八条路各自的位号与跑不跑，以及单板工位的综测仪/蓝牙网关/读码器；本轮跑哪几项在旁边的「测试项」里勾"/>
-                        <MenuItem Header="烧录配置" Click="MenuFlashingConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"
-                                  ToolTip="SPI Flash 烧录器与富芮坤主控工具的参数（所有通道共用），以及八条通道各走哪个口"/>
-                        <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
-                        <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="仪器链接配置" Click="MenuInstrumentConfig_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="LanConnect" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="单板配置" Click="MenuBoardConfig_Click" Style="{StaticResource Style.Menu.SubItem}"
+                                  ToolTip="八条路各自的位号与跑不跑，以及单板工位的综测仪/蓝牙网关/读码器；本轮跑哪几项在旁边的「测试项」里勾">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="DeveloperBoard" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="烧录配置" Click="MenuFlashingConfig_Click" Style="{StaticResource Style.Menu.SubItem}"
+                                  ToolTip="SPI Flash 烧录器与富芮坤主控工具的参数（所有通道共用），以及八条通道各走哪个口">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="Memory" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="血压模拟仪测试配置" Click="MenuBpaParamConfig_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="Gauge" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="AECG100参数配置" Click="MenuAecg100ParamConfig_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="Waveform" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem>
 
                      <!-- 通讯配置菜单 -->
@@ -211,7 +252,11 @@
                                 <TextBlock Text="{Binding}" Margin="-20,0,0,0"/>
                             </DataTemplate>
                         </MenuItem.HeaderTemplate>
-                        <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource MaterialDesignMenuItem}"/>
+                        <MenuItem Header="协议命令配置" Click="MenuProtocolCommandConfig_Click" Style="{StaticResource Style.Menu.SubItem}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="Protocol" Width="18" Height="18" Margin="0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem> 
 
                     <MenuItem Header="测试项" Click="MenuBoardTestItems_Click"

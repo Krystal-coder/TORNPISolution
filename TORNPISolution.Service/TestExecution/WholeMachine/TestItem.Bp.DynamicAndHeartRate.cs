@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using TORNPISolution.Interface;
 using TORNPISolution.Share.Models;
 
@@ -22,7 +24,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A06---**************************血压动态压力精度测试（BP-004）
         public async Task BpDynamicAccuracyModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血压动态压力精度测试")) return;
             var config = _configService.Load();
             if (config.ActiveSimulator == SimulatorType.None)
             {
@@ -42,7 +43,7 @@ namespace TORNPISolution.Service
 
             using (var product = _productFactory())
             {
-                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                var productAvailable = GetProductAvailable();
 
                 // 经共享会话取模拟仪（接口调用：BPA700=SDK 回调状态机；康伟达=压力曲线判定）
                 await using var lease = await _simSession.RentAsync(token);
@@ -50,27 +51,7 @@ namespace TORNPISolution.Service
 
                 if (!productAvailable)
                 {
-                    if (!config.NoProductDemoMode)
-                    {
-                        _log.Warn("BP-004 跳过测量轮次：产品不可用，且全部结果项依赖产品上报值（协议预留），空跑无意义；本轮不会向模拟仪发血压模拟指令，仪器不进入血压模拟页面属预期，请先检查产品串口接线/端口配置");
-                        return;
-                    }
-
-                    // 无产品演示模式：只验证仪器侧指令与波形显示；结果项不报告，由收尾扫描按读回缺失统一判 FAIL
-                    _log.Info("BP-004 无产品演示模式：逐组驱动模拟仪走血压模拟流程（短超时），结果项按产品读回缺失判 FAIL");
-                    try
-                    {
-                        await CollectBpReadingsAsync(simulator, null, groups, repeats, pulseVolume, RoundItem, 0, false, singleMeasureTimeoutMs, token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Warn($"演示轮异常（不影响收尾判定）：{ex.Message}");
-                    }
-
+                    _log.Warn("BP-004 跳过测量轮次：产品不可用，且全部结果项依赖产品上报值（协议预留），空跑无意义；本轮不会向模拟仪发血压模拟指令，仪器不进入血压模拟页面属预期，请先检查产品串口接线/端口配置");
                     return;
                 }
 
@@ -79,7 +60,7 @@ namespace TORNPISolution.Service
                 var (readings, roundSeconds) = await CollectBpReadingsAsync(simulator, product, groups, repeats, pulseVolume,
                     RoundItem, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token);
 
-                if (readings.Values.All(l => !l.Any(x => x != null)))
+                if (!readings.Values.Any(l => l.Any(x => x != null)))
                 {
                     _log.Warn("BP-004 FAIL：未取到任何产品上报值（0xCA 结果帧全缺），请检查产品串口连接与测量周期是否完成");
                     return;
@@ -162,7 +143,6 @@ namespace TORNPISolution.Service
         /// </summary>
         public async Task BpHeartRateAccuracyModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血压心率精度及重复性测试")) return;
             var config = _configService.Load();
             if (config.ActiveSimulator == SimulatorType.None)
             {
@@ -180,31 +160,13 @@ namespace TORNPISolution.Service
 
             using (var product = _productFactory())
             {
-                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                var productAvailable = GetProductAvailable();
                 await using var lease = await _simSession.RentAsync(token);
                 var simulator = lease.Simulator;
 
                 if (!productAvailable)
                 {
-                    if (!config.NoProductDemoMode)
-                    {
-                        _log.Warn("BP-005 跳过测量轮次：心率判定完全依赖产品 0xCA 结果帧上报值，产品不可用时空跑无意义（不向模拟仪发血压模拟指令）");
-                        return;
-                    }
-
-                    _log.Info("BP-005 无产品演示模式：逐点驱动模拟仪走血压模拟流程（短超时），结果项按产品读回缺失判 FAIL");
-                    try
-                    {
-                        await CollectBpReadingsAsync(simulator, null, groups, repeats, pulseVolume, RoundItem, 0, false, singleMeasureTimeoutMs, token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Warn($"演示轮异常（不影响收尾判定）：{ex.Message}");
-                    }
+                    _log.Warn("BP-005 跳过测量轮次：心率判定完全依赖产品 0xCA 结果帧上报值，产品不可用时空跑无意义（不向模拟仪发血压模拟指令）");
                     return;
                 }
 
@@ -213,7 +175,7 @@ namespace TORNPISolution.Service
                 var (readings, roundSeconds) = await CollectBpReadingsAsync(simulator, product, groups, repeats, pulseVolume,
                     RoundItem, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token);
 
-                if (readings.Values.All(l => !l.Any(x => x != null)))
+                if (!readings.Values.Any(l => l.Any(x => x != null)))
                 {
                     _log.Warn("BP-005 FAIL：未取到任何产品上报值（0xCA 结果帧全缺），请检查产品串口连接与测量周期是否完成");
                     return;
@@ -317,11 +279,7 @@ namespace TORNPISolution.Service
                 _log.Info("产品串口已打开并进入产测模式（0x07/0x01），可开始完整血压测量");
                 return true;
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _log.Error($"血压测量前置失败：产品串口打开或进入产测模式异常（{ex.Message}），本模块不驱动模拟仪，未报项按读回缺失判 FAIL");
                 return false;
@@ -358,8 +316,7 @@ namespace TORNPISolution.Service
         {
             if (!ventDuringRest) return;
             try { await simulator.VentToZeroAsync(ct: token).ConfigureAwait(false); }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception ex) { _log.Warn($"轮间泄压失败（继续休息）：{ex.Message}"); }
+            catch (Exception ex) when (ex is not OperationCanceledException) { _log.Warn($"轮间泄压失败（继续休息）：{ex.Message}"); }
         }
 
         /// <summary>
@@ -368,7 +325,7 @@ namespace TORNPISolution.Service
         /// </summary>
         private async Task<(Dictionary<(int, int, int), List<ProductBpReading?>> Readings,
             Dictionary<(int, int, int), List<double>> RoundSeconds)> CollectBpReadingsAsync(
-            IBloodPressureSimulator simulator, IProductController? product,
+            IBloodPressureSimulator simulator, IProductController product,
             (int Systolic, int Diastolic, int HeartRate)[] groups, int repeats, double pulseVolume,
             Func<(int Systolic, int Diastolic, int HeartRate), int, string?> waveItemName,
             int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token)
@@ -394,7 +351,6 @@ namespace TORNPISolution.Service
         /// 逐点位逐轮执行：模拟仪按点位出脉搏波并进入待测 → 产测态 0xCA 开始完整血压测量 → 等 0xCA 结果帧（状态码/收缩/舒张/平均压/心率）→ 0xCC 结束 + 关闭模拟仪输出。
         /// 仪器先输出、产品后开始是现场实测确认的顺序：反过来产品在没有脉搏波的窗口里充气，测完只回 0/0/0/0。
         /// 单轮从 0xCA 起算超过 singleMeasureTimeoutMs（配置项）没等到结果帧：发 0xCC + 停仪器输出后抛 TimeoutException 中止本模块（未报项由收尾扫描判 FAIL）。
-        /// product 为 null（无产品演示模式）时不发产品指令、用短超时只验证仪器侧流程，回读格全部为空，也不休息。
         /// 波形按轮独立：每轮开始重开时间轴、只把本轮采样画给 waveItemName(g, r) 指定的那一项，轮一结束就退订，休息段（每轮后都泄压，非末轮再各等 restSeconds）不进任何曲线。
         /// 写 readings：键为点位三元组（与入参 groups 逐项对应），值按轮次占格（下标 i = 第 i+1 轮，null = 该轮没取到有效回读），一轮一项时下标才能与“第 N 轮”严格对上。
         /// 写 roundSeconds：与 readings 同键同下标，值是本轮实际占用的秒数（从本轮开始到其后的轮间休息结束）。
@@ -402,7 +358,7 @@ namespace TORNPISolution.Service
         private async Task CollectBpRoundsAsync(
             Dictionary<(int, int, int), List<ProductBpReading?>> readings,
             Dictionary<(int, int, int), List<double>> roundSeconds,
-            IBloodPressureSimulator simulator, IProductController? product,
+            IBloodPressureSimulator simulator, IProductController product,
             (int Systolic, int Diastolic, int HeartRate)[] groups, int repeats, double pulseVolume,
             Func<(int Systolic, int Diastolic, int HeartRate), int, string?> waveItemName,
             int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token)
@@ -422,7 +378,7 @@ namespace TORNPISolution.Service
 
                     // 本轮一条独立时间轴，采样只画给本轮那一项（waveItemName 返回 null 则本轮不画）
                     var roundItem = waveItemName(g, r);
-                    var roundWatch = System.Diagnostics.Stopwatch.StartNew();
+                    var roundWatch = Stopwatch.StartNew();
                     void OnRoundSample(double pressure)
                     {
                         if (roundItem != null)
@@ -434,16 +390,6 @@ namespace TORNPISolution.Service
                     Task<BpTestRunResult>? cycleTask = null;
                     try
                     {
-                        if (product == null)
-                        {
-                            // 无产品演示：短超时只验证仪器侧指令与波形（异常由调用方按“不影响收尾判定”处理）
-                            await simulator.RunBpMeasurementAsync(g.Systolic, g.Diastolic, g.HeartRate, pulseVolume,
-                                waitStartTimeoutMs: 8_000, totalTimeoutMs: 15_000, ct: token);
-                            list.Add(null);
-                            seconds.Add(roundWatch.Elapsed.TotalSeconds);
-                            continue;
-                        }
-
                         // 仪器先按点位输出脉搏波并进入待测（BPA700 停在 Wait 等产品充气），再让产品开始测量：现场实测这个顺序才测得出数值
                         cycleTask = simulator.RunBpMeasurementAsync(g.Systolic, g.Diastolic, g.HeartRate, pulseVolume,
                             totalTimeoutMs: singleMeasureTimeoutMs + CycleWaitMarginMs, ct: token);
@@ -490,7 +436,7 @@ namespace TORNPISolution.Service
                         // 取消或异常正好落在这一轮中间：开始测量发出去了却没走到结束，补一次结束指令；仪器周期任务已起的话一并停输出收掉，
                         // 否则产品挂着本次测量，后面每一轮/下一个模块的开始都不被接受。都用 None 令牌：点“停止”时这几句恰恰最需要发得出去。
                         if (cycleTask != null || measureStarted)
-                            await EndBpMeasureRoundAsync(product!, simulator, cycleTask, sendEndCommand: measureStarted && !measureEnded);
+                            await EndBpMeasureRoundAsync(product, simulator, cycleTask, sendEndCommand: measureStarted && !measureEnded);
 
                         // 本轮被打断时袖带可能仍带压：尽力泄回零，避免设备带压进入下一个模块
                         try { await simulator.VentToZeroAsync(ct: CancellationToken.None); }
@@ -503,7 +449,7 @@ namespace TORNPISolution.Service
                         simulator.PressureSampled -= OnRoundSample;   // 本轮曲线到此为止，休息段不再绘制
                     }
 
-                    // 每轮测完让产品休息（换组之间也算一轮的间隔；演示轮走上面的 continue 不休息；本模块最后一轮不休息）
+                    // 每轮测完让产品休息（换组之间也算一轮的间隔；本模块最后一轮不休息）
                     await RestAfterRoundAsync(simulator, r, repeats, restSeconds, ventDuringRest,
                         gi == groups.Length - 1 && r == repeats, token);
 

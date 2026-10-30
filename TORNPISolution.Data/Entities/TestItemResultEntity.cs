@@ -55,7 +55,7 @@ namespace TORNPISolution.Data
         /// <summary>只展示不判定（如 BP-005 平均值项）：值与统计量可见，不进模块判定</summary>
         public bool DisplayOnly { get; set; }
 
-        /// <summary>演示不判定（无产品演示模式）：保持未测试</summary>
+        /// <summary>不判定（预留项/未配置判定区间）：保持未测试</summary>
         public bool NotJudged { get; set; }
 
         /// <summary>本项耗时（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟；null = 该轮未采集</summary>

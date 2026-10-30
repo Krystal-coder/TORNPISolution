@@ -236,7 +236,7 @@ namespace TORNPISolution.Service
             const int barLeft = labelW + 6;
             const int barMaxW = 150;
             const int w = barLeft + barMaxW + 46;
-            // 有轮次但没有参与判定的项（整轮都是演示/只展示项）时集合为空，Max() 会抛——与趋势图同样出一句占位
+            // 有轮次但没有参与判定的项（整轮都是不判定/只展示项）时集合为空，Max() 会抛——与趋势图同样出一句占位
             if (modules.Count == 0)
             {
                 return $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"24\" " +

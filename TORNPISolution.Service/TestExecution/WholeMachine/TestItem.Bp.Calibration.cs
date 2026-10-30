@@ -1,5 +1,4 @@
 using TORNPISolution.Interface;
-using TORNPISolution.Service.Devices;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
@@ -29,7 +28,6 @@ namespace TORNPISolution.Service
             const int PointArriveSeconds = 60;  // 序列每个压力点的到压观察上限
             const int StableRoundEndMs = 15_000;   // 单轮路径的本轮收尾等待上限：正常几秒内 Finish，超时由 WaitStaticPressureFinishAsync 主动结束，不拖住下一点
 
-            if (NoInstrumentDemo("产品静态压力校准")) return;
             var config = _configService.Load();
             if (config.ActiveSimulator is not (SimulatorType.BPA700 or SimulatorType.Kangwenda))
             {
@@ -40,18 +38,14 @@ namespace TORNPISolution.Service
             using (var product = _productFactory())
             {
                 // 产品可用性以本轮 A16 产品通讯初始化记录为准；本模块自建实例仍需打开产品串口才能下发校准指令
-                var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+                var productAvailable = GetProductAvailable();
                 if (productAvailable)
                 {
                     try
                     {
                         await product.OpenAsync(token);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         productAvailable = false;
                         _log.Warn($"A17：产品串口打开失败：{ex.Message}");
@@ -62,8 +56,7 @@ namespace TORNPISolution.Service
                 {
                     _log.Error("A17 判 FAIL：产品不可用（串口未连接或握手失败），校准指令无法下发，本模块不驱动模拟仪");
                     await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(0));
-                    foreach (var value in SpecItems.PcalPoints)
-                        await collector.SetAsync(SpecItems.PcalPoint(value), TestItemResult.Of(PcalTolerance + 1));
+                    await ReportPcalPointsAsFailAsync(collector);
                     await collector.SetAsync(SpecItems.PcalCloseSensor, TestItemResult.Of(0));
                     return;
                 }
@@ -89,11 +82,7 @@ namespace TORNPISolution.Service
                     {
                         await simulator.StartSamplingAsync(token);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         _log.Warn($"A17：开启压力采样失败，稳压值可能无回读：{ex.Message}");
                     }
@@ -107,11 +96,7 @@ namespace TORNPISolution.Service
                     {
                         await simulator.VentToZeroAsync(ct: token);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         _log.Warn($"A17：启动前泄气失败，传感器零点可能带残压：{ex.Message}");
                     }
@@ -122,11 +107,7 @@ namespace TORNPISolution.Service
                         started = true;
                         await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(1));
                     }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         _log.Warn($"A17 启动压力传感器（0x65）无响应，判 FAIL：{ex.Message}");
                         await collector.SetAsync(SpecItems.PcalStartSensor, TestItemResult.Of(0));
@@ -135,8 +116,7 @@ namespace TORNPISolution.Service
                     if (!started)
                     {
                         // 前置命令失败：产品未进入压力静态测试态，各校准点无需空等稳压
-                        foreach (var value in SpecItems.PcalPoints)
-                            await collector.SetAsync(SpecItems.PcalPoint(value), TestItemResult.Of(PcalTolerance + 1));
+                        await ReportPcalPointsAsFailAsync(collector);
                     }
                     else if (rig != null)
                     {
@@ -205,6 +185,13 @@ namespace TORNPISolution.Service
             }
         }
 
+        /// <summary>A17 三个校准点全判 FAIL（产品不可用或前置命令失败，指令发不出去）：测试值顶到规格外，保证必判不合格</summary>
+        private static async Task ReportPcalPointsAsFailAsync(TestItemResultCollector collector)
+        {
+            foreach (var value in SpecItems.PcalPoints)
+                await collector.SetAsync(SpecItems.PcalPoint(value), TestItemResult.Of(PcalTolerance + 1));
+        }
+
         /// <summary>
         /// A17 序列路径（BPA700 的 1.0.4.0-BETA 句柄版 SDK）：三点一次下发、点间直接切压不泄回零，每点在保持窗内读仪器均值并下发校准。
         /// 某点在 arriveTimeoutSeconds 内没到压，该点及其后都不报告（由收尾判 FAIL）；末点校准写入留 2s 间隔后再进收尾。
@@ -250,11 +237,7 @@ namespace TORNPISolution.Service
                     await simulator.SetStaticPressureAsync(value, stableSeconds, inflation, token);
                     await CalibratePcalPointAsync(product, collector, value, simulator.LastStaticPressure, token);
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
                     _log.Warn($"A17 {itemName}：本点异常，判 FAIL：{ex.Message}");
                     await collector.SetAsync(itemName, TestItemResult.Of(PcalTolerance + 1));
@@ -285,11 +268,7 @@ namespace TORNPISolution.Service
                     await product.CalibratePressureSensorAsync((ushort)value, token);
                     ack = true;
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
                     _log.Warn($"A17 {itemName}：校准指令（0x66）无响应，判 FAIL：{ex.Message}");
                 }

@@ -227,25 +227,6 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 输出频率扫描波形并采集回调数据，经 PressureSampled 事件推送给 UI；频率扫描持续输出，故按 <paramref name="captureMs"/> 固定时长采集后返回。
-        /// </summary>
-        private async Task<bool> OutputFrequencyScanWithCaptureAsync(string itemName, AecgFrequencyScan scan, int captureMs, CancellationToken token)
-        {
-            var ok = await Task.Run(() => _hw.Aecg100!.OutputFrequencyScan(scan, (time, ac, dc) =>
-            {
-                PressureSampled?.Invoke(itemName, new PressureSamplePoint(time, ac + dc));
-            }), token).ConfigureAwait(false);
-
-            if (!ok) return false;
-
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            cts.CancelAfter(captureMs);
-            try { await Task.Delay(captureMs, cts.Token); }
-            catch (OperationCanceledException) { }
-            return true;
-        }
-
-        /// <summary>
         /// 输出单通道 PPG 波形并采集回调数据，经 PressureSampled 事件推送给 UI；与 ECG 一致，按 <paramref name="captureMs"/> 固定时长采集后返回，由调用方停止输出。
         /// </summary>
         private async Task<bool> OutputPpgWithCaptureAsync(string itemName, AecgPpgChannel channel, AecgPpgWaveform waveform, int captureMs, CancellationToken token, int segment = 0)
@@ -393,21 +374,9 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
-        /// 无仪器演示模式拦截：返回 true = 已被本模式拦截，调用方模块应立即 return；跳过本模块全部仪器控制（模拟仪/AECG/NFC/电源等），不打开产品串口（产品通讯集中在 A16 产品通讯初始化模块），模块内未报告项由 MainViewModel 收尾扫描按读回缺失统一判 FAIL。
+        /// 验证产品是否可以通讯
         /// </summary>
-        private bool NoInstrumentDemo(string moduleName)
-        {
-            if (!_configService.Load().NoInstrumentDemoMode) return false;
-
-            _log.Info($"{moduleName}：无仪器演示模式，跳过仪器控制（产品通讯集中在 A16 产品通讯初始化）");
-            return true;
-        }
-
-        /// <summary>
-        /// 本轮产品可用性：以 A16 产品通讯初始化握手后的记录为准（不再逐模块重复 0x72/0x74 问询）；为 null（本轮方案未包含初始化模块）时按模式推断——正式模式视为可用、由实际通讯结果决定，无产品演示模式视为不可用（走仪器侧演示分支）。
-        /// </summary>
-        private bool GetProductAvailable(bool noProductDemoMode)
-            => _productCommOk ?? !noProductDemoMode;
+        private bool GetProductAvailable() => _productCommOk ?? true;
 
         /// <summary>
         /// 让测试员动手操作（按产品物理键等）：UI 弹模态框，点确定才返回；提示语同时进日志，界面未订阅时只记日志不阻断。

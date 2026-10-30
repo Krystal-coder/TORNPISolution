@@ -257,7 +257,7 @@ namespace TORNPISolution.ViewModels
                 : TestResultStatus.Fail;
         }
 
-        /// <summary>本次运行是否上报了“演示不判定”结果：此类项保持未测试，模块收尾不强制 FAIL</summary>
+        /// <summary>本次运行是否上报了“不判定”结果：此类项保持未测试，模块收尾不强制 FAIL</summary>
         public bool IsReportedNotJudged => _reportedNotJudged;
 
         /// <summary>本次运行是否上报了“只展示不判定”结果：值与统计量可见，但不计入模块判定、收尾也不强制 FAIL</summary>
@@ -274,7 +274,7 @@ namespace TORNPISolution.ViewModels
             OnPropertyChanged(nameof(UpperLimit));
             OnPropertyChanged(nameof(IsDynamicSpec));
 
-            // 演示不判定项：只显示演示文本，双值列清空并保持未测试，不参与合格判定
+            // 不判定项：只显示说明文本，双值列清空并保持未测试，不参与合格判定
             if (result.NotJudged)
             {
                 _reportedNotJudged = true;

@@ -19,7 +19,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---B02---**************************产品条码获取（单板）
         public async Task BoardBarcodeModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("产品条码获取")) return;
 
             var config = _configService.Load();
             // 按本轮范围筛槽位：单板页右键“只跑通道 3”时只触发它对应的那台读码器

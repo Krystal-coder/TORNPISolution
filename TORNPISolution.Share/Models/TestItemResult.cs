@@ -30,7 +30,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>逐点子结果（BP-003 等逐点测试项用）：UI 在测试项行下方子表逐点展示判定</summary>
         public List<TestPointResult>? Points { get; set; }
 
-        /// <summary>演示/跳过标记：该项仅展示、不参与合格判定（结果保持“未测试”），用于无产品演示模式等场景</summary>
+        /// <summary>不判定标记：该项不参与合格判定（结果保持“未测试”，双值列与子表清空），用于预留项与未配置判定区间的场景</summary>
         public bool NotJudged { get; set; }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace TORNPISolution.Share.Models
         public static TestItemResult OfProductText(double value, string? productText)
             => new() { Value = value, ProductText = productText };
 
-        /// <summary>演示不判定项便捷构造：仪器列显示演示文本，不参与判定（保持未测试）</summary>
-        public static TestItemResult Demo(string text = "演示（不判定）")
+        /// <summary>不判定项便捷构造：仪器列显示说明文本，不参与判定（保持未测试）</summary>
+        public static TestItemResult OfNotJudged(string text)
             => new() { NotJudged = true, InstrumentText = text };
 
         /// <summary>动态规格项便捷构造：测试值 + 本次运行按仪器值现算的规格上下限</summary>

@@ -16,7 +16,6 @@ namespace TORNPISolution.Service
         public async Task Jjg692DeflationRateModule(TestItemResultCollector collector, CancellationToken token)
         {
             const string ModuleName = "JJG692放气速率(听诊)检测";
-            if (NoInstrumentDemo(ModuleName)) return;
 
             if (!TryRequireKangwenda(ModuleName, _configService.Load(), out var jjg))
             {
@@ -67,7 +66,6 @@ namespace TORNPISolution.Service
         public async Task Jjg692AirtightnessModule(TestItemResultCollector collector, CancellationToken token)
         {
             const string ModuleName = "JJG692气密性检测";
-            if (NoInstrumentDemo(ModuleName)) return;
 
             if (!TryRequireKangwenda(ModuleName, _configService.Load(), out var jjg))
             {

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using TORNPISolution.Interface;
 using TORNPISolution.Share.Models;
 
@@ -29,7 +31,6 @@ namespace TORNPISolution.Service
             // 平台离开判定余量：回读跌破"高压设定点 - 该余量"才算离开 230 平台，避开平台抖动；只用来在日志里说明段内何时起降
             const double DescentStartMargin = 10;
 
-            if (NoInstrumentDemo(ModuleName)) return;
             var config = _configService.Load();
             if (config.ActiveSimulator != SimulatorType.BPA700)
             {
@@ -141,7 +142,6 @@ namespace TORNPISolution.Service
             const int PointHoldSeconds = 4;
             const int StageArriveSeconds = 60; // 序列每个压力点的到点观察上限
 
-            if (NoInstrumentDemo(ModuleName)) return;
             var config = _configService.Load();
             if (config.ActiveSimulator != SimulatorType.BPA700)
             {
@@ -229,17 +229,13 @@ namespace TORNPISolution.Service
         /// <summary>气路类模块开产品串口：可用性以本轮 A16 握手记录为准，本模块自建实例仍需打开串口才能下发关阀/模式/读压指令</summary>
         private async Task<bool> OpenProductAsync(IProductController product, string moduleTag, CancellationToken token)
         {
-            if (!GetProductAvailable(_configService.Load().NoProductDemoMode)) return false;
+            if (!GetProductAvailable()) return false;
             try
             {
                 await product.OpenAsync(token);
                 return true;
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _log.Warn($"{moduleTag}：产品串口打开失败：{ex.Message}");
                 return false;
@@ -253,11 +249,7 @@ namespace TORNPISolution.Service
             {
                 return await product.ReadProductPressureAsync(token);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _log.Warn($"产品采样压力读取失败（{label}）：{ex.Message}");
                 return double.NaN;
@@ -284,7 +276,7 @@ namespace TORNPISolution.Service
         {
             var value = Math.Round(seconds, 1);
             var result = min == null && max == null
-                ? new TestItemResult { NotJudged = true, InstrumentText = $"{value:0.0} s" }
+                ? TestItemResult.OfNotJudged($"{value:0.0} s")
                 : new TestItemResult
                 {
                     Value = value,
@@ -395,7 +387,7 @@ namespace TORNPISolution.Service
             private readonly List<(double T, double P)> _samples = new();
             private readonly object _lock = new();
             private string _item = string.Empty;
-            private System.Diagnostics.Stopwatch _watch = System.Diagnostics.Stopwatch.StartNew();
+            private Stopwatch _watch = Stopwatch.StartNew();
 
             public AirPathRig(IBloodPressureSimulator simulator, ILogService log, Action<string, PressureSamplePoint>? sink)
             {
@@ -413,11 +405,7 @@ namespace TORNPISolution.Service
                 {
                     await _simulator.StartSamplingAsync(token);
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
                     _log.Warn($"气路测试：开启压力采样失败，压力值可能无回读：{ex.Message}");
                 }
@@ -428,12 +416,30 @@ namespace TORNPISolution.Service
             {
                 _item = itemName;
                 lock (_lock) _samples.Clear();
-                _watch = System.Diagnostics.Stopwatch.StartNew();
+                _watch = Stopwatch.StartNew();
             }
 
             /// <summary>等本段回读首次升到目标（含容差）并回该时刻（秒），A22 用它作读数窗起点：泵会先冲过设定值再回落，所以这个时刻比序列的 Stable 回调早约 5s，只作段内读数的门控、不作时长判定；观察满 timeoutSeconds 仍未到压回 NaN，由调用方按缺值处理</summary>
             public async Task<double> ArrivalSecondsAsync(double target, int timeoutSeconds, CancellationToken token)
-                => await CrossSecondsAsync(target, timeoutSeconds, token).ConfigureAwait(false);
+            {
+                var watch = Stopwatch.StartNew();
+                while (watch.Elapsed.TotalSeconds < timeoutSeconds)
+                {
+                    double? crossed = null;
+                    lock (_lock)
+                    {
+                        for (var i = 0; i < _samples.Count; i++)
+                        {
+                            if (_samples[i].P < target - ArrivalTolerance) continue;
+                            crossed = _samples[i].T;
+                            break;
+                        }
+                    }
+                    if (crossed.HasValue) return crossed.Value;
+                    await Task.Delay(100, token).ConfigureAwait(false);
+                }
+                return double.NaN;
+            }
 
             /// <summary>
             /// 本段降压读数：回读首次降到 target（含容差）的段内时刻作到达时刻，另回该段回读首次跌破 leaveBelow（离开高压平台）的时刻。
@@ -442,7 +448,7 @@ namespace TORNPISolution.Service
             /// </summary>
             public async Task<(double Arrival, double Departure)> DeflateSpanAsync(double leaveBelow, double target, int timeoutSeconds, CancellationToken token)
             {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var watch = Stopwatch.StartNew();
                 while (watch.Elapsed.TotalSeconds < timeoutSeconds)
                 {
                     var crossed = ScanDeflate(leaveBelow, target);
@@ -467,27 +473,6 @@ namespace TORNPISolution.Service
                     }
                 }
                 return null;
-            }
-
-            private async Task<double> CrossSecondsAsync(double target, int timeoutSeconds, CancellationToken token)
-            {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
-                while (watch.Elapsed.TotalSeconds < timeoutSeconds)
-                {
-                    double? crossed = null;
-                    lock (_lock)
-                    {
-                        for (var i = 0; i < _samples.Count; i++)
-                        {
-                            if (_samples[i].P < target - ArrivalTolerance) continue;
-                            crossed = _samples[i].T;
-                            break;
-                        }
-                    }
-                    if (crossed.HasValue) return crossed.Value;
-                    await Task.Delay(100, token).ConfigureAwait(false);
-                }
-                return double.NaN;
             }
 
             /// <summary>本段最近一次采样回读（无采样时退回仪器最近一次稳压读回）</summary>

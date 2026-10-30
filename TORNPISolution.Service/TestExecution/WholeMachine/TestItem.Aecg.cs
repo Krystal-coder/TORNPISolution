@@ -18,7 +18,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A07---**************************AECG100初始化连接
         public async Task Aecg100InitModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("AECG100 初始化连接")) return;
             var config = _configService.Load();
             var settings = config.Aecg100Tester;
 
@@ -59,9 +58,7 @@ namespace TORNPISolution.Service
         //测试项目**************************---A08---**************************ECG采集与启动（ECG-001/002）
         public async Task EcgAcquisitionTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("ECG 采集与启动")) return;
-            var config = _configService.Load();
-            if (!GetProductAvailable(config.NoProductDemoMode))
+            if (!GetProductAvailable())
                 _log.Warn("产品不可用：ECG-001/002 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL");
 
             if (_hw.Aecg100 == null || !_hw.Aecg100.IsConnected)
@@ -106,9 +103,8 @@ namespace TORNPISolution.Service
         //测试项目**************************---A09---**************************ECG心率监测（ECG-004）
         public async Task EcgHeartRateTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("ECG 心率监测")) return;
             var config = _configService.Load();
-            var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+            var productAvailable = GetProductAvailable();
             if (!productAvailable)
                 _log.Warn("产品不可用：ECG-004 仍将输出 AECG100 波形，但产品回传比对项可能 FAIL");
 
@@ -212,7 +208,6 @@ namespace TORNPISolution.Service
         //测试项目**************************---A10---**************************ECG动态范围和线性（ECG-009）
         public async Task EcgSignalQualityTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("ECG 动态范围和线性")) return;
             if (_hw.Aecg100 == null || !_hw.Aecg100.IsConnected)
             {
                 _log.Error("ECG-009 跳过：AECG100 未连接，请先执行 A07 AECG100初始化连接");
@@ -419,9 +414,8 @@ namespace TORNPISolution.Service
         //测试项目**************************---A11---**************************PPG脉搏率模拟测试（PPG-001）
         public async Task PpgHeartRateTestModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("PPG 心率监测")) return;
             var config = _configService.Load();
-            var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+            var productAvailable = GetProductAvailable();
             if (!productAvailable)
                 _log.Warn("产品不可用：PPG-001 仍将输出 AECG100 PPG 波形，但产品回读项会按无回读判 FAIL");
 
@@ -509,14 +503,13 @@ namespace TORNPISolution.Service
         //测试项目**************************---A12---**************************SpO2测量模块（SPO2-001~003）
         public async Task Spo2MeasurementModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血氧测量")) return;
             var config = _configService.Load();
-            var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+            var productAvailable = GetProductAvailable();
             if (!productAvailable)
                 _log.Warn("产品不可用：SPO2-001/002 仍将输出 AECG100 双通道信号，产品状态回读预留");
 
             // SPO2-003 低氧报警为预留不判定项（产品报警回读协议未定稿）：先报不判定，不参与模块判定
-            await collector.SetAsync(SpecItems.Spo2003LowOxygenAlarm, TestItemResult.Demo("预留（不判定）"));
+            await collector.SetAsync(SpecItems.Spo2003LowOxygenAlarm, TestItemResult.OfNotJudged("预留（不判定）"));
 
             // 设置血氧测试模式（0x73 mode=4）
             using (var productForMode = _productFactory())
@@ -574,9 +567,8 @@ namespace TORNPISolution.Service
         //测试项目**************************---A13---**************************SpO2精度检测（SPO2-004~006）
         public async Task Spo2AccuracyModule(TestItemResultCollector collector, CancellationToken token)
         {
-            if (NoInstrumentDemo("血氧精度测试")) return;
             var config = _configService.Load();
-            var productAvailable = GetProductAvailable(config.NoProductDemoMode);
+            var productAvailable = GetProductAvailable();
             if (!productAvailable)
                 _log.Warn("产品不可用：SPO2-004~006 仍将输出 AECG100 双通道信号，但产品回读比对预留（偏差计 0）");
 
@@ -626,9 +618,9 @@ namespace TORNPISolution.Service
         public async Task Spo2PerfusionModule(TestItemResultCollector collector, CancellationToken token)
         {
             _log.Info("SPO2-008/009/010 为预留不判定项（仪器 PI 幅度控制与环境光控制暂未具备自动化条件），报不判定");
-            await collector.SetAsync(SpecItems.Spo2008WeakPerfusion, TestItemResult.Demo("预留（不判定）"));
-            await collector.SetAsync(SpecItems.Spo2009PerfusionHint, TestItemResult.Demo("预留（不判定）"));
-            await collector.SetAsync(SpecItems.Spo2010AmbientLight, TestItemResult.Demo("预留（不判定）"));
+            await collector.SetAsync(SpecItems.Spo2008WeakPerfusion, TestItemResult.OfNotJudged("预留（不判定）"));
+            await collector.SetAsync(SpecItems.Spo2009PerfusionHint, TestItemResult.OfNotJudged("预留（不判定）"));
+            await collector.SetAsync(SpecItems.Spo2010AmbientLight, TestItemResult.OfNotJudged("预留（不判定）"));
         }
     }
 }

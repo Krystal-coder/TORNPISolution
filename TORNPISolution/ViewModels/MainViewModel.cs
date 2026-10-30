@@ -837,7 +837,7 @@ namespace TORNPISolution.ViewModels
                     {
                         foreach (var item in module.Items)
                         {
-                            // 不判定项（演示/预留/仅统计）保持“未测试”，不强制 FAIL
+                            // 不判定项（预留/仅统计）保持“未测试”，不强制 FAIL
                             if (item.IsReportedNotJudged || item.IsDisplayOnly) continue;
                             if (results.ContainsKey(item.Name) && item.Result != TestResultStatus.NotTested) continue;
                             if (item.Result == TestResultStatus.NotTested)

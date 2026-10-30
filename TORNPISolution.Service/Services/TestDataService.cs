@@ -87,7 +87,7 @@ namespace TORNPISolution.Service
             // 单事务：轮次 + 测试项 + 逐点，任何一步失败整体回滚
             await using var tx = await db.Database.BeginTransactionAsync(ct);
 
-            // 计数与整体判定只统计参与判定的项（只展示/演示项不计），与界面模块判定同口径
+            // 计数与整体判定只统计参与判定的项（只展示/不判定项不计），与界面模块判定同口径
             var judged = snapshot.Items.Where(i => !i.DisplayOnly && !i.NotJudged).ToList();
             var pass = judged.Count(i => i.Result == TestResultStatus.Pass);
             var fail = judged.Count(i => i.Result == TestResultStatus.Fail);

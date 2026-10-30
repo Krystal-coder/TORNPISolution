@@ -76,7 +76,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>只展示不判定（如 BP-005 平均值项）：不计入模块判定</summary>
         public bool DisplayOnly { get; set; }
 
-        /// <summary>演示不判定（无产品演示模式）：保持未测试</summary>
+        /// <summary>不判定（预留项/未配置判定区间）：保持未测试</summary>
         public bool NotJudged { get; set; }
 
         /// <summary>本项耗时（秒）：上一项上报（模块首项取派发时刻）到本项上报的墙钟；null = 本轮没跑到这项</summary>
@@ -142,7 +142,7 @@ namespace TORNPISolution.Share.Models
         /// <summary>报告编号：日期+当天序号（如 20261022-0001），toast/列表/PDF 文件名同一个号</summary>
         public string ReportNo { get; init; } = string.Empty;
 
-        /// <summary>参与判定的测试项计数（只展示/演示项不计入）</summary>
+        /// <summary>参与判定的测试项计数（只展示/不判定项不计入）</summary>
         public int PassCount { get; init; }
 
         public int FailCount { get; init; }
