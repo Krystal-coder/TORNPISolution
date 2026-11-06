@@ -88,6 +88,10 @@ namespace TORNPISolution
             // 测试数据入库：单例只持日志，每轮快照在方法内自写（单事务 3 张表），不跨轮残留
             services.AddSingleton<ITestDataService, TestDataService>();
             services.AddSingleton<ITestReportService, TestReportService>();
+            // 加速度充电检查：这一路自己常驻持有产品串口（与整机方案的 ProductController 抢同一个 COM 口，互斥在界面上挡）
+            services.AddSingleton<AccelCheckService>();
+            // ECG 波形采集：与加速度充电检查同一套串口控制（各自一路常驻会话，互斥同样在界面上挡）
+            services.AddSingleton<EcgCaptureService>();
             services.AddSingleton<IAppStateService, AppStateService>();
             services.AddSingleton<Func<IProductController>>(sp =>
             {
@@ -97,6 +101,8 @@ namespace TORNPISolution
 
             services.AddTransient<FlashingViewModel>();
             services.AddTransient<BoardChannelViewModel>();
+            services.AddTransient<AccelCheckViewModel>();
+            services.AddTransient<EcgCaptureViewModel>();
             services.AddTransient<MainViewModel>();
             services.AddTransient<InstrumentConfigViewModel>();
             services.AddTransient<BpaParamConfigViewModel>();

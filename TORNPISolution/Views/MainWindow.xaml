@@ -271,6 +271,7 @@
                             </DataTemplate>
                         </MenuItem.HeaderTemplate>
                     </MenuItem>
+
                 </Menu>
 
                 <!-- 顶栏右侧操作：加载方案（仅整机页显示）+ 返回工位选择 -->
@@ -285,10 +286,11 @@
                             <TextBlock Text="加载方案" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button Content="← 返回工位选择" Command="{Binding BackToEntryCommand}"
+                    <Button Content="{Binding BackButtonText}" Command="{Binding BackToEntryCommand}"
                             Style="{StaticResource Style.ToolButton}"
                             Visibility="{Binding ShowBackButton, Converter={StaticResource BoolToVisibility}}"
-                            ToolTip="回到工位选择页（任一工位正在跑时不可点）"/>
+                            ToolTipService.ShowOnDisabled="True"
+                            ToolTip="回上一级页面（任一工位正在跑时不可点；辅助功能页回整机测试页，且要先点「断开」交出口）"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -336,6 +338,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="14,12,10,8">
@@ -417,6 +420,36 @@
                                Style="{StaticResource Style.SubText}" TextAlignment="Center" TextWrapping="Wrap"
                                VerticalAlignment="Center" Margin="16,0"
                                Visibility="{Binding HasLibraryModules, Converter={StaticResource InverseBoolToVisibility}}"/>
+
+                    <!-- 辅助工具：不拖进方案、不产测试项，整页切换；与整机测试共用产品串口，任一边在用时另一边进不来 -->
+                    <StackPanel Grid.Row="2" Margin="8,0,8,10">
+                        <Border Height="1" Background="{StaticResource Brush.Panel.Border}" Margin="0,0,0,8"/>
+                        <TextBlock Text="辅助工具" Style="{StaticResource Style.GroupTitle}" Margin="2,0,0,4"/>
+                        <Button Command="{Binding OpenAccelCheckPageCommand}" Padding="10,8" Margin="0"
+                                HorizontalContentAlignment="Stretch"
+                                Style="{StaticResource Style.ToolButton}"
+                                ToolTip="点击整页切换：不拖模块、不进方案、不产测试项。与整机测试共用产品串口，任一边在用时另一边进不来">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Pulse" Width="15" Height="15"
+                                                         VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{StaticResource Brush.Primary}"/>
+                                <TextBlock Text="加速度充电检查" VerticalAlignment="Center" FontSize="13"
+                                           FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Main}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding OpenEcgCapturePageCommand}" Padding="10,8" Margin="0,8,0,0"
+                                HorizontalContentAlignment="Stretch"
+                                Style="{StaticResource Style.ToolButton}"
+                                ToolTip="点击整页切换：不拖模块、不进方案、不产测试项。与整机测试、加速度充电检查共用同一个产品串口，任一边在用时另一边进不来">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="HeartPulse" Width="15" Height="15"
+                                                         VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{StaticResource Brush.Primary}"/>
+                                <TextBlock Text="ECG 波形采集" VerticalAlignment="Center" FontSize="13"
+                                           FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Main}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>
@@ -937,6 +970,18 @@
                             Visibility="{Binding DataContext.IsFlashingPage,
                                          RelativeSource={RelativeSource AncestorType=Window},
                                          Converter={StaticResource BoolToVisibility}}"/>
+
+        <!-- 辅助功能：加速度充电检查 -->
+        <views:AccelCheckView DataContext="{Binding AccelCheck}"
+                              Visibility="{Binding DataContext.IsAccelCheckPage,
+                                           RelativeSource={RelativeSource AncestorType=Window},
+                                           Converter={StaticResource BoolToVisibility}}"/>
+
+        <!-- 辅助功能：ECG 波形采集 -->
+        <views:EcgCaptureView DataContext="{Binding EcgCapture}"
+                              Visibility="{Binding DataContext.IsEcgCapturePage,
+                                           RelativeSource={RelativeSource AncestorType=Window},
+                                           Converter={StaticResource BoolToVisibility}}"/>
         </Grid>
     </DockPanel>
 </Window>

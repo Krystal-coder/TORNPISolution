@@ -622,7 +622,7 @@ namespace TORNPISolution.ViewModels
         /// <summary>Customized 包络参数区可用</summary>
         public bool IsCustomizedMethod => DynamicMethod == "Customized";
 
-        // ==================== 气路类两项判定区间（A18 放气速率 / A22 气路泄露，仅 BPA700 静态压力序列流程） ====================
+        // ==================== 气路类两项判定区间（放气速率 / 气路泄露，BPA700 静态压力序列流程） ====================
 
         /// <summary>加压时间 t1 合格下限文本（s，留空=不限下）</summary>
         public string AirPathInflateTimeMinText
@@ -680,94 +680,62 @@ namespace TORNPISolution.ViewModels
             set => Params.AirPath.LowLossMax = ParseOptionalNumber(value);
         }
 
-        // ==================== JJG692-2010 标准检测（仅康伟达 0x04 功能的放气速率 / 气密性两项） ====================
+        // ==================== 康伟达气路类两项判定区间（放气速率 / 气路泄露，压力源 + 慢释阀流程） ====================
 
-        /// <summary>袖带类型下拉项（帧低 4 位，下标即协议值；0x12/0x13 使用）</summary>
-        public List<string> JjgCuffTypes { get; } = new() { "外部袖带", "内部成人" };
-
-        /// <summary>袖带类型（桥接：下拉项名 ↔ 协议值）</summary>
-        public string JjgCuffType
+        /// <summary>加压时间 t1 合格下限文本（s，留空=不限下）</summary>
+        public string KangwendaAirPathInflateTimeMinText
         {
-            get => JjgIndexToName(Params.Jjg692.CuffType, JjgCuffTypes);
-            set => Params.Jjg692.CuffType = JjgNameToIndex(value, JjgCuffTypes);
+            get => FormatOptionalNumber(Params.KangwendaAirPath.InflateTimeMin);
+            set => Params.KangwendaAirPath.InflateTimeMin = ParseOptionalNumber(value);
         }
 
-        /// <summary>整项检测超时（秒，仅 0x12/0x13 等设备回包用）</summary>
-        public double JjgTimeoutSeconds
+        /// <summary>加压时间 t1 合格上限文本（s，留空兜底 30）</summary>
+        public string KangwendaAirPathInflateTimeMaxText
         {
-            get => Params.Jjg692.TimeoutSeconds;
-            set
-            {
-                Params.Jjg692.TimeoutSeconds = value <= 0 ? 300 : (int)Math.Round(value);
-                OnPropertyChanged();
-            }
+            get => FormatOptionalNumber(Params.KangwendaAirPath.InflateTimeMax);
+            set => Params.KangwendaAirPath.InflateTimeMax = ParseOptionalNumber(value);
         }
 
-        /// <summary>0x12 放气速率（听诊）帧参数</summary>
-        public double JjgDeflationSetPressure
+        /// <summary>泄压时间 t2 合格下限文本（s，留空=不限下）</summary>
+        public string KangwendaAirPathDeflateTimeMinText
         {
-            get => Params.Jjg692.DeflationRate.SetPressure;
-            set => Params.Jjg692.DeflationRate.SetPressure = value;
+            get => FormatOptionalNumber(Params.KangwendaAirPath.DeflateTimeMin);
+            set => Params.KangwendaAirPath.DeflateTimeMin = ParseOptionalNumber(value);
         }
 
-        public double JjgDeflationStartPressure
+        /// <summary>泄压时间 t2 合格上限文本（s，留空兜底 60）</summary>
+        public string KangwendaAirPathDeflateTimeMaxText
         {
-            get => Params.Jjg692.DeflationRate.StartPressure;
-            set => Params.Jjg692.DeflationRate.StartPressure = value;
+            get => FormatOptionalNumber(Params.KangwendaAirPath.DeflateTimeMax);
+            set => Params.KangwendaAirPath.DeflateTimeMax = ParseOptionalNumber(value);
         }
 
-        public double JjgDeflationStopPressure
+        /// <summary>高压段泄气量 ΔP_H 合格下限文本（mmHg，留空=不限下：终点高于起点时差值为负）</summary>
+        public string KangwendaAirPathHighLossMinText
         {
-            get => Params.Jjg692.DeflationRate.StopPressure;
-            set => Params.Jjg692.DeflationRate.StopPressure = value;
+            get => FormatOptionalNumber(Params.KangwendaAirPath.HighLossMin);
+            set => Params.KangwendaAirPath.HighLossMin = ParseOptionalNumber(value);
         }
 
-        /// <summary>放气速率合格下限文本（留空=不判，与上限都留空时该项不判 PASS/FAIL 只报实测值）</summary>
-        public string JjgDeflationMinRateText
+        /// <summary>高压段泄气量 ΔP_H 合格上限文本（mmHg，留空兜底 2）</summary>
+        public string KangwendaAirPathHighLossMaxText
         {
-            get => FormatOptionalNumber(Params.Jjg692.DeflationRate.MinRate);
-            set => Params.Jjg692.DeflationRate.MinRate = ParseOptionalNumber(value);
+            get => FormatOptionalNumber(Params.KangwendaAirPath.HighLossMax);
+            set => Params.KangwendaAirPath.HighLossMax = ParseOptionalNumber(value);
         }
 
-        /// <summary>放气速率合格上限文本（留空=不判）</summary>
-        public string JjgDeflationMaxRateText
+        /// <summary>低压段泄气量 ΔP_L 合格下限文本（mmHg，留空=不限下）</summary>
+        public string KangwendaAirPathLowLossMinText
         {
-            get => FormatOptionalNumber(Params.Jjg692.DeflationRate.MaxRate);
-            set => Params.Jjg692.DeflationRate.MaxRate = ParseOptionalNumber(value);
+            get => FormatOptionalNumber(Params.KangwendaAirPath.LowLossMin);
+            set => Params.KangwendaAirPath.LowLossMin = ParseOptionalNumber(value);
         }
 
-        /// <summary>0x13 气密性帧参数</summary>
-        public double JjgAirtightSetPressure
+        /// <summary>低压段泄气量 ΔP_L 合格上限文本（mmHg，留空兜底 2）</summary>
+        public string KangwendaAirPathLowLossMaxText
         {
-            get => Params.Jjg692.Airtightness.SetPressure;
-            set => Params.Jjg692.Airtightness.SetPressure = value;
-        }
-
-        /// <summary>气密性稳压时间（秒）：帧内只占 1 字节，超 255 会被 (byte) 强转静默截成低字节</summary>
-        public double JjgAirtightStabilizeSeconds
-        {
-            get => Params.Jjg692.Airtightness.StabilizeSeconds;
-            set
-            {
-                Params.Jjg692.Airtightness.StabilizeSeconds = Math.Clamp((int)Math.Round(value), 0, 255);
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>气密性漏气率合格上限文本（留空=不判）</summary>
-        public string JjgAirtightMaxLeakRateText
-        {
-            get => FormatOptionalNumber(Params.Jjg692.Airtightness.MaxLeakRate);
-            set => Params.Jjg692.Airtightness.MaxLeakRate = ParseOptionalNumber(value);
-        }
-
-        private static string JjgIndexToName(int index, List<string> names)
-            => index >= 0 && index < names.Count ? names[index] : names[0];
-
-        private static int JjgNameToIndex(string? name, List<string> names)
-        {
-            var i = names.IndexOf(name ?? string.Empty);
-            return i < 0 ? 0 : i;
+            get => FormatOptionalNumber(Params.KangwendaAirPath.LowLossMax);
+            set => Params.KangwendaAirPath.LowLossMax = ParseOptionalNumber(value);
         }
 
         /// <summary>可空规格值→输入框文本（null 显示空串）</summary>
@@ -798,7 +766,7 @@ namespace TORNPISolution.ViewModels
 
         /// <summary>
         /// 复制生效设备的静态压力点 + BP-004 压力组 + BP-005 心率点及其轮数/休息到当前页签；逐项新建实例而非搬列表，两台设备共享同一个点位对象时改一边会连带另一边。
-        /// 设备专属参数（充气方式/量测时间/方法/包络/JJG692）不复制。
+        /// 设备专属参数（充气方式/量测时间/方法/包络/气路判定区间）不复制。
         /// </summary>
         private void CopyPointsFromActive()
         {

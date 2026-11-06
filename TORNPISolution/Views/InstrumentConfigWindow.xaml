@@ -209,21 +209,50 @@
                         </Style>
                     </ScrollViewer.Style>
                     <Border Style="{StaticResource Style.PanelCard}" Padding="4">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="14,10,14,4">
-                                <materialDesign:PackIcon Kind="Chip" Width="18" Height="18"
-                                                         Foreground="{StaticResource Brush.Primary}"
-                                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <StackPanel>
-                                    <TextBlock Text="被测产品（DUT）"
-                                               Style="{StaticResource Style.PanelTitle}"/>
-                                    <TextBlock Text="串口 232 · AT 指令通讯"
-                                               Style="{StaticResource Style.SubText}" Margin="0,2,0,0"/>
+                        <!-- 上下两条 * 行把产测模式这块夹在中间 -->
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*" MinHeight="20"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*" MinHeight="20"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0">
+                                <StackPanel Orientation="Horizontal" Margin="14,10,14,4">
+                                    <materialDesign:PackIcon Kind="Chip" Width="18" Height="18"
+                                                             Foreground="{StaticResource Brush.Primary}"
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="被测产品（DUT）"
+                                                   Style="{StaticResource Style.PanelTitle}"/>
+                                        <TextBlock Text="串口 232 · AT 指令通讯"
+                                                   Style="{StaticResource Style.SubText}" Margin="0,2,0,0"/>
+                                    </StackPanel>
                                 </StackPanel>
+                                <ContentControl Content="{Binding Config.Product}"
+                                                ContentTemplate="{StaticResource Template.SerialEditor}"/>
                             </StackPanel>
-                            <ContentControl Content="{Binding Config.Product}"
-                                            ContentTemplate="{StaticResource Template.SerialEditor}"/>
-                        </StackPanel>
+
+                            <!-- 产测模式 -->
+                            <Border Grid.Row="2" Margin="12,0" Padding="14,12" CornerRadius="6" Background="#F7F9FC">
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="进入产测" Style="{StaticResource Style.PrimaryButton}" MinWidth="88"
+                                                Command="{Binding EnterProductionModeCommand}"
+                                                ToolTip="只在用串口助手手动联调、产品没进这个态时点这里；正常由「加速度充电检查」连接时代发，那一轮占着口或整机在跑时是灰的"/>
+                                        <Button Content="退出产测" Style="{StaticResource Style.ToolButton}" MinWidth="88" Margin="12,0,0,0"
+                                                Command="{Binding ExitProductionModeCommand}"
+                                                ToolTip="产品已在这个态时才亮；点它把产品退回正常态，否则它会一直停在产测里"/>
+                                    </StackPanel>
+                                    <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <TextBlock Text="产测模式" Style="{StaticResource Style.GroupTitle}"/>
+                                        <TextBlock Style="{StaticResource Style.SubText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                                   Text="{Binding ProductionModeText}"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </Grid>
                     </Border>
                 </ScrollViewer>
 

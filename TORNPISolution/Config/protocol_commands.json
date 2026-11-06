@@ -4,6 +4,11 @@
     "FuncCode": 7,
     "Description": "进入产测模式（打开串口后立即发送防产品休眠，须在 0x72/0x74 查询前发送）"
   },
+  "CtrlExitProductionTestMode": {
+    "Code": 16,
+    "FuncCode": 7,
+    "Description": "退出产测模式（与进入产测 0x01 成对；样帧 EF 02 07 10 96 CC FE）"
+  },
   "CtrlGetProductTime": {
     "Code": 48,
     "FuncCode": 2,
@@ -211,6 +216,16 @@
     "FuncCode": 7,
     "Description": "设置采样频率/上传间隔"
   },
+  "CtrlStartAccelSensor": {
+    "Code": 96,
+    "FuncCode": 7,
+    "Description": "启动加速度传感器（产品随后以 0x07/0x60 持续推采样帧：uint32 序号 + int16 X/Y/Z（mg）+ 2 字节保留 + uint32 时标）"
+  },
+  "CtrlStopAccelSensor": {
+    "Code": 97,
+    "FuncCode": 7,
+    "Description": "关闭加速度传感器（停止 0x60 采样推送）"
+  },
   "CtrlStartPressureSensor": {
     "Code": 101,
     "FuncCode": 7,
@@ -225,6 +240,11 @@
     "Code": 103,
     "FuncCode": 7,
     "Description": "设置关闭压力传感器"
+  },
+  "CtrlReadPressureKb": {
+    "Code": 195,
+    "FuncCode": 7,
+    "Description": "读取压力校准K/B值"
   },
   "CtrlStartPumpTest": {
     "Code": 104,

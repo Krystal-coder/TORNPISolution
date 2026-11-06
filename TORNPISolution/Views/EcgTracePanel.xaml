@@ -1,0 +1,122 @@
+<UserControl x:Class="TORNPISolution.Views.EcgTracePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+             xmlns:conv="clr-namespace:TORNPISolution.Converters"
+             xmlns:viewModels="clr-namespace:TORNPISolution.ViewModels"
+             mc:Ignorable="d"
+             FontFamily="Microsoft YaHei UI"
+             d:DataContext="{d:DesignInstance Type=viewModels:EcgTraceChannel}"
+             d:DesignHeight="420" d:DesignWidth="1300">
+
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 本路轴设置：X 宽度 + Y 上下限 + 应用/放大/缩小/重置缩放/回到最新。
+             右侧读数放独立一档，变长不会把左边的键顶走（WrapPanel 里一个读数变长会整条重排） -->
+        <Border Grid.Row="0" Style="{StaticResource Style.PanelCard}" Padding="12,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding Title}" Style="{StaticResource Style.GroupTitle}"
+                           FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="X宽度(s)" Style="{StaticResource Style.FieldLabel}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBox Width="60" Style="{StaticResource Style.CfgBox}" HorizontalContentAlignment="Center"
+                             Text="{Binding WindowText, UpdateSourceTrigger=LostFocus}"/>
+                    <TextBlock Text="Y最小" Style="{StaticResource Style.FieldLabel}" VerticalAlignment="Center" Margin="10,0,4,0"/>
+                    <TextBox Width="80" Style="{StaticResource Style.CfgBox}" HorizontalContentAlignment="Center"
+                             Text="{Binding YMinText, UpdateSourceTrigger=LostFocus}"/>
+                    <TextBlock Text="Y最大" Style="{StaticResource Style.FieldLabel}" VerticalAlignment="Center" Margin="10,0,4,0"/>
+                    <TextBox Width="80" Style="{StaticResource Style.CfgBox}" HorizontalContentAlignment="Center"
+                             Text="{Binding YMaxText, UpdateSourceTrigger=LostFocus}"/>
+                    <Button Content="应用" Command="{Binding ApplyAxisCommand}" Style="{StaticResource Style.ToolButton}"
+                            Margin="8,0,0,0" Padding="8,4"
+                            ToolTip="按这里的 X 宽度与 Y 上下限画；顺带把横轴拨回贴着最新数据"/>
+                    <Button Content="➕ 放大" Command="{Binding ZoomInCommand}" Style="{StaticResource Style.ToolButton}"
+                            Margin="6,0,0,0" Padding="8,4"
+                            ToolTip="横纵两轴各收到 0.8 倍，X 宽度与 Y 上下限跟着回写"/>
+                    <Button Content="➖ 缩小" Command="{Binding ZoomOutCommand}" Style="{StaticResource Style.ToolButton}"
+                            Margin="6,0,0,0" Padding="8,4" ToolTip="横纵两轴各放到 1.25 倍"/>
+                    <Button Content="🔄 重置缩放" Command="{Binding ResetZoomCommand}" Style="{StaticResource Style.ToolButton}"
+                            Margin="6,0,0,0" Padding="8,4"
+                            ToolTip="X 宽度回到 12 s、Y 上下限回到默认量程，横轴重新贴着最新数据"/>
+                    <Button Content="回到最新" Command="{Binding FollowLatestCommand}" Style="{StaticResource Style.ToolButton}"
+                            Margin="6,0,0,0" Padding="8,4"
+                            ToolTip="只把横轴拨回贴着最新数据，Y 量程保持现场设置不变"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="2" Text="提示：Shift + 左键拖拽框选测量" Style="{StaticResource Style.SubText}"
+                           VerticalAlignment="Center" Margin="20,0,0,0"/>
+
+                <TextBlock Grid.Column="3" Text="{Binding CursorText}" Style="{StaticResource Style.SubText}"
+                           VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0" MinWidth="150"
+                           TextAlignment="Right" FontFamily="Consolas"
+                           ToolTip="鼠标十字标钉住的那个采样点的读数（时间 / 本路数值）"/>
+            </Grid>
+        </Border>
+
+        <!-- 绘图区 + 覆盖层。滚轮缩放、按住左键拖动平移由图表自己做（横纵两轴都可缩）；Shift + 左键拖出一段才进框选统计 -->
+        <Border Grid.Row="1" Style="{StaticResource Style.PanelCard}" Margin="0,6,0,0" Padding="4">
+            <Grid>
+                <lvc:CartesianChart x:Name="Chart"
+                                    Series="{Binding Series}"
+                                    XAxes="{Binding XAxes}"
+                                    YAxes="{Binding YAxes}"
+                                    ZoomMode="Both"
+                                    LegendPosition="Hidden"
+                                    TooltipPosition="Hidden"
+                                    MouseMove="Chart_MouseMove"
+                                    MouseLeave="Chart_MouseLeave"
+                                    PreviewMouseLeftButtonDown="Chart_PreviewMouseLeftButtonDown"
+                                    PreviewMouseMove="Chart_PreviewMouseMove"
+                                    PreviewMouseLeftButtonUp="Chart_PreviewMouseLeftButtonUp"/>
+
+                <Canvas x:Name="Overlay" IsHitTestVisible="False">
+                    <Rectangle x:Name="SelectionRect" Fill="#33007ACC" Stroke="#AA007ACC"
+                               StrokeThickness="1" StrokeDashArray="4 2" Visibility="Collapsed"/>
+                    <Line x:Name="CursorVLine" Stroke="#66007ACC" StrokeThickness="1" Visibility="Collapsed"/>
+                    <Line x:Name="CursorHLine" Stroke="#66007ACC" StrokeThickness="1" Visibility="Collapsed"/>
+                    <Ellipse x:Name="CursorMarker" Width="9" Height="9" Fill="White"
+                             Stroke="{StaticResource Brush.Primary}" StrokeThickness="2" Visibility="Collapsed"/>
+                </Canvas>
+            </Grid>
+        </Border>
+
+        <!-- 框选统计条：没框选时这行只剩一句操作提示 -->
+        <Border Grid.Row="2" Style="{StaticResource Style.PanelCard}" Margin="0,6,0,0" Padding="12,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="区间统计" Style="{StaticResource Style.FieldLabel}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Style="{StaticResource Style.SubText}"
+                           TextTrimming="CharacterEllipsis">
+                    <Run Text="{Binding SelectionRangeText, Mode=OneWay}"/><Run Text="  "/><Run Text="{Binding SelectionValueText, Mode=OneWay}"/>
+                </TextBlock>
+                <Button Grid.Column="2" Content="清除框选" Command="{Binding ClearSelectionCommand}"
+                        Style="{StaticResource Style.ToolButton}" Padding="8,4"
+                        Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

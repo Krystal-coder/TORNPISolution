@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- 采样 CSV 收尾时另生成标红版 xlsx 用（每列最大/最小值标红）：0.104.2 离线包源可还原；图表引擎（XLChart）该版还是 internal，Roll 曲线页的原生折线图由 OpenXML 直补 -->
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.1" />
     <PackageReference Include="QuestPDF" Version="2024.7.3" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />

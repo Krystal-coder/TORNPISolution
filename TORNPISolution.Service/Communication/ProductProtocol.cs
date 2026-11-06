@@ -180,9 +180,15 @@ namespace TORNPISolution.Service.Communication
 
         // ---- 硬件控制/产测（Func=0x07）----
         public static ProductCmd SetSampleRate          => GetCmd("CtrlSetSampleRate");
+        // 加速度传感器启停 + 退出产测：产测态与采集帧都走 0x07（实机由独立工装程序证实）
+        public static ProductCmd StartAccelSensor       => GetCmd("CtrlStartAccelSensor");
+        public static ProductCmd StopAccelSensor        => GetCmd("CtrlStopAccelSensor");
+        public static ProductCmd ExitProductionTestMode => GetCmd("CtrlExitProductionTestMode");
         public static ProductCmd StartPressureSensor    => GetCmd("CtrlStartPressureSensor");
         public static ProductCmd CalibratePressureSensor=> GetCmd("CtrlCalibratePressureSensor");
         public static ProductCmd ClosePressureSensor    => GetCmd("CtrlClosePressureSensor");
+        /// <summary>读取压力校准 K/B（Func=0x07/Code=0xC3，无参帧 EF 02 07 C3 D7 51 FE）：校准写完回读校验，应答参数区 = float K + float B（小端）</summary>
+        public static ProductCmd ReadPressureKb         => GetCmd("CtrlReadPressureKb");
         public static ProductCmd StartPumpTest          => GetCmd("CtrlStartPumpTest");
         public static ProductCmd StopPumpTest           => GetCmd("CtrlStopPumpTest");
         public static ProductCmd OpenValveTest          => GetCmd("CtrlOpenValveTest");
@@ -241,6 +247,73 @@ namespace TORNPISolution.Service.Communication
                 millivolts[i] = (short)ReadUInt16LE(payload, i * 2) / 100.0;
             return millivolts;
         }
+
+        /// <summary>成对帧式一个采样点占的字节数：ADC 4 + 电压码值 4（均 int32 小端）</summary>
+        public const int EcgWavePairBytes = 8;
+
+        /// <summary>成对帧式的采样率（SPS）：实机 500 点/秒，与上面文档口径的 250 并存，采集页按这条走</summary>
+        public const int EcgWavePairSampleRate = 500;
+
+        /// <summary>
+        /// 解析 0x8D 的成对帧式：参数区 = N × (int32 LE ADC + int32 LE 电压码值)，电压码值 /100 = mV（1 码值 = 10μV）。
+        /// 不足一组的尾字节丢弃。
+        /// </summary>
+        /// <param name="payload">帧数据区（不含 Func/Ctrl/CRC）</param>
+        /// <returns>按到达顺序排列的采样点；参数区凑不出一组时返回 null</returns>
+        public static EcgWavePoint[]? ParseEcgWavePairs(byte[] payload)
+        {
+            if (payload == null) return null;
+
+            var count = payload.Length / EcgWavePairBytes;
+            if (count == 0) return null;
+
+            var points = new EcgWavePoint[count];
+            for (var i = 0; i < count; i++)
+                points[i] = new EcgWavePoint(
+                    unchecked((int)ReadUInt32LE(payload, i * EcgWavePairBytes)),
+                    unchecked((int)ReadUInt32LE(payload, i * EcgWavePairBytes + 4)) / 100.0);
+            return points;
+        }
+
+        // ==================== 加速度采样上报（0x60）====================
+
+        /// <summary>0x60 采样帧参数区最短长度：设备序号 4 + X/Y/Z 各 2 + 预留 2 + 设备时标 4（字节）</summary>
+        public const int AccelSamplePayloadBytes = 16;
+
+        /// <summary>
+        /// 解析 0x60 采样推送帧：payload = uint32 LE 设备序号 + int16 LE X/Y/Z（mg）+ 2 字节未用 + uint32 LE 设备时标。
+        /// 与同码的启动应答靠参数区长度区分（应答不足 <see cref="AccelSamplePayloadBytes"/>）。
+        /// </summary>
+        public static AccelSample? ParseAccelSample(byte[] payload, DateTime receivedAt)
+        {
+            if (payload == null || payload.Length < AccelSamplePayloadBytes) return null;
+
+            return new AccelSample
+            {
+                DeviceSeq = ReadUInt32LE(payload, 0),
+                X = (short)ReadUInt16LE(payload, 4),
+                Y = (short)ReadUInt16LE(payload, 6),
+                Z = (short)ReadUInt16LE(payload, 8),
+                ReceivedAt = receivedAt,
+            };
+        }
+
+        // ==================== 压力校准 K/B 回读（0x07 0xC3） ====================
+
+        /// <summary>
+        /// 解析 0x07/0xC3 应答参数区：2 × float 小端（BP_K、BP_B）。
+        /// 实机样例 EF 0A 07 C3 66 66 08 C2 00 00 E0 C0 97 12 FE → K ≈ -34.1、B = -7.0。
+        /// 出厂默认值见 SpecItems.PcalKbDefaultK / PcalKbDefaultB（参数区不足 8 字节返回 null）。
+        /// </summary>
+        public static (double K, double B)? ParsePressureKb(byte[]? payload)
+        {
+            if (payload == null || payload.Length < 8) return null;
+            return (ReadSingleLE(payload, 0), ReadSingleLE(payload, 4));
+        }
+
+        /// <summary>从 payload 按小端序读取 float（IEEE754 位型）</summary>
+        public static float ReadSingleLE(byte[] payload, int offset)
+            => BitConverter.Int32BitsToSingle(unchecked((int)ReadUInt32LE(payload, offset)));
 
         // ==================== 包构建 ====================
 

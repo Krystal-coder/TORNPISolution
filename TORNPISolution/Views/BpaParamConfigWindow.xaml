@@ -656,25 +656,25 @@
                                     <TextBlock Text="加压时间 t1 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathInflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="秒（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="秒（默认 0，清空保存后恢复默认）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
                                     <TextBlock Text="加压时间 t1 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathInflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="秒（留空按 30 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="秒（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,16,4">
                                     <TextBlock Text="泄压时间 t2 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathDeflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="秒（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="秒（默认 20）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
                                     <TextBlock Text="泄压时间 t2 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathDeflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="秒（留空按 60 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="秒（默认 60）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </UniformGrid>
                         </Border>
@@ -687,138 +687,111 @@
                                     <TextBlock Text="高压泄气值 ΔP_H 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathHighLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg（留空=不限下限：终点高于起点时差值为负）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="mmHg（默认 0：终点高于起点时差值为负）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
                                     <TextBlock Text="高压泄气值 ΔP_H 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathHighLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg（留空按 2 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="mmHg（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,16,4">
                                     <TextBlock Text="低压泄气值 ΔP_L 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathLowLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg（留空=不限下限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="mmHg（默认 0）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
                                     <TextBlock Text="低压泄气值 ΔP_L 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
                                              Text="{Binding AirPathLowLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg（留空按 2 兜底）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="mmHg（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </UniformGrid>
                         </Border>
 
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
-                                   Text="说明：两项的判定区间写进 TestParams.AirPath 节点，保存即生效（测试项上的规格范围在每次执行时按本配置现算回填，不必重新拖模块）；&#10;泄气量两项以产品上报值（0x76 采样压力差）判定，仪器侧差值同列展示；加压/泄压时间两列为同一实测时长，产品列文本附该点 0x76 采样压力；&#10;上下限都留空时该项不判 PASS/FAIL，只报实测值。"/>
+                                   Text="说明：两项的判定区间写进 TestParams.AirPath 节点，保存即生效（测试项上的规格范围在每次执行时按本配置现算回填，不必重新拖模块）；&#10;泄气量两项以产品上报值（0x76 采样压力差）判定，仪器侧差值同列展示；加压/泄压时间两列为同一实测时长，产品列文本附该点 0x76 采样压力；&#10;输入框清空后保存会回到默认值（t1 0~10s、t2 20~60s、ΔP 0~10mmHg），即清空 = 恢复默认。"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- JJG692-2010 标准检测（仅康伟达 0x04 功能，BPA700 页签隐藏本页） -->
+            <!-- 康伟达气路类两项判定区间（A19 放气速率 / A20 气路泄露，压力源 + 慢释阀流程，BPA700 页签隐藏本页） -->
             <TabItem Visibility="{Binding IsKangwenda, Converter={StaticResource KwVis}}">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="CheckAll" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <TextBlock Text="JJG692检测" VerticalAlignment="Center"/>
+                        <materialDesign:PackIcon Kind="WeatherWindy" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="气路测试" VerticalAlignment="Center"/>
                     </StackPanel>
                 </TabItem.Header>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="8,4">
 
-                        <!-- 通用：0x12/0x13 帧内袖带类型 + 等待设备回包超时 -->
-                        <TextBlock Text="通用参数（仅放气速率/气密性两项帧内使用，设备专属）" Style="{StaticResource Style.GroupTitle}"/>
+                        <TextBlock Text="放气速率测试（A19）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
                             <UniformGrid Columns="2">
                                 <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="袖带类型" Style="{StaticResource Style.FieldLabel}"/>
-                                    <ComboBox Height="30" ItemsSource="{Binding JjgCuffTypes}"
-                                              SelectedItem="{Binding JjgCuffType, Mode=TwoWay}"/>
-                                    <TextBlock Text="0x12/0x13 帧低 4 位（两项共用）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                    <TextBlock Text="加压时间 t1 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding KangwendaAirPathInflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（默认 0）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
-                                    <TextBlock Text="检测超时" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBlock Text="加压时间 t1 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgTimeoutSeconds, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="秒（仅 0x12/0x13 等设备自行升压/循环/泄放的兜底上限）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                             Text="{Binding KangwendaAirPathInflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,16,4">
+                                    <TextBlock Text="泄压时间 t2 下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding KangwendaAirPathDeflateTimeMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（默认 20）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,4,0,4">
+                                    <TextBlock Text="泄压时间 t2 上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBox Style="{StaticResource Style.CfgBox}"
+                                             Text="{Binding KangwendaAirPathDeflateTimeMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="秒（默认 60）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </UniformGrid>
                         </Border>
 
-                        <TextBlock Text="血压重复性（已归入 A06 的 BP-004）" Style="{StaticResource Style.GroupTitle}"/>
+                        <TextBlock Text="气路泄露测试（A20）" Style="{StaticResource Style.GroupTitle}"/>
                         <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
                                 CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
-                            <TextBlock Style="{StaticResource Style.Hint}" TextWrapping="Wrap"
-                                       Text="协议 0x11 设备自检帧只回“完成/失败”状态位、不带收缩/舒张数值，算不出极差，所以不单设重复性检测模块；&#10;测试要求文档的 BP-004 本就是“动态血压精度及重复性”，已归 A06：一轮一项算偏差、每压力组一项算极差；&#10;压力组与轮数在“动态血压”页配置，±2mmHg 判据按文档写死、不需配置。"/>
-                        </Border>
-
-                        <TextBlock Text="放气速率（听诊）（上行 0x04 0x12）" Style="{StaticResource Style.GroupTitle}"/>
-                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
-                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
-                            <UniformGrid Columns="3">
+                            <UniformGrid Columns="2">
                                 <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="设定压力点" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBlock Text="高压泄气值 ΔP_H 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgDeflationSetPressure, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="mmHg" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="开始气压" Style="{StaticResource Style.FieldLabel}"/>
-                                    <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgDeflationStartPressure, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="mmHg" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                             Text="{Binding KangwendaAirPathHighLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（默认 0：终点高于起点时差值为负）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
-                                    <TextBlock Text="停止气压" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBlock Text="高压泄气值 ΔP_H 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgDeflationStopPressure, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="mmHg" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                             Text="{Binding KangwendaAirPathHighLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="合格下限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBlock Text="低压泄气值 ΔP_L 下限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgDeflationMinRateText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg/s" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                             Text="{Binding KangwendaAirPathLowLossMinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（默认 0）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,4">
-                                    <TextBlock Text="合格上限" Style="{StaticResource Style.FieldLabel}"/>
+                                    <TextBlock Text="低压泄气值 ΔP_L 上限" Style="{StaticResource Style.FieldLabel}"/>
                                     <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgDeflationMaxRateText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg/s" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                            </UniformGrid>
-                        </Border>
-
-                        <TextBlock Text="气密性（上行 0x04 0x13）" Style="{StaticResource Style.GroupTitle}"/>
-                        <Border BorderBrush="{StaticResource Brush.Panel.Border}" BorderThickness="1"
-                                CornerRadius="4" Background="{StaticResource Brush.Panel.Background}" Padding="12">
-                            <UniformGrid Columns="3">
-                                <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="设定压力点" Style="{StaticResource Style.FieldLabel}"/>
-                                    <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgAirtightSetPressure, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="mmHg" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Margin="0,4,16,4">
-                                    <TextBlock Text="稳压时间" Style="{StaticResource Style.FieldLabel}"/>
-                                    <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgAirtightStabilizeSeconds, UpdateSourceTrigger=LostFocus, Converter={StaticResource LenientNumber}}"/>
-                                    <TextBlock Text="秒" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Margin="0,4,0,4">
-                                    <TextBlock Text="漏气率上限" Style="{StaticResource Style.FieldLabel}"/>
-                                    <TextBox Style="{StaticResource Style.CfgBox}"
-                                             Text="{Binding JjgAirtightMaxLeakRateText, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="mmHg/s" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
+                                             Text="{Binding KangwendaAirPathLowLossMaxText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="mmHg（默认 10）" Style="{StaticResource Style.Hint}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </UniformGrid>
                         </Border>
 
                         <TextBlock Style="{StaticResource Style.Hint}" Margin="0,14,0,0" TextWrapping="Wrap"
-                                   Text="说明：放气速率（听诊）与气密性为康伟达 0x04 标准检测功能专属（BPA700 无此能力），参数写入 TestParams.Jjg692 节点；&#10;血压重复性已归入 A06 的 BP-004（压力组与轮数在“动态血压”页，±2mmHg 按文档写死）；&#10;判定区间（放气速率下限/上限、漏气率上限）留空时该项不判 PASS/FAIL，仅以文本报实测值。"/>
+                                   Text="说明：两项的判定区间写进 TestParams.KangwendaAirPath 节点（与 BPA700 的 AirPath 分开存放，换仪器互不影响），保存即生效；&#10;放气速率：仪器压力源充气到 230mmHg 记 t1，再切压力表停保压、开慢释阀缓降到 40mmHg 记 t2；&#10;气路泄露：压力源充到目标后切压力表停保压（停泵才看得出泄漏衰减），稳压 3s 读起点、保压 5s 读终点，起止差即泄气量；&#10;泄气量两项以产品上报值（0x76 采样压力差）判定，仪器侧差值同列展示；加压/泄压时间两列为同一实测时长，产品列文本附该点 0x76 采样压力；&#10;输入框清空后保存会回到默认值（t1 0~10s、t2 20~60s、ΔP 0~10mmHg），即清空 = 恢复默认。"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -891,7 +864,7 @@
                 <Button Content="复制生效设备的点位过来" Style="{StaticResource Style.ToolButton}"
                         Margin="12,0,0,0" VerticalAlignment="Center" IsEnabled="{Binding CanEdit}"
                         Command="{Binding CopyPointsFromActiveCommand}"
-                        ToolTip="只复制静态压力点、血压点位与重复轮数；充气方式/量测时间/方法/包络/JJG692 这些设备专属参数不动"/>
+                        ToolTip="只复制静态压力点、血压点位与重复轮数；充气方式/量测时间/方法/包络/气路判定区间 这些设备专属参数不动"/>
             </StackPanel>
         </Border>
 

@@ -76,14 +76,16 @@ namespace TORNPISolution.ViewModels
                 var judgedItems = Items.Where(i => !i.IsReportedNotJudged && !i.IsDisplayOnly).ToList();
                 if (judgedItems.Count == 0) return TestResultStatus.NotTested;
 
-                if (judgedItems.Any(i => i.Result == TestResultStatus.Fail))
+                // 还有项没出结果（模块正在跑、或跑到一半被停止）：本模块先不下结论，保持“未测试”。
+                // 否则一项先测出 FAIL 就会把整个模块提前判 FAIL，后面还没测的项再 PASS 也翻不回来。
+                if (judgedItems.Any(i => i.Result == TestResultStatus.NotTested))
                 {
-                    return TestResultStatus.Fail;
+                    return TestResultStatus.NotTested;
                 }
 
-                return judgedItems.All(i => i.Result == TestResultStatus.Pass)
-                    ? TestResultStatus.Pass
-                    : TestResultStatus.NotTested;
+                return judgedItems.Any(i => i.Result == TestResultStatus.Fail)
+                    ? TestResultStatus.Fail
+                    : TestResultStatus.Pass;
             }
         }
 

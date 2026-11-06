@@ -22,7 +22,6 @@ namespace TORNPISolution.Service.Devices
         private const byte CmdReset = 0x01;           // 初始化界面/复位
         private const byte FuncBpSimulation = 0x02;   // 血压模拟
         private const byte FuncPressureTest = 0x03;   // 压力测试
-        private const byte FuncStandardCheck = 0x04;  // 标准检测（JJG692-2010 等检定项，子码在 byte1）
         private const byte CmdOpenVent = 0x05;        // 开启放气
         private const byte CmdCloseVent = 0x06;       // 关闭放气
         private const byte CmdZero = 0x07;            // 压力调零
@@ -34,10 +33,6 @@ namespace TORNPISolution.Service.Devices
 
         /// <summary>AA 回包载荷长度（AA 之后 7 字节：压力高、压力低 + 5 字节填充）</summary>
         private const int AaPayloadLength = 7;
-
-        /// <summary>标准检测 AA 结果帧载荷长度（AA 之后字节数，下行表无子码字节）：0x11 血压重复性=3（压力2+状态1）、0x12/0x13=9（压力2+状态1+结果字段6），等待窗口内按本次请求的子码取值</summary>
-        private const int AaStdLenRepeatability = 3;
-        private const int AaStdLenWithResult = 9;
 
         /// <summary>等待模块号 ACK 回显的超时（毫秒），超时重发一包（同事实测参数）</summary>
         private static readonly TimeSpan AckTimeout = TimeSpan.FromMilliseconds(500);
@@ -54,11 +49,6 @@ namespace TORNPISolution.Service.Devices
         private readonly List<byte> _aaBuf = [];
         private bool _inAa;
         private DateTime _lastAaLog = DateTime.MinValue;
-
-        // 标准检测（0x04）回包窗口：仅 RunJjg692Async 等待期间 >0（值=本次子码的结果帧载荷长度），窗口外仍按普通压力表帧解析
-        private volatile int _stdPayloadLen;
-        private readonly object _stdLock = new();
-        private byte[]? _stdFrame;
 
         // 最近一次收到设备任何字节（ACK/AA/心跳）的时刻：设备彻底静默时快速失败用，避免干等收敛超时
         private DateTime _lastRxUtc = DateTime.UtcNow;
@@ -321,16 +311,35 @@ namespace TORNPISolution.Service.Devices
         /// 再设定目标压力并等待 AA 回读收敛（|回读-目标|&lt;1.5mmHg 连续保持 2.5s，控制台实测判据，稳压值取保持窗回读均值），设备将保持该压力直到下一条命令；收敛超时随目标压力放大（梯度与放宽理由见方法内 timeout 计算处），真停滞由停滞检测提前 abort，超时记警告不抛异常。
         /// </summary>
         public Task SetStaticPressureAsync(double pressure, int stableSeconds = 5, CancellationToken ct = default)
-            => SetStaticPressureCoreAsync(pressure, stableSeconds, timeoutSeconds: null, throwOnTimeout: false, ct);
+            => SetStaticPressureCoreAsync(pressure, stableSeconds, timeoutSeconds: null, throwOnTimeout: false, cleanFirst: true, ct);
 
         /// <summary>接口成员（BP-006~008 步骤用）：inflation 无意义（气路始终由设备自身打气）；超时抛 TimeoutException（与 BPA700 行为一致，BP-008 依赖它重试）</summary>
         public Task SetStaticPressureAsync(double pressure, int stableSeconds, bool inflation, CancellationToken ct, int timeoutSeconds = 180)
-            => SetStaticPressureCoreAsync(pressure, stableSeconds, timeoutSeconds, throwOnTimeout: true, ct);
+            => SetStaticPressureCoreAsync(pressure, stableSeconds, timeoutSeconds, throwOnTimeout: true, cleanFirst: true, ct);
 
-        private async Task SetStaticPressureCoreAsync(double pressure, int stableSeconds, int? timeoutSeconds, bool throwOnTimeout, CancellationToken ct)
+        /// <summary>
+        /// 从当前压力直接升压（不清场泄压、不复位调零）：压力源只会升压，气路泄露测试低压→高压段的点间直切用（50 直接拉到 250，不回零）。
+        /// 前置条件：设备已在压力表/压力源模式（AA 流正常、阀关闭），否则应走 SetStaticPressureAsync 的清场路径。
+        /// </summary>
+        public Task RaiseStaticPressureAsync(double pressure, int stableSeconds = 5, CancellationToken ct = default)
+            => SetStaticPressureCoreAsync(pressure, stableSeconds, timeoutSeconds: null, throwOnTimeout: false, cleanFirst: false, ct);
+
+        private async Task SetStaticPressureCoreAsync(double pressure, int stableSeconds, int? timeoutSeconds, bool throwOnTimeout, bool cleanFirst, CancellationToken ct)
         {
-            // 实测仪式：功能帧前必须清场，否则设备不应答 0x03 帧（步骤见 CleanStateAsync）
-            await CleanStateAsync(ct).ConfigureAwait(false);
+            if (cleanFirst)
+                await CleanStateAsync(ct).ConfigureAwait(false);   // 实测仪式：功能帧前必须清场，否则设备不应答 0x03 帧（步骤见 CleanStateAsync）
+
+            // 压力源只会升压：清场后残压仍高于目标时，发源指令降不下去，只会被下方停滞判据空耗 10s。
+            // 直接中止本点，比带高压发低压指令更早失败、日志更明确（大容积容器/气路堵时触发）。
+            if (LastPressure > pressure + 1.5)
+            {
+                LastStaticPressure = LastPressure;
+                var residualMsg = $"康伟达模拟仪：当前残压 {LastPressure:0.0} mmHg 仍高于目标 {pressure:0.#}（压力源只能升压无法降压），中止本点；请检查气路是否堵塞或容器容积过大";
+                if (throwOnTimeout)
+                    throw new TimeoutException(residualMsg);
+                _log.Warn(residualMsg);
+                return;
+            }
 
             var p = ToU16(pressure);
             var frame = BuildPressureTestFrame(3, p, 0, 0, 0);
@@ -575,14 +584,12 @@ namespace TORNPISolution.Service.Devices
         }
 
         /// <summary>
-        /// 05 开阀泄放并等回读归零：实测开阀后设备中断 AA 回传，干等基线会等满上限（点间卡死真因），
-        /// 故泄放期间周期补发压力表帧维持回读；&lt;5mmHg 提前返回，最后 06 关阀。
-        /// 等待时长按残压/10 估算并夹在 [20s, 上限] 内（低点估算过短必超时）：保压中的设备会顶阀数秒才放弃并自行塌压（实测 60 点残压 39 关阀后 1s 内塌到 0）；
-        /// 每圈补发 05 防设备放弃保压时阀状态被复位。
+        /// 05 开阀泄放并等回读归零：开阀期间设备暂停 AA 回传、回读冻结在残压值（干等基线会等满上限，点间卡死真因），
+        /// 故每轮按 nibp 实测的分段脉冲执行——开阀放 2s → 关阀（AA 只在关阀时回传）→ 切压力表 → 等一次新 AA 帧刷新回读，
+        /// &lt;5mmHg 提前返回，最后 06 关阀。等待时长按残压/10 估算并夹在 [20s, 上限] 内：保压中的设备会顶阀数秒才放弃并自行塌压。
         /// </summary>
         private async Task<bool> VentToBaselineAsync(double capSeconds, CancellationToken ct)
         {
-            WriteRaw([CmdOpenVent]);
             var seconds = Math.Max(20, Math.Min(LastPressure / 10, capSeconds));
             var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(seconds);
             while (DateTime.UtcNow < deadline)
@@ -590,9 +597,30 @@ namespace TORNPISolution.Service.Devices
                 ct.ThrowIfCancellationRequested();
                 if (LastPressure < 5)
                     break;
-                WriteRaw([CmdOpenVent]);                       // 补发开阀，防中途阀被设备关闭
-                WriteRaw(BuildPressureTestFrame(2, 0, 0, 0, 0));   // 补发压力表帧，AA 流未断时即可看到压力下降
-                await Task.Delay(600, ct).ConfigureAwait(false);
+
+                // 分段脉冲：先订阅 AA 事件，保证关阀后的第一帧新鲜压力能被捕获（开阀期间无 AA，订阅早于触发即无竞态）
+                var fresh = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                void OnSample(double _) => fresh.TrySetResult(true);
+                PressureSampled += OnSample;
+                try
+                {
+                    WriteRaw([CmdOpenVent]);                          // 开阀放气，AA 回传随之中断
+                    // 开阀时长随残压放大：保压中的压力源会顶阀数秒才放弃（残压越高顶得越久），2s 定长在高残压段撑不到设备放弃保压（实测 250 档顶阀 40s+ 才塌压）；按 20ms/mmHg 夹在 [2s, 5s]
+                    var openMs = (int)Math.Clamp(LastPressure * 20, 2000, 5000);
+                    await Task.Delay(openMs, ct).ConfigureAwait(false);
+                    WriteRaw([CmdCloseVent]);                         // 关阀，AA 恢复回传
+                    await Task.Delay(150, ct).ConfigureAwait(false);
+                    WriteRaw(BuildPressureTestFrame(2, 0, 0, 0, 0));  // 切压力表，确保 AA 流恢复
+                    using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                    linked.CancelAfter(1500);
+                    using var reg = linked.Token.Register(() => fresh.TrySetCanceled());
+                    try { await fresh.Task.ConfigureAwait(false); }
+                    catch (OperationCanceledException) when (!ct.IsCancellationRequested) { }
+                }
+                finally
+                {
+                    PressureSampled -= OnSample;
+                }
             }
             WriteRaw([CmdCloseVent]);
             await Task.Delay(200, ct).ConfigureAwait(false);
@@ -638,197 +666,6 @@ namespace TORNPISolution.Service.Devices
             await Task.Delay(150, ct).ConfigureAwait(false);
         }
 
-        // ==================== JJG692-2010 标准检测（0x04 功能 + 子码 0x11/0x12/0x13） ====================
-
-        /// <summary>JJG692 检测项子码（协议《无创血压接收发送表》标准检测段）</summary>
-        public enum Jjg692Check : byte
-        {
-            /// <summary>0x11 血压重复性（仅返回状态）</summary>
-            BpRepeatability = 0x11,
-            /// <summary>0x12 放气速率（听诊）</summary>
-            DeflationRate = 0x12,
-            /// <summary>0x13 气密性</summary>
-            Airtightness = 0x13,
-        }
-
-        /// <summary>一次 JJG692 标准检测的解析结果（AA 状态帧，未占位字段为 null）；字段取值区间按子码区分：0x11 仅状态、0x12 漏气率/急释时间、0x13 总时间/稳定压力/漏气率</summary>
-        public sealed class Jjg692Result
-        {
-            public Jjg692Check SubCode { get; init; }
-
-            /// <summary>状态：0=等待 1=运行中 2=完成 3=失败</summary>
-            public int Status { get; init; }
-
-            /// <summary>完成且无异常</summary>
-            public bool Completed => Status == 2;
-            /// <summary>设备判定测量失败</summary>
-            public bool Failed => Status == 3;
-
-            /// <summary>当前压力 mmHg（AA 帧内（压力+10）×100 字段还原）</summary>
-            public double Pressure { get; init; }
-
-            /// <summary>漏气率 mmHg/s（0x12／0x13 均有，帧内 ×100）</summary>
-            public double? LeakRate { get; init; }
-
-            /// <summary>漏气率时间（0x12，帧内 1 字节，单位按协议未标注）</summary>
-            public double? LeakRateSeconds { get; init; }
-
-            /// <summary>总测量时间 秒（0x13）</summary>
-            public double? TotalSeconds { get; init; }
-
-            /// <summary>稳定压力值 mmHg（0x13，帧内 ×100）</summary>
-            public double? StablePressure { get; init; }
-
-            /// <summary>从开始气压降到 15mmHg 的放气时间 秒（0x12，帧内 ×100）</summary>
-            public double? DropTo15Seconds { get; init; }
-
-            /// <summary>从开始气压降到 5mmHg 的放气时间 秒（0x12，帧内 ×10，≤10s 失真）</summary>
-            public double? DropTo5Seconds { get; init; }
-        }
-
-        /// <summary>构造 JJG692 标准检测上行帧（协议《无创血压接收发送表》标准检测段）：
-        /// 0x11 血压重复性 = [04, 11, 高4位测量类型|低4位袖带] 三字节短帧；
-        /// 0x12 放气速率（听诊） = [04, 12, 袖带, 设定压力2, 开始气压2, 停止气压2]；
-        /// 0x13 气密性 = [04, 13, 袖带, 设定压力2, 稳压时间1]。</summary>
-        /// <param name="measureType">高 4 位测量类型（0 成人 1 新生儿；协议仅 0x11 定义此位）</param>
-        /// <param name="cuffType">低 4 位袖带类型（0 外部袖带 1 内部成人）</param>
-        public byte[] BuildJjg692Frame(Jjg692Check sub, byte measureType, byte cuffType,
-            double setPressure = 0, double startPressure = 0, double stopPressure = 0, int stabilizeSeconds = 0)
-        {
-            var nb = (byte)((measureType << 4) | (cuffType & 0x0F));
-            var sp = ToU16(setPressure);
-            return sub switch
-            {
-                Jjg692Check.BpRepeatability => [FuncStandardCheck, (byte)sub, nb],
-                // 0x12/0x13 上行表只定义了低 4 位袖带类型，高 4 位未定义，按 0 发避免设备进错误分支
-                Jjg692Check.DeflationRate => [FuncStandardCheck, (byte)sub, (byte)(cuffType & 0x0F),
-                    (byte)(sp >> 8), (byte)sp,
-                    (byte)((ushort)startPressure >> 8), (byte)(ushort)startPressure,
-                    (byte)((ushort)stopPressure >> 8), (byte)(ushort)stopPressure],
-                Jjg692Check.Airtightness => [FuncStandardCheck, (byte)sub, (byte)(cuffType & 0x0F),
-                    (byte)(sp >> 8), (byte)sp, (byte)Math.Clamp(stabilizeSeconds, 0, 255)],   // 稳压时间在帧内是 1 字节，不夹住会静默截成低字节（300→44）
-                _ => throw new ArgumentOutOfRangeException(nameof(sub)),
-            };
-        }
-
-        /// <summary>
-        /// 执行一项 JJG692 标准检测：清场仪式 → 发 0x04 帧 → 等 AA 状态帧转终态（2 完成 3 失败），
-        /// 结束后气路放回常压。等待期间打开结果帧采集窗口（长度按子码：0x11=3 字节、0x12/0x13=9 字节）。
-        /// </summary>
-        public async Task<Jjg692Result> RunJjg692Async(Jjg692Check sub, byte measureType, byte cuffType,
-            double setPressure = 0, double startPressure = 0, double stopPressure = 0,
-            int stabilizeSeconds = 0, int timeoutMs = 300_000, CancellationToken ct = default)
-        {
-            if (!IsOpen)
-                throw new InvalidOperationException("康伟达模拟仪串口未打开。");
-
-            await CleanStateAsync(ct).ConfigureAwait(false);   // 功能帧前清场（同 0x02/0x03 实测仪式）
-            var frame = BuildJjg692Frame(sub, measureType, cuffType,
-                setPressure, startPressure, stopPressure, stabilizeSeconds);
-            _log.Info($"康伟达模拟仪：JJG692 0x{(byte)sub:X2} 开始（报文 {FormatFrame(frame)}，超时 {timeoutMs / 1000}s）");
-
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            _stdFrame = null;
-            _stdPayloadLen = sub == Jjg692Check.BpRepeatability ? AaStdLenRepeatability : AaStdLenWithResult;
-            try
-            {
-                await SendWithRetryAsync(frame, FuncStandardCheck, ct).ConfigureAwait(false);
-
-                Jjg692Result? result = null;
-                while (watch.ElapsedMilliseconds < timeoutMs)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    var snap = TakeStdFrame();
-                    if (snap != null)
-                    {
-                        result = DecodeJjg692Frame(snap, sub);
-                        if (result.Completed || result.Failed)
-                            break;
-                    }
-                    await Task.Delay(200, ct).ConfigureAwait(false);
-                }
-
-                if (result == null)
-                    throw new TimeoutException($"康伟达 JJG692 0x{(byte)sub:X2}：全程收不到 AA 状态帧（设备未进入标准检测模式？）");
-                if (!result.Completed)
-                    _log.Warn($"康伟达 JJG692 0x{(byte)sub:X2}：设备回报状态 {result.Status}（3=测量失败）");
-                else
-                    _log.Info($"康伟达 JJG692 0x{(byte)sub:X2}：完成，耗时 {watch.Elapsed.TotalSeconds:0.0}s（{DescribeJjg692Result(result)}）");
-                return result;
-            }
-            finally
-            {
-                _stdPayloadLen = 0;
-                try { await VentToZeroAsync(30, ct).ConfigureAwait(false); }   // 检定后放回常压，避免设备带压进下次清场
-                catch (OperationCanceledException) { throw; }
-                catch (Exception ex) { _log.Warn($"康伟达 JJG692 结束放气失败（下次清场会补偿）：{ex.Message}"); }
-            }
-        }
-
-        private byte[]? TakeStdFrame()
-        {
-            lock (_stdLock)
-            {
-                var f = _stdFrame;
-                _stdFrame = null;
-                return f;
-            }
-        }
-
-        /// <summary>AA 状态帧解析（payload 为 AA 之后的字节，布局按下行表：[0..1]=（当前压力+10）×100、[2]=状态，
-        /// 字段含义由本次请求的子码决定（下行帧不带子码）：
-        /// 0x11 血压重复性仅到状态为止；
-        /// 0x12：[3..4]=漏气率×100（mmHg/s）[5]=漏气率时间 [6..7]=降到 15mmHg 时间×100 [8]=降到 5mmHg 时间×10；
-        /// 0x13：[3..4]=总测量时间 [5..6]=稳定压力×100 [7..8]=漏气率×100。</summary>
-        private Jjg692Result DecodeJjg692Frame(byte[] p, Jjg692Check sub)
-        {
-            var pressure = ReadU16(p, 0) / 100.0 - FeedbackOffset;
-            var status = ReadByte(p, 2) ?? 0;
-            return sub switch
-            {
-                Jjg692Check.DeflationRate => new Jjg692Result
-                {
-                    SubCode = sub,
-                    Status = status,
-                    Pressure = pressure,
-                    LeakRate = ReadU16(p, 3) / 100.0,
-                    LeakRateSeconds = ReadByte(p, 5),
-                    DropTo15Seconds = ReadU16(p, 6) / 100.0,
-                    DropTo5Seconds = ReadByte(p, 8) / 10.0,
-                },
-                Jjg692Check.Airtightness => new Jjg692Result
-                {
-                    SubCode = sub,
-                    Status = status,
-                    Pressure = pressure,
-                    TotalSeconds = ReadU16(p, 3),
-                    StablePressure = ReadU16(p, 5) / 100.0,
-                    LeakRate = ReadU16(p, 7) / 100.0,
-                },
-                _ => new Jjg692Result { SubCode = sub, Status = status, Pressure = pressure },
-            };
-        }
-
-        /// <summary>读大端 u16（高 8 位在前）：字节不够时返回 0（设备回包短于协议预期时不至于抛异常）</summary>
-        private static ushort ReadU16(byte[] b, int at) =>
-            at + 1 < b.Length ? (ushort)((b[at] << 8) | b[at + 1]) : (ushort)0;
-
-        /// <summary>读单字节：越界返回 null（区分“没回这个字段”与“回了 0”）</summary>
-        private static byte? ReadByte(byte[] b, int at) => at < b.Length ? b[at] : null;
-
-        /// <summary>检测结果摘要，供日志/上报展示</summary>
-        public static string DescribeJjg692Result(Jjg692Result r)
-        {
-            var parts = new List<string> { $"0x{(byte)r.SubCode:X2} 状态{r.Status}" };
-            if (r.LeakRate != null) parts.Add($"漏气率={r.LeakRate:0.00}mmHg/s");
-            if (r.LeakRateSeconds != null) parts.Add($"漏气率时间={r.LeakRateSeconds:0}");
-            if (r.TotalSeconds != null) parts.Add($"总时间={r.TotalSeconds:0}s");
-            if (r.StablePressure != null) parts.Add($"稳定压={r.StablePressure:0.00}mmHg");
-            if (r.DropTo15Seconds != null) parts.Add($"降到15={r.DropTo15Seconds:0.00}s");
-            if (r.DropTo5Seconds != null) parts.Add($"降到5={r.DropTo5Seconds:0.0}s");
-            return string.Join(" ", parts);
-        }
-
         // ==================== 接口成员：血压测量/过压/阀控（曲线判定兼容实现） ====================
 
         /// <summary>
@@ -837,7 +674,7 @@ namespace TORNPISolution.Service.Devices
         /// Finish(4)=Stable 后泄压至 15 以下（测量完成）；Idle(0)=Busy 后未进入 Stable 即骤降（充气中手动停止，BP-002 判定）；
         /// 放气时间 = 峰值时刻→压力降至 10 以下。
         /// </summary>
-        public async Task<BpTestRunResult> RunBpMeasurementAsync(
+        public Task<BpTestRunResult> RunBpMeasurementAsync(
             int systolic, int diastolic, int heartRate, double pulseVolume = 0,
             int waitStartTimeoutMs = 30_000, int totalTimeoutMs = 60_000,
             CancellationToken ct = default)
@@ -845,8 +682,16 @@ namespace TORNPISolution.Service.Devices
             if (!IsOpen)
                 throw new InvalidOperationException("康伟达模拟仪串口未打开。");
 
-            await CleanStateAsync(ct).ConfigureAwait(false);   // 实测仪式：0x02 功能帧同样要先清场
-            await StartSimulationAsync(systolic, diastolic, heartRate, pulseVolume, ct).ConfigureAwait(false);
+            // 清场+发 0x02 在返回前阻塞完成：上层拿到本 Task 后紧接着发产品 0xCA，必须保证脉搏波先就位（仪器先输出、产品后开始；
+            // BPA700 的 BPARunBPTest 同步启动无此问题）。模块跑在线程池，阻塞约 1.7s 不卡 UI，读循环独立线程照常上抛采样。
+            CleanStateAsync(ct).GetAwaiter().GetResult();
+            StartSimulationAsync(systolic, diastolic, heartRate, pulseVolume, ct).GetAwaiter().GetResult();
+            return RunBpCurveJudgementAsync(waitStartTimeoutMs, totalTimeoutMs, ct);
+        }
+
+        private async Task<BpTestRunResult> RunBpCurveJudgementAsync(
+            int waitStartTimeoutMs, int totalTimeoutMs, CancellationToken ct)
+        {
             _log.Info($"康伟达模拟仪：血压测量轮开始（曲线判定），等待产品启动充气（最长 {waitStartTimeoutMs / 1000}s）...");
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -1211,19 +1056,21 @@ namespace TORNPISolution.Service.Devices
             _lastRxUtc = DateTime.UtcNow;   // 任何设备回传（ACK/AA/心跳）都刷新活性时刻
             if (_inAa)
             {
-                // 重同步保护：压力/状态/时间各字段高 8 位均不可能等于 0xAA（压力≤300 时 (P+10)×100 < 0x7B00），
-                // 组包中途再遇 0xAA 只可能是上一帧长度与预期不符，立即以该字节为新帧头，避免整条流错位
-                if (b == HeadFeedback && _aaBuf.Count > 0)
+                // 重同步保护：压力字段高 8 位不可能等于 0xAA（压力≤300 时 (P+10)×100 < 0x7B00），
+                // 组包中途再遇 0xAA 一律按新帧头重收。注意要连缓冲刚清空（Count==0）的第二个头也算上：
+                // 设备在模式切换（压力表/压力源/泄压）时会连发两个 0xAA，旧逻辑只在 Count>0 时重同步，
+                // 第二个头被当成压力高字节，raw=(0xAA<<8)|x 会解出 425.x mmHg 的离群尖峰（图上首尾各一次即此因）。
+                if (b == HeadFeedback)
                 {
-                    _log.Debug("康伟达模拟仪 RX: AA 帧内出现 0xAA，按新帧头重同步");
+                    if (_aaBuf.Count > 0)
+                        _log.Debug("康伟达模拟仪 RX: AA 帧内出现 0xAA，按新帧头重同步");
                     _aaBuf.Clear();
+                    _inAa = true;
                     return;
                 }
 
                 _aaBuf.Add(b);
-                // 标准检测窗口内按本次子码的结果帧长度组包，窗口外维持普通压力表帧长度
-                var need = _stdPayloadLen > 0 ? _stdPayloadLen : AaPayloadLength;
-                if (_aaBuf.Count >= need)
+                if (_aaBuf.Count >= AaPayloadLength)
                     FinishAaFrame();
                 return;
             }
@@ -1252,30 +1099,21 @@ namespace TORNPISolution.Service.Devices
             _inAa = false;
             if (_aaBuf.Count >= 2)
             {
-                // 标准检测结果帧（仅在 RunJjg692Async 等待窗口内采集）：下行表字节布局与各子码字段含义见 DecodeJjg692Frame
-                if (_stdPayloadLen > 0 && _aaBuf.Count >= _stdPayloadLen)
-                {
-                    lock (_stdLock)
-                        _stdFrame = _aaBuf.ToArray();
-                    var stdRaw = (_aaBuf[0] << 8) | _aaBuf[1];
-                    LastPressure = stdRaw / 100.0 - FeedbackOffset;
+                // AA (压力+10)高 (压力+10)低 + 填充：原始值 = (P+偏移)×100
+                var raw = (_aaBuf[0] << 8) | _aaBuf[1];
+                var pressure = raw / 100.0 - FeedbackOffset;
 
-                    if ((DateTime.Now - _lastAaLog).TotalMilliseconds >= 200)
-                    {
-                        _lastAaLog = DateTime.Now;
-                        var sf = new byte[1 + _aaBuf.Count];
-                        sf[0] = HeadFeedback;
-                        _aaBuf.CopyTo(0, sf, 1, _aaBuf.Count);
-                        _log.Debug($"康伟达模拟仪 RX(标准检测): {FormatFrame(sf)} → {LastPressure:0.0} mmHg");
-                    }
-                    PressureSampled?.Invoke(LastPressure);
+                // 量程合理性过滤：压力表/压力源只可能落在 0~300mmHg，空载零点漂移留 ±2 冗余。
+                // 调零/泄压/模式切换瞬间设备会回一帧非压力编码（raw=260 → -7.4mmHg、raw=0xAA06 → 425.26mmHg），
+                // 这种离群值既不能进波形（会把 Y 轴拉爆、曲线压平），也不能进 LastPressure（会带偏收敛/归零判断）。
+                if (pressure is < -2 or > 350)
+                {
+                    _log.Debug($"康伟达模拟仪 RX: 越界压力帧 raw={raw} → {pressure:0.0} mmHg，按错位帧丢弃");
                     _aaBuf.Clear();
                     return;
                 }
 
-                // AA (压力+10)高 (压力+10)低 + 填充：原始值 = (P+偏移)×100
-                var raw = (_aaBuf[0] << 8) | _aaBuf[1];
-                LastPressure = raw / 100.0 - FeedbackOffset;
+                LastPressure = pressure;
 
                 if ((DateTime.Now - _lastAaLog).TotalMilliseconds >= 200)
                 {

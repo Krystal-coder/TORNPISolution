@@ -22,7 +22,7 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>嵌软版本管控规格（A16“产品信息获取(嵌软版本)”项的规格与判定唯一来源）：产品读回版本与它不一致判 FAIL（防烧录老版本）；版本升级时只改这一处，规格列显示与判定同步生效。</summary>
-        public const string ExpectedFirmwareVersion = "V0.1.0.TOR.P264401";
+        public const string ExpectedFirmwareVersion = "V0.1.0.TOR.P264501";
 
         public const string FirmwareStatus = "03-00";
         /// <summary>模块目录：先整机工位、后单板工位，各自按书写顺序（顺序即新建方案时的默认顺序，可拖拽调整）；页面按模块自己的 Category 过滤，所以返回全量不影响左右两栏各只显示本类。新增模块在对应工位分部文件里写 Build 方法并加进那一份清单，别改本方法。</summary>

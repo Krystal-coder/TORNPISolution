@@ -1,0 +1,26 @@
+[
+  {
+    "id": "418c023ba5d94d9cbed8a3434cfe7daa",
+    "userID": "CSDN-Krystral",
+    "domainID": "CSDN-Krystral",
+    "type": "Language preference",
+    "content": "Prefers using Chinese for technical interaction and explanations.",
+    "remark": "new",
+    "namespace": "DevMate",
+    "createTime": "2026-11-06T11:40:46.953Z",
+    "updateTime": "2026-11-06T12:39:43.226Z",
+    "isDeleted": false
+  },
+  {
+    "id": "8726cd32f6184d26b5efd221d6ec44f7",
+    "userID": "CSDN-Krystral",
+    "domainID": "CSDN-Krystral",
+    "type": "Explanation preference",
+    "content": "Prefers detailed, step-by-step analysis; asks for differences between old and new methods and specific timing breakdowns for each phase such as Stable, holding, deflation, and Finish.",
+    "remark": "new",
+    "namespace": "DevMate",
+    "createTime": "2026-11-06T12:39:43.229Z",
+    "updateTime": "2026-11-06T12:39:43.229Z",
+    "isDeleted": false
+  }
+]

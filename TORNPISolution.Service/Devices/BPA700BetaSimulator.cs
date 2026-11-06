@@ -87,6 +87,9 @@ namespace TORNPISolution.Service.Devices
         private StaticPressureExCallbackDelegate? _staticPressureCallback;
         private SamplingCallbackDelegate? _samplingCallback;
         private TaskCompletionSource<bool>? _staticFinishTcs;
+        /// <summary>上一次序列回调的 (status,index)：同一点同一状态（尤其 Wait 0.2s 一条）不重复打日志</summary>
+        private int _lastSeqStatus = -1;
+        private int _lastSeqIndex = -1;
 
         private readonly Queue<double> _recentSamples = new();
         private readonly object _sampleLock = new();
@@ -172,10 +175,18 @@ namespace TORNPISolution.Service.Devices
 
             var finishTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _staticFinishTcs = finishTcs;
+            _lastSeqStatus = -1;
+            _lastSeqIndex = -1;
 
             _staticPressureCallback = (handle, status, waitTime, index) =>
             {
-                _log.Debug($"BPA700Beta 静态压力序列回调：status={status} wait={waitTime:0.0} index={index}");
+                // SDK 每 200ms 回调一次，Wait 阶段连发几十条；只在该点状态切换时记一行
+                if (status != _lastSeqStatus || index != _lastSeqIndex)
+                {
+                    _lastSeqStatus = status;
+                    _lastSeqIndex = index;
+                    _log.Info($"BPA700Beta 静态压力：点{index + 1} {StaticStatusText(status, waitTime)}");
+                }
                 if (status == 3)
                 {
                     LastStaticPressure = ReadRecentAveragePressure();
@@ -195,6 +206,17 @@ namespace TORNPISolution.Service.Devices
 
             _log.Info($"BPA700Beta：启动静态压力序列 {string.Join("→", sequence)}{_pressureUnit}，每点保持 {holdSeconds}s，点间直接切压不泄回零");
         }
+
+        /// <summary>静态压力状态文本（日志用）：SDK status 0=Idle / 1=Wait / 2=Busy / 3=Stable / 4=Finish</summary>
+        private static string StaticStatusText(int status, double waitTime) => status switch
+        {
+            0 => "Idle",
+            1 => $"等待设备恢复 {waitTime:0.#}s",
+            2 => "充气/稳压中",
+            3 => "已稳定（Stable）",
+            4 => "本轮完成（Finish）",
+            _ => $"status={status}"
+        };
 
         /// <summary>等待本轮序列 Finish；超时未收到则主动 BPAStopTest 结束，保证仪器不留在带压态</summary>
         public async Task WaitStaticPressureFinishAsync(int timeoutMs = 60_000, CancellationToken ct = default)

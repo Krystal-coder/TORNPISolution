@@ -61,19 +61,13 @@ namespace TORNPISolution.Share.Models
         /// <summary>产品静态压力校准（模拟仪逐点稳压 50/150/250mmHg 后发 0x66 校准，结束关闭压力传感器）</summary>
         public const string ProductStaticPressureCalibration = "A17";
 
-        /// <summary>放气速率测试（BP-007：产品关泄气阀封闭气路，仪器加压 230mmHg 记 t1、泄压至 40mmHg 记 t2，两段各回读一次产品采样压力）</summary>
+        /// <summary>放气速率测试（BP-007：产品关泄气阀封闭气路，仪器加压 230mmHg 记 t1、泄压至 40mmHg 记 t2，两段各回读一次产品采样压力；BPA700 过压测试 / 康伟达压力源+慢释阀）</summary>
         public const string DeflateRateTest = "A18";
-
-        /// <summary>JJG692-2010 放气速率检测（听诊，康伟达 0x04/0x12，测试值=设备回传漏气率 mmHg/s）</summary>
-        public const string Jjg692DeflationRateTest = "A19";
-
-        /// <summary>JJG692-2010 气密性检测（康伟达 0x04/0x13，测试值=设备回传漏气率 mmHg/s）</summary>
-        public const string Jjg692AirtightnessTest = "A20";
 
         /// <summary>血压心率精度及重复性测试（BP-005：一组压力 + 多档心率，一点一轮一项，偏差与极差按 max(5, 设定×5%) 判）</summary>
         public const string BpHeartRateAccuracyTest = "A21";
 
-        /// <summary>气路泄露测试（BP-010：封堵毛细气孔后低压 50/高压 250 各稳压 3s 读起点、再保压 5s 读终点，起止差即泄气量）</summary>
+        /// <summary>气路泄露测试（BP-010：封堵毛细气孔后低压 50/高压 250 各稳压 3s 读起点、再保压 5s 读终点，起止差即泄气量；BPA700 静态压力序列 / 康伟达压力源直切）</summary>
         public const string AirPathLeakTest = "A22";
 
         // ==================== 单板工位模块（B 前缀，自己连号） ====================

@@ -31,10 +31,8 @@ namespace TORNPISolution.Service
             BuildSpo2PerfusionTest(),        // A14 SpO2灌注与抗干扰测试（SPO2-008~010）
             BuildChargingTest(),             // A15 充电测试
             BuildProductStaticPressureCalibration(),   // A17 产品静态压力校准（50/150/250 逐点校准）
-            BuildDeflateRateTest(),            // A18 放气速率测试（BP-007：加压 t1 / 泄压 t2）
-            BuildAirPathLeakTest(),            // A22 气路泄露测试（BP-010：高低压段起止压差）
-            BuildJjg692DeflationRateTest(),  // A19 JJG692 放气速率（听诊）（康伟达 0x04/0x12）
-            BuildJjg692AirtightnessTest(),   // A20 JJG692 气密性（康伟达 0x04/0x13）
+            BuildDeflateRateTest(),            // A18 放气速率测试（BP-007：加压 t1 / 泄压 t2，BPA700/康伟达）
+            BuildAirPathLeakTest(),            // A22 气路泄露测试（BP-010：高低压段起止压差，BPA700/康伟达）
         };
 
         #region 模块清单（一个模块一段，按书写顺序）
@@ -43,7 +41,7 @@ namespace TORNPISolution.Service
         private static TestModuleModel BuildInitInstruments()
         {
             var ti = AddTI(TestModuleIds.InitInstruments, ModuleCategory.WholeMachine, "初始化仪器",
-                "初始化固高IO等硬件，全部成功为 PASS");
+                "初始化固高IO等硬件");
 
             AddResult(ti, name: SpecItems.GenIoInit,
                 description: "启动 EtherCAT 总线",
@@ -152,7 +150,7 @@ namespace TORNPISolution.Service
 
         //======================================A17-----------产品静态压力校准
         // 流程：启动压力传感器（0x65）-> 逐点 50/150/250：模拟仪稳压 -> 发校准（0x66 + uint16 LE）-> 等 2s -> 下一点
-        //       -> 全部测试项结束后关闭压力传感器（0x67）。逐点判定：|稳压值-校准点| ≤3mmHg 且校准有 ACK。
+        //       -> 全部测试项结束后关闭压力传感器（0x67）。逐点判定：|稳压值-校准点| ≤1.5mmHg 且校准有 ACK。
         private TestModuleModel BuildProductStaticPressureCalibration()
         {
             var ti = AddTI(TestModuleIds.ProductStaticPressureCalibration, ModuleCategory.WholeMachine, "产品静态压力校准",
@@ -165,12 +163,18 @@ namespace TORNPISolution.Service
             foreach (var value in SpecItems.PcalPoints)
             {
                 AddResult(ti, name: SpecItems.PcalPoint(value),
-                    description: $"模拟仪稳压 {value:0.##}mmHg 后发校准（0x66），稳压误差 ≤3mmHg 且校准有 ACK（仪器列=稳压值）",
-                    specMin: 0, specMax: 3, unit: "mmHg", valueSource: "Error");
+                    description: $"模拟仪稳压 {value:0.##}mmHg 后发校准（0x66），稳压误差 ≤1.5mmHg 且校准有 ACK（仪器列=稳压值）",
+                    specMin: 0, specMax: 1.5, unit: "mmHg", valueSource: "Error");
             }
 
             AddResult(ti, name: SpecItems.PcalCloseSensor,
                 description: "关闭压力传感器（0x07 0x67），有响应即通过",
+                specMin: 1, specMax: 1, unit: "", hideSpecRange: true);
+
+            // 校准写完回读 K/B：0x07 0xC3 无参帧，应答 2×float 小端。只要不是出厂默认那一对就说明校准已写入
+            AddResult(ti, name: SpecItems.PcalReadKb,
+                description: "校准完成后读取产品压力校准 K/B（0x07 0xC3）：只要读回值与出厂默认 " +
+                             $"{SpecItems.PcalKbDefaultK:0.####}/{SpecItems.PcalKbDefaultB:0.####} 不同即合格（仪器列=K/B 读回值）",
                 specMin: 1, specMax: 1, unit: "", hideSpecRange: true);
 
             return ti;
@@ -185,7 +189,7 @@ namespace TORNPISolution.Service
         {
             var ap = GetAirPathParams();
             var ti = AddTI(TestModuleIds.DeflateRateTest, ModuleCategory.WholeMachine, "放气速率测试",
-                "仪器充气到 230 记 t1、缓降到 40 记 t2，两段时长由仪器上报，仅 BPA700 模拟仪");
+                "仪器充气到 230 记 t1、缓降到 40 记 t2，两段时长由仪器上报（BPA700 过压测试 / 康伟达压力源+慢释阀）");
 
             // 两项的实测值是同一时长（单位 s），测试值与仪器列同值；该点 0x76 采样压力与仪器均值读回落在子表行（测试值列文本优先，写成项文本会顶掉判定用的时长）
             AddResult(ti, name: SpecItems.Deflate007InflateTime,
@@ -210,7 +214,7 @@ namespace TORNPISolution.Service
         {
             var ap = GetAirPathParams();
             var ti = AddTI(TestModuleIds.AirPathLeakTest, ModuleCategory.WholeMachine, "气路泄露测试",
-                "封堵气孔后低压 50、高压 250 两段各读起止压力，起止差值判气路泄露，仅 BPA700 模拟仪");
+                "封堵气孔后低压 50、高压 250 两段各读起止压力，起止差值判气路泄露（BPA700 静态压力序列 / 康伟达压力源直切）");
 
             AddResult(ti, name: SpecItems.Leak010LowStart,
                 description: $"加压 {SpecItems.LeakLowPressure:0}mmHg 稳压 3s 时的起点压力（仪器列=稳压读回，产品列=采样压力，只展示不判定）",
@@ -233,34 +237,6 @@ namespace TORNPISolution.Service
             AddResult(ti, name: SpecItems.Leak010HighLoss,
                 description: $"高压段起止压力差（判定值=产品侧差值，仪器列=仪器侧差值；判定区间取配置（当前 {FormatRange(ap.HighLossMin, ap.HighLossMax)}））",
                 specMin: ap.HighLossMin ?? 0, specMax: ap.HighLossMax ?? 2, unit: "mmHg", valueSource: "Both");
-
-            return ti;
-        }
-
-        //======================================A19/A20-----------JJG692 放气速率（听诊）/气密性（康伟达 0x04 功能专属）
-
-        private TestModuleModel BuildJjg692DeflationRateTest()
-        {
-            var dr = GetJjg692DeflationRateParams();
-            var ti = AddTI(TestModuleIds.Jjg692DeflationRateTest, ModuleCategory.WholeMachine, "JJG692放气速率检测(听诊)",
-                "设备匀速放气并回传漏气率判定（仅康伟达模拟仪）");
-
-            AddResult(ti, name: SpecItems.Jjg692DeflationRate,
-                description: $"测试值=设备回传漏气率（mmHg/s）；判定区间取配置（当前 {FormatRange(dr.MinRate, dr.MaxRate)}）（仪器列=漏气率/急释时间摘要）",
-                specMin: dr.MinRate ?? 0, specMax: dr.MaxRate ?? 10, unit: "mmHg/s");
-
-            return ti;
-        }
-
-        private TestModuleModel BuildJjg692AirtightnessTest()
-        {
-            var at = GetJjg692AirtightnessParams();
-            var ti = AddTI(TestModuleIds.Jjg692AirtightnessTest, ModuleCategory.WholeMachine, "JJG692气密性检测",
-                "设备稳压后回传漏气率判定（仅康伟达模拟仪）");
-
-            AddResult(ti, name: SpecItems.Jjg692Airtightness,
-                description: $"测试值=设备回传漏气率（mmHg/s）；合格上限取配置（当前 {FormatRange(null, at.MaxLeakRate)}）（仪器列=总时间/稳定压/漏气率摘要）",
-                specMin: 0, specMax: at.MaxLeakRate ?? 10, unit: "mmHg/s");
 
             return ti;
         }
@@ -613,20 +589,6 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>配置页的 JJG692 放气速率参数组（读不到配置时回退默认值，保证目录构建不抛）</summary>
-        private Jjg692DeflationRateParams GetJjg692DeflationRateParams()
-        {
-            try { return _configService.Load().ActiveBpTestParams.Jjg692.DeflationRate; }
-            catch (Exception ex) { _log.Warn($"读取 JJG692 放气速率配置失败，用默认参数：{ex.Message}"); return new Jjg692DeflationRateParams(); }
-        }
-
-        /// <summary>配置页的 JJG692 气密性参数组（读不到配置时回退默认值）</summary>
-        private Jjg692AirtightnessParams GetJjg692AirtightnessParams()
-        {
-            try { return _configService.Load().ActiveBpTestParams.Jjg692.Airtightness; }
-            catch (Exception ex) { _log.Warn($"读取 JJG692 气密性配置失败，用默认参数：{ex.Message}"); return new Jjg692AirtightnessParams(); }
-        }
-
         /// <summary>配置页的气路类两项判定区间（固定读 BPA700 那份：这两项只在 BPA700 上跑，与当前生效设备无关；读不到时回退默认对象）</summary>
         private BpaAirPathParams GetAirPathParams()
         {
@@ -659,15 +621,11 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>幅度档清洗：去 ≤0 的无效档、去重（与执行端同一口径，两边项清单才能一致）</summary>
-        private static List<double> CleanEcg009Amplitudes(List<double>? amplitudes)
-            => amplitudes?.Where(a => a > 0).Distinct().ToList() ?? new List<double>();
+        /// <summary>幅度档清洗：去 ≤0 的无效档、去重 </summary>
+        private static List<double> CleanEcg009Amplitudes(List<double>? amplitudes)=> amplitudes?.Where(a => a > 0).Distinct().ToList() ?? new List<double>();
 
-        /// <summary>判定区间展示文本：null 端显示“不限”（提醒用户规格值还需在配置页填写）</summary>
-        private static string FormatRange(double? min, double? max, string unit = "mmHg/s")
-            => min == null && max == null
-                ? "未填写，仅报实测值不判定"
-                : $"{min?.ToString("0.###") ?? "不限"} ~ {max?.ToString("0.###") ?? "不限"} {unit}";
+        /// <summary>判定区间展示文本：null 端显示“不限”</summary>
+        private static string FormatRange(double? min, double? max, string unit = "mmHg/s") => min == null && max == null? "未填写，仅报实测值不判定": $"{min?.ToString("0.###") ?? "不限"} ~ {max?.ToString("0.###") ?? "不限"} {unit}";
 
         #endregion
     }

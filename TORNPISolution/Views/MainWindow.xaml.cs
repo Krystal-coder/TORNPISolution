@@ -48,12 +48,14 @@ namespace TORNPISolution.Views
 
         private MainViewModel ViewModel => (MainViewModel)DataContext;
 
-        /// <summary>关闭前先让三边各自收尾：测试项（退测试模式、泄压、关共享会话）、单板轮次（断设备连接）、烧录轮（杀工具进程、写记录），再走销毁；否则进程一退设备就留在带压的测试模式、综测仪还挂着输出、烧录工具作为孤儿进程继续占着那几路的串口</summary>
+        /// <summary>关闭前先让五边各自收尾：测试项（退测试模式、泄压、关共享会话）、单板轮次（断设备连接）、烧录轮（杀工具进程、写记录）、加速度充电检查与 ECG 波形采集（各自停推流、收尾 CSV、断自己那一路的产品串口），再走销毁；否则进程一退设备就留在带压的测试模式、综测仪还挂着输出、烧录工具作为孤儿进程继续占着那几路的串口、产品还留在心电测试模式一直推波形</summary>
         protected override void OnClosing(CancelEventArgs e)
         {
             ViewModel.StopAndAwaitWrapUp();
             ViewModel.Board.StopAndAwaitWrapUp();
             ViewModel.Flashing.StopAndAwaitWrapUp();
+            ViewModel.AccelCheck.StopAndAwaitWrapUp();
+            ViewModel.EcgCapture.StopAndAwaitWrapUp();
             base.OnClosing(e);
         }
 

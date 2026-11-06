@@ -98,7 +98,18 @@ namespace TORNPISolution.Service.Communication
             }
 
             var data = Encoding.ASCII.GetBytes(command.TrimEnd('\n', '\r') + "\n");
-            await _stream.WriteAsync(data, ct).ConfigureAwait(false);
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeoutCts.CancelAfter(_timeoutMs);
+
+            try
+            {
+                await _stream.WriteAsync(data, timeoutCts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                throw new TimeoutException($"SCPI 发送超时（{_timeoutMs}ms）：{command}");
+            }
+
             _log.Debug($"SCPI 发送：{command}");
         }
 

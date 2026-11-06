@@ -34,6 +34,10 @@ namespace TORNPISolution.ViewModels
         private readonly FlashingViewModel _flashing;
         // 单板工位的界面数据：按通道跑固定几项，不走模块库与方案
         private readonly BoardChannelViewModel _board;
+        // 辅助功能（加速度充电检查）的界面数据：与整机/单板抢同一个产品串口，两边不得同时占
+        private readonly AccelCheckViewModel _accelCheck;
+        // 辅助功能（ECG 波形采集）的界面数据：同样抢那一个产品串口，与整机/单板/加速度三路互斥
+        private readonly EcgCaptureViewModel _ecgCapture;
         // 主窗口停在哪个页面：启动永远先落在工位选择页，让人自己点进去
         private WorkbenchPage _selectedPage = WorkbenchPage.Entry;
         // 上一次进的工位：只在入口页念一句“上次在…”，不替人决定进哪一页
@@ -73,6 +77,8 @@ namespace TORNPISolution.ViewModels
         public MainViewModel(ITestModuleService moduleService, ITestItemService testItemService,
                              ITestPlanService testPlanService, IAppStateService appState,
                              FlashingViewModel flashing, BoardChannelViewModel board,
+                             AccelCheckViewModel accelCheck,
+                             EcgCaptureViewModel ecgCapture,
                              BloodPressureSimulatorSession simSession, ITestDataService testDataService,
                              ITestReportService testReportService, IInstrumentConfigService configService)
         {
@@ -83,6 +89,8 @@ namespace TORNPISolution.ViewModels
             _configService = configService;
             _flashing = flashing;
             _board = board;
+            _accelCheck = accelCheck;
+            _ecgCapture = ecgCapture;
             _simSession = simSession;
             _testDataService = testDataService;
             _testReportService = testReportService;
@@ -103,7 +111,11 @@ namespace TORNPISolution.ViewModels
             OpenWholeMachinePageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.WholeMachine), CanSwitchPage);
             OpenBoardPageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.Board), CanSwitchPage);
             OpenFlashingPageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.Flashing), CanSwitchPage);
-            BackToEntryCommand = new RelayCommand(BackToEntry, CanSwitchPage);
+            // 辅助功能（加速度充电检查）：整机页模块库底部那颗入口，点击即整页切换，不拖模块、不进方案、不产测试项
+            OpenAccelCheckPageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.AccelCheck), CanSwitchPage);
+            OpenEcgCapturePageCommand = new RelayCommand(() => SwitchPage(WorkbenchPage.EcgCapture), CanSwitchPage);
+            // 返回键再叠一条：停在辅助功能页且那一页还占着产品串口就不让走（先在本页点「断开」交出口）
+            BackToEntryCommand = new RelayCommand(BackToEntry, () => CanSwitchPage() && !IsAuxPortHeld);
             SavePlanCommand = new RelayCommand(SavePlan, () => PlanModules.Count > 0 && !IsRunning);
             LoadPlanCommand = new RelayCommand(LoadPlan, () => !IsRunning);
             // 入库失败后的重试：快照留内存，CanExecute 由 _pendingSaveSnapshot 是否有值决定（WPF 空闲自动刷新）
@@ -264,6 +276,9 @@ namespace TORNPISolution.ViewModels
         /// <summary>入库失败滞留提示留几秒：这条要人去点「重试保存」，比成功提示给更长的停留</summary>
         private const int PendingSaveGrowlSeconds = 20;
 
+        /// <summary>产品串口被辅助功能占着、方案开不了跑时的提示留几秒</summary>
+        private const int PortBusyGrowlSeconds = 8;
+
         /// <summary>设备连接失败通知：Growl 错误气泡，几秒后自己收，鼠标停在气泡上 HandyControl 会把计时清零。Error 档在 !IsCustom 时硬置 StaysOpen=true（就是不自动关，8 路一起报错就得挨个点关闭）；走 IsCustom=true 才会上启动关闭的计时器，而图标与红色仍按 Error 默认给（源码那边是 ??= 兜底），外观不变；同一份内容在页底状态条、明细表与日志里都还在。</summary>
         private void OnDeviceConnectionFailed(string moduleName, string message)
         {
@@ -380,19 +395,33 @@ namespace TORNPISolution.ViewModels
         /// <summary>单板工位的界面数据：XAML 把 BoardChannelView 的 DataContext 接到它上</summary>
         public BoardChannelViewModel Board => _board;
 
+        /// <summary>辅助功能（加速度充电检查）的界面数据：XAML 把 AccelCheckView 的 DataContext 接到它上</summary>
+        public AccelCheckViewModel AccelCheck => _accelCheck;
+
+        /// <summary>辅助功能（ECG 波形采集）的界面数据：XAML 把 EcgCaptureView 的 DataContext 接到它上</summary>
+        public EcgCaptureViewModel EcgCapture => _ecgCapture;
+
         /// <summary>主窗口当前停在哪个页面（只能由入口页的四个命令改，绑定不回写）</summary>
         public WorkbenchPage SelectedPage
         {
             get => _selectedPage;
             private set
             {
+                var from = _selectedPage;
                 if (!SetProperty(ref _selectedPage, value)) return;
+
+                // 能离开辅助功能页说明口已经交出去了：这里只收那一页的界面定时器
+                if (from == WorkbenchPage.AccelCheck && value != WorkbenchPage.AccelCheck) _accelCheck.LeavePage();
+                if (from == WorkbenchPage.EcgCapture && value != WorkbenchPage.EcgCapture) _ecgCapture.LeavePage();
 
                 OnPropertyChanged(nameof(IsEntryPage));
                 OnPropertyChanged(nameof(IsWholeMachinePage));
                 OnPropertyChanged(nameof(IsBoardPage));
                 OnPropertyChanged(nameof(IsFlashingPage));
+                OnPropertyChanged(nameof(IsAccelCheckPage));
+                OnPropertyChanged(nameof(IsEcgCapturePage));
                 OnPropertyChanged(nameof(ShowBackButton));
+                OnPropertyChanged(nameof(BackButtonText));
                 OnPropertyChanged(nameof(LastStationHintText));
             }
         }
@@ -409,8 +438,17 @@ namespace TORNPISolution.ViewModels
         /// <summary>停在烧录页</summary>
         public bool IsFlashingPage => SelectedPage == WorkbenchPage.Flashing;
 
+        /// <summary>停在辅助功能页（加速度充电检查）</summary>
+        public bool IsAccelCheckPage => SelectedPage == WorkbenchPage.AccelCheck;
+
+        /// <summary>停在辅助功能页（ECG 波形采集）</summary>
+        public bool IsEcgCapturePage => SelectedPage == WorkbenchPage.EcgCapture;
+
         /// <summary>菜单行最右侧那枚返回键要不要给（入口页上没有自己可返）</summary>
         public bool ShowBackButton => !IsEntryPage;
+
+        /// <summary>返回键文字：辅助功能页是从整机页的模块库底部进来的，回去就回那一页，不用人再在工位选择页点一次</summary>
+        public string BackButtonText => IsAuxPage(SelectedPage) ? "← 返回整机测试" : "← 返回工位选择";
 
         /// <summary>入口页注释</summary>
         public string LastStationHintText => $"上次这台机器用的是：{_lastStation.ToDisplay()}";
@@ -545,6 +583,8 @@ namespace TORNPISolution.ViewModels
         public ICommand OpenWholeMachinePageCommand { get; }
         public ICommand OpenBoardPageCommand { get; }
         public ICommand OpenFlashingPageCommand { get; }
+        public ICommand OpenAccelCheckPageCommand { get; }
+        public ICommand OpenEcgCapturePageCommand { get; }
         public ICommand BackToEntryCommand { get; }
         public ICommand SavePlanCommand { get; }
         public ICommand LoadPlanCommand { get; }
@@ -730,6 +770,22 @@ namespace TORNPISolution.ViewModels
                 if (TestRunState.IsRunning)
                 {
                     _log.Warn("单板轮次正在跑，忽略启动测试方案的请求");
+                    return;
+                }
+
+                // 辅助功能那两路还连着就不开方案：两边用的是同一个产品串口，COM 口只能有一个持有者
+                var heldBy = AccelCheck.IsPortBusy ? WorkbenchPage.AccelCheck
+                           : EcgCapture.IsPortBusy ? WorkbenchPage.EcgCapture
+                           : (WorkbenchPage?)null;
+                if (heldBy != null)
+                {
+                    _log.Warn($"「{heldBy.Value.ToDisplay()}」还占着产品串口，忽略启动测试方案的请求：回那一页点「断开」再跑");
+                    Growl.WarningGlobal(new GrowlInfo
+                    {
+                        Message = $"产品串口还被「{heldBy.Value.ToDisplay()}」占着（产测态也还保持着）：回那一页点「断开」把口交出来，再跑方案",
+                        WaitTime = PendingSaveGrowlSeconds,
+                        IsCustom = true,
+                    });
                     return;
                 }
 
@@ -1164,6 +1220,17 @@ namespace TORNPISolution.ViewModels
 
         private bool CanSwitchPage() => !IsRunning && !_flashing.IsRunning && !_board.IsRunning;
 
+        /// <summary>辅助功能页（加速度充电检查 / ECG 波形采集）：都不算一台机器的工位，返回一律回整机页，也不记进"上次用的是哪一站"</summary>
+        private static bool IsAuxPage(WorkbenchPage page) => page is WorkbenchPage.AccelCheck or WorkbenchPage.EcgCapture;
+
+        /// <summary>停在辅助功能页且那一页还占着产品串口（连着、正在推流或正在收尾都算）：没点「断开」交出口就不让离开本页</summary>
+        private bool IsAuxPortHeld => SelectedPage switch
+        {
+            WorkbenchPage.AccelCheck => _accelCheck.IsPortBusy,
+            WorkbenchPage.EcgCapture => _ecgCapture.IsPortBusy,
+            _ => false,
+        };
+
         private void SwitchPage(WorkbenchPage target)
         {
             _log.Info($"{DateTime.Now} Start calling the MainViewModel.SwitchPage() method . {Environment.NewLine}");
@@ -1177,10 +1244,24 @@ namespace TORNPISolution.ViewModels
                     return;
                 }
 
+                if (IsAuxPortHeld)
+                {
+                    _log.Warn($"「{SelectedPage.ToDisplay()}」还占着产品串口，忽略离开本页的请求：先在本页点「断开」把口交出来");
+                    return;
+                }
+
                 SelectedPage = target;
-                _lastStation = target;
-                _appState.SaveLastPage(target);
+
+                // 辅助功能页不算一台机器的工位，不记进"上次用的是哪一站"，免得下次启动提示变成一句没意义的话
+                if (!IsAuxPage(target))
+                {
+                    _lastStation = target;
+                    _appState.SaveLastPage(target);
+                }
                 OnPropertyChanged(nameof(LastStationHintText));
+
+                if (target == WorkbenchPage.AccelCheck) _accelCheck.EnterPage();
+                if (target == WorkbenchPage.EcgCapture) _ecgCapture.EnterPage();
 
                 _log.Info($"已进入{target.ToDisplay()}：模块库 {LibraryModules.Count} 项，方案 {PlanModules.Count} 个模块（各页东西互不清）");
             }
@@ -1198,6 +1279,13 @@ namespace TORNPISolution.ViewModels
             if (!CanSwitchPage())
             {
                 _log.Warn("这一轮还在跑，先停下再回工位选择页");
+                return;
+            }
+
+            // 辅助功能页只在整机页的模块库里入口，返回理所当然回整机页；口没交出来时 SwitchPage 那一关先把它挡下
+            if (IsAuxPage(SelectedPage))
+            {
+                SwitchPage(WorkbenchPage.WholeMachine);
                 return;
             }
 

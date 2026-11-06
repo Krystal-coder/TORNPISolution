@@ -37,17 +37,24 @@ namespace TORNPISolution.Service
         public static readonly double[] PcalPoints = { 50, 150, 250 };
         public const string PcalStartSensor = "启动压力传感器";
         public const string PcalCloseSensor = "关闭压力传感器";
+
+        /// <summary>压力校准 K/B 回读项（0x07 0xC3）：校准动作完成后读回，两个值都不等于出厂默认即合格</summary>
+        public const string PcalReadKb = "读取压力校准KB值";
+
+        /// <summary>K/B 出厂默认值（产品未校准或恢复出厂设置时就是这一对；实机未校准读回约 -34.1 / -7.0）</summary>
+        public const double PcalKbDefaultK = -30.9006;
+        public const double PcalKbDefaultB = -46.6286;
         /// <summary>校准点项名（按压力值命名）：目录构建（Spec）与执行端上报（TestItem）同用本函数</summary>
         public static string PcalPoint(double value) => $"设置{value:0.##}mmHg压力校准";
 
-        // -------- A18 放气速率测试（产品关泄气阀封闭气路，仪器充气/缓降两段各一项：测试值=该段时长，双值列=该点采样压力）--------
+        // -------- A18 放气速率测试（产品关泄气阀封闭气路，仪器充气/缓降两段各一项：测试值=该段时长，双值列=该点采样压力；BPA700 过压测试 / 康伟达压力源+慢释阀）--------
         /// <summary>充气目标（mmHg）与缓降终点（mmHg）：Spec 说明与执行端流程同用</summary>
         public const double DeflateInflatePressure = 230;
         public const double DeflateEndPressure = 40;
         public const string Deflate007InflateTime = "BP-007加压时间t1";
         public const string Deflate007DeflateTime = "BP-007放气时间t2";
 
-        // -------- A22 气路泄露测试（封堵毛细气孔后高低压各读起止两点，差值即泄气量；读取用指令与校准/BP-003 同款）--------
+        // -------- A22 气路泄露测试（封堵毛细气孔后高低压各读起止两点，差值即泄气量；BPA700 静态压力序列 / 康伟达压力源直切；读取用指令与校准/BP-003 同款）--------
         /// <summary>高压段与低压段压力点（mmHg）：Spec 说明与执行端流程同用</summary>
         public const double LeakHighPressure = 250;
         public const double LeakLowPressure = 50;
@@ -57,10 +64,6 @@ namespace TORNPISolution.Service
         public const string Leak010LowStart = "BP-010低压起点P_L_start";
         public const string Leak010LowEnd = "BP-010低压终点P_L_end";
         public const string Leak010LowLoss = "BP-010低压泄气值ΔP_L";
-
-        // -------- A19/A20 JJG692-2010 标准检测（康伟达 0x04 功能，参数取康伟达配置页→JJG692 段）--------
-        public const string Jjg692DeflationRate = "JJG692放气速率(听诊)";
-        public const string Jjg692Airtightness = "JJG692气密性";
 
         // -------- A06 血压动态压力精度测试（BP-004，一组压力一轮一项：按配置压力组与轮数动态生成，同 A05 机制）--------
         /// <summary>

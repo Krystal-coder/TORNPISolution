@@ -123,7 +123,7 @@ namespace TORNPISolution.Service
         ///    康伟达（或勾了「点间泄压」的 BPA700）=逐点单轮，每点经 RunStaticPressureSequenceAsync 执行（到位后本轮自带泄压收尾）。
         /// ② 每点到稳压后取窗口末端均值作仪器标准值，并在同一保持窗内回读产品压力（0x76），保证与仪器稳定值同时刻口径；
         /// ③ 逐点判定 产品−仪器 按静态规格 -0.5~0.5mmHg，一点一项（项名 SpecItems.Bp003Point，与 Spec 目录同源）：测试值=带符号偏差（正=产品偏高），
-        ///    仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；
+        ///    仪器列=稳压值、产品列=上报值；产品无上报的点判 FAIL，模块结论=各项全过；单轮路径每点测完立即上报（序列路径同样逐点上报），不等全部点跑完；
         ///    全程开启压力采样，每个点的项只挂本点那一段曲线（时间轴逐点重开，不与前一点相连）。
         /// </summary>
         //测试项目**************************---A05---**************************血压静态压力精度测试（BP-003）
@@ -202,7 +202,7 @@ namespace TORNPISolution.Service
                         {
                             try
                             {
-                                productValues[i] = await product.ReadProductPressureAsync(token);
+                                productValues[i] = await ReadStableProductPressureAsync(product, pointValues[i], token);
                             }
                             catch (Exception ex) when (ex is not OperationCanceledException)
                             {
@@ -267,6 +267,9 @@ namespace TORNPISolution.Service
                             lock (readTasksLock) { pending = readTasks.ToArray(); readTasks.Clear(); }
                             await Task.WhenAll(pending);
 
+                            // 逐点上报：本点仪器稳压值与产品回读都齐了就立即交出一项，UI 边测边出，不等全部点跑完
+                            await ReportStaticAccuracyPointAsync(collector, pointValues[i], stablePressures[i], productValues[i]);
+
                             // 点间泄压（配置选「点间泄压」时）：本点测完泄回零再升下一点，末点留给模块结束统一泄
                             if (sp.VentBetweenPoints && i < pointValues.Length - 1)
                             {
@@ -275,8 +278,6 @@ namespace TORNPISolution.Service
                             }
                         }
                         currentPoint = -1;   // 收尾段（泄气/退模式）不再画进任何点的曲线
-
-                        await ReportStaticAccuracyAsync(collector, pointValues, stablePressures, productValues);
                     }
                 }
                 finally
@@ -333,29 +334,26 @@ namespace TORNPISolution.Service
             }
         }
 
-        /// <summary>BP-003 逐点判定与上报（一点一项）：每点 产品上报值 − 仪器稳压值 按静态规格 -0.5~0.5mmHg 判定；无产品上报/仪器未稳压的点误差落到规格外保证 FAIL，缺值列显示 --。</summary>
-        private async Task ReportStaticAccuracyAsync(TestItemResultCollector collector,
-            double[] pointValues, double[] stablePressures, double?[] productValues)
-        {
-            for (var i = 0; i < pointValues.Length; i++)
-                await ReportStaticAccuracyPointAsync(collector, pointValues[i], stablePressures[i], productValues[i]);
-        }
-
         /// <summary>BP-003 单点判定与上报（两条驱动路径共用）：产品/仪器任一缺值时误差算不出，测试值落到规格外保证 FAIL。</summary>
         private async Task ReportStaticAccuracyPointAsync(TestItemResultCollector collector,
             double target, double standard, double? productValue)
         {
             const double Tolerance = 0.5;   // mmHg，测试要求文档固定
+            const double TargetTolerance = 2.0;   // mmHg：仪器稳压值必须贴住本点目标（设备稳压判据 ±1.5，留余量）
 
             var hasInstrument = !double.IsNaN(standard);
             var hasProduct = productValue.HasValue && !double.IsNaN(productValue.Value);
+            // 先卡"本点到底测的是不是这个目标"：设 100 却停在 250 时，产品回读和仪器一起偏，
+            // 误差照样算得出 0——不先拦住就会判 PASS（牛头不对马嘴）。仪器没到点一律不报告误差。
+            var instrumentAtTarget = hasInstrument && Math.Abs(standard - target) <= TargetTolerance;
             // 带符号上报：取绝对值的话规格下界 -0.5 永远用不上，也看不出产品偏高还是偏低
-            var err = hasInstrument && hasProduct ? productValue!.Value - standard : (double?)null;
+            var err = instrumentAtTarget && hasProduct ? productValue!.Value - standard : (double?)null;
             var pass = err.HasValue && Math.Abs(err.Value) <= Tolerance;
             var remark = pass
                 ? string.Empty
                 : !hasProduct ? "无产品上报值（产品未连接或无响应）"
                 : !hasInstrument ? "仪器未稳压到位"
+                : !instrumentAtTarget ? $"仪器未稳到本点目标（仪器 {standard:0.0} / 目标 {target:0.0}，偏差超过 ±{TargetTolerance:0.##}mmHg）"
                 // 备注只写未通过原因，具体偏差数值看测试值列与下一行日志
                 : $"误差超过 ±{Tolerance:0.##}mmHg（测试值为带符号偏差：正=产品偏高）";
 
@@ -378,7 +376,6 @@ namespace TORNPISolution.Service
             AirPathRig rig, TestItemResultCollector collector, double[] pointValues, bool productAvailable,
             bool inflation, int holdSeconds, CancellationToken token)
         {
-            const int SettleMs = 800;
             const int PointArriveSeconds = 60;
 
             try
@@ -387,17 +384,21 @@ namespace TORNPISolution.Service
                     PointArriveSeconds,
                     i =>
                     {
-                        rig.BeginPhase(SpecItems.Bp003Point(pointValues[i]));   // 本点独立时间轴
+                        // 本点独立时间轴；起压阈值取目标 10%（100→10、200→20）：
+                        // BPA700 每点前有一段设备恢复/泄压平台（现场约 8.8s），与目标无关，
+                        // 画进曲线只占时间轴、把真正的升压段压扁
+                        rig.BeginPhase(SpecItems.Bp003Point(pointValues[i]), pointValues[i] * 0.1);
                         return Task.CompletedTask;
                     },
                     async i =>
                     {
-                        await Task.Delay(SettleMs, token);
-                        var standard = rig.WindowAverage();
+                        // 等压力源真正稳到 ±0.5mmHg 再取标准值：SDK 报 Stable 后曲线仍可能小幅爬升/回落，
+                        // 0.8s 窗口均值会在目标附近跳 1~2mmHg（0.5 规格下这点抖动就足以判错）
+                        var standard = await WaitPressureStableAsync(rig, pointValues[i], 0.5, 5, token);
                         double? productValue = null;
                         if (productAvailable)
                         {
-                            var read = await ReadProductPressureAsync(product, $"{pointValues[i]:0.#}mmHg 上报", token);
+                            var read = await ReadStableProductPressureAsync(product, pointValues[i], token);
                             if (!double.IsNaN(read)) productValue = read;
                         }
                         await ReportStaticAccuracyPointAsync(collector, pointValues[i], standard, productValue);
@@ -408,6 +409,53 @@ namespace TORNPISolution.Service
             {
                 _log.Warn($"BP-003：{ex.Message}（未报告的点由收尾判 FAIL）");
             }
+        }
+
+        /// <summary>
+        /// 等仪器采样均值真正贴住本点目标（|均值−目标| ≤ tolerance 连续三拍，约 0.6s）再取标准值。
+        /// BPA700 的 Stable 只是 SDK 判定点，之后曲线仍会小幅爬升/回落，0.8s 窗口均值在目标附近能跳 1~2mmHg；
+        /// ±0.5mmHg 的规格下这点抖动就足以把合格点判成不合格。超时用最后均值并记 Warn，不中断本轮。
+        /// </summary>
+        private async Task<double> WaitPressureStableAsync(AirPathRig rig, double target, double tolerance,
+            int timeoutSeconds, CancellationToken token)
+        {
+            await Task.Delay(800, token);   // 原固定 settle：先让采样窗从爬坡段走出来
+
+            var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
+            var last = rig.WindowAverage();
+            var hits = 0;
+            while (DateTime.UtcNow < deadline)
+            {
+                token.ThrowIfCancellationRequested();
+                last = rig.WindowAverage();
+                if (!double.IsNaN(last) && Math.Abs(last - target) <= tolerance)
+                {
+                    if (++hits >= 3) return last;
+                }
+                else hits = 0;
+                await Task.Delay(200, token);
+            }
+
+            _log.Warn($"BP-003 {target:0.#}mmHg：{timeoutSeconds}s 内仪器稳压没进 ±{tolerance:0.##}（当前 {last:0.0}），按最后均值判定");
+            return last;
+        }
+
+        /// <summary>
+        /// 读产品静压（0x76）并等它自己稳下来：连续两次读数差 ≤0.5mmHg 才采用，最多读 5 次（间隔 300ms）。
+        /// 产品内部压力滤波/上报有滞后，Stable 瞬间读到的是还在爬的中间值；不稳定的单次读数会在 ±0.5 规格下造成 3~5mmHg 的假误差。
+        /// </summary>
+        private async Task<double> ReadStableProductPressureAsync(IProductController product, double target, CancellationToken token)
+        {
+            double prev = double.NaN, last = double.NaN;
+            for (var i = 0; i < 5; i++)
+            {
+                last = await ReadProductPressureAsync(product, $"{target:0.#}mmHg 上报", token);
+                if (!double.IsNaN(last) && !double.IsNaN(prev) && Math.Abs(last - prev) <= 0.5)
+                    return last;
+                prev = last;
+                if (i < 4) await Task.Delay(300, token);
+            }
+            return last;
         }
 
     }

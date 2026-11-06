@@ -34,7 +34,7 @@ namespace TORNPISolution.ViewModels
         private static readonly string[] OrderedKeys =
         {
             // 心跳（Func=0x07）
-            "CtrlKeepAlive",
+            "CtrlKeepAlive", "CtrlExitProductionTestMode",
             // 产品信息查询（Func=0x02）
             "CtrlGetProductTime", "CtrlGetAllUserParams", "CtrlGetUserCount", "CtrlGetProductConfig",
             "CtrlGetProductStatus", "CtrlGetDisconnectInfo", "CtrlGetResetInfo", "CtrlGetVersionInfo",
@@ -49,10 +49,11 @@ namespace TORNPISolution.ViewModels
             // 主动推送（Func=0x06）
             "CtrlPushEcgWave", "CtrlPushEcgHr", "CtrlPushPpgHr", "CtrlPushPpgSpo2",
             // 硬件控制/产测（Func=0x07）
-            "CtrlSetSampleRate", "CtrlStartPressureSensor", "CtrlCalibratePressureSensor", "CtrlClosePressureSensor",
+            "CtrlSetSampleRate", "CtrlStartPressureSensor", "CtrlCalibratePressureSensor", "CtrlClosePressureSensor", "CtrlReadPressureKb",
             "CtrlStartPumpTest", "CtrlStopPumpTest", "CtrlOpenValveTest", "CtrlCloseValveTest",
             "CtrlGetBatteryInfo", "CtrlGetChargingStatus", "CtrlSoftPowerOff",
             "CtrlPlay1KHzSine", "CtrlStopAudioPlay",
+            "CtrlStartAccelSensor", "CtrlStopAccelSensor",
             "CtrlStartEcgPpgMeasure", "CtrlStopEcgPpgMeasure", "CtrlGetEcgPpgResult",
             "CtrlFactoryReset"
         };

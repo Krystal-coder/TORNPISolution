@@ -14,6 +14,12 @@ namespace TORNPISolution.Data
 
         public static string ConnectionString { get; } = $"Data Source={DatabaseFile}";
 
+        /// <summary>加速度充电检查的采样 CSV 目录：输出目录下的 TestData\AccelCheck，一次保存一份文件</summary>
+        public static string AccelCheckDirectory { get; } = Path.Combine(AppContext.BaseDirectory, "TestData", "AccelCheck");
+
+        /// <summary>ECG 波形采集的 CSV 目录：输出目录下的 TestData\EcgCapture，滚动段与手动导出都落在这里</summary>
+        public static string EcgCaptureDirectory { get; } = Path.Combine(AppContext.BaseDirectory, "TestData", "EcgCapture");
+
         public static void EnsureDirectories()
         {
             Directory.CreateDirectory(RootDirectory);

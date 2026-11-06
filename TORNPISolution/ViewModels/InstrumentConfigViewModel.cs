@@ -18,11 +18,13 @@ namespace TORNPISolution.ViewModels
     public class InstrumentConfigViewModel : ViewModelBase
     {
         private readonly IInstrumentConfigService _configService;
+        private readonly AccelCheckService _accelCheck;
         private readonly ILogService _log = new LogService(nameof(InstrumentConfigViewModel));
 
-        public InstrumentConfigViewModel(IInstrumentConfigService configService)
+        public InstrumentConfigViewModel(IInstrumentConfigService configService, AccelCheckService accelCheck)
         {
             _configService = configService;
+            _accelCheck = accelCheck;
             Config = _configService.Load();
             RefreshPorts();
 
@@ -33,6 +35,11 @@ namespace TORNPISolution.ViewModels
 
             SaveCommand = new RelayCommand(Save, () => !TestRunState.IsRunning);
             RefreshPortsCommand = new RelayCommand(RefreshPorts);
+            // 产测态进出（手动联调对口用）：加速度那一轮占着口、或整机在跑时不让发；进了只有退出能点，反之同理
+            EnterProductionModeCommand = new RelayCommand(async () => await ApplyProductionModeAsync(true),
+                () => !_accelCheck.InProductionMode && CanEditProductionMode);
+            ExitProductionModeCommand = new RelayCommand(async () => await ApplyProductionModeAsync(false),
+                () => _accelCheck.InProductionMode && CanEditProductionMode);
         }
 
         /// <summary>当前编辑中的配置</summary>
@@ -168,6 +175,39 @@ namespace TORNPISolution.ViewModels
         public bool CanSave => !IsRunning;
 
         public ICommand RefreshPortsCommand { get; }
+
+        /// <summary>手动补发进入产测（产品尚未进这个态时可点）</summary>
+        public ICommand EnterProductionModeCommand { get; }
+
+        /// <summary>手动补发退出产测（产品已在这个态时可点）</summary>
+        public ICommand ExitProductionModeCommand { get; }
+
+        /// <summary>串口被加速度那一轮或整机测试占着时，两枚按钮都不给点</summary>
+        private bool CanEditProductionMode => !TestRunState.IsRunning && !_accelCheck.IsPortBusy;
+
+        private string _productionModeText = "「加速度充电检查」连产品串口时自动进这个态、断开时自动退出；这里只给用串口助手手动联调时补发，走已保存的串口参数";
+
+        /// <summary>产测模式那两枚按钮下面的一行回执</summary>
+        public string ProductionModeText
+        {
+            get => _productionModeText;
+            private set => SetProperty(ref _productionModeText, value);
+        }
+
+        private async Task ApplyProductionModeAsync(bool enter)
+        {
+            _log.Info($"{DateTime.Now} Start calling the InstrumentConfigViewModel.ApplyProductionModeAsync() method . {Environment.NewLine}");
+            try
+            {
+                ProductionModeText = $"{(enter ? "进入" : "退出")}产测：发送中…";
+                ProductionModeText = await _accelCheck.ApplyProductionModeAsync(enter);
+            }
+            finally
+            {
+                CommandManager.InvalidateRequerySuggested();
+                _log.Info($"{DateTime.Now} Ended calling the InstrumentConfigViewModel.ApplyProductionModeAsync() method . {Environment.NewLine}");
+            }
+        }
 
         /// <summary>保存成功后请求关闭对话框（由窗口订阅）</summary>
         public event Action? CloseRequested;

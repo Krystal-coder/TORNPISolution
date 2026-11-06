@@ -41,9 +41,31 @@ namespace TORNPISolution.Service
         public string Unit { get; init; } = string.Empty;
     }
 
+    /// <summary>Roll 折线图上的一个采样点（横轴用相对会话首帧的秒数，抽稀后仍按时刻先后排）</summary>
+    public sealed record AccelRollSample(double AtSeconds, double Roll, bool Exceeded);
+
+    /// <summary>Roll 折线图的一条线 = 同一姿态标签的一次连续区间；同名标签来回切过的多次区间同色但各自一条，中间不连线</summary>
+    public sealed class AccelRollLineSeries
+    {
+        /// <summary>姿态标签（图例文字）</summary>
+        public string Name { get; init; } = string.Empty;
+
+        /// <summary>线色（HEX，按标签首次出现取，与界面曲线同一排顺序）</summary>
+        public string Color { get; init; } = "#1F77B4";
+
+        public List<AccelRollSample> Points { get; init; } = new();
+    }
+
+    /// <summary>Roll 折线图模型：X=相对秒数，Y=倾角；超限帧按段色描点标出</summary>
+    public sealed class AccelRollChartModel
+    {
+        public List<AccelRollLineSeries> Series { get; init; } = new();
+    }
+
     /// <summary>
     /// 报表图表（SVG 矢量，QuestPDF 原生渲染，无位图依赖）：重复性折线图 <see cref="BuildRepeatLineChart"/>、
-    /// 判定构成环形图 <see cref="BuildVerdictDoughnut"/>、模块通过率横条 <see cref="BuildModuleRateBars"/>、按天趋势图 <see cref="BuildTrendChart"/>。
+    /// 判定构成环形图 <see cref="BuildVerdictDoughnut"/>、模块通过率横条 <see cref="BuildModuleRateBars"/>、
+    /// 按天趋势图 <see cref="BuildTrendChart"/>、加速度 Roll 折线 <see cref="BuildAccelRollLineChart"/>。
     /// </summary>
     public static class ReportCharts
     {
@@ -407,6 +429,123 @@ namespace TORNPISolution.Service
             sb.Append($"<text x=\"{plotLeft + 168}\" y=\"{legendY}\" font-size=\"7.5\" fill=\"#666666\">通过率（右轴）</text>");
             sb.Append("</svg>");
             return sb.ToString();
+        }
+
+        // ==================== 加速度 Roll 折线 ====================
+
+        /// <summary>
+        /// 加速度 Roll 折线图：一段（同一姿态标签的一次连续区间）一条线，同名标签的多次区间同色但各自断开不连线；
+        /// 横轴是相对会话首帧的秒数，超限帧按段色描点。数据侧已抽稀到每段几百点，这里只铺线不再降采样。
+        /// </summary>
+        public static string BuildAccelRollLineChart(AccelRollChartModel model)
+        {
+            const int w = 520;
+            const int h = 200;
+            const int plotLeft = 40;
+            const int plotRight = w - 8;
+            const int plotTop = 32;
+            const int plotBottom = h - 26;
+
+            var drawn = model.Series.Where(s => s.Points.Count > 0).ToList();
+            var all = drawn.SelectMany(s => s.Points).ToList();
+            if (all.Count == 0)
+            {
+                return $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" " +
+                       $"viewBox=\"0 0 {w} {h}\" font-family=\"{Font}\">" +
+                       $"<rect width=\"{w}\" height=\"{h}\" fill=\"#FFFFFF\"/>" +
+                       $"<text x=\"{w / 2}\" y=\"{h / 2}\" font-size=\"9\" fill=\"#999999\" text-anchor=\"middle\">这份采样没有可画的 Roll 数据</text></svg>";
+            }
+
+            var maxSeconds = Math.Max(1.0, all.Max(p => p.AtSeconds));
+            var lo = all.Min(p => p.Roll);
+            var hi = all.Max(p => p.Roll);
+            // 整份采样同一个值时视野会塌成一条线（除零），按 ±1° 撑开
+            var pad = Math.Max((hi - lo) * 0.08, 0.5);
+            lo -= pad;
+            hi += pad;
+            var yStep = NiceStep((hi - lo) / 4);
+            lo = Math.Floor(lo / yStep) * yStep;
+            hi = Math.Ceiling(hi / yStep) * yStep;
+            var xStep = Math.Max(1, Math.Round(NiceStep(maxSeconds / 5)));
+
+            float X(double seconds) => plotLeft + (plotRight - plotLeft) * (float)(seconds / maxSeconds);
+            float Y(double v) => plotBottom - (plotBottom - plotTop) * (float)((v - lo) / (hi - lo));
+
+            var sb = new StringBuilder();
+            sb.Append($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" " +
+                      $"viewBox=\"0 0 {w} {h}\" font-family=\"{Font}\">");
+            sb.Append($"<rect width=\"{w}\" height=\"{h}\" fill=\"#FFFFFF\"/>");
+
+            // Y 网格与刻度
+            var yTicks = (int)Math.Round((hi - lo) / yStep);
+            for (var t = 0; t <= yTicks; t++)
+            {
+                var v = lo + yStep * t;
+                var y = Y(v);
+                sb.Append($"<line x1=\"{plotLeft}\" y1=\"{F(y)}\" x2=\"{plotRight}\" y2=\"{F(y)}\" stroke=\"#EEEEEE\"/>");
+                sb.Append($"<text x=\"{plotLeft - 4}\" y=\"{F(y + 3)}\" font-size=\"7.5\" fill=\"#999999\" " +
+                          $"text-anchor=\"end\">{V(v)}</text>");
+            }
+
+            // X 网格与时刻标签（mm:ss，满一小时转 h:mm:ss）
+            for (var t = 0; t <= 5; t++)
+            {
+                var seconds = xStep * t;
+                if (seconds > maxSeconds && t > 0) break;
+                var x = X(seconds);
+                sb.Append($"<line x1=\"{F(x)}\" y1=\"{plotTop}\" x2=\"{F(x)}\" y2=\"{plotBottom}\" stroke=\"#F5F5F5\"/>");
+                sb.Append($"<text x=\"{F(x)}\" y=\"{plotBottom + 12}\" font-size=\"7.5\" fill=\"#666666\" " +
+                          $"text-anchor=\"middle\">{Clock(seconds)}</text>");
+            }
+
+            // 0° 基准线：倾角正负在这里换号，没有它得靠 Y 刻度自己找零
+            if (lo < 0 && hi > 0)
+                sb.Append($"<line x1=\"{plotLeft}\" y1=\"{F(Y(0))}\" x2=\"{plotRight}\" y2=\"{F(Y(0))}\" " +
+                          $"stroke=\"#BDBDBD\" stroke-width=\"1\" stroke-dasharray=\"4,3\"/>");
+
+            sb.Append($"<line x1=\"{plotLeft}\" y1=\"{plotBottom}\" x2=\"{plotRight}\" y2=\"{plotBottom}\" stroke=\"#CCCCCC\"/>");
+
+            foreach (var s in drawn)
+            {
+                var path = new StringBuilder();
+                for (var i = 0; i < s.Points.Count; i++)
+                {
+                    var p = s.Points[i];
+                    path.Append(i == 0 ? " M " : " L ").Append($"{F(X(p.AtSeconds))},{F(Y(p.Roll))}");
+                }
+                sb.Append($"<path d=\"{path}\" fill=\"none\" stroke=\"{s.Color}\" stroke-width=\"1.6\" " +
+                          $"stroke-linejoin=\"round\" stroke-linecap=\"round\"/>");
+            }
+
+            // 超限帧在折线上描点：点用段自己的颜色，跟线一个样（红标判定在逐帧明细表里，图上不再另起一种红）
+            foreach (var s in drawn)
+                foreach (var p in s.Points.Where(p => p.Exceeded))
+                    sb.Append($"<circle cx=\"{F(X(p.AtSeconds))}\" cy=\"{F(Y(p.Roll))}\" r=\"2.2\" fill=\"{s.Color}\"/>");
+
+            // 图例：按标签去重（同名标签的多次区间共用一色），每行四条、最多两行，再长就省略
+            var legend = drawn.GroupBy(s => s.Name).Select(g => (g.Key, g.First().Color)).ToList();
+            for (var i = 0; i < Math.Min(legend.Count, 8); i++)
+            {
+                var x = plotLeft + (i % 4) * 122;
+                var y = 10 + (i / 4) * 11;
+                sb.Append($"<line x1=\"{x}\" y1=\"{y - 3}\" x2=\"{x + 14}\" y2=\"{y - 3}\" " +
+                          $"stroke=\"{legend[i].Item2}\" stroke-width=\"2.5\"/>");
+                sb.Append($"<text x=\"{x + 18}\" y=\"{y}\" font-size=\"8\" fill=\"#444444\">{Esc(Truncate(legend[i].Item1, 8))}</text>");
+            }
+            if (legend.Count > 8)
+                sb.Append($"<text x=\"{plotLeft + 4 * 122}\" y=\"{21}\" font-size=\"8\" fill=\"#9E9E9E\">还有 {legend.Count - 8} 档（见分段统计）</text>");
+
+            sb.Append("</svg>");
+            return sb.ToString();
+        }
+
+        /// <summary>相对秒数铺成时刻标签：满一小时才带小时位，否则 mm:ss</summary>
+        private static string Clock(double seconds)
+        {
+            var span = TimeSpan.FromSeconds(seconds);
+            return span.TotalHours >= 1
+                ? span.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture)
+                : span.ToString(@"m\:ss", CultureInfo.InvariantCulture);
         }
     }
 }

@@ -158,6 +158,8 @@ namespace TORNPISolution.Service.Devices
 
         // 静态压力测试：Finish(4) 信号（上一轮未 Finish 前再调 BPARunStaticPressure 会被设备拒绝）
         private TaskCompletionSource<bool>? _staticFinishTcs;
+        /// <summary>上一次静态压力状态：同一状态（尤其 Wait 0.2s 一条）不重复打日志，只在状态切换时记一行</summary>
+        private int _lastStaticStatus = -1;
 
         private readonly Queue<double> _recentSamples = new();
         private readonly object _sampleLock = new();
@@ -617,7 +619,12 @@ namespace TORNPISolution.Service.Devices
             // 保持回调引用防止 GC；status: 0=Idle, 1=Wait, 2=Busy, 3=Stable, 4=Finish
             _staticPressureCallback = (status, waitTime, index) =>
             {
-                _log.Debug($"BPA700 静态压力回调：status={status} wait={waitTime:0.0} index={index}");
+                // SDK 每 200ms 回调一次，Wait 阶段会连发几十条；同一状态只记一行，状态切换时才打
+                if (status != _lastStaticStatus)
+                {
+                    _lastStaticStatus = status;
+                    _log.Info($"BPA700 静态压力：{StaticStatusText(status, waitTime)}");
+                }
                 if (status == 3 || status == 4)
                     stableReached.TrySetResult(true);
                 if (status == 4)
@@ -649,6 +656,17 @@ namespace TORNPISolution.Service.Devices
         /// </summary>
         public Task StartStaticPressureSequenceAsync(double[] points, int holdSeconds, bool inflation, CancellationToken ct = default)
             => throw new NotSupportedException("BPA700 正式版 SDK 无静态压力序列模式，请用 BPA700 Beta 句柄版（A18/A22 已按此路由）");
+
+        /// <summary>静态压力状态文本（日志用）：SDK status 0=Idle / 1=Wait / 2=Busy / 3=Stable / 4=Finish</summary>
+        private static string StaticStatusText(int status, double waitTime) => status switch
+        {
+            0 => "Idle",
+            1 => $"等待设备恢复 {waitTime:0.#}s",
+            2 => "充气/稳压中",
+            3 => "已稳定（Stable）",
+            4 => "本轮完成（Finish）",
+            _ => $"status={status}"
+        };
 
         /// <summary>
         /// 等待当前静态压力测试完成（回调 status=Finish）：逐点循环时每个压力点读值后必须调用，否则下一轮 BPARunStaticPressure 会被设备拒绝。

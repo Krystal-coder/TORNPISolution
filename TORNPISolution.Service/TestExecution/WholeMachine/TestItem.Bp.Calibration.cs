@@ -1,4 +1,5 @@
 using TORNPISolution.Interface;
+using TORNPISolution.Service.Communication;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
@@ -8,23 +9,22 @@ namespace TORNPISolution.Service
     /// </summary>
     public partial class TestItem
     {
-        /// <summary>A17 校准点的稳压误差规格（mmHg），与 BP-003 同口径</summary>
-        private const double PcalTolerance = 3;
+        /// <summary>A17 校准点的稳压误差规格（mmHg）：必须稳到目标 ±1.5 内才允许下发 0x66（与康伟达收敛判据一致），与 BP-003 的到点容差同口径</summary>
+        private const double PcalTolerance = 1.5;
 
         /// <summary>
         /// 产品静态压力校准（A17）：产品压力传感器逐点校准，校准点固定 50/150/250mmHg，时序与手动校准一致（无需先进静态压力模式）。
         /// ① 启动压力传感器（0x65）前先泄气归零（常压下启动传感器），有响应即通过；
-        /// ② 逐点在带压下下发校准（0x66 + uint16 LE）：|稳压值-校准点| ≤3mmHg 才发指令，有 ACK 判 PASS（测试值=稳压误差，仪器列=稳压值），
-        ///    稳压超限或无 ACK 判 FAIL 并跳过该点指令。驱动按仪器分两条路：
-        ///    BPA700=静态压力序列一次下发三点（点间直接切压不泄回零，省掉每轮约 10s 的设备恢复等待与从零重新充气）；
-        ///    康伟达=逐点单轮（到稳压后发指令，等本轮走完再升下一点，仪器要 Finish 才接受下一次调用）。
+        /// ② 逐点在带压下下发校准（0x66 + uint16 LE）：|稳压值-校准点| ≤1.5mmHg 才发指令，有 ACK 判 PASS（测试值=稳压误差，仪器列=稳压值），
+        ///    稳压超限或无 ACK 判 FAIL 并跳过该点指令。两台仪器统一走逐点单轮（到稳压后发指令，等本轮 Finish 再升下一点）：
+        ///    BPA700=BPARunStaticPressure(校准点, 量测时间)，等 Stable 后取采样均值下发，再等 Finish；康伟达=压力源逐点稳压后下发。
+        ///    不用 BETA 序列点间直切：保持窗太短，产品会把上一档的 ADC 标成新校准点，KB 截距乱跳、后续压力读数整体偏。
         /// ③ 三个点完成后关闭压力传感器（0x67）：finally + None 令牌，停止/异常路径也发送；产品不可用（未连接/握手失败）时全项判 FAIL、不驱动模拟仪。
         /// </summary>
         //测试项目**************************---A17---**************************产品静态压力校准
         public async Task ProductStaticPressureCalibrationModule(TestItemResultCollector collector, CancellationToken token)
         {
-            const int StableSeconds = 2;        // 正式版单点轮的保持窗：0x66 落在 Stable+1.2s、产品侧校准写入需 2s，Finish 在保持窗末端再多约 1.6s，2s 窗口内写入全程带压（临时值，后续按 SOP 调整）
-            const int SequenceHoldSeconds = 3;  // 序列模式每点保持窗：从该点回读稳压起计时。SDK 只给所有点同一个秒数，所以下限由末点定（读值 0.4s + 0x66 往返 0.15s + 上报 0.15s + 校准写入需带压 2s ≈ 2.7s）；前两点各自只用 0.7s，保持窗剩下的就是等设备切点的白等（临时值，后续按 SOP 调整）
+            const int SequenceHoldSeconds = 3;  // 序列模式每点保持窗（当前 A17 已不走序列，保留常量供回退）：从该点回读稳压起计时
             const int PointArriveSeconds = 60;  // 序列每个压力点的到压观察上限
             const int StableRoundEndMs = 15_000;   // 单轮路径的本轮收尾等待上限：正常几秒内 Finish，超时由 WaitStaticPressureFinishAsync 主动结束，不拖住下一点
 
@@ -61,7 +61,11 @@ namespace TORNPISolution.Service
                     return;
                 }
 
-                var useSequenceSdk = config.ActiveSimulator == SimulatorType.BPA700;
+                // 校准写入依赖产品内部 ADC 基准，必须让 BPA700 自己按"设定压力 + 量测时间"稳到位再写。
+                // BETA 序列点间直切、每点只保持 3s，实测会把上一档的 ADC 标成新点：KB 截距在 -144 / +74 / +3185 之间乱跳，
+                // 产品读数随之整体偏 5mmHg。因此 A17 统一走逐点单轮（正式版 BPARunStaticPressure(pressure, MeasureSeconds, cb, inflation)），
+                // 与现场用 BPA700 手动校准的口径一致：仪器自己稳压 → 量测时间窗口内写入 → 等 Finish 再下一点。
+                var useSequenceSdk = false;
                 await using var lease = useSequenceSdk
                     ? await _simSession.RentSequenceSdkAsync(token)
                     : await _simSession.RentAsync(token);
@@ -117,16 +121,19 @@ namespace TORNPISolution.Service
                     {
                         // 前置命令失败：产品未进入压力静态测试态，各校准点无需空等稳压
                         await ReportPcalPointsAsFailAsync(collector);
+                        await collector.SetAsync(SpecItems.PcalReadKb, TestItemResult.OfProductText(0, "压力传感器未启动，未读取"));
                     }
                     else if (rig != null)
                     {
                         await CalibrateBySequenceAsync(product, simulator, rig, collector, sp.BpaInflation,
                             SequenceHoldSeconds, PointArriveSeconds, token);
+                        await ReportPcalKbAsync(product, collector, token);
                     }
                     else
                     {
                         await CalibrateBySingleRoundsAsync(product, simulator, collector, sp.BpaInflation,
-                            StableSeconds, StableRoundEndMs, token);
+                            Math.Max(sp.MeasureSeconds, 2), StableRoundEndMs, token);
+                        await ReportPcalKbAsync(product, collector, token);
                     }
                 }
                 finally
@@ -193,6 +200,42 @@ namespace TORNPISolution.Service
         }
 
         /// <summary>
+        /// 校准完成后回读产品压力校准 K/B（0x07 0xC3 无参帧，应答参数区 = float K + float B 小端）。
+        /// 判定：读回的 K、B 只要有一个不等于出厂默认值，即认为校准已写入（1=PASS，0=FAIL）；
+        /// 无响应或参数区不足 8 字节按 FAIL，文本列写明原因，便于现场区分"没校准上"和"读不到"。
+        /// </summary>
+        private async Task ReportPcalKbAsync(IProductController product, TestItemResultCollector collector, CancellationToken token)
+        {
+            byte[]? payload = null;
+            try
+            {
+                payload = await product.SendRawCommandAsync(ProductProtocol.ReadPressureKb, null, 2000, token);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _log.Warn($"A17：读取压力校准 K/B（0x07 0xC3）失败：{ex.Message}");
+            }
+
+            var kb = ProductProtocol.ParsePressureKb(payload);
+            if (kb == null)
+            {
+                _log.Warn("A17：压力校准 K/B 回读无响应或参数区不足 8 字节，判 FAIL");
+                await collector.SetAsync(SpecItems.PcalReadKb, TestItemResult.OfProductText(0, "读取失败/无响应"));
+                return;
+            }
+
+            // 浮点比较容差：默认值保留 4 位小数，未校准时读回值与默认值差异应远小于该量级
+            const double Epsilon = 1e-3;
+            var (k, b) = kb.Value;
+            var changed = Math.Abs(k - SpecItems.PcalKbDefaultK) > Epsilon
+                          || Math.Abs(b - SpecItems.PcalKbDefaultB) > Epsilon;
+            _log.Info($"A17 读取压力校准KB值：K={k:0.####} B={b:0.####}" +
+                      $"（默认 {SpecItems.PcalKbDefaultK:0.####}/{SpecItems.PcalKbDefaultB:0.####}）→ {(changed ? "PASS" : "FAIL（仍是出厂默认值，校准未写入）")}");
+            await collector.SetAsync(SpecItems.PcalReadKb,
+                TestItemResult.OfProductText(changed ? 1 : 0, $"K={k:0.####} B={b:0.####}"));
+        }
+
+        /// <summary>
         /// A17 序列路径（BPA700 的 1.0.4.0-BETA 句柄版 SDK）：三点一次下发、点间直接切压不泄回零，每点在保持窗内读仪器均值并下发校准。
         /// 某点在 arriveTimeoutSeconds 内没到压，该点及其后都不报告（由收尾判 FAIL）；末点校准写入留 2s 间隔后再进收尾。
         /// </summary>
@@ -223,7 +266,7 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// A17 单轮路径（康伟达）：逐点各起一轮静态压力，到稳压后下发校准，再等本轮走完升下一点（仪器要上一轮 Finish 才接受下一次调用）。
-        /// 点间不额外泄压：康伟达每点开头的清场仪式自带泄残压+调零；残压若把稳压带偏，误差超 3mmHg 会拦住该点指令并判 FAIL。
+        /// 点间不额外泄压：康伟达每点开头的清场仪式自带泄残压+调零；残压若把稳压带偏，误差超 1.5mmHg 会拦住该点指令并判 FAIL。
         /// </summary>
         private async Task CalibrateBySingleRoundsAsync(IProductController product, IBloodPressureSimulator simulator,
             TestItemResultCollector collector, bool inflation, int stableSeconds, int stableRoundEndMs, CancellationToken token)
@@ -244,16 +287,15 @@ namespace TORNPISolution.Service
                 }
                 finally
                 {
-                    // 等本轮稳压窗走完（不等 Finish 下一点会被仪器拒绝）；产品侧校准写入需 2s 间隔：
-                    // 该间隔落在稳压窗内不额外耗时，无异步测试态的仪器由这条延时补足，两者并发等待取较长者
-                    await Task.WhenAll(
-                        simulator.WaitStaticPressureFinishAsync(stableRoundEndMs, token),
-                        Task.Delay(2000, token));
+                    // 只等本轮 Finish（设备测试态结束就能接受下一次调用）；Stable+量测时间才 Finish，
+                    // 而前面 settle 0.8s + 写校准 0.2s 已占掉约 1s，这里实际只再等约 1s。
+                    // 用 None 令牌：停止/取消时也要把设备收干净，不能把激活态留给下一点。
+                    await simulator.WaitStaticPressureFinishAsync(stableRoundEndMs, CancellationToken.None);
                 }
             }
         }
 
-        /// <summary>A17 单个校准点的下发与上报（两条驱动路径共用）：稳压误差 ≤3mmHg 才在带压下发 0x66，有 ACK 判 PASS；超限或无 ACK 判 FAIL 并跳过指令</summary>
+        /// <summary>A17 单个校准点的下发与上报（两条驱动路径共用）：稳压误差 ≤1.5mmHg 才在带压下发 0x66，有 ACK 判 PASS；超限或无 ACK 判 FAIL 并跳过指令</summary>
         private async Task CalibratePcalPointAsync(IProductController product, TestItemResultCollector collector,
             double value, double stable, CancellationToken token)
         {
@@ -263,6 +305,10 @@ namespace TORNPISolution.Service
             var ack = false;
             if (err.HasValue && err.Value <= PcalTolerance)
             {
+                // 校准帧不带压力值，产品以"当前 ADC/内部压力"为基准；这里不再额外读 0x76：
+                // BPA700 的稳压保持窗只有 2s，多一次 0x76 往返就可能把 0x66 挤到降压段。
+                // 校准基准直接从仪器采样回读（仪器列），产品侧读数留到 READ KB 一项统一验证。
+
                 try
                 {
                     await product.CalibratePressureSensorAsync((ushort)value, token);

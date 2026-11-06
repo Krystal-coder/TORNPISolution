@@ -146,8 +146,6 @@ namespace TORNPISolution.Service
             TestModuleIds.ProductStaticPressureCalibration => (nameof(ProductStaticPressureCalibrationModule), () => ProductStaticPressureCalibrationModule(collector, token), null),
             TestModuleIds.DeflateRateTest => (nameof(DeflateRateModule), () => DeflateRateModule(collector, token), null),
             TestModuleIds.AirPathLeakTest => (nameof(AirPathLeakModule), () => AirPathLeakModule(collector, token), null),
-            TestModuleIds.Jjg692DeflationRateTest => (nameof(Jjg692DeflationRateModule), () => Jjg692DeflationRateModule(collector, token), null),
-            TestModuleIds.Jjg692AirtightnessTest => (nameof(Jjg692AirtightnessModule), () => Jjg692AirtightnessModule(collector, token), null),
             TestModuleIds.BpDynamicAccuracyTest => (nameof(BpDynamicAccuracyModule), () => BpDynamicAccuracyModule(collector, token), null),
             TestModuleIds.BpHeartRateAccuracyTest => (nameof(BpHeartRateAccuracyModule), () => BpHeartRateAccuracyModule(collector, token), null),
             TestModuleIds.Aecg100Init => (nameof(Aecg100InitModule), () => Aecg100InitModule(collector, token), null),

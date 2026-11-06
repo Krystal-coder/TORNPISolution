@@ -17,7 +17,7 @@ namespace TORNPISolution.Service
         /// <summary>
         /// 血压动态压力精度测试（BP-004），产品通讯统一在 A16 初始化：
         /// ① 压力组与轮数取 血压模拟仪测试配置→动态血压→BP-004 压力组（只跑勾选行，每组自带心率作激励参数）；逐组逐轮经 CollectBpReadingsAsync 执行（产测态 0xCA 开始 → 等 0xCA 结果帧 → 0xCC 结束 + 停仪器输出，每轮之间按配置休息）；
-        /// ② 一轮一项（项名 SpecItems.Bp004Round，与 Spec 目录同源，改点位/轮数自动跟随）：测试值 = max(|收缩压回读−设定|, |舒张压回读−设定|) 判 ≤±2mmHg；子表两行=收缩压/舒张压 各自 设定/回读/偏差/判定；
+        /// ② 一轮一项（项名 SpecItems.Bp004Round，与 Spec 目录同源，改点位/轮数自动跟随）：每轮（含轮间休息）走完立即上报，测试值 = max(|收缩压回读−设定|, |舒张压回读−设定|) 判 ≤±2mmHg；子表两行=收缩压/舒张压 各自 设定/回读/偏差/判定；
         /// ③ 每组一项重复性（项名 SpecItems.Bp004Repeat，仅 2 轮起建项）：测试值 = max(收缩压各轮极差, 舒张压各轮极差) 判 ≤±2mmHg；子表列=收缩压/舒张压，行=设定值/第N轮/均值/与设定偏差/极差；
         /// ④ 心率判定在 A21 血压心率精度及重复性测试；某轮无有效回读 → 该项不报告，由收尾扫描按读回缺失判 FAIL；有效轮数 <2 的组其重复性项同理。
         /// </summary>
@@ -57,8 +57,40 @@ namespace TORNPISolution.Service
 
                 if (!await PrepareProductForBpMeasureAsync(product, token)) return;
 
-                var (readings, roundSeconds) = await CollectBpReadingsAsync(simulator, product, groups, repeats, pulseVolume,
-                    RoundItem, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token);
+                const double BpTolerance = 2;   // mmHg，测试要求文档 BP-004：重复测试的偏差与极差均 ≤±2mmHg
+
+                // 一轮一项：采集层每轮（含轮间休息）走完就回调一次，测一项出一项，不必等全部轮次跑完；
+                // 本轮无有效回读则不报告，由收尾扫描判 FAIL
+                async Task ReportRoundAsync((int Systolic, int Diastolic, int HeartRate) g, int r, ProductBpReading? rd, double seconds)
+                {
+                    var roundName = SpecItems.Bp004Round(g.Systolic, g.Diastolic, r);
+                    if (rd == null)
+                    {
+                        _log.Warn($"{roundName}：本轮无有效回读，不报告（由收尾扫描判 FAIL）");
+                        return;
+                    }
+
+                    var sysErr = Math.Abs(rd.Systolic - g.Systolic);
+                    var diaErr = Math.Abs(rd.Diastolic - g.Diastolic);
+                    _log.Info($"{roundName}：设定 {g.Systolic}/{g.Diastolic}（心率 {g.HeartRate}） 回读 {rd.Systolic:0.0}/{rd.Diastolic:0.0} " +
+                              $"偏差 收缩={sysErr:0.0} 舒张={diaErr:0.0} → {(Math.Max(sysErr, diaErr) <= BpTolerance ? "PASS" : "FAIL")}");
+
+                    await collector.SetAsync(roundName, new TestItemResult
+                    {
+                        Value = Math.Round(Math.Max(sysErr, diaErr), 2),
+                        InstrumentText = $"{g.Systolic}/{g.Diastolic}",
+                        ProductText = $"{rd.Systolic:0.##}/{rd.Diastolic:0.##}/{rd.MeanPressure:0.##}/{rd.HeartRate:0.##}",
+                        MeasuredSeconds = Math.Round(seconds, 1),
+                        Points = new List<TestPointResult>
+                        {
+                            BpChannelPoint("收缩压", g.Systolic, rd.Systolic, sysErr, BpTolerance, "mmHg"),
+                            BpChannelPoint("舒张压", g.Diastolic, rd.Diastolic, diaErr, BpTolerance, "mmHg"),
+                        },
+                    });
+                }
+
+                var (readings, _) = await CollectBpReadingsAsync(simulator, product, groups, repeats, pulseVolume,
+                    RoundItem, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token, ReportRoundAsync);
 
                 if (!readings.Values.Any(l => l.Any(x => x != null)))
                 {
@@ -66,38 +98,10 @@ namespace TORNPISolution.Service
                     return;
                 }
 
-                const double BpTolerance = 2;   // mmHg，测试要求文档 BP-004：重复测试的偏差与极差均 ≤±2mmHg
                 foreach (var g in groups)
                 {
                     var list = readings[(g.Systolic, g.Diastolic, g.HeartRate)];
-                    var valid = new List<ProductBpReading>();
-
-                    // 一轮一项：本轮回读与设定值的偏差（收缩/舒张取大者）；本轮无有效回读则不报告，收尾判 FAIL
-                    for (var r = 1; r <= repeats; r++)
-                    {
-                        var rd = r <= list.Count ? list[r - 1] : null;
-                        if (rd == null) continue;
-                        valid.Add(rd);
-
-                        var sysErr = Math.Abs(rd.Systolic - g.Systolic);
-                        var diaErr = Math.Abs(rd.Diastolic - g.Diastolic);
-                        var roundName = SpecItems.Bp004Round(g.Systolic, g.Diastolic, r);
-                        _log.Info($"{roundName}：设定 {g.Systolic}/{g.Diastolic}（心率 {g.HeartRate}） 回读 {rd.Systolic:0.0}/{rd.Diastolic:0.0} " +
-                                  $"偏差 收缩={sysErr:0.0} 舒张={diaErr:0.0} → {(Math.Max(sysErr, diaErr) <= BpTolerance ? "PASS" : "FAIL")}");
-
-                        await collector.SetAsync(roundName, new TestItemResult
-                        {
-                            Value = Math.Round(Math.Max(sysErr, diaErr), 2),
-                            InstrumentText = $"{g.Systolic}/{g.Diastolic}",
-                            ProductText = $"{rd.Systolic:0.##}/{rd.Diastolic:0.##}/{rd.MeanPressure:0.##}/{rd.HeartRate:0.##}",
-                            MeasuredSeconds = BpRoundSeconds(roundSeconds, g, r),
-                            Points = new List<TestPointResult>
-                            {
-                                BpChannelPoint("收缩压", g.Systolic, rd.Systolic, sysErr, BpTolerance, "mmHg"),
-                                BpChannelPoint("舒张压", g.Diastolic, rd.Diastolic, diaErr, BpTolerance, "mmHg"),
-                            },
-                        });
-                    }
+                    var valid = list.Where(x => x != null).Select(x => x!).ToList();
 
                     // 每组一项重复性：判据只落在极差行（收缩/舒张取大者 ≤±2mmHg），中间统计行不判定，避免整屏 PASS 误读
                     if (repeats < 2)
@@ -130,7 +134,7 @@ namespace TORNPISolution.Service
                     else
                         _log.Warn($"BP-004重复性 压力组 {g.Systolic}/{g.Diastolic}：有效回读仅 {valid.Count} 轮（<2），极差无统计意义，该项不报告由收尾判 FAIL");
                 }
-                _log.Info($"BP-004 统计完成：{groups.Length} 组×{repeats} 轮（轮间休息 {restSeconds}s），逐轮偏差与每组极差已按项上报");
+                _log.Info($"BP-004 统计完成：{groups.Length} 组×{repeats} 轮（轮间休息 {restSeconds}s），逐轮偏差已边测边上、每组极差已按项上报");
             }
         }
 
@@ -321,14 +325,16 @@ namespace TORNPISolution.Service
 
         /// <summary>
         /// 血压测量轮次采集（A06 的 BP-004 轮次/重复性与 BP-005 心率共用同一套流程）：整轮采集期间常开压力采样（界面波形的唯一数据源），逐轮流程见 <see cref="CollectBpRoundsAsync"/>。
-        /// 回读格与逐轮用时一起返回：模块是采完全部轮次才批量上报，逐项耗时只能由采集层给出。
+        /// 回读格与逐轮用时一起返回：模块仍需按轮次做重复性统计，逐项耗时由采集层给出。
+        /// onRoundMeasured（可选）：每轮（含轮间休息）走完时立刻回调，供 BP-004 边测边上报；null = 采完再统一处理（BP-005）。
         /// </summary>
         private async Task<(Dictionary<(int, int, int), List<ProductBpReading?>> Readings,
             Dictionary<(int, int, int), List<double>> RoundSeconds)> CollectBpReadingsAsync(
             IBloodPressureSimulator simulator, IProductController product,
             (int Systolic, int Diastolic, int HeartRate)[] groups, int repeats, double pulseVolume,
             Func<(int Systolic, int Diastolic, int HeartRate), int, string?> waveItemName,
-            int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token)
+            int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token,
+            Func<(int Systolic, int Diastolic, int HeartRate), int, ProductBpReading?, double, Task>? onRoundMeasured = null)
         {
             var readings = new Dictionary<(int, int, int), List<ProductBpReading?>>();
             var roundSeconds = new Dictionary<(int, int, int), List<double>>();
@@ -338,7 +344,7 @@ namespace TORNPISolution.Service
             try
             {
                 await CollectBpRoundsAsync(readings, roundSeconds, simulator, product, groups, repeats, pulseVolume,
-                    waveItemName, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token);
+                    waveItemName, restSeconds, ventDuringRest, singleMeasureTimeoutMs, token, onRoundMeasured);
             }
             finally
             {
@@ -361,7 +367,8 @@ namespace TORNPISolution.Service
             IBloodPressureSimulator simulator, IProductController product,
             (int Systolic, int Diastolic, int HeartRate)[] groups, int repeats, double pulseVolume,
             Func<(int Systolic, int Diastolic, int HeartRate), int, string?> waveItemName,
-            int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token)
+            int restSeconds, bool ventDuringRest, int singleMeasureTimeoutMs, CancellationToken token,
+            Func<(int Systolic, int Diastolic, int HeartRate), int, ProductBpReading?, double, Task>? onRoundMeasured = null)
         {
             for (var gi = 0; gi < groups.Length; gi++)
             {
@@ -388,6 +395,7 @@ namespace TORNPISolution.Service
                     var measureStarted = false;
                     var measureEnded = false;
                     Task<BpTestRunResult>? cycleTask = null;
+                    ProductBpReading? roundReading = null;   // 本轮有效回读（含休息段走完后逐轮上报用）
                     try
                     {
                         // 仪器先按点位输出脉搏波并进入待测（BPA700 停在 Wait 等产品充气），再让产品开始测量：现场实测这个顺序才测得出数值
@@ -417,6 +425,7 @@ namespace TORNPISolution.Service
 
                         if (reading != null)
                         {
+                            roundReading = reading;
                             list.Add(reading);
                             _log.Info($"产品上报：SYS={reading.Systolic:0.##} DIA={reading.Diastolic:0.##} MAP={reading.MeanPressure:0.##} HR={reading.HeartRate:0.##}");
                         }
@@ -455,6 +464,10 @@ namespace TORNPISolution.Service
 
                     // 本轮用时到休息结束为止：休息是这一轮换来的，算进这一项，逐项之和才对得上大项用时
                     seconds.Add(roundWatch.Elapsed.TotalSeconds);
+
+                    // 逐轮上报：本轮（含轮间休息）走完立刻交出一项，UI 边测边出，不必等全部轮次跑完
+                    if (onRoundMeasured != null)
+                        await onRoundMeasured((g.Systolic, g.Diastolic, g.HeartRate), r, roundReading, seconds[^1]);
                 }
             }
         }
@@ -481,7 +494,7 @@ namespace TORNPISolution.Service
             catch (Exception ex) { _log.Debug($"模拟仪周期任务收尾异常（输出已停）：{ex.Message}"); }
         }
 
-        /// <summary>本轮实测用时（秒）：BP-004/BP-005 采完全部轮次才批量上报，逐项耗时取采集层记录，不用上报时刻差</summary>
+        /// <summary>本轮实测用时（秒）：BP-005 采完全部轮次才批量上报，逐项耗时取采集层记录，不用上报时刻差</summary>
         private static double? BpRoundSeconds(Dictionary<(int, int, int), List<double>> roundSeconds,
             (int Systolic, int Diastolic, int HeartRate) g, int r)
             => roundSeconds.TryGetValue(g, out var list) && r <= list.Count ? Math.Round(list[r - 1], 1) : null;

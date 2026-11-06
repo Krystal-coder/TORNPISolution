@@ -26,37 +26,14 @@ namespace TORNPISolution.Share.Models
         /// <summary>压力控制功能测试（BP-006~008）过程参数</summary>
         public BpaPressureControlParams PressureControl { get; set; } = new();
 
-        /// <summary>气路类两项（A18 放气速率 BP-007 / A22 气路泄露 BP-010）的判定区间</summary>
+        /// <summary>气路类两项（放气速率 BP-007 / 气路泄露 BP-010）的判定区间，BPA700 专用</summary>
         public BpaAirPathParams AirPath { get; set; } = new();
+
+        /// <summary>气路类两项（放气速率 / 气路泄露）的判定区间，康伟达专用</summary>
+        public BpaKangwendaAirPathParams KangwendaAirPath { get; set; } = new();
 
         /// <summary>波形显示配置（按测试项自定义 X 轴模式与时间刻度，Y 轴固定 mmHg）</summary>
         public BpaWaveformDisplayConfig WaveformDisplay { get; set; } = new();
-
-        /// <summary>JJG692-2010 标准检测参数（放气速率 / 气密性，均为康伟达 0x04 功能专属）</summary>
-        public Jjg692Params Jjg692 { get; set; } = new();
-    }
-
-    /// <summary>
-    /// JJG692-2010 标准检测参数组（仅放气速率（0x12）/ 气密性（0x13）两项使用，按康伟达协议 0x04 功能下发），判定规格值留空时只报实测值不判 PASS/FAIL。
-    /// 血压重复性不在本组（即 BP-004 的"精度及重复性"，已归 A06，点位与轮数见 <see cref="BpaTestParams.BpAccuracy"/>，±2mmHg 判据按文档写死）：
-    /// 协议 0x04/0x11 设备自检帧只回"完成/失败"状态位、拿不到三轮收缩/舒张数值，算不出极差。
-    /// </summary>
-    public class Jjg692Params
-    {
-        /// <summary>测量类型：0=成人 1=新生儿（协议仅 0x11 设备自检帧高 4 位定义，现模块走软件控点位路线、不下发 0x11，配置页不再展示）</summary>
-        public int MeasureType { get; set; } = 0;
-
-        /// <summary>袖带类型：0=外部袖带 1=内部成人（0x12/0x13 帧低 4 位共用）</summary>
-        public int CuffType { get; set; } = 0;
-
-        /// <summary>整项检测超时（秒）：仅 0x12/0x13 用，设备自行完成升压/循环/泄放的兜底上限</summary>
-        public int TimeoutSeconds { get; set; } = 300;
-
-        /// <summary>放气速率（听诊，0x12）参数与判定区间</summary>
-        public Jjg692DeflationRateParams DeflationRate { get; set; } = new();
-
-        /// <summary>气密性（0x13）参数与判定上限</summary>
-        public Jjg692AirtightnessParams Airtightness { get; set; } = new();
     }
 
     /// <summary>
@@ -141,69 +118,66 @@ namespace TORNPISolution.Share.Models
         public int Value { get; set; } = 80;
     }
 
-    /// <summary>0x12 放气速率（听诊）：帧 = [04, 12, 袖带, 设定压力2, 开始气压2, 停止气压2]；
-    /// 测试值 = 设备回传漏气率（mmHg/s），判定区间留空则不判。</summary>
-    public class Jjg692DeflationRateParams
-    {
-        /// <summary>设定压力点（mmHg，帧内 u16）</summary>
-        public double SetPressure { get; set; } = 200;
-
-        /// <summary>开始气压（mmHg，计时起点）</summary>
-        public double StartPressure { get; set; } = 160;
-
-        /// <summary>停止气压（mmHg，计时终点）</summary>
-        public double StopPressure { get; set; } = 60;
-
-        /// <summary>漏气率合格下限（mmHg/s，null=不判）</summary>
-        public double? MinRate { get; set; }
-
-        /// <summary>漏气率合格上限（mmHg/s，null=不判）</summary>
-        public double? MaxRate { get; set; }
-    }
-
     /// <summary>
     /// 气路类两项的判定区间（A18 放气速率 BP-007 的加压/泄压时长、A22 气路泄露 BP-010 的高低压制气量），只走 BPA700 静态压力序列流程。
-    /// 任一端留空按不判该端处理（下限空=不限下、上限空用测试要求文档暂定的兜底值），两端都留空则该项不判 PASS/FAIL、只报实测值。
+    /// 默认值与康伟达同口径（0/10s、20/60s、0/10mmHg），配置页不再是空输入框；用户保存过则以保存的值为准。
     /// </summary>
     public class BpaAirPathParams
     {
-        /// <summary>加压时间 t1 合格下限（s）</summary>
-        public double? InflateTimeMin { get; set; }
+        /// <summary>加压时间 t1 合格下限（s，默认 0）</summary>
+        public double? InflateTimeMin { get; set; } = 0;
 
-        /// <summary>加压时间 t1 合格上限（s，留空兜底 30）</summary>
-        public double? InflateTimeMax { get; set; }
+        /// <summary>加压时间 t1 合格上限（s，默认 10）</summary>
+        public double? InflateTimeMax { get; set; } = 10;
 
-        /// <summary>泄压时间 t2 合格下限（s）</summary>
-        public double? DeflateTimeMin { get; set; }
+        /// <summary>泄压时间 t2 合格下限（s，默认 20）</summary>
+        public double? DeflateTimeMin { get; set; } = 20;
 
-        /// <summary>泄压时间 t2 合格上限（s，留空兜底 60）</summary>
-        public double? DeflateTimeMax { get; set; }
+        /// <summary>泄压时间 t2 合格上限（s，默认 60）</summary>
+        public double? DeflateTimeMax { get; set; } = 60;
 
-        /// <summary>高压段泄气量 ΔP_H 合格下限（mmHg，留空=不限下）：终点高于起点时差值为负</summary>
-        public double? HighLossMin { get; set; }
+        /// <summary>高压段泄气量 ΔP_H 合格下限（mmHg，默认 0）：终点高于起点时差值为负</summary>
+        public double? HighLossMin { get; set; } = 0;
 
-        /// <summary>高压段泄气量 ΔP_H 合格上限（mmHg，留空兜底 2）</summary>
-        public double? HighLossMax { get; set; }
+        /// <summary>高压段泄气量 ΔP_H 合格上限（mmHg，默认 10）</summary>
+        public double? HighLossMax { get; set; } = 10;
 
-        /// <summary>低压段泄气量 ΔP_L 合格下限（mmHg，留空=不限下）</summary>
-        public double? LowLossMin { get; set; }
+        /// <summary>低压段泄气量 ΔP_L 合格下限（mmHg，默认 0）</summary>
+        public double? LowLossMin { get; set; } = 0;
 
-        /// <summary>低压段泄气量 ΔP_L 合格上限（mmHg，留空兜底 2）</summary>
-        public double? LowLossMax { get; set; }
+        /// <summary>低压段泄气量 ΔP_L 合格上限（mmHg，默认 10）</summary>
+        public double? LowLossMax { get; set; } = 10;
     }
 
-    /// <summary>0x13 气密性：帧 = [04, 13, 袖带, 设定压力2, 稳压时间1]；
-    /// 测试值 = 设备回传漏气率（mmHg/s），上限留空则不判。</summary>
-    public class Jjg692AirtightnessParams
+    /// <summary>
+    /// 气路类两项的判定区间（放气速率的加压/泄压时长、气路泄露的高低压制气量），走康伟达压力源+慢释阀流程（与 BPA700 的 AirPath 同结构、独立存放，便于换仪器时保留各自参数）。
+    /// 默认值为配置页展示的常用区间（0/10s、20/60s、0/10mmHg），用户保存过则以保存的值为准。
+    /// </summary>
+    public class BpaKangwendaAirPathParams
     {
-        /// <summary>设定压力点（mmHg，帧内 u16）</summary>
-        public double SetPressure { get; set; } = 200;
+        /// <summary>加压时间 t1 合格下限（s，默认 0）</summary>
+        public double? InflateTimeMin { get; set; } = 0;
 
-        /// <summary>稳压时间（秒，帧内 1 字节）</summary>
-        public int StabilizeSeconds { get; set; } = 60;
+        /// <summary>加压时间 t1 合格上限（s，默认 10）</summary>
+        public double? InflateTimeMax { get; set; } = 10;
 
-        /// <summary>漏气率合格上限（mmHg/s，null=不判）</summary>
-        public double? MaxLeakRate { get; set; }
+        /// <summary>泄压时间 t2 合格下限（s，默认 20）</summary>
+        public double? DeflateTimeMin { get; set; } = 20;
+
+        /// <summary>泄压时间 t2 合格上限（s，默认 60）</summary>
+        public double? DeflateTimeMax { get; set; } = 60;
+
+        /// <summary>高压段泄气量 ΔP_H 合格下限（mmHg，默认 0）：终点高于起点时差值为负</summary>
+        public double? HighLossMin { get; set; } = 0;
+
+        /// <summary>高压段泄气量 ΔP_H 合格上限（mmHg，默认 10）</summary>
+        public double? HighLossMax { get; set; } = 10;
+
+        /// <summary>低压段泄气量 ΔP_L 合格下限（mmHg，默认 0）</summary>
+        public double? LowLossMin { get; set; } = 0;
+
+        /// <summary>低压段泄气量 ΔP_L 合格上限（mmHg，默认 10）</summary>
+        public double? LowLossMax { get; set; } = 10;
     }
 
     /// <summary>

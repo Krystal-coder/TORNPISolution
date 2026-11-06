@@ -1,6 +1,7 @@
 using System.Diagnostics;
 
 using TORNPISolution.Interface;
+using TORNPISolution.Service.Devices;
 using TORNPISolution.Share.Models;
 
 namespace TORNPISolution.Service
@@ -15,26 +16,22 @@ namespace TORNPISolution.Service
         //测试项目**************************---A18---**************************放气速率测试（BP-007）
         /// <summary>
         /// 放气速率测试（A18）：血压计气路与模拟仪接通、不封堵毛细气孔，产品关闭泄气阀（0x6B）后进入静态压力模式（0x73 mode=3），整轮压力由仪器给。
-        /// ① 仪器跑一轮"充气到 230 → 转入缓降 → 降到 40 即停"（正式版 SDK 的过压测试），t1/t2 取仪器自己上报的充气段与泄气段时长；
-        ///    回读（采样曲线）只用来分两段曲线、取该点仪器均值与门控产品 0x76 采样，两项都在本轮结束后一起上报，逐项耗时按回读时刻给。
-        /// ② 缓降走的就是仪器自己的放气阀，所以本项不下发仪器阀指令：阀态要下一次测试调用才生效，此处关阀会把缓降堵死。
-        /// ③ 收尾退出静态压力模式（0x73 status=1）+ 打开泄气阀（0x6A）+ 仪器泄放回零，停止/异常路径同样执行。
+        /// 按仪器分两条通路，测试值同为两段时长（s）：BPA700 用正式版 SDK 的过压测试（充气到 230 后转入缓降、降到 40 即停），t1/t2 取仪器上报时长；
+        /// 康伟达用压力源充气到 230 + 切压力表停保压 + 慢释阀缓降到 40，t1/t2 取回读时刻。判定区间各取各自配置页（气路测试）。
+        /// 收尾退出静态压力模式（0x73 status=1）+ 打开泄气阀（0x6A）+ 仪器泄放回零，停止/异常路径同样执行。
         /// </summary>
         public async Task DeflateRateModule(TestItemResultCollector collector, CancellationToken token)
         {
             const string ModuleName = "放气速率测试";
-            // 阈值 2：仪器充过该线即转入缓降，取厂商上位机超压测试页的默认值（临时值，后续按 SOP 调整）
-            const double VentStartThreshold = 210;
-            const int InflateArriveSeconds = 60;   // 加压段等回读升到 230 的观察上限
-            const int DescentObserveSeconds = 120; // 泄压段等回读降到 40 的观察上限（缓降约 4.7mmHg/s，190mmHg 要 40s 上下）
-            const int RoundTimeoutSeconds = 180;   // 整轮（充气 + 缓降）兜底超时
             // 平台离开判定余量：回读跌破"高压设定点 - 该余量"才算离开 230 平台，避开平台抖动；只用来在日志里说明段内何时起降
             const double DescentStartMargin = 10;
+            const int DescentObserveSeconds = 120; // 泄压段等回读降到 40 的观察上限（BPA700 缓降约 4.7mmHg/s、康伟达慢释阀约 4mmHg/s）
 
             var config = _configService.Load();
-            if (config.ActiveSimulator != SimulatorType.BPA700)
+            var useKangwenda = config.ActiveSimulator == SimulatorType.Kangwenda;
+            if (config.ActiveSimulator != SimulatorType.BPA700 && !useKangwenda)
             {
-                _log.Error($"{ModuleName}跳过：充气—缓降这一轮流程用 BPA700 正式版 SDK 的过压测试，康伟达未做验证");
+                _log.Error($"{ModuleName}跳过：当前模拟仪（{config.ActiveSimulator}）不在 BPA700/康伟达支持范围内");
                 return;
             }
 
@@ -47,15 +44,19 @@ namespace TORNPISolution.Service
 
             await using var lease = await _simSession.RentAsync(token);
             var simulator = lease.Simulator;
-            var testParams = config.BPA700Simulator.TestParams;
-            var airPath = testParams.AirPath;
-            var inflation = testParams.Overpressure.BpaInflation;
+            if (useKangwenda && simulator is not KangwendaNIBPSimulator)
+            {
+                _log.Error($"{ModuleName} 判 FAIL：租到的实例不是康伟达驱动（实际 {simulator.GetType().Name}）");
+                return;
+            }
 
             var rig = new AirPathRig(simulator, _log, PressureSampled);
             var staticModeEntered = false;
             try
             {
                 await rig.StartAsync(token);
+                if (useKangwenda)
+                    await simulator.SetSlowValveAsync(false, token);   // 兜底：停掉可能残留的泄放回路，避免与充气相冲
 
                 // ① 关闭泄气阀（0x6B）：产品侧封闭气路，整轮压力都由仪器给，收尾再打开
                 await product.SetVentValveAsync(false, token);
@@ -64,60 +65,127 @@ namespace TORNPISolution.Service
                 await product.SetTestModeAsync(3, ct: token);
                 staticModeEntered = true;
 
-                // ③ 整轮只发一次仪器指令，边跑边按回读切两段曲线、取该点压力
-                rig.BeginPhase(SpecItems.Deflate007InflateTime);
-                var run = simulator.RunOverpressureTestAsync(SpecItems.DeflateInflatePressure,
-                    SpecItems.DeflateEndPressure, VentStartThreshold, inflation, RoundTimeoutSeconds * 1000, token);
-
-                var arriveHigh = await rig.ArrivalSecondsAsync(SpecItems.DeflateInflatePressure, InflateArriveSeconds, token);
-                if (double.IsNaN(arriveHigh))
+                if (useKangwenda)
                 {
-                    _log.Warn($"{SpecItems.Deflate007InflateTime}：{InflateArriveSeconds}s 内回读没升到 {SpecItems.DeflateInflatePressure:0}mmHg" +
-                              $"（观察末 {Format(rig.LatestPressure())}），t1 与 t2 都不报告（由收尾判 FAIL）");
-                    // 本轮由收尾的停止指令结束，这里只把稍后可能抛出的异常观察掉，不留到 GC 时才炸
-                    _ = run.ContinueWith(static t => { _ = t.Exception; }, TaskScheduler.Default);
-                    return;
+                    // ---- 康伟达通路：压力源充气 230 → 切压力表停保压 → 慢释阀缓降 40，t1/t2 取回读时刻 ----
+                    const int InflateArriveSeconds = 150;   // 康伟达泵接大容积容器约 2~4mmHg/s，230 约需 60~115s
+                    var airPath = config.KangwendaSimulator.TestParams.KangwendaAirPath;
+                    var kw = (KangwendaNIBPSimulator)simulator;
+
+                    rig.BeginPhase(SpecItems.Deflate007InflateTime);
+                    await simulator.SetStaticPressureAsync(SpecItems.DeflateInflatePressure, 5, token);
+                    var arriveHigh = await rig.ArrivalSecondsAsync(SpecItems.DeflateInflatePressure, InflateArriveSeconds, token);
+                    if (double.IsNaN(arriveHigh))
+                    {
+                        _log.Warn($"{SpecItems.Deflate007InflateTime}：{InflateArriveSeconds}s 内回读没升到 {SpecItems.DeflateInflatePressure:0}mmHg" +
+                                  $"（观察末 {Format(rig.LatestPressure())}），t1 与 t2 都不报告（由收尾判 FAIL）");
+                        return;
+                    }
+                    var pHigh = rig.WindowAverage();
+                    var productHigh = await ReadProductPressureAsync(product, $"{SpecItems.DeflateInflatePressure:0}mmHg 采样", token);
+
+                    rig.BeginPhase(SpecItems.Deflate007DeflateTime);
+                    await kw.SendPressureTestAsync(2, 0, 0, 0, 0, token);   // 切压力表，停掉压力源的闭环保压
+                    await simulator.SetSlowValveAsync(true, token);
+                    var (arriveLow, departAt) = await rig.DeflateSpanAsync(
+                        SpecItems.DeflateInflatePressure - DescentStartMargin, SpecItems.DeflateEndPressure, DescentObserveSeconds, token);
+                    var pLow = rig.WindowAverage();
+                    var productLow = await ReadProductPressureAsync(product, $"{SpecItems.DeflateEndPressure:0}mmHg 采样", token);
+                    await simulator.SetSlowValveAsync(false, token);
+
+                    await collector.SetAsync(SpecItems.Deflate007InflateTime,
+                        AirPathTimeResult(arriveHigh, SpecItems.DeflateInflatePressure, pHigh, productHigh,
+                            airPath.InflateTimeMin, airPath.InflateTimeMax, 30, arriveHigh));
+                    if (double.IsNaN(arriveLow))
+                    {
+                        _log.Warn($"{SpecItems.Deflate007DeflateTime}：{DescentObserveSeconds}s 内回读没降到 {SpecItems.DeflateEndPressure:0}mmHg" +
+                                  $"（段内最低 {Format(rig.PhaseMinimum())}、观察末 {Format(rig.LatestPressure())}），t2 不报告（由收尾判 FAIL）");
+                    }
+                    else
+                    {
+                        await collector.SetAsync(SpecItems.Deflate007DeflateTime,
+                            AirPathTimeResult(arriveLow, SpecItems.DeflateEndPressure, pLow, productLow,
+                                airPath.DeflateTimeMin, airPath.DeflateTimeMax, 60, arriveLow));
+                    }
+
+                    var deflateRate = double.IsNaN(arriveLow) || arriveLow <= 0
+                        ? double.NaN
+                        : (SpecItems.DeflateInflatePressure - SpecItems.DeflateEndPressure) / arriveLow;
+                    _log.Info($"A18（康伟达）：t1={arriveHigh:0.0}s {SpecItems.DeflateInflatePressure:0} 点仪器={Format(pHigh)} 产品={Format(productHigh)}；" +
+                              $"t2={arriveLow:0.0}s（回读 {departAt:0.0}s 起降、{arriveLow:0.0}s 降到 {SpecItems.DeflateEndPressure:0}，均速 {deflateRate:0.00}mmHg/s）" +
+                              $"{SpecItems.DeflateEndPressure:0} 点仪器={Format(pLow)} 产品={Format(productLow)}");
                 }
-                var pHigh = rig.WindowAverage();
-                var productHigh = await ReadProductPressureAsync(product, $"{SpecItems.DeflateInflatePressure:0}mmHg 采样", token);
-
-                rig.BeginPhase(SpecItems.Deflate007DeflateTime);
-                var (arriveLow, departAt) = await rig.DeflateSpanAsync(SpecItems.DeflateInflatePressure - DescentStartMargin,
-                    SpecItems.DeflateEndPressure, DescentObserveSeconds, token);
-                var pLow = rig.WindowAverage();
-                var productLow = await ReadProductPressureAsync(product, $"{SpecItems.DeflateEndPressure:0}mmHg 采样", token);
-
-                OverpressureRunResult round;
-                try
+                else
                 {
-                    round = await run;
-                }
-                catch (TimeoutException ex)
-                {
-                    _log.Warn($"A18：{ex.Message}，t1 与 t2 都不报告（由收尾判 FAIL）");
-                    return;
-                }
-                if (double.IsNaN(arriveLow))
-                    _log.Warn($"{SpecItems.Deflate007DeflateTime}：{DescentObserveSeconds}s 内回读没降到 {SpecItems.DeflateEndPressure:0}mmHg" +
-                              $"（段内最低 {Format(rig.PhaseMinimum())}、观察末 {Format(rig.LatestPressure())}），t2 的逐项耗时按观察末给");
+                    // ---- BPA700 通路：正式版 SDK 过压测试（充气到 230 → 缓降 → 降到 40 即停），t1/t2 取仪器上报时长；缓降走仪器自己的放气阀，本通路不下发仪器阀指令 ----
+                    // 阈值 2：仪器充过该线即转入缓降，取厂商上位机超压测试页的默认值（临时值，后续按 SOP 调整）
+                    const double VentStartThreshold = 210;
+                    const int InflateArriveSeconds = 60;   // 加压段等回读升到 230 的观察上限
+                    const int RoundTimeoutSeconds = 180;   // 整轮（充气 + 缓降）兜底超时
+                    var testParams = config.BPA700Simulator.TestParams;
+                    var airPath = testParams.AirPath;
+                    var inflation = testParams.Overpressure.BpaInflation;
 
-                // 测试值=仪器上报的两段时长（单位 s 与列头一致），判定区间取配置页（气路测试）；该点仪器均值与产品 0x76 采样进子表行
-                await collector.SetAsync(SpecItems.Deflate007InflateTime,
-                    AirPathTimeResult(round.InflateSeconds, SpecItems.DeflateInflatePressure, pHigh, productHigh,
-                        airPath.InflateTimeMin, airPath.InflateTimeMax, 30, arriveHigh));
-                await collector.SetAsync(SpecItems.Deflate007DeflateTime,
-                    AirPathTimeResult(round.DeflateSeconds, SpecItems.DeflateEndPressure, pLow, productLow,
-                        airPath.DeflateTimeMin, airPath.DeflateTimeMax, 60, double.IsNaN(arriveLow) ? DescentObserveSeconds : arriveLow));
+                    // 整轮只发一次仪器指令，边跑边按回读切两段曲线、取该点压力
+                    rig.BeginPhase(SpecItems.Deflate007InflateTime);
+                    var run = simulator.RunOverpressureTestAsync(SpecItems.DeflateInflatePressure,
+                        SpecItems.DeflateEndPressure, VentStartThreshold, inflation, RoundTimeoutSeconds * 1000, token);
 
-                var deflateRate = round.DeflateSeconds > 0
-                    ? (SpecItems.DeflateInflatePressure - SpecItems.DeflateEndPressure) / round.DeflateSeconds : double.NaN;
-                _log.Info($"BP-007：t1={round.InflateSeconds:0.0}s（回读 {arriveHigh:0.0}s 时升到 {SpecItems.DeflateInflatePressure:0}，" +
-                          $"峰值={Format(round.PeakPressure)}）{SpecItems.DeflateInflatePressure:0} 点仪器={Format(pHigh)} 产品={Format(productHigh)}；" +
-                          $"t2={round.DeflateSeconds:0.0}s（回读 {departAt:0.0}s 起降、{arriveLow:0.0}s 降到 {SpecItems.DeflateEndPressure:0}，均速 {deflateRate:0.00}mmHg/s）" +
-                          $"{SpecItems.DeflateEndPressure:0} 点仪器={Format(pLow)} 产品={Format(productLow)}");
+                    var arriveHigh = await rig.ArrivalSecondsAsync(SpecItems.DeflateInflatePressure, InflateArriveSeconds, token);
+                    if (double.IsNaN(arriveHigh))
+                    {
+                        _log.Warn($"{SpecItems.Deflate007InflateTime}：{InflateArriveSeconds}s 内回读没升到 {SpecItems.DeflateInflatePressure:0}mmHg" +
+                                  $"（观察末 {Format(rig.LatestPressure())}），t1 与 t2 都不报告（由收尾判 FAIL）");
+                        // 本轮由收尾的停止指令结束，这里只把稍后可能抛出的异常观察掉，不留到 GC 时才炸
+                        _ = run.ContinueWith(static t => { _ = t.Exception; }, TaskScheduler.Default);
+                        return;
+                    }
+                    var pHigh = rig.WindowAverage();
+                    var productHigh = await ReadProductPressureAsync(product, $"{SpecItems.DeflateInflatePressure:0}mmHg 采样", token);
+
+                    rig.BeginPhase(SpecItems.Deflate007DeflateTime);
+                    var (arriveLow, departAt) = await rig.DeflateSpanAsync(SpecItems.DeflateInflatePressure - DescentStartMargin,
+                        SpecItems.DeflateEndPressure, DescentObserveSeconds, token);
+                    var pLow = rig.WindowAverage();
+                    var productLow = await ReadProductPressureAsync(product, $"{SpecItems.DeflateEndPressure:0}mmHg 采样", token);
+
+                    OverpressureRunResult round;
+                    try
+                    {
+                        round = await run;
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        _log.Warn($"A18：{ex.Message}，t1 与 t2 都不报告（由收尾判 FAIL）");
+                        return;
+                    }
+                    if (double.IsNaN(arriveLow))
+                        _log.Warn($"{SpecItems.Deflate007DeflateTime}：{DescentObserveSeconds}s 内回读没降到 {SpecItems.DeflateEndPressure:0}mmHg" +
+                                  $"（段内最低 {Format(rig.PhaseMinimum())}、观察末 {Format(rig.LatestPressure())}），t2 的逐项耗时按观察末给");
+
+                    // 测试值=仪器上报的两段时长（单位 s 与列头一致），判定区间取配置页（气路测试）；该点仪器均值与产品 0x76 采样进子表行
+                    await collector.SetAsync(SpecItems.Deflate007InflateTime,
+                        AirPathTimeResult(round.InflateSeconds, SpecItems.DeflateInflatePressure, pHigh, productHigh,
+                            airPath.InflateTimeMin, airPath.InflateTimeMax, 30, arriveHigh));
+                    await collector.SetAsync(SpecItems.Deflate007DeflateTime,
+                        AirPathTimeResult(round.DeflateSeconds, SpecItems.DeflateEndPressure, pLow, productLow,
+                            airPath.DeflateTimeMin, airPath.DeflateTimeMax, 60, double.IsNaN(arriveLow) ? DescentObserveSeconds : arriveLow));
+
+                    var deflateRate = round.DeflateSeconds > 0
+                        ? (SpecItems.DeflateInflatePressure - SpecItems.DeflateEndPressure) / round.DeflateSeconds : double.NaN;
+                    _log.Info($"BP-007：t1={round.InflateSeconds:0.0}s（回读 {arriveHigh:0.0}s 时升到 {SpecItems.DeflateInflatePressure:0}，" +
+                              $"峰值={Format(round.PeakPressure)}）{SpecItems.DeflateInflatePressure:0} 点仪器={Format(pHigh)} 产品={Format(productHigh)}；" +
+                              $"t2={round.DeflateSeconds:0.0}s（回读 {departAt:0.0}s 起降、{arriveLow:0.0}s 降到 {SpecItems.DeflateEndPressure:0}，均速 {deflateRate:0.00}mmHg/s）" +
+                              $"{SpecItems.DeflateEndPressure:0} 点仪器={Format(pLow)} 产品={Format(productLow)}");
+                }
             }
             finally
             {
+                if (useKangwenda)
+                {
+                    try { await simulator.SetSlowValveAsync(false, CancellationToken.None); }
+                    catch (Exception ex) { _log.Warn($"A18：停止慢释阀失败：{ex.Message}"); }
+                }
                 await FinishAirPathAsync(product, simulator, rig, staticModeEntered, "A18");
             }
         }
@@ -126,12 +194,10 @@ namespace TORNPISolution.Service
         /// <summary>
         /// 气路泄露测试（A22）：先弹模态提示让测试员封堵泄气阀毛细气孔，点确定才开始流程。
         /// ① 关闭泄气阀（0x6B）+ 进入静态压力模式（0x73 mode=3）；
-        /// ② 仪器用静态压力序列一次下发 [50, 250]：低压段回读升到 50 后稳压 3s 读 P_L_start、再保压 5s 读 P_L_end，起止差=低压泄气量；
-        /// ③ 50 这点回读稳压后满 PointHoldSeconds 设备直接升到 250（点间不泄回零），高压段同样在升到 250 后 3s 读起点、再 5s 读终点，起止差=高压泄气量；两段都由仪器泵压驱动，没有硬泄压带来的过冲；
-        ///    每段仪器值取窗口末端 1s 采样均值、产品值走 0x76（与校准、静态压力精度检测同一条指令）。
+        /// ② BPA700：仪器用静态压力序列一次下发 [50, 250]（低压段在前，点间不泄回零直接切压）；康伟达：压力源充到 50 切压力表停保压，再从 50 直接升到 250 切压力表停保压（点间不泄回零）。
+        /// ③ 每段到点稳压 3s 读起点、再保压 5s 读终点，起止差=该段泄气量；每段仪器值取窗口末端 1s 采样均值、产品值走 0x76（与校准、静态压力精度检测同一条指令）。
         /// ④ 收尾结束本轮 + 退出静态压力模式 + 打开泄气阀（0x6A）+ 仪器泄放回零。
-        /// 起止四点只展示不判定；某段在 StageArriveSeconds 内没到点就读不出起止，该段及其后不报告，由收尾判 FAIL。
-        /// 仅 BPA700：点之间直接切压不泄回零只有 1.0.4.0-BETA 句柄版 SDK 的序列模式提供，康伟达未做验证。
+        /// 起止四点只展示不判定；某段在观察期内没到点就读不出起止，该段及其后不报告，由收尾判 FAIL。
         /// </summary>
         public async Task AirPathLeakModule(TestItemResultCollector collector, CancellationToken token)
         {
@@ -143,9 +209,10 @@ namespace TORNPISolution.Service
             const int StageArriveSeconds = 60; // 序列每个压力点的到点观察上限
 
             var config = _configService.Load();
-            if (config.ActiveSimulator != SimulatorType.BPA700)
+            var useKangwenda = config.ActiveSimulator == SimulatorType.Kangwenda;
+            if (config.ActiveSimulator != SimulatorType.BPA700 && !useKangwenda)
             {
-                _log.Error($"{ModuleName}跳过：气路类两项只按鲸扬 BPA700 的流程实现，康伟达未做验证");
+                _log.Error($"{ModuleName}跳过：当前模拟仪（{config.ActiveSimulator}）不在 BPA700/康伟达支持范围内");
                 return;
             }
 
@@ -159,36 +226,81 @@ namespace TORNPISolution.Service
             await PromptOperatorAsync(ModuleName,
                 "请用堵头封堵血压计泄气阀的毛细气孔，使气路完全封闭（压力传感器、阀、泵都接入气路），封堵完成后点「确定」开始测试。", token);
 
-            await using var lease = await _simSession.RentSequenceSdkAsync(token);
+            await using var lease = useKangwenda
+                ? await _simSession.RentAsync(token)
+                : await _simSession.RentSequenceSdkAsync(token);
             var simulator = lease.Simulator;
-            var inflation = config.ActiveBpTestParams.StaticPressure.BpaInflation;
-            var airPath = config.BPA700Simulator.TestParams.AirPath;
+            if (useKangwenda && simulator is not KangwendaNIBPSimulator)
+            {
+                _log.Error($"{ModuleName} 判 FAIL：租到的实例不是康伟达驱动（实际 {simulator.GetType().Name}）");
+                return;
+            }
+
+            double? lowLossMin, lowLossMax, highLossMin, highLossMax;
+            if (useKangwenda)
+            {
+                var ap = config.KangwendaSimulator.TestParams.KangwendaAirPath;
+                lowLossMin = ap.LowLossMin; lowLossMax = ap.LowLossMax;
+                highLossMin = ap.HighLossMin; highLossMax = ap.HighLossMax;
+            }
+            else
+            {
+                var ap = config.BPA700Simulator.TestParams.AirPath;
+                lowLossMin = ap.LowLossMin; lowLossMax = ap.LowLossMax;
+                highLossMin = ap.HighLossMin; highLossMax = ap.HighLossMax;
+            }
 
             var rig = new AirPathRig(simulator, _log, PressureSampled);
             var staticModeEntered = false;
             try
             {
                 await rig.StartAsync(token);
-                await simulator.SetFastValveAsync(false);
-                await simulator.SetSlowValveAsync(false);
+                if (useKangwenda)
+                {
+                    await simulator.SetSlowValveAsync(false, token);   // 兜底：停掉可能残留的泄放回路
+                }
+                else
+                {
+                    await simulator.SetFastValveAsync(false);
+                    await simulator.SetSlowValveAsync(false);
+                }
+
                 await product.SetVentValveAsync(false, token);
                 await product.SetTestModeAsync(3, ct: token);
                 staticModeEntered = true;
 
-                await simulator.StartStaticPressureSequenceAsync(
-                    new[] { SpecItems.LeakLowPressure, SpecItems.LeakHighPressure }, PointHoldSeconds, inflation, token);
-                _log.Info($"BP-010 升压段：{SpecItems.LeakLowPressure:0} 这点回读稳压后再保持 {PointHoldSeconds}s，到时设备直接升向 {SpecItems.LeakHighPressure:0}mmHg，期间请勿停止");
+                if (!useKangwenda)
+                {
+                    await simulator.StartStaticPressureSequenceAsync(
+                        new[] { SpecItems.LeakLowPressure, SpecItems.LeakHighPressure }, PointHoldSeconds,
+                        config.ActiveBpTestParams.StaticPressure.BpaInflation, token);
+                    _log.Info($"BP-010 升压段：{SpecItems.LeakLowPressure:0} 这点回读稳压后再保持 {PointHoldSeconds}s，到时设备直接升向 {SpecItems.LeakHighPressure:0}mmHg，期间请勿停止");
+                }
 
                 // 一段：回读升到点 -> 稳压满 3s 读起点 -> 再保压 5s 读终点；到点判定用采样回读（回调只在点状态变化时来一次，给不到时刻精度）
-                async Task<LeakStage?> RunStageAsync(double target, string curveItem)
+                async Task<LeakStage?> RunStageAsync(double target, string curveItem, bool fromCurrent)
                 {
                     rig.BeginPhase(curveItem);
-                    var crossed = await rig.ArrivalSecondsAsync(target, StageArriveSeconds, token);
-                    if (double.IsNaN(crossed))
+                    var tag = useKangwenda ? "A22" : "BP-010";
+                    if (useKangwenda)
                     {
-                        _log.Warn($"{target:0}mmHg 段：{StageArriveSeconds}s 内回读未升到 {target:0}mmHg" +
-                                  $"（观察末 {Format(rig.LatestPressure())}），该段起止值不报告（由收尾判 FAIL）");
-                        return null;
+                        // 康伟达：低压段从常压清场升压、高压段从当前残压直接升压（点间不泄回零）→ 切压力表停保压，泄气量开始体现在回读衰减上
+                        var kw = (KangwendaNIBPSimulator)simulator;
+                        if (fromCurrent)
+                            await kw.RaiseStaticPressureAsync(target, 5, token);
+                        else
+                            await simulator.SetStaticPressureAsync(target, 5, token);
+                        await kw.SendPressureTestAsync(2, 0, 0, 0, 0, token);
+                    }
+                    else
+                    {
+                        var crossed = await rig.ArrivalSecondsAsync(target, StageArriveSeconds, token);
+                        if (double.IsNaN(crossed))
+                        {
+                            _log.Warn($"{target:0}mmHg 段：{StageArriveSeconds}s 内回读未升到 {target:0}mmHg" +
+                                      $"（观察末 {Format(rig.LatestPressure())}），该段起止值不报告（由收尾判 FAIL）");
+                            return null;
+                        }
                     }
 
                     await Task.Delay(TimeSpan.FromSeconds(SettleSeconds), token);
@@ -199,26 +311,31 @@ namespace TORNPISolution.Service
                     var endInstrument = rig.WindowAverage();
                     var endProduct = await ReadProductPressureAsync(product, $"{target:0}mmHg 终点", token);
 
-                    _log.Info($"BP-010 {target:0}mmHg 段：起点 仪器={Format(startInstrument)} 产品={Format(startProduct)}，" +
+                    _log.Info($"{tag} {target:0}mmHg 段：起点 仪器={Format(startInstrument)} 产品={Format(startProduct)}，" +
                               $"终点 仪器={Format(endInstrument)} 产品={Format(endProduct)}");
                     return new LeakStage(Measured(startInstrument), Measured(startProduct),
                         Measured(endInstrument), Measured(endProduct));
                 }
 
-                var low = await RunStageAsync(SpecItems.LeakLowPressure, SpecItems.Leak010LowStart);
+                var low = await RunStageAsync(SpecItems.LeakLowPressure, SpecItems.Leak010LowStart, fromCurrent: false);
                 if (low == null) return;
                 await ReportLeakPointAsync(collector, SpecItems.Leak010LowStart, low.StartInstrument, low.StartProduct);
                 await ReportLeakPointAsync(collector, SpecItems.Leak010LowEnd, low.EndInstrument, low.EndProduct);
-                await ReportLeakLossAsync(collector, SpecItems.Leak010LowLoss, low, "低压", airPath.LowLossMin, airPath.LowLossMax);
+                await ReportLeakLossAsync(collector, SpecItems.Leak010LowLoss, low, "低压", lowLossMin, lowLossMax);
 
-                var high = await RunStageAsync(SpecItems.LeakHighPressure, SpecItems.Leak010HighStart);
+                var high = await RunStageAsync(SpecItems.LeakHighPressure, SpecItems.Leak010HighStart, fromCurrent: true);
                 if (high == null) return;
                 await ReportLeakPointAsync(collector, SpecItems.Leak010HighStart, high.StartInstrument, high.StartProduct);
                 await ReportLeakPointAsync(collector, SpecItems.Leak010HighEnd, high.EndInstrument, high.EndProduct);
-                await ReportLeakLossAsync(collector, SpecItems.Leak010HighLoss, high, "高压", airPath.HighLossMin, airPath.HighLossMax);
+                await ReportLeakLossAsync(collector, SpecItems.Leak010HighLoss, high, "高压", highLossMin, highLossMax);
             }
             finally
             {
+                if (useKangwenda)
+                {
+                    try { await simulator.SetSlowValveAsync(false, CancellationToken.None); }
+                    catch (Exception ex) { _log.Warn($"A22：停止慢释阀失败：{ex.Message}"); }
+                }
                 await FinishAirPathAsync(product, simulator, rig, staticModeEntered, "A22");
             }
         }
@@ -388,6 +505,10 @@ namespace TORNPISolution.Service
             private readonly object _lock = new();
             private string _item = string.Empty;
             private Stopwatch _watch = Stopwatch.StartNew();
+            /// <summary>起压阈值（mmHg）：有值时，压力升到该阈值之前的一律不画、不计时间轴（BP-003 点前的设备恢复/泄压平台）</summary>
+            private double? _startWhenAbove;
+            /// <summary>本段是否已开始计曲线（无阈值时 BeginPhase 即开始）</summary>
+            private bool _started = true;
 
             public AirPathRig(IBloodPressureSimulator simulator, ILogService log, Action<string, PressureSamplePoint>? sink)
             {
@@ -412,10 +533,17 @@ namespace TORNPISolution.Service
             }
 
             /// <summary>换到下一段：曲线改挂到本段项名，时间轴与读值窗口重新开始</summary>
-            public void BeginPhase(string itemName)
+            /// <param name="startWhenAbove">起压阈值（mmHg）：压力升到该值才把时间轴归零并开始画，
+            /// 用于 BP-003 这类"点前还有一段设备恢复/泄压平台"的曲线（平台段既占时间轴、又把升压段压扁）；null=立即开始（A18/A22 原行为）</param>
+            public void BeginPhase(string itemName, double? startWhenAbove = null)
             {
                 _item = itemName;
-                lock (_lock) _samples.Clear();
+                lock (_lock)
+                {
+                    _samples.Clear();
+                    _startWhenAbove = startWhenAbove;
+                    _started = startWhenAbove == null;
+                }
                 _watch = Stopwatch.StartNew();
             }
 
@@ -518,8 +646,19 @@ namespace TORNPISolution.Service
 
             private void OnSample(double pressure)
             {
-                var at = _watch.Elapsed.TotalSeconds;
-                lock (_lock) _samples.Add((at, pressure));
+                double at;
+                lock (_lock)
+                {
+                    if (!_started)
+                    {
+                        // 起压前（设备恢复/泄压平台）：不画、不计时；等一次越过阈值才把 0s 定在起压点
+                        if (pressure < _startWhenAbove) return;
+                        _started = true;
+                        _watch.Restart();
+                    }
+                    at = _watch.Elapsed.TotalSeconds;
+                    _samples.Add((at, pressure));
+                }
                 if (_item.Length > 0) _sink?.Invoke(_item, new PressureSamplePoint(at, pressure));
             }
         }
